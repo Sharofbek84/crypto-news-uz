@@ -1,0 +1,62 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0b0e11;
+  color: #eaecef;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+a { color: #f0b90b; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+.header {
+  background: #12161c;
+  border-bottom: 1px solid #1e2329;
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.logo { font-size: 1.35rem; font-weight: 700; color: #f0b90b; }
+.logo span { color: #eaecef; }
+.prices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin: 20px 0 32px;
+}
+.card {
+  background: #12161c;
+  border: 1px solid #1e2329;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card img { width: 32px; height: 32px; border-radius: 50%; }
+.card h3 { font-size: 0.9rem; }
+.card .sym { font-size: 0.7rem; color: #848e9c; text-transform: uppercase; }
+.card .right { margin-left: auto; text-align: right; }
+.card .price { font-weight: 600; }
+.up { color: #0ecb81; font-size: 0.8rem; }
+.down { color: #f6465d; font-size: 0.8rem; }
+.section { font-size: 1.2rem; margin: 28px 0 14px; border-bottom: 1px solid #1e2329; padding-bottom: 6px; }
+.news { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+.item {
+  background: #12161c;
+  border: 1px solid #1e2329;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.item h3 { font-size: 1rem; margin-bottom: 4px; }
+.item h3 a { color: #eaecef; }
+.item h3 a:hover { color: #f0b90b; }
+.meta { font-size: 0.75rem; color: #848e9c; }
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: #848e9c;
+  font-size: 0.8rem;
+  border-top: 1px solid #1e2329;
+}
