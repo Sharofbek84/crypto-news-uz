@@ -1,3 +1,5 @@
+import newsData from '../data/news.json'
+
 async function getPrices() {
   try {
     const res = await fetch(
@@ -15,53 +17,6 @@ async function getPrices() {
   }
 }
 
-async function getNews() {
-  // Fallback yangiliklar (API bo'sh bo'lsa ham ishlaydi)
-  const fallback = [
-    {
-      title: 'Bitcoin bozori faol — eng so\'nggi tendensiyalar',
-      url: 'https://www.coindesk.com',
-      source: 'CoinDesk',
-    },
-    {
-      title: 'Ethereum yangilanishlari va Layer-2 rivoji',
-      url: 'https://cointelegraph.com',
-      source: 'CoinTelegraph',
-    },
-    {
-      title: 'Solana ekotizimi o\'smoqda',
-      url: 'https://www.theblock.co',
-      source: 'The Block',
-    },
-    {
-      title: 'Kripto bozorida institutsional investitsiyalar',
-      url: 'https://decrypt.co',
-      source: 'Decrypt',
-    },
-    {
-      title: 'Stablecoinlar va DeFi yangiliklari',
-      url: 'https://www.thedefiant.io',
-      source: 'The Defiant',
-    },
-  ]
-
-  try {
-    const res = await fetch('https://cryptocurrency.cv/api/news?limit=10', {
-      next: { revalidate: 300 },
-      headers: { Accept: 'application/json' },
-    })
-    if (!res.ok) return fallback
-    const data = await res.json()
-    const articles = data.articles || data || []
-    if (Array.isArray(articles) && articles.length > 0) {
-      return articles
-    }
-    return fallback
-  } catch {
-    return fallback
-  }
-}
-
 function fmt(p: number) {
   if (p == null || isNaN(p)) return '—'
   if (p >= 1000) return '$' + p.toLocaleString('en-US', { maximumFractionDigits: 0 })
@@ -70,7 +25,8 @@ function fmt(p: number) {
 }
 
 export default async function Home() {
-  const [prices, news] = await Promise.all([getPrices(), getNews()])
+  const prices = await getPrices()
+  const news = Array.isArray(newsData) ? newsData : []
 
   return (
     <>
@@ -123,21 +79,22 @@ export default async function Home() {
           </div>
         )}
 
-        <h2 className="section">Songgi Yangiliklar</h2>
+        <h2 className="section">So‘nggi Yangiliklar</h2>
         <div className="news">
-          {(Array.isArray(news) ? news : []).slice(0, 10).map((item: any, i: number) => (
+          {news.map((item: any, i: number) => (
             <article key={i} className="item">
               <h3>
                 <a
-                  href={item.url || item.link || '#'}
+                  href={item.url || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {item.title || 'Yangilik'}
+                  {item.title}
                 </a>
               </h3>
               <div className="meta">
-                {item.source?.name || item.source || 'Crypto'}
+                {item.source || 'Crypto News UZ'}
+                {item.date ? ` • ${item.date}` : ''}
               </div>
             </article>
           ))}
@@ -145,7 +102,7 @@ export default async function Home() {
       </main>
 
       <footer className="footer">
-        Crypto News UZ • CoinGecko + ochiq manbalar •{' '}
+        Crypto News UZ • CoinGecko + o‘zbekcha yangiliklar •{' '}
         {new Date().getFullYear()}
       </footer>
     </>
