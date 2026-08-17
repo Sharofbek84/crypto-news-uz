@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number}
 type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
@@ -12,6 +12,7 @@ function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=
 function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.map((x,i)=>{if(i)a=x.close*k+a*(1-k);return a})}
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
+  const [zoom,setZoom]=useState(1)
   const W=1500,H=780,L=62,R=145,T=48,MB=520,RT=565,RB=700
   const min=Math.min(...candles.map(c=>c.low),result.invalidation,result.entryLow)*.998
   const max=Math.max(...candles.map(c=>c.high),...result.tp)*1.002
@@ -23,7 +24,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   const latest=candles[candles.length-1]?.close||0, lx=x(candles.length-1), fw=Math.min(W-R,lx+150)
   const cw=Math.max(3,Math.min(11,(W-L-R)/candles.length*.7))
   const label=(yy:number,text:string,fill:string)=> <g><line x1={L} x2={W-R} y1={yy} y2={yy} stroke={fill} strokeWidth="1.6" strokeDasharray="9 7"/><rect x={W-R+8} y={yy-15} width="125" height="30" rx="5" fill={fill}/><text x={W-R+70} y={yy+5} textAnchor="middle" fill="#fff" fontSize="14" fontWeight="800">{text}</text></g>
-  return <div className="homeChartWrap"><svg viewBox={`0 0 ${W} ${H}`} className="homeChart" role="img" aria-label={`${coin} ${interval} professional technical analysis`}>
+  return <div className="homeChartWrap"><div className="chartZoomControls"><button onClick={()=>setZoom(z=>Math.min(1.8,+(z+0.2).toFixed(1)))}>＋</button><span>{Math.round(zoom*100)}%</span><button onClick={()=>setZoom(z=>Math.max(1,+(z-0.2).toFixed(1)))}>−</button><button onClick={()=>setZoom(1)}>Reset</button></div><div className="homeChartScroller"><svg viewBox={`0 0 ${W} ${H}`} className="homeChart" style={{width:`${zoom*100}%`,maxWidth:'none'}} role="img" aria-label={`${coin} ${interval} professional technical analysis`}>
     <defs><linearGradient id="hcMain" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0b1420"/><stop offset="1" stopColor="#081019"/></linearGradient><marker id="hcBull" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#20d67a"/></marker></defs>
     <rect width={W} height={H} fill="url(#hcMain)"/><rect x="0" y={RT-18} width={W} height={RB-RT+40} fill="#111326"/>
     {[0,.2,.4,.6,.8,1].map(v=><line key={v} x1={L} x2={W-R} y1={T+v*(MB-T)} y2={T+v*(MB-T)} stroke="#1c2a38"/>)}
@@ -42,11 +43,11 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
     <path d={`M${lx},${y(latest)-5} C${lx+45},${y(latest)-40} ${fw-40},${y(result.tp[0]||latest)+30} ${fw},${y(result.tp[0]||latest)}`} fill="none" stroke="#20d67a" strokeWidth="2" strokeDasharray="8 6" markerEnd="url(#hcBull)"/>
     <text x={L} y={RT+4} fill="#e6edf3" fontSize="16" fontWeight="800">RSI (14) · {result.rsi.toFixed(2)}</text><polyline points={rs.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2.2"/>
     <text x={W-R-8} y={ry(70)-6} textAnchor="end" fill="#8c98a6" fontSize="12">70</text><text x={W-R-8} y={ry(50)-6} textAnchor="end" fill="#8c98a6" fontSize="12">50</text><text x={W-R-8} y={ry(30)-6} textAnchor="end" fill="#8c98a6" fontSize="12">30</text>
-  </svg></div>
+  </svg></div></div>
 }
 
 export default function HomeAnalyst(){
-  const [coin,setCoin]=useState('BTC'),[interval,setInterval]=useState('4h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
+  const [coin,setCoin]=useState('BTC'),[interval,setInterval]=useState('1h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
   async function load(){setLoading(true);setError('');try{const r=await fetch(`/api/analyze?symbol=${coin}&interval=${interval}`);const j=await r.json();if(!r.ok)throw new Error(j.error||'Market data xatosi');setData(j)}catch(e:any){setError(e.message||'Xato')}finally{setLoading(false)}}
   useEffect(()=>{load()},[coin,interval])
   const r=data?.result
