@@ -64,7 +64,6 @@ async function fetchMarketData(symbol: string, interval: string) {
   try { return { candles: await fetchKraken(symbol, interval), provider: 'Kraken' } }
   catch (e: any) { errors.push(e?.message || 'Kraken error') }
 
-  // Binance is intentionally the last fallback. Some server regions return HTTP 451.
   const binanceSymbol = ALIASES[symbol] || `${symbol}USDT`
   const url = `https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(binanceSymbol)}&interval=${encodeURIComponent(interval)}&limit=150`
   try {
@@ -85,11 +84,11 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams
   const raw = (q.get('symbol') || 'BTC').toUpperCase()
   const symbol = raw.replace(/[^A-Z0-9]/g, '')
-  const interval = ['1h', '4h', '1d'].includes(q.get('interval') || '') ? (q.get('interval') as string) : '4h'
+  const interval = ['1h', '4h', '1d'].includes(q.get('interval') || '') ? (q.get('interval') as string) : '1h'
 
   try {
     const { candles, provider } = await fetchMarketData(symbol, interval)
-    const result = analyze(candles)
+    const result = analyze(candles, interval)
     return NextResponse.json({ symbol, interval, provider, candles, result, generatedAt: new Date().toISOString() })
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || 'Market data serveriga ulanib bo‘lmadi.' }, { status: 502 })
