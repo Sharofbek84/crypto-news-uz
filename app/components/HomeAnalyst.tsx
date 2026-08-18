@@ -14,10 +14,10 @@ function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
   const [zoom,setZoom]=useState(1)
-  // Candles use ~86% of plot width → gap is half of previous (was 28%, now ~14%)
+  // Candles use ~93% of plot width → gap halved again (~7%)
   const W=1700,H=820,L=68,R=210,T=78,MB=540,RT=580,RB=740
   const plotRight=W-R
-  const candleRight=L+(plotRight-L)*0.86
+  const candleRight=L+(plotRight-L)*0.93
   const min=Math.min(...candles.map(c=>c.low),result.invalidation,result.entryLow)*.997
   const max=Math.max(...candles.map(c=>c.high),...result.tp)*1.003
   const x=(i:number)=>L+i*(candleRight-L)/Math.max(1,candles.length-1)
