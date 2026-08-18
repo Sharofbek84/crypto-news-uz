@@ -43,7 +43,14 @@ function Chart({candles,result,coin,interval}:{candles:Candle[];result:Result;co
   const bullishY=y(result.tp[0]||latest*1.02), bearishY=y(result.invalidation)
   const labelX=plotRight+78
   const labelCenter=labelX+44
-  const level=(value:number,label:string,stroke:string,fill:string,dash='8 7')=><g><line x1={left} x2={plotRight} y1={y(value)} y2={y(value)} stroke={stroke} strokeDasharray={dash} strokeWidth="1.8"/><rect x={labelX} y={y(value)-14} width="88" height="28" rx="5" fill={fill}/><text x={labelCenter} y={y(value)+5} textAnchor="middle" fill="white" fontSize="13" fontWeight="800">{label}</text><text x={W-8} y={y(value)+5} textAnchor="end" fill={stroke} fontSize="12" fontWeight="700">{money(value)}</text></g>
+  const level=(value:number,label:string,stroke:string,fill:string,dash='8 7') => (
+    <g>
+      <line x1={left} x2={plotRight} y1={y(value)} y2={y(value)} stroke={stroke} strokeDasharray={dash} strokeWidth="1.8"/>
+      <rect x={labelX} y={y(value)-14} width="88" height="28" rx="5" fill={fill}/>
+      <text x={labelCenter} y={y(value)+5} textAnchor="middle" fill="white" fontSize="13" fontWeight="800">{label}</text>
+      <text x={W-8} y={y(value)+5} textAnchor="end" fill={stroke} fontSize="12" fontWeight="700">{money(value)}</text>
+    </g>
+  )
   return <div className="chartWrap">
     <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label={`${coin} ${interval} texnik tahlil grafigi`}>
       <defs>
