@@ -98,12 +98,17 @@ export default async function Home() {
           </div>
         )}
 
-        <h2 className="section">So‘nggi Yangiliklar</h2>
+        <div className="sectionRow">
+          <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>So‘nggi Yangiliklar</h2>
+          <Link href="/yangiliklar" className="sectionMore">Barchasi →</Link>
+        </div>
         <div className="news">
-          {news.map((item: any, i: number) => (
-            <article key={i} className="item">
+          {news.map((item: any) => (
+            <article key={item.slug || item.title} className="item">
               <h3>
-                <a href={item.url || '#'} target="_blank" rel="noopener noreferrer">{item.title}</a>
+                <Link href={item.slug ? `/yangiliklar/${item.slug}` : '/yangiliklar'}>
+                  {item.title}
+                </Link>
               </h3>
               <div className="meta">
                 {item.source || 'Crypto Tahlil UZ'}
