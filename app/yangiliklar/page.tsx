@@ -24,10 +24,7 @@ export default function YangiliklarPage() {
       <header className="header">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Link href="/" className="logo">GOLDENWEB<span>.UZ</span></Link>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-            <Link href="/" style={{ color: '#9aa7b8', fontSize: '.9rem', fontWeight: 600 }}>← Bosh sahifa</Link>
-            <Link href="/obuna" className="headerCta">Obuna bo‘lish</Link>
-          </div>
+          <Link href="/" style={{ color: '#9aa7b8', fontSize: '.9rem', fontWeight: 600 }}>← Bosh sahifa</Link>
         </div>
       </header>
 
