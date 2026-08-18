@@ -1,4 +1,4 @@
-# Crypto News UZ
+# GOLDENWEB.UZ
 
 Oddiy Next.js kripto yangiliklar va jonli narxlar sayti.
 
