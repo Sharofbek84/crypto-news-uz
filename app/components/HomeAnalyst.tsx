@@ -131,7 +131,7 @@ export default function HomeAnalyst(){
       <div>
         <div className="homeKicker">🤖 AI CRYPTO ANALYST</div>
         <h2>Professional TradingView tahlili</h2>
-        <p>Jonli market data asosida avtomatik Entry · TP1 · TP2 · TP3 · SL va texnik xulosa. Har bir timeframe alohida tahlil qilinadi.</p>
+        <p>Jonli market data asosida avtomatik Entry · TP1 · TP2 · TP3 · SL va texnik xulosa.</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
