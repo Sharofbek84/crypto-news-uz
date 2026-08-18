@@ -20,9 +20,9 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
   const item = news.find((n) => n.slug === params.slug)
-  if (!item) return { title: 'Yangilik topilmadi | Crypto Tahlil UZ' }
+  if (!item) return { title: 'Yangilik topilmadi | GOLDENWEB.UZ' }
   return {
-    title: `${item.title} | Crypto Tahlil UZ`,
+    title: `${item.title} | GOLDENWEB.UZ`,
     description: item.summary || item.title,
   }
 }
@@ -37,7 +37,7 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
     <>
       <header className="header">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" className="logo">Crypto <span>Tahlil</span> UZ</Link>
+          <Link href="/" className="logo">GOLDENWEB<span>.UZ</span></Link>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
             <Link href="/yangiliklar" style={{ color: '#9aa7b8', fontSize: '.9rem', fontWeight: 600 }}>← Yangiliklar</Link>
             <Link href="/obuna" className="headerCta">Obuna bo‘lish</Link>
@@ -48,7 +48,7 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
       <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
         <article className="articlePage">
           <div className="articleMeta">
-            <span>{item.source || 'Crypto Tahlil UZ'}</span>
+            <span>{item.source || 'GOLDENWEB.UZ'}</span>
             {item.date ? <span>• {item.date}</span> : null}
           </div>
           <h1>{item.title}</h1>
@@ -77,7 +77,7 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
       </main>
 
       <footer className="footer">
-        Crypto Tahlil UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
+        GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
       </footer>
     </>
   )
