@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import HomeAnalyst from './components/HomeAnalyst'
 import newsData from '../data/news.json'
 
@@ -14,9 +13,60 @@ function fmt(p:number){if(p==null||isNaN(p))return '—';if(p>=1000)return '$'+p
 export default async function Home(){
   const prices=await getPrices(),news=Array.isArray(newsData)?newsData:[]
   return <>
-    <header className="header"><div className="container" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><div className="logo">Crypto <span>Tahlil</span> UZ</div><Link href="/analyst" style={{fontWeight:700}}>To‘liq AI Analyst →</Link></div></header>
+    <header className="header"><div className="container" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><div className="logo">Crypto <span>Tahlil</span> UZ</div><a href="#obuna" className="headerCta">Obuna bo‘lish</a></div></header>
     <main className="container">
       <HomeAnalyst />
+
+      <section id="obuna" className="subscribeSection">
+        <div className="subscribeHead">
+          <div className="subscribeKicker">💎 PREMIUM</div>
+          <h2>Obuna bo‘lish</h2>
+          <p>Tez orada pullik obuna orqali kengaytirilgan tahlillar, signal va maxsus hisobotlarga kirish ochiladi.</p>
+        </div>
+
+        <div className="planGrid">
+          <div className="planCard">
+            <div className="planName">Bepul</div>
+            <div className="planPrice">$0<span>/oy</span></div>
+            <ul>
+              <li>Asosiy texnik tahlil</li>
+              <li>Entry · TP · SL darajalari</li>
+              <li>Kripto yangiliklari</li>
+            </ul>
+            <button className="planBtn muted" disabled>Hozir faol</button>
+          </div>
+
+          <div className="planCard featured">
+            <div className="planBadge">Tez orada</div>
+            <div className="planName">Pro</div>
+            <div className="planPrice">$9<span>/oy</span></div>
+            <ul>
+              <li>Kengaytirilgan AI tahlil</li>
+              <li>Ko‘p juftlik signalari</li>
+              <li>Kunlik hisobot</li>
+              <li>Prioritet yangilanishlar</li>
+            </ul>
+            <button className="planBtn" disabled>Tez orada</button>
+          </div>
+
+          <div className="planCard">
+            <div className="planName">Elite</div>
+            <div className="planPrice">$29<span>/oy</span></div>
+            <ul>
+              <li>Barcha Pro imkoniyatlar</li>
+              <li>Shaxsiy signal kanali</li>
+              <li>Haftalik chuqur tahlil</li>
+              <li>VIP qo‘llab-quvvatlash</li>
+            </ul>
+            <button className="planBtn" disabled>Tez orada</button>
+          </div>
+        </div>
+
+        <div className="subscribeNote">
+          To‘lov tizimi (Stripe / Payme / Click) keyinchalik ulanadi. Hozircha reja va narxlar namuna sifatida ko‘rsatilgan.
+        </div>
+      </section>
+
       <h2 className="section">Top Kriptovalyutalar</h2>
       {prices.length===0?<p style={{color:'#848e9c',marginBottom:24}}>Narxlar vaqtincha yuklanmadi. Keyinroq yangilang.</p>:<div className="prices">{prices.map((c:any)=><div key={c.id} className="card"><img src={c.image} alt={c.name} width={32} height={32}/><div><h3>{c.name}</h3><div className="sym">{c.symbol}</div></div><div className="right"><div className="price">{fmt(c.current_price)}</div><div className={(c.price_change_percentage_24h??0)>=0?'up':'down'}>{(c.price_change_percentage_24h??0)>=0?'+':''}{(c.price_change_percentage_24h??0).toFixed(2)}%</div></div></div>)}</div>}
       <h2 className="section">So‘nggi Yangiliklar</h2>
