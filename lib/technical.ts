@@ -43,7 +43,13 @@ function fmt(n: number) {
   return n.toFixed(5)
 }
 
-export function analyze(candles: Candle[]): TechnicalResult {
+function tfLabel(interval?: string) {
+  if (interval === '1d') return 'D1'
+  if (interval === '4h') return 'H4'
+  return 'H1'
+}
+
+export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
   const closes = candles.map(c => c.close)
   const last = closes.at(-1) ?? 0
   const e10 = ema(closes, 10), e20 = ema(closes, 20), e50 = ema(closes, 50)
@@ -62,18 +68,18 @@ export function analyze(candles: Candle[]): TechnicalResult {
   const entryHigh = last
   const invalidation = s - range * 0.2
   const tp = [last + range, last + range * 2, last + range * 3]
+  const tf = tfLabel(interval)
 
-  // Qisqa tahliliy xulosa (texnik ko'rsatkichlar ro'yxati emas)
+  // Har bir timeframe uchun alohida hisoblangan qisqa xulosa
   let summary: string
   if (trend === 'BULLISH') {
-    summary = `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
+    summary = `${tf}: Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
   } else if (trend === 'BEARISH') {
-    summary = `Narx ${fmt(entryHigh)} atrofida bosim ostida. ${fmt(invalidation)} pastga yopilsa, pasayish davom etishi mumkin. ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida qayta ushlansa, rebound kutiladi.`
+    summary = `${tf}: Narx ${fmt(entryHigh)} atrofida bosim ostida. ${fmt(invalidation)} pastga yopilsa, pasayish davom etishi mumkin. ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida qayta ushlansa, rebound kutiladi.`
   } else {
-    summary = `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona atrofida neytral. Ushbu zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli bor. ${fmt(invalidation)} pastga buzilsa, pasayish davom etishi mumkin.`
+    summary = `${tf}: Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona atrofida neytral. Ushbu zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli bor. ${fmt(invalidation)} pastga buzilsa, pasayish davom etishi mumkin.`
   }
 
-  // Oldingi uslubdagi bullish / bearish ssenariylar
   const bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(rr)} gacha rebound/breakout ssenariysi kuzatiladi.`
   const bearish = `EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(s)} support zonasini qayta test qilish xavfini oshiradi.`
 
