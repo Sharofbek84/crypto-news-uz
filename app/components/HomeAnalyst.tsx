@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number}
 type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
@@ -120,7 +121,15 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 }
 
 export default function HomeAnalyst(){
-  const [coin,setCoin]=useState('BTC'),[interval,setInterval]=useState('1h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
+  const searchParams=useSearchParams()
+  const urlSymbol=(searchParams.get('symbol')||'').toUpperCase()
+  const initial=coins.includes(urlSymbol)?urlSymbol:'BTC'
+  const [coin,setCoin]=useState(initial),[interval,setInterval]=useState('1h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
+
+  useEffect(()=>{
+    if(coins.includes(urlSymbol) && urlSymbol!==coin) setCoin(urlSymbol)
+  },[urlSymbol])
+
   async function load(){setLoading(true);setError('');try{const r=await fetch(`/api/analyze?symbol=${coin}&interval=${interval}`);const j=await r.json();if(!r.ok)throw new Error(j.error||'Market data xatosi');setData(j)}catch(e:any){setError(e.message||'Xato')}finally{setLoading(false)}}
   useEffect(()=>{load()},[coin,interval])
   const r=data?.result
