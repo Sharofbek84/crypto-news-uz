@@ -53,7 +53,7 @@ export default async function Home() {
     <>
       <header className="header">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="logo">Crypto <span>Tahlil</span> UZ</div>
+          <div className="logo">GOLDENWEB<span>.UZ</span></div>
           <Link href="/obuna" className="headerCta">Obuna bo‘lish</Link>
         </div>
       </header>
@@ -111,7 +111,7 @@ export default async function Home() {
                 </Link>
               </h3>
               <div className="meta">
-                {item.source || 'Crypto Tahlil UZ'}
+                {item.source || 'GOLDENWEB.UZ'}
                 {item.date ? ` • ${item.date}` : ''}
               </div>
             </article>
@@ -120,7 +120,7 @@ export default async function Home() {
       </main>
 
       <footer className="footer">
-        Crypto Tahlil UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
+        GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
       </footer>
     </>
   )
