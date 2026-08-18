@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Crypto Tahlil UZ',
+  title: 'GOLDENWEB.UZ',
   description: 'AI yordamida kriptovalyuta texnik tahlili va kripto yangiliklari',
 }
 
