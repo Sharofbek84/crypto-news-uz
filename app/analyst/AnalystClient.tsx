@@ -69,7 +69,7 @@ function Chart({candles,result,coin,interval}:{candles:Candle[];result:Result;co
       <line x1={latestX} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#55d6ff" strokeDasharray="3 5"/>
       <rect x={labelX} y={y(latest)-15} width="88" height="30" rx="5" fill="#20a85a"/><text x={labelCenter} y={y(latest)+5} textAnchor="middle" fill="white" fontSize="14" fontWeight="800">{money(latest)}</text>
       {level(result.entryLow,'ENTRY','#ffd43b','#7a5b00','6 5')}
-      {result.entryHigh!==result.entryLow && <level(result.entryHigh,'ENTRY','#ffd43b','#7a5b00','6 5')}
+      {result.entryHigh!==result.entryLow && level(result.entryHigh,'ENTRY','#ffd43b','#7a5b00','6 5')}
       {result.tp.slice(0,3).map((v,i)=>level(v,`TP${i+1}`,'#23d18b','#116b4b','8 7'))}
       {level(result.invalidation,'SL','#ff4d5a','#8f202a','8 7')}
       <text x={left} y={rsiTop+4} fill="#e6edf3" fontSize="16" fontWeight="800">RSI (14) = {result.rsi.toFixed(2)}</text>
