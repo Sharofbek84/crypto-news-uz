@@ -2,18 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
 
 const ALIASES: Record<string, string> = {
-  BTC: 'BTCUSDT', ETH: 'ETHUSDT', SOL: 'SOLUSDT', APT: 'APTUSDT', SUI: 'SUIUSDT',
-  XRP: 'XRPUSDT', BNB: 'BNBUSDT', CORE: 'COREUSDT', MYX: 'MYXUSDT', ALEO: 'ALEOUSDT'
+  BTC: 'BTCUSDT', ETH: 'ETHUSDT', LTC: 'LTCUSDT', SOL: 'SOLUSDT', BNB: 'BNBUSDT',
+  NEAR: 'NEARUSDT', GRAM: 'GRAMUSDT', SUI: 'SUIUSDT', APT: 'APTUSDT', ATOM: 'ATOMUSDT'
 }
 
 const COINBASE_PRODUCTS: Record<string, string> = {
-  BTC: 'BTC-USD', ETH: 'ETH-USD', SOL: 'SOL-USD', APT: 'APT-USD', SUI: 'SUI-USD',
-  XRP: 'XRP-USD', BNB: 'BNB-USD', CORE: 'CORE-USD', ALEO: 'ALEO-USD', MYX: 'MYX-USD'
+  BTC: 'BTC-USD', ETH: 'ETH-USD', LTC: 'LTC-USD', SOL: 'SOL-USD', BNB: 'BNB-USD',
+  NEAR: 'NEAR-USD', GRAM: 'GRAM-USD', SUI: 'SUI-USD', APT: 'APT-USD', ATOM: 'ATOM-USD'
 }
 
 const KRAKEN_PAIRS: Record<string, string> = {
-  BTC: 'XBTUSD', ETH: 'ETHUSD', SOL: 'SOLUSD', APT: 'APTUSD', SUI: 'SUIUSD',
-  XRP: 'XRPUSD', BNB: 'BNBUSD', CORE: 'COREUSD', ALEO: 'ALEOUSD', MYX: 'MYXUSD'
+  BTC: 'XBTUSD', ETH: 'ETHUSD', LTC: 'LTCUSD', SOL: 'SOLUSD', BNB: 'BNBUSD',
+  NEAR: 'NEARUSD', GRAM: 'TONUSD', SUI: 'SUIUSD', APT: 'APTUSD', ATOM: 'ATOMUSD'
 }
 
 function intervalConfig(interval: string) {
