@@ -76,7 +76,7 @@ export default function AnalystClient(){
   const r=data?.result
   return <div className="analystPage">
     <div className="analystHeader">
-      <div><div className="brand">Crypto <b>Tahlil</b> UZ</div><h1>AI Analyst</h1><p>Texnik tahlil · Entry · TP · SL</p></div>
+      <div><div className="brand">GOLDENWEB<b>.UZ</b></div><h1>AI Analyst</h1><p>Texnik tahlil · Entry · TP · SL</p></div>
       <div className="controls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
         <select value={interval} onChange={e=>setInterval(e.target.value)}>{intervals.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select>
