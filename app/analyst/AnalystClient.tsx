@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number}
 type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
 
-const coins=['BTC','ETH','SOL','SUI','APT','XRP','BNB','CORE','MYX','ALEO']
+const coins=['BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM']
 const intervals=[['1h','H1'],['4h','H4'],['1d','D1']]
 
 function money(n:number){if(n>=1000)return '$'+n.toLocaleString('en-US',{maximumFractionDigits:0});if(n>=1)return '$'+n.toFixed(2);return '$'+n.toFixed(5)}
@@ -28,59 +28,45 @@ function Chart({candles,result,coin,interval}:{candles:Candle[];result:Result;co
   const highs=candles.map(c=>c.high), lows=candles.map(c=>c.low)
   const tradeLevels=[result.entryLow,result.entryHigh,result.invalidation,...result.tp.slice(0,3)].filter(Number.isFinite)
   const rawMin=Math.min(...lows,...tradeLevels),rawMax=Math.max(...highs,...tradeLevels),pad=(rawMax-rawMin)*.09
-  const min=rawMin-pad,max=rawMax+pad
-  const x=(i:number)=>left+i*(plotWidth/(Math.max(1,candles.length-1)))
-  const y=(v:number)=>mainBottom-(v-min)/(max-min)*(mainBottom-top)
-  const ry=(v:number)=>rsiBottom-(Math.max(0,Math.min(100,v))/100)*(rsiBottom-rsiTop)
-  const ema=(period:number)=>{let a=candles[0]?.close||0,k=2/(period+1);return candles.map((c,i)=>{if(i>0)a=c.close*k+a*(1-k);return `${x(i)},${y(a)}`}).join(' ')}
-  const rsis=rsiSeries(candles)
-  const rsiPoints=rsis.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')
-  const latest=candles[candles.length-1]?.close||0
-  const latestX=x(candles.length-1)
-  const candleW=Math.max(3,Math.min(12,plotWidth/candles.length*.72))
-  const fmtTime=(t:number)=>new Date(t).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
-  const xFuture=Math.min(plotRight,latestX+120)
-  const bullishY=y(result.tp[0]||latest*1.02), bearishY=y(result.invalidation)
-  const labelX=plotRight+78
-  const labelCenter=labelX+44
-  const level=(value:number,label:string,stroke:string,fill:string,dash='8 7') => (
-    <g>
-      <line x1={left} x2={plotRight} y1={y(value)} y2={y(value)} stroke={stroke} strokeDasharray={dash} strokeWidth="1.8"/>
-      <rect x={labelX} y={y(value)-14} width="88" height="28" rx="5" fill={fill}/>
-      <text x={labelCenter} y={y(value)+5} textAnchor="middle" fill="white" fontSize="13" fontWeight="800">{label}</text>
-      <text x={W-8} y={y(value)+5} textAnchor="end" fill={stroke} fontSize="12" fontWeight="700">{money(value)}</text>
+  const min=rawMin-pad, max=rawMax+pad
+  const x=(i:number)=>left+i*plotWidth/Math.max(1,candles.length-1)
+  const y=(v:number)=>mainBottom-((v-min)/(max-min))*(mainBottom-top)
+  const ry=(v:number)=>rsiBottom-((Math.max(0,Math.min(100,v))/100)*(rsiBottom-rsiTop))
+  const ema=(period:number)=>{let a=candles[0]?.close||0,k=2/(period+1);return candles.map((c,i)=>{if(i)a=c.close*k+a*(1-k);return a})}
+  const e10=ema(10),e20=ema(20),e50=ema(50),rs=rsiSeries(candles)
+  const poly=(arr:number[])=>arr.map((v,i)=>`${x(i)},${y(v)}`).join(' ')
+  const last=candles[candles.length-1]?.close||0
+  const lx=x(candles.length-1)
+  const cw=Math.max(2,Math.min(10,plotWidth/candles.length*.65))
+  const level=(price:number,label:string,color:string,bg:string,dash='6 5')=>(
+    <g key={label}>
+      <line x1={left} x2={plotRight} y1={y(price)} y2={y(price)} stroke={color} strokeWidth={1.5} strokeDasharray={dash}/>
+      <rect x={plotRight+8} y={y(price)-12} width={right-16} height={24} rx={4} fill={bg}/>
+      <text x={plotRight+(right/2)} y={y(price)+5} textAnchor="middle" fill="#fff" fontSize={11} fontWeight={700}>{label} {money(price)}</text>
     </g>
   )
-  return <div className="chartWrap">
-    <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label={`${coin} ${interval} texnik tahlil grafigi`}>
-      <defs>
-        <marker id="bullArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#23d18b"/></marker>
-        <marker id="bearArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ff4d5a"/></marker>
-      </defs>
-      <rect width={W} height={H} fill="#080d15"/>
-      <rect x="0" y="0" width={W} height={mainBottom+18} fill="#0b111b"/>
-      <rect x="0" y={rsiTop-18} width={W} height={rsiBottom-rsiTop+45} fill="#111326"/>
-      {[0,.25,.5,.75,1].map(t=><line key={t} x1={left} x2={plotRight} y1={top+t*(mainBottom-top)} y2={top+t*(mainBottom-top)} stroke="#1d2734" strokeWidth="1"/>)}
-      {[30,50,70].map(v=><line key={v} x1={left} x2={plotRight} y1={ry(v)} y2={ry(v)} stroke="#4b5563" strokeDasharray="5 6" strokeWidth="1"/>)}
-      <text x={left} y="27" fill="#e6edf3" fontSize="18" fontWeight="800">{coin}/USDT ({coin==='BTC'?'Bitcoin':coin}), {interval==='4h'?'4 soatlik (H4)':interval==='1d'?'1 kunlik (D1)':'1 soatlik (H1)'} grafik</text>
-      <text x={left} y="48" fill="#9aa7b5" fontSize="13">EMA 10 / 20 / 50 • RSI (14) • Entry / TP / SL</text>
-      {candles.map((c,i)=>{const up=c.close>=c.open;return <g key={c.time}><line x1={x(i)} x2={x(i)} y1={y(c.high)} y2={y(c.low)} stroke={up?'#37d66f':'#ff4d5a'} strokeWidth="1.2"/><rect x={x(i)-candleW/2} y={Math.min(y(c.open),y(c.close))} width={candleW} height={Math.max(1.5,Math.abs(y(c.open)-y(c.close)))} rx=".8" fill={up?'#37d66f':'#ff4d5a'}/></g>})}
-      <polyline points={ema(10)} fill="none" stroke="#ff9f0a" strokeWidth="2.2"/><polyline points={ema(20)} fill="none" stroke="#00bcd4" strokeWidth="2.2"/><polyline points={ema(50)} fill="none" stroke="#49b6ff" strokeWidth="2.2"/>
-      <line x1={latestX} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#55d6ff" strokeDasharray="3 5"/>
-      <rect x={labelX} y={y(latest)-15} width="88" height="30" rx="5" fill="#20a85a"/><text x={labelCenter} y={y(latest)+5} textAnchor="middle" fill="white" fontSize="14" fontWeight="800">{money(latest)}</text>
-      {level(result.entryLow,'ENTRY','#ffd43b','#7a5b00','6 5')}
-      {result.entryHigh!==result.entryLow && level(result.entryHigh,'ENTRY','#ffd43b','#7a5b00','6 5')}
-      {result.tp.slice(0,3).map((v,i)=>level(v,`TP${i+1}`,'#23d18b','#116b4b','8 7'))}
-      {level(result.invalidation,'SL','#ff4d5a','#8f202a','8 7')}
-      <text x={left} y={rsiTop+4} fill="#e6edf3" fontSize="16" fontWeight="800">RSI (14) = {result.rsi.toFixed(2)}</text>
-      <text x={plotRight-5} y={ry(70)-6} textAnchor="end" fill="#8f9baa" fontSize="12">70</text><text x={plotRight-5} y={ry(50)-6} textAnchor="end" fill="#8f9baa" fontSize="12">50</text><text x={plotRight-5} y={ry(30)-6} textAnchor="end" fill="#8f9baa" fontSize="12">30</text>
-      <polyline points={rsiPoints} fill="none" stroke="#a78bfa" strokeWidth="2.2"/>
-      {candles.filter((_,i)=>i%Math.max(1,Math.floor(candles.length/7))===0).map((c,i)=><text key={i} x={x(candles.indexOf(c))} y={rsiBottom+27} textAnchor="middle" fill="#7f8b99" fontSize="12">{fmtTime(c.time)}</text>)}
-      <line x1={latestX+12} y1={y(latest)-2} x2={xFuture} y2={bullishY} stroke="#23d18b" strokeWidth="2.4" strokeDasharray="8 6" markerEnd="url(#bullArrow)"/>
-      <line x1={latestX+12} y1={y(latest)+7} x2={xFuture} y2={bearishY} stroke="#ff4d5a" strokeWidth="2.4" strokeDasharray="8 6" markerEnd="url(#bearArrow)"/>
-    </svg>
-    <div className="legend"><span><i className="orange"/>EMA10</span><span><i className="cyan"/>EMA20</span><span><i className="blue"/>EMA50</span><span>🟡 Entry</span><span>🟢 TP</span><span>🔴 SL</span></div>
-  </div>
+  return <div className="chartWrap"><svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img">
+    <rect width={W} height={H} fill="#0b1220"/>
+    <rect x={0} y={rsiTop-20} width={W} height={rsiBottom-rsiTop+40} fill="#111827"/>
+    {[0,.25,.5,.75,1].map(v=><line key={v} x1={left} x2={plotRight} y1={top+v*(mainBottom-top)} y2={top+v*(mainBottom-top)} stroke="#1f2937"/>)}
+    <text x={left} y={28} fill="#e5e7eb" fontSize={16} fontWeight={700}>{coin}/USDT · {interval}</text>
+    {candles.map((c,i)=>{const up=c.close>=c.open;return <g key={c.time}>
+      <line x1={x(i)} x2={x(i)} y1={y(c.high)} y2={y(c.low)} stroke={up?'#22c55e':'#ef4444'} strokeWidth={1}/>
+      <rect x={x(i)-cw/2} y={Math.min(y(c.open),y(c.close))} width={cw} height={Math.max(1,Math.abs(y(c.open)-y(c.close)))} fill={up?'#22c55e':'#ef4444'}/>
+    </g>})}
+    <polyline points={poly(e10)} fill="none" stroke="#f59e0b" strokeWidth={1.6}/>
+    <polyline points={poly(e20)} fill="none" stroke="#06b6d4" strokeWidth={1.6}/>
+    <polyline points={poly(e50)} fill="none" stroke="#3b82f6" strokeWidth={1.6}/>
+    {level(result.entryHigh,'ENTRY','#22c55e','#166534')}
+    {result.entryHigh!==result.entryLow && level(result.entryLow,'ENTRY','#22c55e','#166534')}
+    {result.tp[0] && level(result.tp[0],'TP1','#16a34a','#14532d')}
+    {result.tp[1] && level(result.tp[1],'TP2','#16a34a','#14532d')}
+    {result.tp[2] && level(result.tp[2],'TP3','#16a34a','#14532d')}
+    {level(result.invalidation,'SL','#ef4444','#7f1d1d')}
+    <line x1={lx} x2={plotRight} y1={y(last)} y2={y(last)} stroke="#38bdf8" strokeDasharray="3 4"/>
+    <text x={left} y={rsiTop-4} fill="#e5e7eb" fontSize={13} fontWeight={700}>RSI 14 · {result.rsi.toFixed(2)}</text>
+    <polyline points={rs.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth={1.8}/>
+  </svg></div>
 }
 
 export default function AnalystClient(){
@@ -88,7 +74,28 @@ export default function AnalystClient(){
   async function load(){setLoading(true);setError('');try{const r=await fetch(`/api/analyze?symbol=${coin}&interval=${interval}`);const j=await r.json();if(!r.ok)throw new Error(j.error||'Xato');setData(j)}catch(e:any){setError(e.message||'Xato')}finally{setLoading(false)}}
   useEffect(()=>{load()},[coin,interval])
   const r=data?.result
-  return <main className="analystPage"><div className="analystHeader"><div><div className="brand">Crypto Tahlil <b>UZ</b></div><h1>{coin}/USDT texnik tahlili</h1><p>Avtomatik H1/H4/D1 tahlil • EMA • RSI • MACD • Entry/TP/SL</p></div><div className="controls"><select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select><select value={interval} onChange={e=>setInterval(e.target.value)}>{intervals.map(([v,l])=><option value={v} key={v}>{l}</option>)}</select><button onClick={load}>Yangilash</button></div></div>
-    {loading?<div className="panel">Tahlil yuklanmoqda...</div>:error?<div className="panel error">{error}</div>:r&&<><div className="panel chartPanel"><Chart candles={data.candles} result={r} coin={coin} interval={interval}/></div><div className="metrics"><div><small>Trend</small><strong className={r.trend.toUpperCase().includes('BULL')?'good':r.trend.toUpperCase().includes('BEAR')?'bad':''}>{r.trend}</strong></div><div><small>RSI</small><strong>{r.rsi.toFixed(1)}</strong></div><div><small>Entry</small><strong>{money(r.entryLow)}–{money(r.entryHigh)}</strong></div><div><small>Invalidation</small><strong>{money(r.invalidation)}</strong></div><div><small>TP1 / TP2 / TP3</small><strong>{r.tp.map((v:number)=>money(v)).join(' / ')}</strong></div></div><div className="analysisGrid"><section className="panel"><h2>📌 Texnik ko‘rsatmalar</h2><p>{r.summary}</p><ul><li>EMA10: <b>{money(r.ema10)}</b></li><li>EMA20: <b>{money(r.ema20)}</b></li><li>EMA50: <b>{money(r.ema50)}</b></li><li>MACD histogram: <b>{r.histogram.toFixed(6)}</b></li><li>Support: <b>{r.support.map((v:number)=>money(v)).join(', ')}</b></li><li>Resistance: <b>{r.resistance.map((v:number)=>money(v)).join(', ')}</b></li></ul></section><section className="panel"><h2>🔮 Ssenariylar</h2><div className="scenario bull"><b>🟢 Bullish</b><p>{r.bullish}</p></div><div className="scenario bear"><b>🔴 Bearish</b><p>{r.bearish}</p></div><p className="note">⚠️ Bu avtomatik texnik tahlil. U kafolatlangan narx prognozi yoki moliyaviy maslahat emas.</p></section></div></>}
-  </main>
+  return <div className="analystPage">
+    <div className="analystHeader">
+      <div><div className="brand">Crypto <b>Tahlil</b> UZ</div><h1>AI Analyst</h1><p>Texnik tahlil · Entry · TP · SL</p></div>
+      <div className="controls">
+        <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
+        <select value={interval} onChange={e=>setInterval(e.target.value)}>{intervals.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select>
+        <button onClick={load}>Yangilash</button>
+      </div>
+    </div>
+    {loading?<div className="panel">Yuklanmoqda...</div>:error?<div className="panel error">{error}</div>:r&&<>
+      <div className="panel chartPanel"><Chart candles={data.candles} result={r} coin={coin} interval={interval}/></div>
+      <div className="metrics">
+        <div><small>Trend</small><strong>{r.trend}</strong></div>
+        <div><small>RSI</small><strong>{r.rsi.toFixed(2)}</strong></div>
+        <div><small>EMA10</small><strong>{money(r.ema10)}</strong></div>
+        <div><small>EMA20</small><strong>{money(r.ema20)}</strong></div>
+        <div><small>EMA50</small><strong>{money(r.ema50)}</strong></div>
+      </div>
+      <div className="analysisGrid">
+        <div className="panel"><h2>Xulosa</h2><p>{r.summary}</p></div>
+        <div className="panel"><h2>Ssenariylar</h2><div className="scenario bull">{r.bullish}</div><div className="scenario bear">{r.bearish}</div></div>
+      </div>
+    </>}
+  </div>
 }
