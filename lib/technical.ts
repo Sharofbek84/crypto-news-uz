@@ -56,13 +56,13 @@ export function analyze(candles: Candle[]): TechnicalResult {
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
   const s = Math.min(...support)
-  const rr = Math.max(...resistance)
   const range = Math.max(last - s, last * 0.01)
   const entryLow = Math.max(s, last - range * 0.35)
   const entryHigh = last
   const invalidation = s - range * 0.2
   const tp = [last + range, last + range * 2, last + range * 3]
 
+  // Qisqa tahliliy xulosa (texnik ko'rsatkichlar ro'yxati emas)
   let summary: string
   if (trend === 'BULLISH') {
     summary = `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
