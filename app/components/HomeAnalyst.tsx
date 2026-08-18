@@ -9,12 +9,12 @@ const coins=['BTC','ETH','SOL','SUI','APT','XRP','BNB','CORE','MYX','ALEO']
 const intervals=[['1h','H1'],['4h','H4'],['1d','D1']]
 function money(n:number){if(n>=1000)return n.toLocaleString('en-US',{maximumFractionDigits:0});if(n>=1)return n.toFixed(2);return n.toFixed(5)}
 function money$(n:number){return '$'+money(n)}
+function tfShort(interval:string){return interval==='4h'?'H4':interval==='1d'?'D1':'H1'}
 function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i<c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))}}return out}
 function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.map((x,i)=>{if(i)a=x.close*k+a*(1-k);return a})}
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
   const [zoom,setZoom]=useState(1)
-  // Candles use ~93% of plot width → gap halved again (~7%)
   const W=1700,H=820,L=68,R=210,T=78,MB=540,RT=580,RB=740
   const plotRight=W-R
   const candleRight=L+(plotRight-L)*0.93
@@ -92,7 +92,6 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9"/>
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9"/>
 
-          {/* Entry zone rectangle only — no text label */}
           <rect x={zoneLeft} y={y(result.entryHigh)} width={zoneW} height={Math.max(12,y(result.entryLow)-y(result.entryHigh))} fill="#1dbf6b" fillOpacity=".18" stroke="#20d67a" strokeOpacity=".55" rx="3"/>
 
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2"/>
@@ -121,17 +120,18 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 }
 
 export default function HomeAnalyst(){
-  const [coin,setCoin]=useState('BTC'),[interval,setInterval]=useState('4h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
+  const [coin,setCoin]=useState('BTC'),[interval,setInterval]=useState('1h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
   async function load(){setLoading(true);setError('');try{const r=await fetch(`/api/analyze?symbol=${coin}&interval=${interval}`);const j=await r.json();if(!r.ok)throw new Error(j.error||'Market data xatosi');setData(j)}catch(e:any){setError(e.message||'Xato')}finally{setLoading(false)}}
   useEffect(()=>{load()},[coin,interval])
   const r=data?.result
+  const tf=tfShort(interval)
 
   return <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
         <div className="homeKicker">🤖 AI CRYPTO ANALYST</div>
         <h2>Professional TradingView tahlili</h2>
-        <p>Jonli market data asosida avtomatik Entry · TP1 · TP2 · TP3 · SL va texnik xulosa.</p>
+        <p>Jonli market data asosida avtomatik Entry · TP1 · TP2 · TP3 · SL va texnik xulosa. Har bir timeframe alohida tahlil qilinadi.</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
@@ -147,7 +147,7 @@ export default function HomeAnalyst(){
 
       <div className="proAnalysis">
         <div className="proCard">
-          <h3>📊 TEXNIK TAHLIL</h3>
+          <h3>📊 TEXNIK TAHLIL · {tf}</h3>
           <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral → Bullish momentum'}</strong></div>
           <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
           <p className="proNote">{r.rsi>=50?'RSI 50 dan yuqorida, bu bullish momentumni ko‘rsatadi.':'RSI 50 dan past, momentum susaygan.'}</p>
@@ -163,7 +163,7 @@ export default function HomeAnalyst(){
           <div className="proBox red">
             <b>STOP LOSS (SL)</b>
             <strong>{money$(r.invalidation)}</strong>
-            <small>pastida 4H candle yopilsa</small>
+            <small>pastida {tf} candle yopilsa</small>
           </div>
           <div className="proBox tp">
             <b>TAKE PROFIT (TP)</b>
@@ -174,7 +174,7 @@ export default function HomeAnalyst(){
         </div>
 
         <div className="proCard bullCard">
-          <h3 className="bullText">🟢 BULLISH SENARIY</h3>
+          <h3 className="bullText">🟢 BULLISH SENARIY · {tf}</h3>
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
             {money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
@@ -182,7 +182,7 @@ export default function HomeAnalyst(){
         </div>
 
         <div className="proCard bearCard">
-          <h3 className="bearText">🔴 BEARISH SENARIY</h3>
+          <h3 className="bearText">🔴 BEARISH SENARIY · {tf}</h3>
           <p>{r.bearish}</p>
           <div className="levelPath redPath">
             {money$(r.invalidation)} ↓ {money$(r.invalidation*0.99)} ↓ {money$(r.invalidation*0.97)}
