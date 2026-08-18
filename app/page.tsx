@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import HomeAnalyst from './components/HomeAnalyst'
 import newsData from '../data/news.json'
 
@@ -26,12 +27,11 @@ async function getPrices() {
     if (!res.ok) return []
     const data = await res.json()
     if (!Array.isArray(data)) return []
-    // CoinGecko tartibini saqlamaydi — bizning tartibimiz bo‘yicha joylashtiramiz
     const byId = new Map(data.map((c: any) => [c.id, c]))
     return TOP_COINS.map(({ symbol, geckoId }) => {
       const c = byId.get(geckoId)
-      if (!c) return { id: geckoId, symbol, name: symbol, image: '', current_price: null, price_change_percentage_24h: null, missing: true }
-      return { ...c, symbol, missing: false }
+      if (!c) return { id: geckoId, symbol, name: symbol, image: '', current_price: null, price_change_percentage_24h: null }
+      return { ...c, symbol }
     })
   } catch {
     return []
@@ -60,7 +60,9 @@ export default async function Home() {
 
       <main className="container">
         <div id="tahlil">
-          <HomeAnalyst />
+          <Suspense fallback={<div className="homeLoading">Grafik va tahlil yuklanmoqda...</div>}>
+            <HomeAnalyst />
+          </Suspense>
         </div>
 
         <h2 className="section">Top Kriptovalyutalar</h2>
@@ -75,7 +77,11 @@ export default async function Home() {
                 className="card cardLink"
                 title={`${c.symbol} texnik tahlilini ochish`}
               >
-                {c.image ? <img src={c.image} alt={c.name} width={32} height={32} /> : <div className="coinPlaceholder">{c.symbol.slice(0, 2)}</div>}
+                {c.image ? (
+                  <img src={c.image} alt={c.name} width={32} height={32} />
+                ) : (
+                  <div className="coinPlaceholder">{c.symbol.slice(0, 2)}</div>
+                )}
                 <div>
                   <h3>{c.name || c.symbol}</h3>
                   <div className="sym">{c.symbol}</div>
@@ -84,7 +90,7 @@ export default async function Home() {
                   <div className="price">{fmt(c.current_price)}</div>
                   <div className={(c.price_change_percentage_24h ?? 0) >= 0 ? 'up' : 'down'}>
                     {(c.price_change_percentage_24h ?? 0) >= 0 ? '+' : ''}
-                    {(c.price_change_percentage_24h ?? 0).toFixed?.(2) ?? '0.00'}%
+                    {Number(c.price_change_percentage_24h ?? 0).toFixed(2)}%
                   </div>
                 </div>
               </Link>
