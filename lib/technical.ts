@@ -37,6 +37,12 @@ function levels(candles: Candle[]) {
   return { support: lows.slice(0, 3), resistance: highs.slice(0, 3) }
 }
 
+function fmt(n: number) {
+  if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
+  if (n >= 1) return n.toFixed(2)
+  return n.toFixed(5)
+}
+
 export function analyze(candles: Candle[]): TechnicalResult {
   const closes = candles.map(c => c.close)
   const last = closes.at(-1) ?? 0
@@ -46,20 +52,33 @@ export function analyze(candles: Candle[]): TechnicalResult {
   const signal = ema(closes.map((_, i) => ema(closes.slice(0, i + 1), 12) - ema(closes.slice(0, i + 1), 26)), 9)
   const hist = macdLine - signal
   const { support, resistance } = levels(candles)
-  const bullish = last > e20 && e20 > e50 && r >= 50 && hist >= 0
-  const bearish = last < e20 && e20 < e50 && r < 50 && hist < 0
-  const trend = bullish ? 'BULLISH' : bearish ? 'BEARISH' : 'NEUTRAL'
+  const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
+  const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
+  const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
   const s = Math.min(...support)
   const rr = Math.max(...resistance)
   const range = Math.max(last - s, last * 0.01)
+  const entryLow = Math.max(s, last - range * 0.35)
+  const entryHigh = last
+  const invalidation = s - range * 0.2
+  const tp = [last + range, last + range * 2, last + range * 3]
+
+  let summary: string
+  if (trend === 'BULLISH') {
+    summary = `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
+  } else if (trend === 'BEARISH') {
+    summary = `Narx ${fmt(entryHigh)} atrofida bosim ostida. ${fmt(invalidation)} pastga yopilsa, pasayish davom etishi mumkin. ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida qayta ushlansa, rebound kutiladi.`
+  } else {
+    summary = `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona atrofida neytral. Ushbu zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli bor. ${fmt(invalidation)} pastga buzilsa, pasayish davom etishi mumkin.`
+  }
+
+  const bullish = `Agar narx ${fmt(entryHigh)} ustida 4H candle bilan yopilsa, yuqoriga davom etishi mumkin.`
+  const bearish = `Agar narx ${fmt(invalidation)} pastida 4H candle bilan yopilsa, pasayish davom etishi mumkin.`
+
   return {
     ema10: e10, ema20: e20, ema50: e50, rsi: r, macd: macdLine, signal, histogram: hist,
     trend, support, resistance,
-    entryLow: Math.max(s, last - range * 0.35), entryHigh: last,
-    invalidation: s - range * 0.2,
-    tp: [last + range, last + range * 2, last + range * 3],
-    bullish: `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${rr.toFixed(4)} gacha rebound/breakout ssenariysi kuzatiladi.`,
-    bearish: `EMA20/EMA50 ostida qolish va momentum susayishi ${s.toFixed(4)} support zonasini qayta test qilish xavfini oshiradi.`,
-    summary: `Trend ${trend}. RSI ${r.toFixed(1)}, EMA10 ${e10.toFixed(4)}, EMA20 ${e20.toFixed(4)}, EMA50 ${e50.toFixed(4)}.`
+    entryLow, entryHigh, invalidation, tp,
+    bullish, bearish, summary
   }
 }
