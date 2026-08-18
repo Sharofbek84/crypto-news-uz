@@ -14,10 +14,10 @@ function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
   const [zoom,setZoom]=useState(1)
-  // Layout: candles use ~72% of plot width → large empty gap on the right for arrows + labels never overlap.
+  // Candles use ~86% of plot width → gap is half of previous (was 28%, now ~14%)
   const W=1700,H=820,L=68,R=210,T=78,MB=540,RT=580,RB=740
   const plotRight=W-R
-  const candleRight=L+(plotRight-L)*0.72
+  const candleRight=L+(plotRight-L)*0.86
   const min=Math.min(...candles.map(c=>c.low),result.invalidation,result.entryLow)*.997
   const max=Math.max(...candles.map(c=>c.high),...result.tp)*1.003
   const x=(i:number)=>L+i*(candleRight-L)/Math.max(1,candles.length-1)
@@ -31,10 +31,9 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   const chg=latest-prev, chgPct=prev?(chg/prev)*100:0
   const cw=Math.max(2.5,Math.min(11,(candleRight-L)/candles.length*.65))
   const zoneLeft=x(Math.max(0,candles.length-18))
-  const zoneW=Math.max(80,lx+40-zoneLeft)
-  // Arrow starts near last candle and ends clearly inside the empty gap (pointing right/forward)
-  const arrowStartX=lx+12
-  const arrowEndX=plotRight-18
+  const zoneW=Math.max(80,lx+35-zoneLeft)
+  const arrowStartX=lx+10
+  const arrowEndX=plotRight-16
   const labelX=plotRight+10
   const tf=interval==='4h'?'4 soatlik (H4)':interval==='1d'?'1 kunlik (D1)':'1 soatlik (H1)'
 
@@ -60,7 +59,6 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
             <linearGradient id="hcMain" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#0a1018"/><stop offset="1" stopColor="#070b11"/>
             </linearGradient>
-            {/* Arrow head always points along the line direction (forward) */}
             <marker id="hcBull" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
               <path d="M0 0L10 5L0 10z" fill="#20d67a"/>
             </marker>
@@ -94,13 +92,9 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9"/>
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9"/>
 
-          {/* Entry zone — only over recent candles, not into the gap */}
+          {/* Entry zone rectangle only — no text label */}
           <rect x={zoneLeft} y={y(result.entryHigh)} width={zoneW} height={Math.max(12,y(result.entryLow)-y(result.entryHigh))} fill="#1dbf6b" fillOpacity=".18" stroke="#20d67a" strokeOpacity=".55" rx="3"/>
-          <rect x={Math.min(zoneLeft+zoneW-4,lx-8)-108} y={y((result.entryLow+result.entryHigh)/2)-18} width="112" height="36" rx="4" fill="#0d3d28" fillOpacity=".92" stroke="#20d67a" strokeOpacity=".5"/>
-          <text x={Math.min(zoneLeft+zoneW-4,lx-8)-52} y={y((result.entryLow+result.entryHigh)/2)-3} textAnchor="middle" fill="#20d67a" fontSize="11" fontWeight="800">KIRISH ZONASI</text>
-          <text x={Math.min(zoneLeft+zoneW-4,lx-8)-52} y={y((result.entryLow+result.entryHigh)/2)+12} textAnchor="middle" fill="#b8f5d0" fontSize="11" fontWeight="700">{money(result.entryLow)} – {money(result.entryHigh)}</text>
 
-          {/* Current price dashed line into the gap */}
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2"/>
           <rect x={labelX} y={y(latest)-13} width="100" height="26" rx="4" fill="#1a9e55"/>
           <text x={labelX+50} y={y(latest)+5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">{money(latest)}</text>
@@ -110,7 +104,6 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           {rightBox(y(result.tp[0]||latest*1.01),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
           {rightBox(y(result.invalidation),`SL  ${money(result.invalidation)}`,'#c52f3a')}
 
-          {/* Forward arrows: left → right into the empty gap toward TP levels */}
           <line x1={arrowStartX} y1={y(latest)-3} x2={arrowEndX} y2={y(result.tp[0]||latest)} stroke="#20d67a" strokeWidth="2.2" strokeDasharray="8 5" markerEnd="url(#hcBull)"/>
           <line x1={arrowStartX} y1={y(latest)-9} x2={arrowEndX} y2={y(result.tp[1]||latest)} stroke="#20d67a" strokeWidth="1.9" strokeDasharray="8 5" markerEnd="url(#hcBull)" opacity=".88"/>
 
