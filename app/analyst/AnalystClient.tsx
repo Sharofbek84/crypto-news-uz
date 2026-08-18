@@ -22,7 +22,7 @@ function rsiSeries(candles:Candle[],period=14){
 }
 
 function Chart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
-  const W=1400,H=800,left=65,right=125,gap=40,top=48,mainBottom=505,rsiTop=555,rsiBottom=715
+  const W=1400,H=800,left=65,right=125,gap=105,top=48,mainBottom=505,rsiTop=555,rsiBottom=715
   const plotRight=W-right-gap
   const plotWidth=plotRight-left
   const highs=candles.map(c=>c.high), lows=candles.map(c=>c.low)
@@ -39,13 +39,17 @@ function Chart({candles,result,coin,interval}:{candles:Candle[];result:Result;co
   const latestX=x(candles.length-1)
   const candleW=Math.max(3,Math.min(12,plotWidth/candles.length*.72))
   const fmtTime=(t:number)=>new Date(t).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})
-  const xFuture=Math.min(plotRight,latestX+155)
+  const xFuture=Math.min(plotRight,latestX+120)
   const bullishY=y(result.tp[0]||latest*1.02), bearishY=y(result.invalidation)
-  const labelX=W-right+6
+  const labelX=plotRight+78
   const labelCenter=labelX+44
   const level=(value:number,label:string,stroke:string,fill:string,dash='8 7')=><g><line x1={left} x2={plotRight} y1={y(value)} y2={y(value)} stroke={stroke} strokeDasharray={dash} strokeWidth="1.8"/><rect x={labelX} y={y(value)-14} width="88" height="28" rx="5" fill={fill}/><text x={labelCenter} y={y(value)+5} textAnchor="middle" fill="white" fontSize="13" fontWeight="800">{label}</text><text x={W-8} y={y(value)+5} textAnchor="end" fill={stroke} fontSize="12" fontWeight="700">{money(value)}</text></g>
   return <div className="chartWrap">
     <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label={`${coin} ${interval} texnik tahlil grafigi`}>
+      <defs>
+        <marker id="bullArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#23d18b"/></marker>
+        <marker id="bearArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ff4d5a"/></marker>
+      </defs>
       <rect width={W} height={H} fill="#080d15"/>
       <rect x="0" y="0" width={W} height={mainBottom+18} fill="#0b111b"/>
       <rect x="0" y={rsiTop-18} width={W} height={rsiBottom-rsiTop+45} fill="#111326"/>
@@ -65,8 +69,8 @@ function Chart({candles,result,coin,interval}:{candles:Candle[];result:Result;co
       <text x={plotRight-5} y={ry(70)-6} textAnchor="end" fill="#8f9baa" fontSize="12">70</text><text x={plotRight-5} y={ry(50)-6} textAnchor="end" fill="#8f9baa" fontSize="12">50</text><text x={plotRight-5} y={ry(30)-6} textAnchor="end" fill="#8f9baa" fontSize="12">30</text>
       <polyline points={rsiPoints} fill="none" stroke="#a78bfa" strokeWidth="2.2"/>
       {candles.filter((_,i)=>i%Math.max(1,Math.floor(candles.length/7))===0).map((c,i)=><text key={i} x={x(candles.indexOf(c))} y={rsiBottom+27} textAnchor="middle" fill="#7f8b99" fontSize="12">{fmtTime(c.time)}</text>)}
-      <path d={`M${latestX},${y(latest)-4} C${latestX+45},${y(latest)-45} ${xFuture-40},${bullishY+40} ${xFuture},${bullishY}`} fill="none" stroke="#23d18b" strokeWidth="2" strokeDasharray="8 6"/>
-      <path d={`M${latestX},${y(latest)+7} C${latestX+45},${y(latest)+45} ${xFuture-35},${bearishY-30} ${xFuture},${bearishY}`} fill="none" stroke="#ff4d5a" strokeWidth="2" strokeDasharray="8 6"/>
+      <line x1={latestX+12} y1={y(latest)-2} x2={xFuture} y2={bullishY} stroke="#23d18b" strokeWidth="2.4" strokeDasharray="8 6" markerEnd="url(#bullArrow)"/>
+      <line x1={latestX+12} y1={y(latest)+7} x2={xFuture} y2={bearishY} stroke="#ff4d5a" strokeWidth="2.4" strokeDasharray="8 6" markerEnd="url(#bearArrow)"/>
     </svg>
     <div className="legend"><span><i className="orange"/>EMA10</span><span><i className="cyan"/>EMA20</span><span><i className="blue"/>EMA50</span><span>🟡 Entry</span><span>🟢 TP</span><span>🔴 SL</span></div>
   </div>
