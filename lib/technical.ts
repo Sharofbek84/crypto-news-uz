@@ -56,6 +56,7 @@ export function analyze(candles: Candle[]): TechnicalResult {
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
   const s = Math.min(...support)
+  const rr = Math.max(...resistance)
   const range = Math.max(last - s, last * 0.01)
   const entryLow = Math.max(s, last - range * 0.35)
   const entryHigh = last
@@ -72,8 +73,9 @@ export function analyze(candles: Candle[]): TechnicalResult {
     summary = `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona atrofida neytral. Ushbu zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli bor. ${fmt(invalidation)} pastga buzilsa, pasayish davom etishi mumkin.`
   }
 
-  const bullish = `Agar narx ${fmt(entryHigh)} ustida 4H candle bilan yopilsa, yuqoriga davom etishi mumkin.`
-  const bearish = `Agar narx ${fmt(invalidation)} pastida 4H candle bilan yopilsa, pasayish davom etishi mumkin.`
+  // Oldingi uslubdagi bullish / bearish ssenariylar
+  const bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(rr)} gacha rebound/breakout ssenariysi kuzatiladi.`
+  const bearish = `EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(s)} support zonasini qayta test qilish xavfini oshiradi.`
 
   return {
     ema10: e10, ema20: e20, ema50: e50, rsi: r, macd: macdLine, signal, histogram: hist,
