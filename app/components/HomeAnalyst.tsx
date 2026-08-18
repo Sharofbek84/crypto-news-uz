@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number}
 type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
 
-const coins=['BTC','ETH','SOL','SUI','APT','XRP','BNB','CORE','MYX','ALEO']
+const coins=['BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM']
 const intervals=[['1h','H1'],['4h','H4'],['1d','D1']]
 function money(n:number){if(n>=1000)return n.toLocaleString('en-US',{maximumFractionDigits:0});if(n>=1)return n.toFixed(2);return n.toFixed(5)}
 function money$(n:number){return '$'+money(n)}
