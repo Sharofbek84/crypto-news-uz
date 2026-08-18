@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Obuna bo‘lish | Crypto Tahlil UZ',
-  description: 'Crypto Tahlil UZ premium obuna rejalari — kengaytirilgan AI tahlil, signal va hisobotlar.',
+  title: 'Obuna bo‘lish | GOLDENWEB.UZ',
+  description: 'GOLDENWEB.UZ premium obuna rejalari — kengaytirilgan AI tahlil, signal va hisobotlar.',
 }
 
 export default function ObunaPage() {
@@ -10,7 +10,7 @@ export default function ObunaPage() {
     <>
       <header className="header">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" className="logo">Crypto <span>Tahlil</span> UZ</Link>
+          <Link href="/" className="logo">GOLDENWEB<span>.UZ</span></Link>
           <Link href="/" style={{ color: '#9aa7b8', fontSize: '.9rem', fontWeight: 600 }}>← Bosh sahifa</Link>
         </div>
       </header>
@@ -67,7 +67,7 @@ export default function ObunaPage() {
         </section>
       </main>
 
-      <footer className="footer">Crypto Tahlil UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}</footer>
+      <footer className="footer">GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}</footer>
     </>
   )
 }
