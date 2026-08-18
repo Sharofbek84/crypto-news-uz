@@ -2,7 +2,7 @@ import Link from 'next/link'
 import newsData from '../../data/news.json'
 
 export const metadata = {
-  title: 'So‘nggi Yangiliklar | Crypto Tahlil UZ',
+  title: 'So‘nggi Yangiliklar | GOLDENWEB.UZ',
   description: 'Kriptovalyuta bozori haqida o‘zbek tilidagi so‘nggi yangiliklar va tahlillar.',
 }
 
@@ -23,7 +23,7 @@ export default function YangiliklarPage() {
     <>
       <header className="header">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" className="logo">Crypto <span>Tahlil</span> UZ</Link>
+          <Link href="/" className="logo">GOLDENWEB<span>.UZ</span></Link>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
             <Link href="/" style={{ color: '#9aa7b8', fontSize: '.9rem', fontWeight: 600 }}>← Bosh sahifa</Link>
             <Link href="/obuna" className="headerCta">Obuna bo‘lish</Link>
@@ -42,7 +42,7 @@ export default function YangiliklarPage() {
           {news.map((item) => (
             <article key={item.slug} className="newsCard">
               <div className="newsCardMeta">
-                <span>{item.source || 'Crypto Tahlil UZ'}</span>
+                <span>{item.source || 'GOLDENWEB.UZ'}</span>
                 {item.date ? <span>• {item.date}</span> : null}
               </div>
               <h2>
@@ -58,7 +58,7 @@ export default function YangiliklarPage() {
       </main>
 
       <footer className="footer">
-        Crypto Tahlil UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
+        GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
       </footer>
     </>
   )
