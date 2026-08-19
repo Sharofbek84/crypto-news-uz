@@ -1,46 +1,46 @@
 [
   {
     "slug": "sec-regulation-crypto",
-    "title": "AQSh SEC birinchi yirik kripto qoidasini taklif qildi — «Regulation Crypto»",
-    "summary": "AQSh Qimmatli qog‘ozlar va birja komissiyasi (SEC) kutilmaganda «Regulation Crypto» deb nomlangan birinchi yirik kripto qoidasini e’lon qildi.",
-    "body": "AQSh Qimmatli qog‘ozlar va birja komissiyasi (SEC) «Regulation Crypto» nomli taklifni e’lon qildi. Bu qoida kripto aktivlarini tartibga solish uchun ikkita imtiyoz yo‘lini ko‘zda tutadi va $75 milliongacha bo‘lgan emissiyalar uchun hisobot talablarini belgilaydi.\n\nBu qadam SECning avvalgi majlisni bekor qilganidan so‘ng kutilmaganda chiqarildi. Mutaxassislarning fikricha, bu AQShda kripto sohasini tartibga solishda muhim burilish nuqtasi bo‘lishi mumkin.\n\nQoida hali taklif bosqichida — jamoatchilik fikrlari va yakuniy qabul jarayoni oldinda.",
-    "url": "https://www.coindesk.com/policy",
+    "title": "AQSh SEC «Regulation Crypto» — birinchi yirik kripto qoidasini taklif qildi",
+    "summary": "SEC kutilmaganda kripto aktivlari uchun maxsus takliflarni e’lon qildi: $5 mln va $75 mln gacha imtiyozlar hamda safe harbor.",
+    "body": "AQSh Qimmatli qog‘ozlar va birja komissiyasi (SEC) 18-avgust kuni «Regulation Crypto Assets» deb nomlangan birinchi yirik kripto qoidasini taklif qildi.\n\nTaklifda ikkita imtiyoz yo‘li bor: startaplar uchun 4 yil davomida $5 milliongacha va yillik $75 milliongacha bo‘lgan emissiyalar. Shuningdek, investment contract safe harbor ham kiritilgan.\n\nBu qadam avvalgi majlis bekor qilinganidan so‘ng kutilmaganda chiqarildi. Jamoatchilik fikrlari 60 kun ichida qabul qilinadi.",
+    "url": "https://www.coindesk.com/policy/2026/08/18/r",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-19"
   },
   {
     "slug": "fasb-stablecoin-cash",
-    "title": "FASB stablecoinlarni ‘naqd ekvivalent’ sifatida ko‘rishni taklif qildi",
-    "summary": "AQSh buxgalteriya standartlari guruhi (FASB) ba’zi stablecoinlarni naqd pullarga o‘xshash deb hisoblash imkoniyatini taklif qildi.",
-    "body": "Moliyaviy buxgalteriya standartlari kengashi (FASB) ba’zi stablecoinlarni ‘cash equivalent’ (naqd ekvivalent) sifatida ko‘rishni taklif qildi. Bu qadam kompaniyalar uchun hisobot va likvidlik bahosida muhim o‘zgarish keltirishi mumkin.\n\nAgar qabul qilinsa, stablecoinlar balansda an’anaviy naqd mablag‘larga yaqinroq ko‘rinishda aks etishi mumkin. Bu institutsional qabulni oshirishi mumkin.\n\nHozircha bu faqat taklif — yakuniy qoida hali tasdiqlanmagan.",
-    "url": "https://www.coindesk.com/policy",
+    "title": "FASB ba’zi stablecoinlarni ‘naqd ekvivalent’ deb hisoblashni taklif qildi",
+    "summary": "AQSh buxgalteriya standartlari kengashi (FASB) likvid rezervli va darhol qaytariladigan stablecoinlarni cash equivalent sifatida ko‘rishni taklif etdi.",
+    "body": "Moliyaviy buxgalteriya standartlari kengashi (FASB) 18-avgustda yangi Accounting Standards Update taklifini e’lon qildi.\n\nAgar stablecoin likvid rezervlarga ega bo‘lsa (yillik oshkor etiladi), aylanmadagi tokenlar miqdoridan kam bo‘lmasa va istalgan vaqtda dollarga qaytarilsa — u ‘cash equivalent’ deb hisoblanishi mumkin.\n\nBu o‘zgarish kompaniyalar balansida stablecoinlarni an’anaviy naqd mablag‘larga yaqinroq ko‘rsatishga imkon beradi. Jamoatchilik fikrlari 19-noyabrgacha qabul qilinadi.",
+    "url": "https://www.coindesk.com/policy/2026/08/18/u-s-accounting-standards-group-proposes-way-to-see-stablecoins-as-cash-equivalent",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-19"
   },
   {
-    "slug": "wyoming-layerzero-stablecoin",
-    "title": "Wyoming shtati LayerZero’dan voz kechib, stablecoin uchun yangi infratuzilmaga o‘tdi",
-    "summary": "Wyoming shtati xavfsizlik sababli LayerZero infratuzilmasidan voz kechdi. Bu AQSh hukumat organining birinchi ochiq bunday qarori.",
-    "body": "Wyoming shtati o‘z stablecoin loyihasi uchun LayerZero infratuzilmasidan voz kechib, boshqa yechimga o‘tdi. Bu AQSh hukumat organining xavfsizlik sababli blokcheyn infratuzilmasini ochiq almashtirgan birinchi holati sifatida baholanmoqda.\n\nLayerZero ekotizimidan $15 milliardlik chiqishlar fonida bu qaror e’tibor qozondi. Shtat xavfsizlikni ustuvor deb hisoblagan.\n\nBu hodisa blokcheyn interoperabilitisi va xavfsizlik o‘rtasidagi muvozanat muhokamasini kuchaytirishi mumkin.",
-    "url": "https://www.coindesk.com",
+    "slug": "wyoming-layerzero-chainlink",
+    "title": "Wyoming shtati LayerZero’dan voz kechib, Chainlink CCIP’ga o‘tdi",
+    "summary": "Wyoming Stable Token Commission FRNT stablecoinini xavfsizlik sababli LayerZero’dan Chainlink CCIP’ga ko‘chirdi — AQSh hukumat organining birinchi ochiq bunday qarori.",
+    "body": "Wyoming Stable Token Commission o‘z Frontier Stable Token (FRNT) ni LayerZero infratuzilmasidan Chainlink Cross-Chain Interoperability Protocol (CCIP) ga to‘liq ko‘chirdi.\n\nQaror keng qamrovli xavfsizlik tekshiruvidan so‘ng qabul qilindi. Bu AQSh hukumat organining blokcheyn infratuzilmasini xavfsizlik sababli ochiq almashtirgan birinchi holati.\n\nHozirgi paytda LayerZero’dan Chainlink’ga taxminan $15 milliardlik aktivlar ko‘chgan. FRNT endi CCIP orqali ishlaydi.",
+    "url": "https://www.coindesk.com/business/2026/08/18/wyoming-joins-usd15-billion-layerzero-exodus-with-state-stablecoin-move",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-19"
   },
   {
-    "slug": "bitcoin-64000-ustida",
-    "title": "Bitcoin $64,000 dan yuqorida saqlanmoqda, ammo altcoinlar aralash holatda",
-    "summary": "Bitcoin $64,000 atrofida barqarorlashdi. Bozor umumiy o‘sish ko‘rsatdi, lekin ko‘pgina yirik altcoinlar aralash natija berdi.",
-    "body": "Bitcoin narxi $64,000 darajasidan yuqoriga chiqib, so‘nggi kunlarda nisbatan barqaror harakat qilmoqda. Umumiy kriptovalyuta bozori kapitalizatsiyasi $2,28 trillion atrofida.\n\nEthereum $1,900 atrofida tebranmoqda, Solana va ba’zi boshqa aktivlar ijobiy, lekin XRP va ba’zi altcoinlar bosim ostida.\n\nTahlilchilar FOMC bayonnomalari va makro iqtisodiy ma’lumotlarni kutishmoqda. $65,000–$66,000 zonasi qarshilik sifatida saqlanmoqda.",
+    "slug": "bitcoin-64000",
+    "title": "Bitcoin $64,000 atrofida barqarorlashdi, bozor aralash holatda",
+    "summary": "Bitcoin $64,000 darajasida saqlanmoqda. Umumiy bozor kapitalizatsiyasi $2,28–2,29 trillion atrofida, altcoinlar aralash natija berdi.",
+    "body": "Bitcoin narxi so‘nggi 24 soatda $64,000 atrofida tebranib, nisbatan barqaror harakat qilmoqda. Umumiy kriptovalyuta bozori kapitalizatsiyasi $2,28–2,29 trillion oralig‘ida.\n\nEthereum $1,900–1,910 atrofida, Solana biroz o‘sish ko‘rsatdi. Ba’zi altcoinlar (ACE va boshqalar) kuchli o‘sish qayd etdi, lekin umumiy sentiment ehtiyotkor.\n\nBozor FOMC bayonnomalari va Oq uyda kripto rahbarlari bilan uchrashuvni kutmoqda.",
     "url": "https://www.coindesk.com/markets",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-19"
   },
   {
-    "slug": "kraken-us-stocks-europe",
-    "title": "Kraken Yevropada AQSh aksiyalarini taklif qilmoqda — TradFi va kripto chegarasi yo‘qolmoqda",
-    "summary": "Kraken Yevropa mijozlariga an’anaviy AQSh aksiyalari va ularning tokenlashtirilgan versiyalarini bitta platformada taklif qilmoqda.",
-    "body": "Kraken birjasi Yevropa mijozlariga AQSh aksiyalarini va ularning tokenlashtirilgan shakllarini bitta tartibga solingan platformada taklif qilayotganini e’lon qildi. Bu kripto kompaniyasi uchun birinchi shunday qadam sifatida baholanmoqda.\n\nBu qadam an’anaviy moliya (TradFi) va kriptovalyuta sohalari o‘rtasidagi chegaraning yo‘qolayotganini ko‘rsatadi.\n\nTartibga solingan muhitda ishlash investorlar ishonchini oshirishi mumkin.",
-    "url": "https://www.coindesk.com/markets",
+    "slug": "robinhood-tokenized-stocks",
+    "title": "Robinhood rahbari AQShda tokenlashtirilgan aksiyalar uchun yo‘l ochishni so‘radi",
+    "summary": "Vlad Tenev AQSh qoidalarini yumshatishni talab qildi: tokenlashtirilgan aksiyalar real-time hisob-kitob va 24/7 savdoni olib kelishi mumkin.",
+    "body": "Robinhood CEO’si Vlad Tenev AQSh tartibga soluvchilaridan tokenlashtirilgan aksiyalar uchun aniq qoidalar yaratishni so‘radi.\n\nUning aytishicha, tokenlashtirilgan aksiyalar real-time settlement va 24/7 savdoni ta’minlaydi, lekin AQSh qoidalari hali to‘siq bo‘lib turibdi. Robinhood allaqachon 120+ mamlakatda tokenlashtirilgan AQSh aksiyalarini taklif qilmoqda.\n\nTenev AQSh bu sohada orqada qolayotganini ogohlantirdi.",
+    "url": "https://www.coindesk.com/markets/2026/08/18/robinhood-ceo-urges-u-s-to-clear-path-for-tokenized-stocks-as-overseas-markets-advance",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-19"
   }
