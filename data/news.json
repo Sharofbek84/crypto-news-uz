@@ -1,47 +1,47 @@
 [
   {
-    "slug": "sec-regulation-crypto",
-    "title": "AQSh SEC «Regulation Crypto» — birinchi yirik kripto qoidasini taklif qildi",
-    "summary": "SEC kutilmaganda kripto aktivlari uchun maxsus takliflarni e’lon qildi: $5 mln va $75 mln gacha imtiyozlar hamda safe harbor.",
-    "body": "AQSh Qimmatli qog‘ozlar va birja komissiyasi (SEC) 18-avgust kuni «Regulation Crypto Assets» deb nomlangan birinchi yirik kripto qoidasini taklif qildi.\n\nTaklifda ikkita imtiyoz yo‘li bor: startaplar uchun 4 yil davomida $5 milliongacha va yillik $75 milliongacha bo‘lgan emissiyalar. Shuningdek, investment contract safe harbor ham kiritilgan.\n\nBu qadam avvalgi majlis bekor qilinganidan so‘ng kutilmaganda chiqarildi. Jamoatchilik fikrlari 60 kun ichida qabul qilinadi.",
-    "url": "https://www.coindesk.com/policy/2026/08/18/r",
+    "slug": "bitcoin-69000-short-squeeze",
+    "title": "Bitcoin $69,000 dan oshdi — $1,4 milliardlik short pozitsiyalar likvidatsiya qilindi",
+    "summary": "AQSh G‘aznachiligi uzoq muddatli obligatsiyalar bo‘yicha qayta sotib olish hajmini ikki baravar oshirdi. Bu xavf-aktivlarga bo‘lgan ishtahani kuchaytirdi va Bitcoin $69,000 atrofiga ko‘tarildi.",
+    "body": "Bitcoin narxi 19-avgust kuni $64,000 dan $69,000 dan yuqoriga ko‘tarildi. Bu so‘nggi uch oy ichidagi eng yuqori daraja.\n\nCoinglass ma’lumotlariga ko‘ra, taxminan $1,4 milliardlik short pozitsiyalar bir necha soat ichida likvidatsiya qilindi. Bu 2021-yildan beri eng yirik short-squeeze holatlaridan biri.\n\nAsosiy katalizator — AQSh G‘aznachiligining uzoq muddatli (10–30 yillik) obligatsiyalar bo‘yicha qayta sotib olish operatsiyalarini kamida ikki baravar oshirishi bo‘ldi. Bu foiz stavkalarini pasaytirib, xavf-aktivlarga kapital oqimini kuchaytirdi.\n\nEthereum, Solana va boshqa altcoinlar ham sezilarli o‘sish ko‘rsatdi.",
+    "url": "https://www.coindesk.com/markets/2026/08/19/bitcoin-surges-above-68000-liquidating-14-billion-shorts-as-treasury-buybacks-boost-risk-appetite",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-19"
+    "date": "2026-08-20"
   },
   {
-    "slug": "fasb-stablecoin-cash",
-    "title": "FASB ba’zi stablecoinlarni ‘naqd ekvivalent’ deb hisoblashni taklif qildi",
-    "summary": "AQSh buxgalteriya standartlari kengashi (FASB) likvid rezervli va darhol qaytariladigan stablecoinlarni cash equivalent sifatida ko‘rishni taklif etdi.",
-    "body": "Moliyaviy buxgalteriya standartlari kengashi (FASB) 18-avgustda yangi Accounting Standards Update taklifini e’lon qildi.\n\nAgar stablecoin likvid rezervlarga ega bo‘lsa (yillik oshkor etiladi), aylanmadagi tokenlar miqdoridan kam bo‘lmasa va istalgan vaqtda dollarga qaytarilsa — u ‘cash equivalent’ deb hisoblanishi mumkin.\n\nBu o‘zgarish kompaniyalar balansida stablecoinlarni an’anaviy naqd mablag‘larga yaqinroq ko‘rsatishga imkon beradi. Jamoatchilik fikrlari 19-noyabrgacha qabul qilinadi.",
-    "url": "https://www.coindesk.com/policy/2026/08/18/u-s-accounting-standards-group-proposes-way-to-see-stablecoins-as-cash-equivalent",
+    "slug": "trump-white-house-crypto-clarity",
+    "title": "Trump Oq uyda kripto rahbarlari bilan uchrashdi va Clarity Act’ni tezlashtirishni so‘radi",
+    "summary": "Prezident Donald Trump kripto kompaniyalari rahbarlari bilan uchrashib, Kongressdan Clarity Act’ni tezroq qabul qilishni talab qildi. CFTC Hyperliquid’ni AQShga kiritish ustida ishlamoqda.",
+    "body": "19-avgust kuni Oq uyda Prezident Donald Trump Coinbase, Blockchain.com va boshqa kripto kompaniyalari rahbarlari bilan uchrashdi.\n\nUchrashuvda Trump Kongressdan Clarity Act (kripto tartibga solish qonun loyihasi) ni tezroq ko‘rib chiqishni so‘radi. Qonun loyihasi bo‘yicha muhim protsedural ovoz berish 15-sentabrga rejalashtirilgan.\n\nShuningdek, Trump CFTC raisi Mayk Selig Hyperliquid perpetual futures platformasini federal qoidalar ostida AQSh bozoriga kiritish ustida ishlayotganini aytdi. Bu yangilik HYPE tokenini 11% ga oshirdi.\n\nBu uchrashuv sohada tartibga solish bo‘yicha ijobiy kayfiyatni kuchaytirdi.",
+    "url": "https://www.coindesk.com/policy/2026/08/19/trump-pushes-congress-to-move-on-clarity-act-during-white-house-crypto-event",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-19"
+    "date": "2026-08-20"
   },
   {
-    "slug": "wyoming-layerzero-chainlink",
-    "title": "Wyoming shtati LayerZero’dan voz kechib, Chainlink CCIP’ga o‘tdi",
-    "summary": "Wyoming Stable Token Commission FRNT stablecoinini xavfsizlik sababli LayerZero’dan Chainlink CCIP’ga ko‘chirdi — AQSh hukumat organining birinchi ochiq bunday qarori.",
-    "body": "Wyoming Stable Token Commission o‘z Frontier Stable Token (FRNT) ni LayerZero infratuzilmasidan Chainlink Cross-Chain Interoperability Protocol (CCIP) ga to‘liq ko‘chirdi.\n\nQaror keng qamrovli xavfsizlik tekshiruvidan so‘ng qabul qilindi. Bu AQSh hukumat organining blokcheyn infratuzilmasini xavfsizlik sababli ochiq almashtirgan birinchi holati.\n\nHozirgi paytda LayerZero’dan Chainlink’ga taxminan $15 milliardlik aktivlar ko‘chgan. FRNT endi CCIP orqali ishlaydi.",
-    "url": "https://www.coindesk.com/business/2026/08/18/wyoming-joins-usd15-billion-layerzero-exodus-with-state-stablecoin-move",
+    "slug": "btc-technical-breakout-76000",
+    "title": "Bitcoin texnik jihatdan $76,000 ga o‘sishga tayyor pattern shakllantirmoqda",
+    "summary": "Tahlilchilar Bitcoin yaqin orada muhim texnik patternni yakunlab, narxni $76,000 gacha ko‘tarishi mumkinligini aytishmoqda.",
+    "body": "Bitcoin $69,000 atrofida turib, muhim texnik patternni shakllantirmoqda. Ba’zi tahlilchilar bu pattern muvaffaqiyatli yopilsa, narx $76,000 gacha o‘sishi mumkinligini ta’kidlashmoqda.\n\nSo‘nggi rally $64,000–$65,000 zonalaridan chiqib ketishni tasdiqladi. Endi diqqat $70,000 va undan yuqori darajalarga qaratilgan.\n\nBiroq ba’zi traderlar qisqa muddatli tuzatish ($66,500–$67,000) ni kutishmoqda, so‘ngra $72,000–$73,500 tomon harakat bo‘lishi mumkin.\n\nUmumiy bozor kapitalizatsiyasi $2,4 trillion atrofida, BTC dominansi oshgan.",
+    "url": "https://www.coindesk.com/markets/2026/08/19/bitcoin-nears-key-technical-breakout-that-could-propel-prices-to-76000",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-19"
+    "date": "2026-08-20"
   },
   {
-    "slug": "bitcoin-64000",
-    "title": "Bitcoin $64,000 atrofida barqarorlashdi, bozor aralash holatda",
-    "summary": "Bitcoin $64,000 darajasida saqlanmoqda. Umumiy bozor kapitalizatsiyasi $2,28–2,29 trillion atrofida, altcoinlar aralash natija berdi.",
-    "body": "Bitcoin narxi so‘nggi 24 soatda $64,000 atrofida tebranib, nisbatan barqaror harakat qilmoqda. Umumiy kriptovalyuta bozori kapitalizatsiyasi $2,28–2,29 trillion oralig‘ida.\n\nEthereum $1,900–1,910 atrofida, Solana biroz o‘sish ko‘rsatdi. Ba’zi altcoinlar (ACE va boshqalar) kuchli o‘sish qayd etdi, lekin umumiy sentiment ehtiyotkor.\n\nBozor FOMC bayonnomalari va Oq uyda kripto rahbarlari bilan uchrashuvni kutmoqda.",
-    "url": "https://www.coindesk.com/markets",
+    "slug": "coinbase-circle-clarity-optimism",
+    "title": "Coinbase, Circle va Bullish aksiyalari Clarity Act optimizmi bilan oshdi",
+    "summary": "Clarity Act bo‘yicha ijobiy kayfiyat Coinbase (+8%), Circle (~+10%) va Bullish aksiyalarini ko‘tardi. 15-sentabrda muhim ovoz berish kutilmoqda.",
+    "body": "AQShda Clarity Act qonun loyihasi bo‘yicha optimizm kuchaygani sababli kripto-bog‘liq kompaniyalar aksiyalari sezilarli o‘sish ko‘rsatdi.\n\nCoinbase (COIN) taxminan 8%, Bullish (BLSH) 8% atrofida, Circle (CRCL) esa deyarli 10% ga oshdi.\n\nQonun loyihasi bo‘yicha asosiy protsedural ovoz berish 15-sentabrga rejalashtirilgan. Oq uy va soha vakillari qonunning o‘tish imkoniyatini yuqori deb baholashmoqda.\n\nBu ijobiy kayfiyat butun kripto bozoriga qo‘shimcha kuch berdi.",
+    "url": "https://www.coindesk.com/markets/2026/08/19/coinbase-circle-and-bullish-jump-as-clarity-act-proponents-express-optimism-about-bill",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-19"
+    "date": "2026-08-20"
   },
   {
-    "slug": "robinhood-tokenized-stocks",
-    "title": "Robinhood rahbari AQShda tokenlashtirilgan aksiyalar uchun yo‘l ochishni so‘radi",
-    "summary": "Vlad Tenev AQSh qoidalarini yumshatishni talab qildi: tokenlashtirilgan aksiyalar real-time hisob-kitob va 24/7 savdoni olib kelishi mumkin.",
-    "body": "Robinhood CEO’si Vlad Tenev AQSh tartibga soluvchilaridan tokenlashtirilgan aksiyalar uchun aniq qoidalar yaratishni so‘radi.\n\nUning aytishicha, tokenlashtirilgan aksiyalar real-time settlement va 24/7 savdoni ta’minlaydi, lekin AQSh qoidalari hali to‘siq bo‘lib turibdi. Robinhood allaqachon 120+ mamlakatda tokenlashtirilgan AQSh aksiyalarini taklif qilmoqda.\n\nTenev AQSh bu sohada orqada qolayotganini ogohlantirdi.",
-    "url": "https://www.coindesk.com/markets/2026/08/18/robinhood-ceo-urges-u-s-to-clear-path-for-tokenized-stocks-as-overseas-markets-advance",
+    "slug": "hype-hyperliquid-cftc",
+    "title": "HYPE 11% oshdi: Trump CFTC Hyperliquid’ni AQShga kiritishini aytdi",
+    "summary": "Oq uy uchrashuvida Prezident Trump CFTC raisi Hyperliquid perpetual futures platformasini federal qoidalar ostida AQShga olib kirish ustida ishlayotganini ma’lum qildi.",
+    "body": "Hyperliquid’ning HYPE tokeni 11% ga oshdi. Sabab — Prezident Trumpning Oq uyda aytgan bayonoti.\n\nTrump CFTC raisi Mayk Selig platformani AQSh federal qoidalari ostida ishga tushirish ustida ishlayotganini aytdi. Bu perpetual futures bozorida muhim qadam hisoblanadi.\n\nHyperliquid hozirda markazlashtirilmagan perpetual futures platformalar orasida yetakchilardan biri. AQSh bozoriga kirish platforma va token uchun katta o‘sish imkoniyatini ochadi.\n\nBu yangilik butun DeFi va perpetual futures segmentiga ijobiy ta’sir ko‘rsatdi.",
+    "url": "https://www.coindesk.com/markets/2026/08/19/hype-jumps-11-as-trump-says-cftc-is-working-to-bring-hyperliquid-to-u-s",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-19"
+    "date": "2026-08-20"
   }
 ]
