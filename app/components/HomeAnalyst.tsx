@@ -139,7 +139,7 @@ export default function HomeAnalyst(){
     <div className="homeAnalystHead">
       <div>
         <div className="homeKicker">🤖 AI CRYPTO ANALYST</div>
-        <h2>Professional TradingView tahlili</h2>
+        <h2>Real vaqtda kripto bozor tahlili</h2>
         <p>Jonli market data asosida avtomatik Entry · TP1 · TP2 · TP3 · SL va texnik xulosa.</p>
       </div>
       <div className="homeControls">
