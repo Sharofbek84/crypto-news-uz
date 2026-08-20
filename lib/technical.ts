@@ -37,22 +37,13 @@ function levels(candles: Candle[]) {
   return { support: lows.slice(0, 3), resistance: highs.slice(0, 3) }
 }
 
-/** Oxirgi N ta shamdan eng past low (yaqin swing low) */
-function recentSwingLow(candles: Candle[], lookback: number) {
+/** Oxirgi N ta shamdan eng past / eng yuqori */
+function recentMinMax(candles: Candle[], lookback: number) {
   const slice = candles.slice(-lookback)
-  return Math.min(...slice.map(c => c.low))
-}
-
-/** Oddiy ATR (Average True Range) – volatillik o‘lchovi */
-function atr(candles: Candle[], period = 14) {
-  if (candles.length < 2) return 0
-  const trs: number[] = []
-  for (let i = 1; i < candles.length; i++) {
-    const c = candles[i], p = candles[i - 1]
-    trs.push(Math.max(c.high - c.low, Math.abs(c.high - p.close), Math.abs(c.low - p.close)))
+  return {
+    min: Math.min(...slice.map(c => c.low)),
+    max: Math.max(...slice.map(c => c.high)),
   }
-  const recent = trs.slice(-period)
-  return recent.reduce((a, b) => a + b, 0) / recent.length
 }
 
 function fmt(n: number) {
@@ -67,19 +58,11 @@ function tfLabel(interval?: string) {
   return 'H1'
 }
 
-/** Timeframe bo‘yicha SL/TP multiplikatorlari – qisqa SL, realistik TP */
-function tfParams(interval: string) {
-  // lookback: yaqin swing low uchun shamlar soni
-  // slBuffer: SL ni swing low dan biroz pastroqqa siljitish (ATR ulushi)
-  // tpMult: TP1/TP2/TP3 uchun ATR multiplikatorlari
-  if (interval === '1d') {
-    return { lookback: 10, slBuffer: 0.4, tpMult: [1.5, 2.5, 4] }
-  }
-  if (interval === '4h') {
-    return { lookback: 8, slBuffer: 0.35, tpMult: [1.2, 2.2, 3.5] }
-  }
-  // 1h – eng qisqa SL
-  return { lookback: 6, slBuffer: 0.25, tpMult: [1.0, 1.8, 2.8] }
+/** Timeframe bo‘yicha lookback (oxirgi min/max uchun shamlar soni) */
+function tfLookback(interval: string) {
+  if (interval === '1d') return 10
+  if (interval === '4h') return 8
+  return 6 // H1
 }
 
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
@@ -95,29 +78,36 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
 
-  const params = tfParams(interval)
-  const vol = atr(candles, 14) || last * 0.005
-  const swingLow = recentSwingLow(candles, params.lookback)
+  const lookback = tfLookback(interval)
+  const { min: recentMin, max: recentMax } = recentMinMax(candles, lookback)
+  const range = Math.max(recentMax - recentMin, last * 0.003) // minimal range himoyasi
 
-  // SL: yaqin swing low dan biroz pastroq (ATR buffer bilan) – iloji boricha qisqa
-  let invalidation = swingLow - vol * params.slBuffer
-  // SL hech qachon narxdan haddan tashqari uzoq bo‘lmasin
+  // SL: oxirgi minimumdan biroz pastroq (range ning 5–8%)
+  const slBuffer = range * (interval === '1h' ? 0.05 : interval === '4h' ? 0.07 : 0.1)
+  let invalidation = recentMin - slBuffer
+
+  // SL juda uzoq chiqib ketmasin
   const maxSlDistance = interval === '1h' ? last * 0.015 : interval === '4h' ? last * 0.025 : last * 0.04
   if (last - invalidation > maxSlDistance) {
     invalidation = last - maxSlDistance
   }
-  // Minimal masofa – juda yaqin SL ham bo‘lmasin (noise)
-  const minSlDistance = vol * 0.5
+  // SL juda yaqin ham bo‘lmasin
+  const minSlDistance = range * 0.15
   if (last - invalidation < minSlDistance) {
     invalidation = last - minSlDistance
   }
 
-  // Entry zona: narx atrofida, SL dan yuqoriroq
+  // Entry zona: oxirgi min va joriy narx orasida
   const entryHigh = last
-  const entryLow = Math.max(invalidation + vol * 0.3, last - vol * 0.8)
+  const entryLow = Math.max(invalidation + range * 0.1, Math.min(recentMin + range * 0.2, last - range * 0.15))
 
-  // TP: ATR asosida timeframe bo‘yicha
-  const tp = params.tpMult.map(m => last + vol * m)
+  // TP: oxirgi maksimum va range asosida
+  // TP1 — oxirgi max atrofida (yoki undan biroz yuqori)
+  // TP2 / TP3 — range kengaytmasi
+  const tp1 = Math.max(recentMax, last + range * 0.4)
+  const tp2 = tp1 + range * 0.6
+  const tp3 = tp1 + range * 1.2
+  const tp = [tp1, tp2, tp3]
 
   const s = Math.min(...support)
   const rr = Math.max(...resistance)
