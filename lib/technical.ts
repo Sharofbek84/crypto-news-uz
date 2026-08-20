@@ -226,31 +226,22 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
   const sr = srBreakoutLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
+
+  const s = support[0] ?? invalidation
+  const rr = resistance[0] ?? tp[0]
   const tf = tfLabel(interval)
 
-  // Oddiy foydalanuvchi uchun: faqat grafikdagi Entry / SL / TP zonalari
-  const bullish =
-    `${tf}: Agar narx ${fmt(entryLow)}–${fmt(entryHigh)} (kirish zonasi) ustida ushlanib tursa, ` +
-    `yuqoriga ${fmt(tp[0])} (TP1), keyin ${fmt(tp[1])} (TP2) va ${fmt(tp[2])} (TP3) sari harakat qilishi mumkin. ` +
-    `Stop: ${fmt(invalidation)} (SL).`
-
-  const bearish =
-    `${tf}: Agar narx ${fmt(invalidation)} (SL) pastga yopilsa, pasayish davom etishi mumkin. ` +
-    `Agar yana ${fmt(entryLow)}–${fmt(entryHigh)} zona ustiga qaytsa, o‘sish senariysi saqlanadi.`
+  // Avvalgi senariy matnlari (EMA asosida)
+  const bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(rr)} gacha rebound/breakout ssenariysi kuzatiladi.`
+  const bearish = `EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(s)} support zonasini qayta test qilish xavfini oshiradi.`
 
   let summary: string
   if (trend === 'BULLISH') {
-    summary =
-      `${tf}: O‘sish ehtimoli yuqori. Kirish: ${fmt(entryLow)}–${fmt(entryHigh)}. ` +
-      `Maqsadlar: ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}. SL: ${fmt(invalidation)}.`
+    summary = `${tf}: Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
   } else if (trend === 'BEARISH') {
-    summary =
-      `${tf}: Pasayish xavfi bor. ${fmt(invalidation)} pastga yopilsa pastga davom etishi mumkin. ` +
-      `Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida ushlansa qayta o‘sish kutiladi.`
+    summary = `${tf}: Narx ${fmt(entryHigh)} atrofida bosim ostida. ${fmt(invalidation)} pastga yopilsa, pasayish davom etishi mumkin. ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida qayta ushlansa, rebound kutiladi.`
   } else {
-    summary =
-      `${tf}: Neytral. Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida — o‘sish tomon. ` +
-      `${fmt(invalidation)} pastga — pasayish. TP: ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}.`
+    summary = `${tf}: Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona atrofida neytral. Ushbu zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli bor. ${fmt(invalidation)} pastga buzilsa, pasayish davom etishi mumkin.`
   }
 
   return {
