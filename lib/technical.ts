@@ -73,10 +73,10 @@ function tfParams(interval: string) {
   // slBuffer: SL ni swing low dan biroz pastroqqa siljitish (ATR ulushi)
   // tpMult: TP1/TP2/TP3 uchun ATR multiplikatorlari
   if (interval === '1d') {
-    return { lookback: 18, slBuffer: 0.4, tpMult: [1.5, 2.5, 4] }
+    return { lookback: 10, slBuffer: 0.4, tpMult: [1.5, 2.5, 4] }
   }
   if (interval === '4h') {
-    return { lookback: 10, slBuffer: 0.35, tpMult: [1.2, 2.2, 3.5] }
+    return { lookback: 8, slBuffer: 0.35, tpMult: [1.2, 2.2, 3.5] }
   }
   // 1h – eng qisqa SL
   return { lookback: 6, slBuffer: 0.25, tpMult: [1.0, 1.8, 2.8] }
