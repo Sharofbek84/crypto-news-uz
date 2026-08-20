@@ -32,9 +32,27 @@ export function rsi(values: number[], period = 14) {
 
 function levels(candles: Candle[]) {
   const recent = candles.slice(-50)
-  const lows = recent.map(c => c.low).sort((a,b) => a-b)
-  const highs = recent.map(c => c.high).sort((a,b) => b-a)
+  const lows = recent.map(c => c.low).sort((a, b) => a - b)
+  const highs = recent.map(c => c.high).sort((a, b) => b - a)
   return { support: lows.slice(0, 3), resistance: highs.slice(0, 3) }
+}
+
+/** Oxirgi N ta shamdan eng past low (yaqin swing low) */
+function recentSwingLow(candles: Candle[], lookback: number) {
+  const slice = candles.slice(-lookback)
+  return Math.min(...slice.map(c => c.low))
+}
+
+/** Oddiy ATR (Average True Range) – volatillik o‘lchovi */
+function atr(candles: Candle[], period = 14) {
+  if (candles.length < 2) return 0
+  const trs: number[] = []
+  for (let i = 1; i < candles.length; i++) {
+    const c = candles[i], p = candles[i - 1]
+    trs.push(Math.max(c.high - c.low, Math.abs(c.high - p.close), Math.abs(c.low - p.close)))
+  }
+  const recent = trs.slice(-period)
+  return recent.reduce((a, b) => a + b, 0) / recent.length
 }
 
 function fmt(n: number) {
@@ -49,6 +67,21 @@ function tfLabel(interval?: string) {
   return 'H1'
 }
 
+/** Timeframe bo‘yicha SL/TP multiplikatorlari – qisqa SL, realistik TP */
+function tfParams(interval: string) {
+  // lookback: yaqin swing low uchun shamlar soni
+  // slBuffer: SL ni swing low dan biroz pastroqqa siljitish (ATR ulushi)
+  // tpMult: TP1/TP2/TP3 uchun ATR multiplikatorlari
+  if (interval === '1d') {
+    return { lookback: 10, slBuffer: 0.4, tpMult: [1.5, 2.5, 4] }
+  }
+  if (interval === '4h') {
+    return { lookback: 8, slBuffer: 0.35, tpMult: [1.2, 2.2, 3.5] }
+  }
+  // 1h – eng qisqa SL
+  return { lookback: 6, slBuffer: 0.25, tpMult: [1.0, 1.8, 2.8] }
+}
+
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
   const closes = candles.map(c => c.close)
   const last = closes.at(-1) ?? 0
@@ -61,16 +94,35 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
+
+  const params = tfParams(interval)
+  const vol = atr(candles, 14) || last * 0.005
+  const swingLow = recentSwingLow(candles, params.lookback)
+
+  // SL: yaqin swing low dan biroz pastroq (ATR buffer bilan) – iloji boricha qisqa
+  let invalidation = swingLow - vol * params.slBuffer
+  // SL hech qachon narxdan 3% dan uzoqroq bo‘lmasin (H1 uchun himoya)
+  const maxSlDistance = interval === '1h' ? last * 0.015 : interval === '4h' ? last * 0.025 : last * 0.04
+  if (last - invalidation > maxSlDistance) {
+    invalidation = last - maxSlDistance
+  }
+  // Minimal masofa – juda yaqin SL ham bo‘lmasin (noise)
+  const minSlDistance = vol * 0.5
+  if (last - invalidation < minSlDistance) {
+    invalidation = last - minSlDistance
+  }
+
+  // Entry zona: narx atrofida, SL dan yuqoriroq
+  const entryHigh = last
+  const entryLow = Math.max(invalidation + vol * 0.3, last - vol * 0.8)
+
+  // TP: ATR asosida timeframe bo‘yicha
+  const tp = params.tpMult.map(m => last + vol * m)
+
   const s = Math.min(...support)
   const rr = Math.max(...resistance)
-  const range = Math.max(last - s, last * 0.01)
-  const entryLow = Math.max(s, last - range * 0.35)
-  const entryHigh = last
-  const invalidation = s - range * 0.2
-  const tp = [last + range, last + range * 2, last + range * 3]
   const tf = tfLabel(interval)
 
-  // Har bir timeframe uchun alohida hisoblangan qisqa xulosa
   let summary: string
   if (trend === 'BULLISH') {
     summary = `${tf}: Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
