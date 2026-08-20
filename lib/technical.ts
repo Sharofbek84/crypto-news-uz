@@ -110,7 +110,6 @@ function clusterLevels(prices: number[], tolerance: number) {
   return clusters
 }
 
-/** Support / Resistance + Breakout — faqat SL/TP (grafikda chizilmaydi) */
 function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
   const window = Math.min(candles.length, interval === '1d' ? 60 : interval === '4h' ? 50 : 40)
   const recent = candles.slice(-window)
@@ -118,8 +117,8 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
   const tol = last * (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
   const lb = tfLookback(interval)
 
-  const rawLows = swings.filter(s => s.type === 'low').map(s => s.price)
-  const rawHighs = swings.filter(s => s.type === 'high').map(s => s.price)
+  const rawLows: number[] = swings.filter(s => s.type === 'low').map(s => s.price)
+  const rawHighs: number[] = swings.filter(s => s.type === 'high').map(s => s.price)
 
   if (!rawLows.length) {
     rawLows.push(Math.min(...recent.slice(-lb).map(c => c.low)))
