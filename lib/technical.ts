@@ -1,11 +1,30 @@
-export type Candle = { time: number; open: number; high: number; low: number; close: number; volume: number }
+export type Candle = {
+  time: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
 
 export type TechnicalResult = {
-  ema10: number; ema20: number; ema50: number; rsi: number; macd: number; signal: number; histogram: number
+  ema10: number
+  ema20: number
+  ema50: number
+  rsi: number
+  macd: number
+  signal: number
+  histogram: number
   trend: 'BULLISH' | 'BEARISH' | 'NEUTRAL'
-  support: number[]; resistance: number[]
-  entryLow: number; entryHigh: number; invalidation: number; tp: number[]
-  bullish: string; bearish: string; summary: string
+  support: number[]
+  resistance: number[]
+  entryLow: number
+  entryHigh: number
+  invalidation: number
+  tp: number[]
+  bullish: string
+  bearish: string
+  summary: string
 }
 
 export function ema(values: number[], period: number) {
@@ -18,13 +37,15 @@ export function ema(values: number[], period: number) {
 
 export function rsi(values: number[], period = 14) {
   if (values.length <= period) return 50
-  let gain = 0, loss = 0
+  let gain = 0
+  let loss = 0
   for (let i = 1; i <= period; i++) {
     const d = values[i] - values[i - 1]
     if (d >= 0) gain += d
     else loss -= d
   }
-  let avgGain = gain / period, avgLoss = loss / period
+  let avgGain = gain / period
+  let avgLoss = loss / period
   for (let i = period + 1; i < values.length; i++) {
     const d = values[i] - values[i - 1]
     avgGain = (avgGain * (period - 1) + Math.max(d, 0)) / period
@@ -52,7 +73,6 @@ function tfLookback(interval: string) {
   return 6
 }
 
-/** Swing high/low: markaz sham yonidagilardan balandroq/pastroq */
 function findSwingPoints(candles: Candle[], left = 2, right = 2) {
   const swings: { price: number; type: 'high' | 'low'; index: number }[] = []
   for (let i = left; i < candles.length - right; i++) {
@@ -73,9 +93,8 @@ function findSwingPoints(candles: Candle[], left = 2, right = 2) {
   return swings
 }
 
-/** Yaqin darajalarni birlashtirish (cluster) */
 function clusterLevels(prices: number[], tolerance: number) {
-  if (!prices.length) return []
+  if (!prices.length) return [] as number[]
   const sorted = [...prices].sort((a, b) => a - b)
   const clusters: number[] = []
   let group = [sorted[0]]
@@ -91,9 +110,7 @@ function clusterLevels(prices: number[], tolerance: number) {
   return clusters
 }
 
-/**
- * Support / Resistance + Breakout — faqat SL/TP (grafikda chizilmaydi)
- */
+/** Support / Resistance + Breakout — faqat SL/TP (grafikda chizilmaydi) */
 function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
   const window = Math.min(candles.length, interval === '1d' ? 60 : interval === '4h' ? 50 : 40)
   const recent = candles.slice(-window)
@@ -117,9 +134,7 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
   const allRes = clusterLevels(rawHighs, tol).sort((a, b) => a - b)
   const nearestResBelow = [...allRes].reverse().find(p => p <= last)
   const isBreakout =
-    nearestResBelow != null &&
-    last > nearestResBelow &&
-    (last - nearestResBelow) / last < 0.02
+    nearestResBelow != null && last > nearestResBelow && (last - nearestResBelow) / last < 0.02
 
   let structureLow: number
   if (isBreakout && nearestResBelow != null) {
@@ -128,8 +143,8 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
     structureLow = supports[0] ?? Math.min(...recent.slice(-lb).map(c => c.low))
   }
 
-  const nextRes = resistances[0] ?? last * 1.01
-  const rangeHint = Math.max(nextRes - structureLow, last * 0.004)
+  const nextResHint = resistances[0] ?? last * 1.01
+  const rangeHint = Math.max(nextResHint - structureLow, last * 0.004)
   const buffer = rangeHint * (interval === '1h' ? 0.08 : interval === '4h' ? 0.1 : 0.12)
   let invalidation = structureLow - buffer
 
@@ -196,7 +211,6 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
   }
 }
 
-/** Bullish/Bearish senariy matnlari — S/R + Breakout asosida */
 function buildScenarios(
   last: number,
   interval: string,
@@ -223,13 +237,13 @@ function buildScenarios(
   let bullish: string
   if (isBreakout) {
     bullish =
-      `${tf}: Resistance ${fmt(nearestSupport > last ? nearestSupport : entryLow)} yorildi (breakout). ` +
+      `${tf}: Resistance yorildi (breakout). ` +
       `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlansa, ` +
-      `TP1 ${fmt(tp[0])}, TP2 ${fmt(tp[1])}, TP3 ${fmt(tp[2])} sari measured move kutiladi. ` +
+      `TP1 ${fmt(tp[0])}, TP2 ${fmt(tp[1])}, TP3 ${fmt(tp[2])} sari measured move. ` +
       `SL ${fmt(invalidation)} ostida yopilsa setup bekor.`
   } else if (resistance.length > 0) {
     bullish =
-      `${tf}: Support ${fmt(nearestSupport)} ushlanib, resistance ${fmt(nearestResistance)} sari harakat. ` +
+      `${tf}: Support ${fmt(nearestSupport)} ushlanib, resistance ${fmt(nearestResistance)} sari. ` +
       `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. ` +
       `Maqsadlar: TP1 ${fmt(tp[0])}` +
       (resistance[1] != null ? `, keyingi R ${fmt(nextRes)}` : '') +
@@ -237,7 +251,7 @@ function buildScenarios(
       `. SL: ${fmt(invalidation)} (support ostida).`
   } else {
     bullish =
-      `${tf}: Aniq resistance yo‘q; risk ${fmt(risk)} asosida proyeksiya. ` +
+      `${tf}: Aniq resistance yo‘q; risk ${fmt(risk)} proyeksiya. ` +
       `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}, TP1 ${fmt(tp[0])}, TP2 ${fmt(tp[1])}, TP3 ${fmt(tp[2])}. ` +
       `SL ${fmt(invalidation)}.`
   }
@@ -245,7 +259,7 @@ function buildScenarios(
   let bearish: string
   if (isBreakout) {
     bearish =
-      `${tf}: Breakout failed (yorilgan daraja qayta resistance). ` +
+      `${tf}: Breakout failed — yorilgan daraja qayta resistance. ` +
       `Narx ${fmt(nearestSupport)} ostiga tushsa yoki ${fmt(invalidation)} yopilsa, ` +
       `pasayish: ${fmt(invalidation)} → ${fmt(deeperSup)} → ${fmt(deeperSup - risk)}. ` +
       `Qayta ${fmt(entryHigh)} ustida ushlansa breakout haqiqiy.`
@@ -269,7 +283,9 @@ function buildScenarios(
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
   const closes = candles.map(c => c.close)
   const last = closes.at(-1) ?? 0
-  const e10 = ema(closes, 10), e20 = ema(closes, 20), e50 = ema(closes, 50)
+  const e10 = ema(closes, 10)
+  const e20 = ema(closes, 20)
+  const e50 = ema(closes, 50)
   const r = rsi(closes)
   const macdLine = ema(closes, 12) - ema(closes, 26)
   const signal = ema(
@@ -281,7 +297,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
 
-  // S/R + Breakout — faqat SL/TP (grafikda chizilmaydi)
   const sr = srBreakoutLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
   const { bullish, bearish } = buildScenarios(last, interval, sr)
