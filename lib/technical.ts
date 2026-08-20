@@ -19,7 +19,11 @@ export function ema(values: number[], period: number) {
 export function rsi(values: number[], period = 14) {
   if (values.length <= period) return 50
   let gain = 0, loss = 0
-  for (let i = 1; i <= period; i++) { const d = values[i] - values[i - 1]; if (d >= 0) gain += d; else loss -= d }
+  for (let i = 1; i <= period; i++) {
+    const d = values[i] - values[i - 1]
+    if (d >= 0) gain += d
+    else loss -= d
+  }
   let avgGain = gain / period, avgLoss = loss / period
   for (let i = period + 1; i < values.length; i++) {
     const d = values[i] - values[i - 1]
@@ -88,62 +92,56 @@ function clusterLevels(prices: number[], tolerance: number) {
 }
 
 /**
- * Support / Resistance + Breakout (faqat SL/TP uchun, grafikda chizilmaydi)
- * - Support: narx ostidagi swing low lar
- * - Resistance: narx ustidagi swing high lar
- * - Breakout: narx oxirgi resistance dan yuqoriga yopilgan bo‘lsa
+ * Support / Resistance + Breakout — faqat SL/TP (grafikda chizilmaydi)
  */
 function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
-  const lookback = Math.min(candles.length, interval === '1d' ? 60 : interval === '4h' ? 50 : 40)
-  const recent = candles.slice(-lookback)
+  const window = Math.min(candles.length, interval === '1d' ? 60 : interval === '4h' ? 50 : 40)
+  const recent = candles.slice(-window)
   const swings = findSwingPoints(recent, 2, 2)
   const tol = last * (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
+  const lb = tfLookback(interval)
 
   const rawLows = swings.filter(s => s.type === 'low').map(s => s.price)
   const rawHighs = swings.filter(s => s.type === 'high').map(s => s.price)
 
-  // Fallback: agar swing topilmasa, oddiy min/max
   if (!rawLows.length) {
-    const slice = recent.slice(-tfLookback(interval))
-    rawLows.push(Math.min(...slice.map(c => c.low)))
+    rawLows.push(Math.min(...recent.slice(-lb).map(c => c.low)))
   }
   if (!rawHighs.length) {
-    const slice = recent.slice(-tfLookback(interval))
-    rawHighs.push(Math.max(...slice.map(c => c.high)))
+    rawHighs.push(Math.max(...recent.slice(-lb).map(c => c.high)))
   }
 
-  const supports = clusterLevels(rawLows, tol).filter(p => p < last).sort((a, b) => b - a) // yaqindan uzoqqa
-  const resistances = clusterLevels(rawHighs, tol).filter(p => p > last).sort((a, b) => a - b) // pastidan yuqoriga
+  const supports = clusterLevels(rawLows, tol).filter(p => p < last).sort((a, b) => b - a)
+  const resistances = clusterLevels(rawHighs, tol).filter(p => p > last).sort((a, b) => a - b)
 
-  // Barcha resistance (breakout tekshiruvi uchun)
   const allRes = clusterLevels(rawHighs, tol).sort((a, b) => a - b)
   const nearestResBelow = [...allRes].reverse().find(p => p <= last)
-  const isBreakout = nearestResBelow != null && last > nearestResBelow && (last - nearestResBelow) / last < 0.02
+  const isBreakout =
+    nearestResBelow != null &&
+    last > nearestResBelow &&
+    (last - nearestResBelow) / last < 0.02
 
-  // SL: eng yaqin support ostida (breakout bo‘lsa — yorilgan daraja ostida)
   let structureLow: number
   if (isBreakout && nearestResBelow != null) {
-    // Breakout: SL yorilgan resistance ning ostidagi supportga yoki struktura pastiga
     structureLow = supports[0] ?? nearestResBelow * 0.995
   } else {
-    structureLow = supports[0] ?? Math.min(...recent.slice(-tfLookback(interval)).map(c => c.low))
+    structureLow = supports[0] ?? Math.min(...recent.slice(-lb).map(c => c.low))
   }
 
-  const rangeHint = Math.max(
-    (resistances[0] ?? last * 1.01) - structureLow,
-    last * 0.004
-  )
-  const slBuffer = rangeHint * (interval === '1h' ? 0.08 : interval === '4h' ? 0.1 : 0.12)
-  let invalidation = structureLow - slBuffer
+  const nextRes = resistances[0] ?? last * 1.01
+  const rangeHint = Math.max(nextRes - structureLow, last * 0.004)
+  const buffer = rangeHint * (interval === '1h' ? 0.08 : interval === '4h' ? 0.1 : 0.12)
+  let invalidation = structureLow - buffer
 
-  const maxSlDistance = interval === '1h' ? last * 0.015 : interval === '4h' ? last * 0.025 : last * 0.04
-  if (last - invalidation > maxSlDistance) invalidation = last - maxSlDistance
-  const minSlDistance = last * (interval === '1h' ? 0.004 : interval === '4h' ? 0.006 : 0.01)
-  if (last - invalidation < minSlDistance) invalidation = last - minSlDistance
+  const maxSl = interval === '1h' ? last * 0.015 : interval === '4h' ? last * 0.025 : last * 0.04
+  if (last - invalidation > maxSl) invalidation = last - maxSl
+  const minSl = last * (interval === '1h' ? 0.004 : interval === '4h' ? 0.006 : 0.01)
+  if (last - invalidation < minSl) invalidation = last - minSl
 
-  // TP: keyingi resistance darajalari; yetarli bo‘lmasa range projection
-  const risk = last - invalidation
-  let tp1: number, tp2: number, tp3: number
+  const risk = Math.max(last - invalidation, last * 0.003)
+  let tp1: number
+  let tp2: number
+  let tp3: number
 
   if (resistances.length >= 3) {
     tp1 = resistances[0]
@@ -157,34 +155,32 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
     tp1 = resistances[0]
     tp2 = resistances[0] + risk
     tp3 = resistances[0] + risk * 2
-  } else if (isBreakout && nearestResBelow != null) {
-    // Breakout measured move: range ≈ resistance - oldingi support
-    const measured = last - invalidation
-    tp1 = last + measured * 0.8
-    tp2 = last + measured * 1.5
-    tp3 = last + measured * 2.2
+  } else if (isBreakout) {
+    tp1 = last + risk * 0.8
+    tp2 = last + risk * 1.5
+    tp3 = last + risk * 2.2
   } else {
     tp1 = last + risk * 1.2
     tp2 = last + risk * 2
     tp3 = last + risk * 3
   }
 
-  // TP har doim narxdan yuqori va tartibli bo‘lsin
   tp1 = Math.max(tp1, last + risk * 0.5)
   tp2 = Math.max(tp2, tp1 + risk * 0.4)
   tp3 = Math.max(tp3, tp2 + risk * 0.4)
 
-  // UI dagi support/resistance massivlari (matn uchun)
   const supportArr = supports.slice(0, 3)
   const resistanceArr = resistances.slice(0, 3)
   if (!supportArr.length) supportArr.push(structureLow)
   if (!resistanceArr.length) resistanceArr.push(tp1)
 
-  // Entry: support va narx orasida / breakout pullback zonasi
   const entryHigh = last
-  const entryLow = isBreakout
-    ? Math.max(invalidation + risk * 0.25, nearestResBelow ?? last - risk * 0.3)
-    : Math.max(invalidation + risk * 0.2, structureLow)
+  let entryLow: number
+  if (isBreakout && nearestResBelow != null) {
+    entryLow = Math.max(invalidation + risk * 0.25, nearestResBelow)
+  } else {
+    entryLow = Math.max(invalidation + risk * 0.2, structureLow)
+  }
 
   return {
     support: supportArr,
@@ -194,7 +190,80 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
     entryHigh,
     tp: [tp1, tp2, tp3],
     isBreakout,
+    nearestSupport: supports[0] ?? structureLow,
+    nearestResistance: resistances[0] ?? tp1,
+    risk,
   }
+}
+
+/** Bullish/Bearish senariy matnlari — S/R + Breakout asosida */
+function buildScenarios(
+  last: number,
+  interval: string,
+  sr: ReturnType<typeof srBreakoutLevels>
+) {
+  const tf = tfLabel(interval)
+  const {
+    invalidation,
+    entryLow,
+    entryHigh,
+    tp,
+    isBreakout,
+    nearestSupport,
+    nearestResistance,
+    risk,
+    support,
+    resistance,
+  } = sr
+
+  const nextRes = resistance[1] ?? tp[1]
+  const farRes = resistance[2] ?? tp[2]
+  const deeperSup = support[1] ?? invalidation - risk
+
+  let bullish: string
+  if (isBreakout) {
+    bullish =
+      `${tf}: Resistance ${fmt(nearestSupport > last ? nearestSupport : entryLow)} yorildi (breakout). ` +
+      `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlansa, ` +
+      `TP1 ${fmt(tp[0])}, TP2 ${fmt(tp[1])}, TP3 ${fmt(tp[2])} sari measured move kutiladi. ` +
+      `SL ${fmt(invalidation)} ostida yopilsa setup bekor.`
+  } else if (resistance.length > 0) {
+    bullish =
+      `${tf}: Support ${fmt(nearestSupport)} ushlanib, resistance ${fmt(nearestResistance)} sari harakat. ` +
+      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. ` +
+      `Maqsadlar: TP1 ${fmt(tp[0])}` +
+      (resistance[1] != null ? `, keyingi R ${fmt(nextRes)}` : '') +
+      (resistance[2] != null ? `, uzoq R ${fmt(farRes)}` : `, TP3 ${fmt(tp[2])}`) +
+      `. SL: ${fmt(invalidation)} (support ostida).`
+  } else {
+    bullish =
+      `${tf}: Aniq resistance yo‘q; risk ${fmt(risk)} asosida proyeksiya. ` +
+      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}, TP1 ${fmt(tp[0])}, TP2 ${fmt(tp[1])}, TP3 ${fmt(tp[2])}. ` +
+      `SL ${fmt(invalidation)}.`
+  }
+
+  let bearish: string
+  if (isBreakout) {
+    bearish =
+      `${tf}: Breakout failed (yorilgan daraja qayta resistance). ` +
+      `Narx ${fmt(nearestSupport)} ostiga tushsa yoki ${fmt(invalidation)} yopilsa, ` +
+      `pasayish: ${fmt(invalidation)} → ${fmt(deeperSup)} → ${fmt(deeperSup - risk)}. ` +
+      `Qayta ${fmt(entryHigh)} ustida ushlansa breakout haqiqiy.`
+  } else if (support.length > 0) {
+    bearish =
+      `${tf}: Resistance ${fmt(nearestResistance)} ushlansa yoki support ${fmt(nearestSupport)} yorilsa. ` +
+      `SL ${fmt(invalidation)} ostida yopilish — support sinishi. ` +
+      `Keyingi maqsadlar: ${fmt(nearestSupport)}` +
+      (support[1] != null ? ` → ${fmt(deeperSup)}` : '') +
+      `. Qayta ${fmt(entryLow)}–${fmt(entryHigh)} ustida — bullish saqlanadi.`
+  } else {
+    bearish =
+      `${tf}: Support aniq emas. ${fmt(invalidation)} pastga yopilsa pasayish: ` +
+      `${fmt(invalidation)} → ${fmt(invalidation - risk)} → ${fmt(invalidation - risk * 2)}. ` +
+      `Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida qayta ushlansa rebound.`
+  }
+
+  return { bullish, bearish }
 }
 
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
@@ -203,35 +272,60 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const e10 = ema(closes, 10), e20 = ema(closes, 20), e50 = ema(closes, 50)
   const r = rsi(closes)
   const macdLine = ema(closes, 12) - ema(closes, 26)
-  const signal = ema(closes.map((_, i) => ema(closes.slice(0, i + 1), 12) - ema(closes.slice(0, i + 1), 26)), 9)
+  const signal = ema(
+    closes.map((_, i) => ema(closes.slice(0, i + 1), 12) - ema(closes.slice(0, i + 1), 26)),
+    9
+  )
   const hist = macdLine - signal
   const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
 
+  // S/R + Breakout — faqat SL/TP (grafikda chizilmaydi)
   const sr = srBreakoutLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
+  const { bullish, bearish } = buildScenarios(last, interval, sr)
 
-  const s = support[0] ?? invalidation
-  const rr = resistance[0] ?? tp[0]
   const tf = tfLabel(interval)
-
   let summary: string
-  if (trend === 'BULLISH') {
-    summary = `${tf}: Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
+  if (sr.isBreakout) {
+    summary =
+      `${tf}: Resistance yorildi (breakout). ` +
+      `Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida — TP ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}. ` +
+      `SL ${fmt(invalidation)}.`
+  } else if (trend === 'BULLISH') {
+    summary =
+      `${tf}: Support ${fmt(support[0] ?? invalidation)} ushlanib, ` +
+      `resistance ${fmt(resistance[0] ?? tp[0])} sari. ` +
+      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL ${fmt(invalidation)}.`
   } else if (trend === 'BEARISH') {
-    summary = `${tf}: Narx ${fmt(entryHigh)} atrofida bosim ostida. ${fmt(invalidation)} pastga yopilsa, pasayish davom etishi mumkin. ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida qayta ushlansa, rebound kutiladi.`
+    summary =
+      `${tf}: Resistance ${fmt(resistance[0] ?? last)} bosimi. ` +
+      `Support ${fmt(support[0] ?? invalidation)} yorilsa pasayish. SL ${fmt(invalidation)}.`
   } else {
-    summary = `${tf}: Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona atrofida neytral. Ushbu zona ustida ushlanib tursa, yuqoriga davom etishi ehtimoli bor. ${fmt(invalidation)} pastga buzilsa, pasayish davom etishi mumkin.`
+    summary =
+      `${tf}: S/R oralig‘ida. Support ${fmt(support[0] ?? invalidation)}, ` +
+      `resistance ${fmt(resistance[0] ?? tp[0])}. ` +
+      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}, SL ${fmt(invalidation)}.`
   }
 
-  const bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(rr)} gacha rebound/breakout ssenariysi kuzatiladi.`
-  const bearish = `EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(s)} support zonasini qayta test qilish xavfini oshiradi.`
-
   return {
-    ema10: e10, ema20: e20, ema50: e50, rsi: r, macd: macdLine, signal, histogram: hist,
-    trend, support, resistance,
-    entryLow, entryHigh, invalidation, tp,
-    bullish, bearish, summary
+    ema10: e10,
+    ema20: e20,
+    ema50: e50,
+    rsi: r,
+    macd: macdLine,
+    signal,
+    histogram: hist,
+    trend,
+    support,
+    resistance,
+    entryLow,
+    entryHigh,
+    invalidation,
+    tp,
+    bullish,
+    bearish,
+    summary,
   }
 }
