@@ -110,6 +110,7 @@ function clusterLevels(prices: number[], tolerance: number) {
   return clusters
 }
 
+/** Support / Resistance + Breakout — faqat SL/TP (grafikda chizilmaydi) */
 function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
   const window = Math.min(candles.length, interval === '1d' ? 60 : interval === '4h' ? 50 : 40)
   const recent = candles.slice(-window)
@@ -203,80 +204,7 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
     entryLow: Math.min(entryLow, last),
     entryHigh,
     tp: [tp1, tp2, tp3],
-    isBreakout,
-    nearestSupport: supports[0] ?? structureLow,
-    nearestResistance: resistances[0] ?? tp1,
-    risk,
   }
-}
-
-function buildScenarios(
-  last: number,
-  interval: string,
-  sr: ReturnType<typeof srBreakoutLevels>
-) {
-  const tf = tfLabel(interval)
-  const {
-    invalidation,
-    entryLow,
-    entryHigh,
-    tp,
-    isBreakout,
-    nearestSupport,
-    nearestResistance,
-    risk,
-    support,
-    resistance,
-  } = sr
-
-  const nextRes = resistance[1] ?? tp[1]
-  const farRes = resistance[2] ?? tp[2]
-  const deeperSup = support[1] ?? invalidation - risk
-
-  let bullish: string
-  if (isBreakout) {
-    bullish =
-      `${tf}: Resistance yorildi (breakout). ` +
-      `Narx ${fmt(entryLow)}–${fmt(entryHigh)} zona ustida ushlansa, ` +
-      `TP1 ${fmt(tp[0])}, TP2 ${fmt(tp[1])}, TP3 ${fmt(tp[2])} sari measured move. ` +
-      `SL ${fmt(invalidation)} ostida yopilsa setup bekor.`
-  } else if (resistance.length > 0) {
-    bullish =
-      `${tf}: Support ${fmt(nearestSupport)} ushlanib, resistance ${fmt(nearestResistance)} sari. ` +
-      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. ` +
-      `Maqsadlar: TP1 ${fmt(tp[0])}` +
-      (resistance[1] != null ? `, keyingi R ${fmt(nextRes)}` : '') +
-      (resistance[2] != null ? `, uzoq R ${fmt(farRes)}` : `, TP3 ${fmt(tp[2])}`) +
-      `. SL: ${fmt(invalidation)} (support ostida).`
-  } else {
-    bullish =
-      `${tf}: Aniq resistance yo‘q; risk ${fmt(risk)} proyeksiya. ` +
-      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}, TP1 ${fmt(tp[0])}, TP2 ${fmt(tp[1])}, TP3 ${fmt(tp[2])}. ` +
-      `SL ${fmt(invalidation)}.`
-  }
-
-  let bearish: string
-  if (isBreakout) {
-    bearish =
-      `${tf}: Breakout failed — yorilgan daraja qayta resistance. ` +
-      `Narx ${fmt(nearestSupport)} ostiga tushsa yoki ${fmt(invalidation)} yopilsa, ` +
-      `pasayish: ${fmt(invalidation)} → ${fmt(deeperSup)} → ${fmt(deeperSup - risk)}. ` +
-      `Qayta ${fmt(entryHigh)} ustida ushlansa breakout haqiqiy.`
-  } else if (support.length > 0) {
-    bearish =
-      `${tf}: Resistance ${fmt(nearestResistance)} ushlansa yoki support ${fmt(nearestSupport)} yorilsa. ` +
-      `SL ${fmt(invalidation)} ostida yopilish — support sinishi. ` +
-      `Keyingi maqsadlar: ${fmt(nearestSupport)}` +
-      (support[1] != null ? ` → ${fmt(deeperSup)}` : '') +
-      `. Qayta ${fmt(entryLow)}–${fmt(entryHigh)} ustida — bullish saqlanadi.`
-  } else {
-    bearish =
-      `${tf}: Support aniq emas. ${fmt(invalidation)} pastga yopilsa pasayish: ` +
-      `${fmt(invalidation)} → ${fmt(invalidation - risk)} → ${fmt(invalidation - risk * 2)}. ` +
-      `Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida qayta ushlansa rebound.`
-  }
-
-  return { bullish, bearish }
 }
 
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
@@ -298,29 +226,31 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
   const sr = srBreakoutLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
-  const { bullish, bearish } = buildScenarios(last, interval, sr)
-
   const tf = tfLabel(interval)
+
+  // Oddiy foydalanuvchi uchun: faqat grafikdagi Entry / SL / TP zonalari
+  const bullish =
+    `${tf}: Agar narx ${fmt(entryLow)}–${fmt(entryHigh)} (kirish zonasi) ustida ushlanib tursa, ` +
+    `yuqoriga ${fmt(tp[0])} (TP1), keyin ${fmt(tp[1])} (TP2) va ${fmt(tp[2])} (TP3) sari harakat qilishi mumkin. ` +
+    `Stop: ${fmt(invalidation)} (SL).`
+
+  const bearish =
+    `${tf}: Agar narx ${fmt(invalidation)} (SL) pastga yopilsa, pasayish davom etishi mumkin. ` +
+    `Agar yana ${fmt(entryLow)}–${fmt(entryHigh)} zona ustiga qaytsa, o‘sish senariysi saqlanadi.`
+
   let summary: string
-  if (sr.isBreakout) {
+  if (trend === 'BULLISH') {
     summary =
-      `${tf}: Resistance yorildi (breakout). ` +
-      `Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida — TP ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}. ` +
-      `SL ${fmt(invalidation)}.`
-  } else if (trend === 'BULLISH') {
-    summary =
-      `${tf}: Support ${fmt(support[0] ?? invalidation)} ushlanib, ` +
-      `resistance ${fmt(resistance[0] ?? tp[0])} sari. ` +
-      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL ${fmt(invalidation)}.`
+      `${tf}: O‘sish ehtimoli yuqori. Kirish: ${fmt(entryLow)}–${fmt(entryHigh)}. ` +
+      `Maqsadlar: ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}. SL: ${fmt(invalidation)}.`
   } else if (trend === 'BEARISH') {
     summary =
-      `${tf}: Resistance ${fmt(resistance[0] ?? last)} bosimi. ` +
-      `Support ${fmt(support[0] ?? invalidation)} yorilsa pasayish. SL ${fmt(invalidation)}.`
+      `${tf}: Pasayish xavfi bor. ${fmt(invalidation)} pastga yopilsa pastga davom etishi mumkin. ` +
+      `Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida ushlansa qayta o‘sish kutiladi.`
   } else {
     summary =
-      `${tf}: S/R oralig‘ida. Support ${fmt(support[0] ?? invalidation)}, ` +
-      `resistance ${fmt(resistance[0] ?? tp[0])}. ` +
-      `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}, SL ${fmt(invalidation)}.`
+      `${tf}: Neytral. Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida — o‘sish tomon. ` +
+      `${fmt(invalidation)} pastga — pasayish. TP: ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}.`
   }
 
   return {
