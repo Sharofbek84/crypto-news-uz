@@ -1,47 +1,47 @@
 [
   {
-    "slug": "bitcoin-70000-yaqinlashdi",
-    "title": "Bitcoin $70,000 ga yaqinlashdi — so‘nggi 5 oydagi eng kuchli rally",
-    "summary": "Bitcoin 19-avgustda $64,000 dan $69,800+ gacha ko‘tarildi va 20-avgustda $69,000–$69,500 oralig‘ida ushlanib turibdi. $1,4–3 milliardlik short pozitsiyalar likvidatsiya qilindi.",
-    "body": "Bitcoin narxi 19-avgust kuni $64,000 atrofidan $69,800–$70,000 ga yaqinlashib, iyun oyidan beri eng yuqori darajani qayd etdi. 20-avgust ertalab $69,000–$69,500 oralig‘ida savdo qilinmoqda.\n\nCoinglass ma’lumotlariga ko‘ra, 24 soat ichida $1,4–2,9 milliardlik short pozitsiyalar likvidatsiya qilindi — bu so‘nggi yillardagi eng yirik short-squeeze holatlaridan biri.\n\nAsosiy katalizatorlar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar bo‘yicha qayta sotib olish hajmini ikki baravar oshirishi va Oq uydagi kripto uchrashuvi.\n\nEthereum 17–18%, Solana va XRP ham 9–10% atrofida o‘sdi. Umumiy bozor kapitallashuvi $2,4–2,5 trillionga yetdi.",
-    "url": "https://www.coindesk.com/markets/2026/08/19/bitcoin-briefly-hits-70000-for-the-first-time-since-june-here-is-why",
+    "slug": "bitcoin-72000-short-squeeze",
+    "title": "Bitcoin $72,000 dan oshdi — $3 milliardlik short pozitsiyalar likvidatsiya qilindi",
+    "summary": "Bitcoin 6 haftalik diapazondan chiqib $71,000–$72,800 oralig‘iga yetdi. 24 soat ichida taxminan $3 milliardlik short pozitsiyalar yopildi — 2021-yildan beri eng yirik short-squeeze.",
+    "body": "Bitcoin 20–21 avgust kunlari $64,000 atrofidan $72,000+ darajasiga ko‘tarilib, iyun oyidan beri eng yuqori narxni qayd etdi. Coinglass va CoinDesk ma’lumotlariga ko‘ra, 24 soat ichida taxminan $2,7–3,3 milliardlik short pozitsiyalar likvidatsiya qilindi.\n\nBu 2021-yildan beri eng yirik short-squeeze holatlaridan biri hisoblanadi. Bir soat ichida $1 milliarddan ortiq shortlar yopildi.\n\nAsosiy katalizatorlar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar bo‘yicha qayta sotib olish hajmini ikki baravar oshirishi, Trumpning Clarity Act’ni tezlashtirish chaqirig‘i va kuchli ETF oqimlari.\n\nUmumiy kripto bozor kapitallashuvi $2,45–2,55 trillion atrofida. Fear & Greed indeksi «Fear»dan «Greed»ga o‘tdi.",
+    "url": "https://www.coindesk.com/markets/2026/08/20/bitcoin-breaks-out-of-six-week-range-tops-usd71-000-as-usd3-billion-in-shorts-get-wiped-out",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-20"
+    "date": "2026-08-21"
   },
   {
-    "slug": "trump-clarity-act-oq-uy",
-    "title": "Trump Oq uyda kripto rahbarlari bilan uchrashdi — Clarity Act’ni tezlashtirishni so‘radi",
-    "summary": "Prezident Trump Coinbase, Ripple, a16z va Kraken rahbarlari bilan uchrashib, Kongressdan Clarity Act’ni tezroq qabul qilishni talab qildi. 15-sentabrda muhim ovoz berish kutilmoqda.",
-    "body": "19-avgust kuni Oq uyda Prezident Donald Trump kripto va texnologiya kompaniyalari rahbarlari bilan uchrashdi. Uchrashuvda SEC va CFTC raislari ham ishtirok etdi.\n\nTrump Kongressdan Clarity Act (kripto bozori tuzilmasi haqidagi qonun loyihasi) ni tezroq ko‘rib chiqishni so‘radi. Qonun loyihasi bo‘yicha asosiy protsedural ovoz berish 15-sentabrga rejalashtirilgan.\n\nBu uchrashuv sohada tartibga solish bo‘yicha ijobiy kayfiyatni sezilarli kuchaytirdi. Coinbase, Circle va Bullish aksiyalari 8–10% atrofida oshdi.\n\nCFTC raisi ertangi Innovation Advisory Committee yig‘ilishida kelajakdagi tartibga solish yo‘l xaritasi haqida batafsil ma’lumot berishini aytdi.",
-    "url": "https://www.coindesk.com/policy/2026/08/19/trump-pushes-congress-to-move-on-clarity-act-during-white-house-crypto-event",
+    "slug": "ethereum-20-foiz-etf",
+    "title": "Ethereum 18–20% oshdi — ETF’larga $189 mln oqim, DeFi kuchaydi",
+    "summary": "Ethereum $2,250–$2,320 oralig‘iga yetib, BTC dan kuchliroq o‘sish ko‘rsatdi. Spot ETH ETF’larga bir kunda $189 million sof oqim tushdi — 10 oydagi eng yuqori ko‘rsatkich.",
+    "body": "Ethereum 24 soat ichida 18–20% atrofida oshib, $2,250–$2,320 darajasiga yetdi. Bu Bitcoin o‘sishidan sezilarli kuchliroq.\n\nSpot Ethereum ETF’lariga bir kunda taxminan $189 million sof oqim qayd etildi — so‘nggi 10 oydagi eng yirik kunlik oqim. Bitcoin ETF’lari esa $517 million oqim jalb qildi.\n\nDeFi sektori 9–12% oralig‘ida o‘sdi. ETH/BTC nisbati ham yaxshilandi, bu kapitalning Ethereum ekotizimiga qaytishini ko‘rsatadi.\n\nTahlilchilar ETH’ning kuchli o‘sishini risk-on kayfiyat, tartibga solish optimizmi va institutsional talab bilan bog‘lashmoqda.",
+    "url": "https://www.coindesk.com/markets/2026/08/20/ether-jumps-18-to-usd2-250-as-bitcoin-tops-usd69-000-in-broad-crypto-rally",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-20"
+    "date": "2026-08-21"
   },
   {
-    "slug": "hype-hyperliquid-aqsh",
-    "title": "HYPE 11–19% oshdi: Trump CFTC Hyperliquid’ni AQShga kiritishini ma’lum qildi",
-    "summary": "Oq uy uchrashuvida Trump CFTC raisi Hyperliquid perpetual futures platformasini federal qoidalar ostida AQSh bozoriga olib kirish ustida ishlayotganini aytdi. HYPE sezilarli o‘sdi.",
-    "body": "Hyperliquid’ning HYPE tokeni 11–19% oralig‘ida oshdi. Sabab — Prezident Trumpning Oq uyda aytgan bayonoti.\n\nTrump CFTC raisi Mayk Selig platformani AQSh federal qoidalari ostida ishga tushirish ustida ishlayotganini tasdiqladi. Bu perpetual futures bozorida muhim qadam hisoblanadi.\n\nHyperliquid hozirda markazlashtirilmagan perpetual futures platformalar orasida yetakchilardan biri. AQSh bozoriga kirish platforma va token uchun katta o‘sish imkoniyatini ochadi.\n\nBu yangilik butun DeFi va perpetual futures segmentiga ijobiy ta’sir ko‘rsatdi. Savdo hajmi sezilarli oshdi.",
-    "url": "https://www.coindesk.com/markets/2026/08/19/hype-jumps-11-as-trump-says-cftc-is-working-to-bring-hyperliquid-to-u-s",
+    "slug": "btc-etf-517-mln",
+    "title": "Bitcoin ETF’lariga $517 mln, ETH ETF’lariga $189 mln oqim — eng kuchli kunlardan biri",
+    "summary": "AQSh spot Bitcoin ETF’lari bir kunda $517 million, Ethereum ETF’lari $189 million sof oqim jalb qildi. Bu so‘nggi oylardagi eng yirik oqimlardan biri.",
+    "body": "20-avgust kuni AQSh spot Bitcoin ETF’lariga taxminan $517 million, Ethereum ETF’lariga $189 million sof oqim tushdi.\n\nBlackRock IBIT yetakchilik qildi. Bu oqimlar short-squeeze va makroiqtisodiy katalizatorlar bilan birgalikda narxlarni yuqoriga turtib yubordi.\n\nInstitutsional talabning qaytishi bozor ishtirokchilari orasida ijobiy kayfiyatni kuchaytirdi. Savdo hajmi Bitcoin bo‘yicha 250% ga oshib, $59 milliard atrofida qayd etildi.\n\nTahlilchilar buni «hard assets»ga qiziqishning oshishi va foiz stavkalarining pasayishi bilan bog‘lashmoqda.",
+    "url": "https://www.coindesk.com/tech/2026/08/20/live-updates-bitcoin-etfs-draw-usd517-million-ether-pulls-usd189-million-in-biggest-inflows-in-months",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-20"
+    "date": "2026-08-21"
   },
   {
-    "slug": "ethereum-18-foiz-oshdi",
-    "title": "Ethereum 18% oshdi — BTC dan kuchliroq rally, DeFi 10% ga ko‘tarildi",
-    "summary": "Ethereum 24 soat ichida 17–18% oshib $2,200–$2,280 oralig‘iga yetdi. DeFi sektori 9–12% o‘sdi. ETH ETF’larga ham kapital oqimi kuchaydi.",
-    "body": "Ethereum narxi 19–20 avgustda 17–18% ga oshib, $2,200–$2,280 darajasiga yetdi. Bu Bitcoin o‘sishidan sezilarli kuchliroq.\n\nDeFi sektori 9–12% oralig‘ida o‘sdi. Umumiy kripto bozori kapitallashuvi $2,45 trillion atrofida.\n\nSpot Ethereum ETF’lariga ham net inflows kuzatildi. Tahlilchilar ETH’ning kuchli o‘sishini risk-on kayfiyat va tartibga solish optimizmi bilan bog‘lashmoqda.\n\nSolana va XRP ham 9–10% atrofida o‘sish ko‘rsatdi. Bozor umumiy qisqa pozitsiyalarning massiv likvidatsiyasidan foyda ko‘rdi.",
-    "url": "https://finance.yahoo.com/markets/crypto/articles/bitcoin-hits-69-000-ethereum-211512521.html",
+    "slug": "golden-cross-btc",
+    "title": "Bitcoin $71k+ — golden cross shakllanishi mumkin, ba’zi tahlilchilar $180k ni ko‘rmoqda",
+    "summary": "Bitcoin $71,000 dan oshgandan so‘ng texnik ko‘rsatkichlar yaxshilandi. Ba’zi strateglar G‘aznachilik buybacklari tufayli keyingi rally $180,000 ga yetishi mumkinligini aytishmoqda.",
+    "body": "Bitcoin $71,000–$72,800 oralig‘iga chiqqandan so‘ng, tahlilchilar golden cross (50 kunlik MA 200 kunlik MA ni kesib o‘tishi) shakllanishi mumkinligini qayd etishmoqda.\n\nMark Connors kabi uzoq muddatli obligatsiya bozori investori G‘aznachilikning muntazam buyback operatsiyalari likvidlikni yaxshilashi va Bitcoinning keyingi o‘sishini $180,000 tomon yaqinlashtirishi mumkinligini aytmoqda.\n\nBiroq ba’zi tahlilchilar RSI 79 atrofida overbought holatda ekanligini va $60,000–$68,000 zona sinovdan o‘tishi kerakligini ogohlantirmoqda.\n\nUmuman olganda, makroiqtisodiy va tartibga solish fonida bozor kayfiyati sezilarli yaxshilandi.",
+    "url": "https://www.coindesk.com/markets/2026/08/20/bitcoin-s-jump-above-usd71-000-sets-up-bullish-golden-cross-pattern",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-20"
+    "date": "2026-08-21"
   },
   {
-    "slug": "treasury-buybacks-short-squeeze",
-    "title": "G‘aznachilik obligatsiya qayta sotib olishini 2 baravar oshirdi — $1,4+ mlrd short squeeze",
-    "summary": "AQSh G‘aznachiligi 10–30 yillik obligatsiyalar bo‘yicha qayta sotib olish operatsiyalarini kamida ikki baravar oshirdi. Bu foiz stavkalarini pasaytirib, kripto va risk-aktivlarga kuchli oqim keltirdi.",
-    "body": "AQSh G‘aznachiligi 19-avgust kuni uzoq muddatli (10–30 yillik) obligatsiyalar bo‘yicha likvidlikni qo‘llab-quvvatlash operatsiyalarini kamida ikki baravar oshirishini e’lon qildi.\n\nBu harakat uzoq muddatli foiz stavkalarini pasaytirdi va dollarni zaiflashtirdi. Natijada xavf-aktivlarga, jumladan kriptoga, kuchli kapital oqimi boshlandi.\n\nBitcoin va boshqa aktivlar keskin o‘sdi. Bir soat ichida $1 milliarddan ortiq short pozitsiyalar likvidatsiya qilindi. Umumiy 24 soatlik likvidatsiya $2–3 milliard atrofida baholanmoqda.\n\nBu makroiqtisodiy katalizator Oq uydagi tartibga solish optimizmi bilan birgalikda bozorni yuqoriga turtib yubordi.",
-    "url": "https://www.coindesk.com/markets/2026/08/19/bitcoin-surges-above-68000-liquidating-14-billion-shorts-as-treasury-buybacks-boost-risk-appetite",
+    "slug": "xrp-sol-hype-rally",
+    "title": "XRP 15–18%, SOL 12%, HYPE 19–22% oshdi — altcoinlar rallyda",
+    "summary": "Bitcoin va Ethereum rallysi altcoinlarga ham tarqaldi. XRP, Solana va Hyperliquid HYPE tokenlari ikki xonali foizda o‘sdi.",
+    "body": "Bitcoin va Ethereumning kuchli o‘sishi bilan birga asosiy altcoinlar ham sezilarli rally ko‘rsatdi.\n\nXRP 15–18% atrofida oshib, $1,19 ga yaqinlashdi. Solana 12–13% o‘sib, $87–$88 oralig‘iga yetdi. Hyperliquid’ning HYPE tokeni 19–22% o‘sish bilan eng kuchli ishtirokchilardan biri bo‘ldi.\n\nBNB, DOGE va Cardano ham 6–10% oralig‘ida o‘sdi. Umumiy bozor kapitallashuviga $190 milliard atrofida qo‘shimcha qo‘shildi.\n\nTrumpning CFTC orqali Hyperliquid’ni AQShga kiritish haqidagi bayonoti HYPE’ga qo‘shimcha impuls berdi.",
+    "url": "https://www.coindesk.com/markets/2026/08/20/hype-jumps-11-as-trump-says-cftc-is-working-to-bring-hyperliquid-to-u-s",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-20"
+    "date": "2026-08-21"
   }
 ]
