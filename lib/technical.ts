@@ -228,12 +228,11 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
   const s = support[0] ?? invalidation
-  const rr = resistance[0] ?? tp[0]
   const tf = tfLabel(interval)
 
-  // Avvalgi senariy matnlari (EMA asosida)
-  const bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(rr)} gacha rebound/breakout ssenariysi kuzatiladi.`
-  const bearish = `EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(s)} support zonasini qayta test qilish xavfini oshiradi.`
+  // Bullish: TP3 gacha; Bearish: support zona
+  const bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(tp[2])} (TP3) gacha rebound/breakout ssenariysi kuzatiladi.`
+  const bearish = `Narx EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(s)} support zonasini qayta test qilish xavfini oshiradi.`
 
   let summary: string
   if (trend === 'BULLISH') {
