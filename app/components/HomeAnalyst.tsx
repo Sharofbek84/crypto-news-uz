@@ -135,6 +135,13 @@ export default function HomeAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
 
+  // Uzoq swing support: support massividagi eng past (oxirgi) daraja
+  const deepSupport = r
+    ? (r.support?.length >= 2
+        ? r.support[r.support.length - 1]
+        : (r.support?.[0] ?? r.invalidation))
+    : 0
+
   return <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
@@ -194,7 +201,7 @@ export default function HomeAnalyst(){
           <h3 className="bearText">🔴 BEARISH SENARIY · {tf}</h3>
           <p>{r.bearish}</p>
           <div className="levelPath redPath">
-            {money$(r.invalidation)} ↓ {money$(r.invalidation*0.99)} ↓ {money$(r.invalidation*0.97)}
+            {money$(r.invalidation)} ↓ {money$(deepSupport)}
           </div>
         </div>
       </div>
