@@ -1,46 +1,46 @@
 [
   {
-    "slug": "bitcoin-72000-short-squeeze",
-    "title": "Bitcoin $72,000 dan oshdi — $3 milliardlik short pozitsiyalar likvidatsiya qilindi",
-    "summary": "Bitcoin 6 haftalik diapazondan chiqib $71,000–$72,800 oralig‘iga yetdi. 24 soat ichida taxminan $3 milliardlik short pozitsiyalar yopildi — 2021-yildan beri eng yirik short-squeeze.",
-    "body": "Bitcoin 20–21 avgust kunlari $64,000 atrofidan $72,000+ darajasiga ko‘tarilib, iyun oyidan beri eng yuqori narxni qayd etdi. Coinglass va CoinDesk ma’lumotlariga ko‘ra, 24 soat ichida taxminan $2,7–3,3 milliardlik short pozitsiyalar likvidatsiya qilindi.\n\nBu 2021-yildan beri eng yirik short-squeeze holatlaridan biri hisoblanadi. Bir soat ichida $1 milliarddan ortiq shortlar yopildi.\n\nAsosiy katalizatorlar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar bo‘yicha qayta sotib olish hajmini ikki baravar oshirishi, Trumpning Clarity Act’ni tezlashtirish chaqirig‘i va kuchli ETF oqimlari.\n\nUmumiy kripto bozor kapitallashuvi $2,45–2,55 trillion atrofida. Fear & Greed indeksi «Fear»dan «Greed»ga o‘tdi.",
+    "slug": "bitcoin-75000-rally",
+    "title": "Bitcoin $75,000 dan oshdi — haftalik o‘sish 19% ga yetdi",
+    "summary": "Bitcoin may oyidan beri birinchi marta $75,000–$75,740 oralig‘iga chiqdi. 24 soatda 7–9%, haftada taxminan 19% o‘sish qayd etildi.",
+    "body": "Bitcoin 21-avgust kuni $75,000 darajasini yorib o‘tdi va $75,740 gacha ko‘tarildi. Bu may oyidan beri eng yuqori ko‘rsatkich.\n\nNarx 24 soat ichida 7–9% atrofida, haftalik hisobda esa taxminan 19% o‘sdi. Umumiy kripto bozor kapitallashuvi $2,5 trilliondan oshdi.\n\nAsosiy sabablar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar bo‘yicha qayta sotib olish hajmini ikki baravar oshirishi, Trumpning Clarity Act chaqirig‘i va kuchli institutsional oqimlar.\n\nFear & Greed indeksi «Greed» zonasi (70+) da qoldi.",
+    "url": "https://www.coindesk.com/markets/2026/08/20/bitcoin-pushes-past-usd75-000-as-rally-continues",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-21"
+  },
+  {
+    "slug": "short-squeeze-3-milliard",
+    "title": "$3 milliardlik short-squeeze — 2021-yildan beri eng yirik likvidatsiya",
+    "summary": "Bitcoin rallysi $2,7–3,3 milliardlik short pozitsiyalarni yopib yubordi. Bir soat ichida $1 milliarddan ortiq shortlar likvidatsiya qilindi.",
+    "body": "20–21 avgust kunlari kripto bozorida 2021-yildan beri eng yirik short-squeeze ro‘y berdi. Coinglass ma’lumotlariga ko‘ra, 24 soat ichida taxminan $2,7–3,3 milliardlik short pozitsiyalar yopildi.\n\nFaqat Bitcoin bo‘yicha bir soat ichida $1 milliarddan ortiq shortlar likvidatsiya qilindi. Keyingi 24 soatda yana $780 million atrofida shortlar yopildi.\n\nBu narxning tez o‘sishiga qo‘shimcha impuls berdi. Long pozitsiyalar esa ancha kam zarar ko‘rdi.\n\nTahlilchilar short-squeeze tugashi bilan haqiqiy talabning kuchini kuzatishni tavsiya qilmoqda.",
     "url": "https://www.coindesk.com/markets/2026/08/20/bitcoin-breaks-out-of-six-week-range-tops-usd71-000-as-usd3-billion-in-shorts-get-wiped-out",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-21"
   },
   {
-    "slug": "ethereum-20-foiz-etf",
-    "title": "Ethereum 18–20% oshdi — ETF’larga $189 mln oqim, DeFi kuchaydi",
-    "summary": "Ethereum $2,250–$2,320 oralig‘iga yetib, BTC dan kuchliroq o‘sish ko‘rsatdi. Spot ETH ETF’larga bir kunda $189 million sof oqim tushdi — 10 oydagi eng yuqori ko‘rsatkich.",
-    "body": "Ethereum 24 soat ichida 18–20% atrofida oshib, $2,250–$2,320 darajasiga yetdi. Bu Bitcoin o‘sishidan sezilarli kuchliroq.\n\nSpot Ethereum ETF’lariga bir kunda taxminan $189 million sof oqim qayd etildi — so‘nggi 10 oydagi eng yirik kunlik oqim. Bitcoin ETF’lari esa $517 million oqim jalb qildi.\n\nDeFi sektori 9–12% oralig‘ida o‘sdi. ETH/BTC nisbati ham yaxshilandi, bu kapitalning Ethereum ekotizimiga qaytishini ko‘rsatadi.\n\nTahlilchilar ETH’ning kuchli o‘sishini risk-on kayfiyat, tartibga solish optimizmi va institutsional talab bilan bog‘lashmoqda.",
-    "url": "https://www.coindesk.com/markets/2026/08/20/ether-jumps-18-to-usd2-250-as-bitcoin-tops-usd69-000-in-broad-crypto-rally",
+    "slug": "treasury-clarity-act",
+    "title": "G‘aznachilik buyback + Trump Clarity Act — rallyning asosiy katalizatorlari",
+    "summary": "AQSh G‘aznachiligi uzoq muddatli obligatsiyalar buybackini ikki baravar oshirdi. Trump Clarity Act’ni tezlashtirishni talab qildi.",
+    "body": "AQSh G‘aznachiligi 10–30 yillik obligatsiyalar bo‘yicha qayta sotib olish hajmini kamida ikki baravar oshirishini e’lon qildi. Bu uzoq muddatli foiz stavkalarini pastga tortib, riskli aktivlarga talabni oshirdi.\n\nShu bilan birga Prezident Trump Beyaz Saroyda kripto rahbarlari bilan uchrashib, Clarity Act’ni Senatdan o‘tkazishni chaqirdi. Hyperliquid’ni AQShga qonuniy kiritish haqida ham gapirdi.\n\nVanEck tahlilchisi Matthew Sigel: «Bu Clarity Act emas, balki G‘aznachilikning likvidlik choralari asosiy omil» deb hisoblaydi.\n\nBu ikki omil birgalikda bozor kayfiyatini keskin o‘zgartirdi.",
+    "url": "https://www.bloomberg.com/news/articles/2026-08-21/bitcoin-leaps-past-75-000-as-crypto-rally-continues-in-asia",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-21"
   },
   {
-    "slug": "btc-etf-517-mln",
-    "title": "Bitcoin ETF’lariga $517 mln, ETH ETF’lariga $189 mln oqim — eng kuchli kunlardan biri",
-    "summary": "AQSh spot Bitcoin ETF’lari bir kunda $517 million, Ethereum ETF’lari $189 million sof oqim jalb qildi. Bu so‘nggi oylardagi eng yirik oqimlardan biri.",
-    "body": "20-avgust kuni AQSh spot Bitcoin ETF’lariga taxminan $517 million, Ethereum ETF’lariga $189 million sof oqim tushdi.\n\nBlackRock IBIT yetakchilik qildi. Bu oqimlar short-squeeze va makroiqtisodiy katalizatorlar bilan birgalikda narxlarni yuqoriga turtib yubordi.\n\nInstitutsional talabning qaytishi bozor ishtirokchilari orasida ijobiy kayfiyatni kuchaytirdi. Savdo hajmi Bitcoin bo‘yicha 250% ga oshib, $59 milliard atrofida qayd etildi.\n\nTahlilchilar buni «hard assets»ga qiziqishning oshishi va foiz stavkalarining pasayishi bilan bog‘lashmoqda.",
+    "slug": "eth-xrp-altcoin-rally",
+    "title": "Ethereum 4–5%, XRP 15–16% oshdi — altcoinlar ham kuchli",
+    "summary": "Ethereum $2,350–$2,380 oralig‘ida, XRP $1,29 ga yetdi. Solana va HYPE ham ikki xonali foizda o‘sishda davom etmoqda.",
+    "body": "Bitcoin rallysi altcoinlarga ham tarqaldi. Ethereum 24 soatda 4–5% atrofida oshib, $2,350–$2,380 darajasida turibdi. Haftalik o‘sish 25% ga yaqin.\n\nXRP 15–16% o‘sib, $1,29 atrofida savdo qilinmoqda. Solana va Hyperliquid HYPE tokenlari ham ikki xonali foizda o‘sishni saqlab qoldi.\n\nUmumiy bozor kapitallashuviga yana milliardlab dollar qo‘shildi. ETF oqimlari va risk-on kayfiyat altcoinlarga ham foyda keltirmoqda.\n\nTahlilchilar ETH/BTC nisbatining yaxshilanishini Ethereum ekotizimiga kapital qaytishi sifatida baholamoqda.",
+    "url": "https://www.coindesk.com/markets/2026/08/20/bitcoin-pushes-past-usd75-000-as-rally-continues",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-21"
+  },
+  {
+    "slug": "etf-inflows-microstrategy",
+    "title": "BTC ETF’larga $517 mln oqim, MicroStrategy zarari $685 mln gacha kamaydi",
+    "summary": "Spot Bitcoin ETF’lari bir kunda $517 million, ETH ETF’lari $189 million jalb qildi. MicroStrategy’ning realizatsiya qilinmagan zarari keskin kamaydi.",
+    "body": "AQSh spot Bitcoin ETF’lariga 20-avgust kuni taxminan $517 million sof oqim tushdi (BlackRock yetakchi). Ethereum ETF’lari esa $189 million jalb qildi — so‘nggi 10 oydagi eng yaxshi kunlardan biri.\n\nMicroStrategy 840 mingdan ortiq BTC ushlab turadi. Narx $75,000 atrofida bo‘lganda uning realizatsiya qilinmagan zarari $9,9 milliarddan $685 millionga tushdi.\n\nBu institutsional talabning qaytishini va «hard assets»ga qiziqishning oshishini ko‘rsatadi.\n\nSavdo hajmi Bitcoin bo‘yicha keskin oshib, bozor likvidligini mustahkamladi.",
     "url": "https://www.coindesk.com/tech/2026/08/20/live-updates-bitcoin-etfs-draw-usd517-million-ether-pulls-usd189-million-in-biggest-inflows-in-months",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-21"
-  },
-  {
-    "slug": "golden-cross-btc",
-    "title": "Bitcoin $71k+ — golden cross shakllanishi mumkin, ba’zi tahlilchilar $180k ni ko‘rmoqda",
-    "summary": "Bitcoin $71,000 dan oshgandan so‘ng texnik ko‘rsatkichlar yaxshilandi. Ba’zi strateglar G‘aznachilik buybacklari tufayli keyingi rally $180,000 ga yetishi mumkinligini aytishmoqda.",
-    "body": "Bitcoin $71,000–$72,800 oralig‘iga chiqqandan so‘ng, tahlilchilar golden cross (50 kunlik MA 200 kunlik MA ni kesib o‘tishi) shakllanishi mumkinligini qayd etishmoqda.\n\nMark Connors kabi uzoq muddatli obligatsiya bozori investori G‘aznachilikning muntazam buyback operatsiyalari likvidlikni yaxshilashi va Bitcoinning keyingi o‘sishini $180,000 tomon yaqinlashtirishi mumkinligini aytmoqda.\n\nBiroq ba’zi tahlilchilar RSI 79 atrofida overbought holatda ekanligini va $60,000–$68,000 zona sinovdan o‘tishi kerakligini ogohlantirmoqda.\n\nUmuman olganda, makroiqtisodiy va tartibga solish fonida bozor kayfiyati sezilarli yaxshilandi.",
-    "url": "https://www.coindesk.com/markets/2026/08/20/bitcoin-s-jump-above-usd71-000-sets-up-bullish-golden-cross-pattern",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-21"
-  },
-  {
-    "slug": "xrp-sol-hype-rally",
-    "title": "XRP 15–18%, SOL 12%, HYPE 19–22% oshdi — altcoinlar rallyda",
-    "summary": "Bitcoin va Ethereum rallysi altcoinlarga ham tarqaldi. XRP, Solana va Hyperliquid HYPE tokenlari ikki xonali foizda o‘sdi.",
-    "body": "Bitcoin va Ethereumning kuchli o‘sishi bilan birga asosiy altcoinlar ham sezilarli rally ko‘rsatdi.\n\nXRP 15–18% atrofida oshib, $1,19 ga yaqinlashdi. Solana 12–13% o‘sib, $87–$88 oralig‘iga yetdi. Hyperliquid’ning HYPE tokeni 19–22% o‘sish bilan eng kuchli ishtirokchilardan biri bo‘ldi.\n\nBNB, DOGE va Cardano ham 6–10% oralig‘ida o‘sdi. Umumiy bozor kapitallashuviga $190 milliard atrofida qo‘shimcha qo‘shildi.\n\nTrumpning CFTC orqali Hyperliquid’ni AQShga kiritish haqidagi bayonoti HYPE’ga qo‘shimcha impuls berdi.",
-    "url": "https://www.coindesk.com/markets/2026/08/20/hype-jumps-11-as-trump-says-cftc-is-working-to-bring-hyperliquid-to-u-s",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-21"
   }
