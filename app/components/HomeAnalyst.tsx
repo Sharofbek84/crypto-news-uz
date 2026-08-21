@@ -120,6 +120,25 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   )
 }
 
+/** Bearish uchun 4 ta pasayish zonasi: Entry → SL → Support1 → uzoq Support */
+function bearishLevels(r: Result): number[] {
+  const entry = r.entryHigh
+  const sl = r.invalidation
+  const supports = (r.support || []).filter(s => s < sl).sort((a, b) => b - a)
+  const s1 = supports[0] ?? sl * 0.99
+  const s2 = supports[1] ?? supports[supports.length - 1] ?? sl * 0.97
+  const deep = supports.length ? supports[supports.length - 1] : sl * 0.97
+  // 4 ta aniq, kamayib boruvchi daraja
+  const levels = [entry, sl, s1, deep]
+  // Agar s1 ≈ deep bo‘lsa, oraliq qo‘shamiz
+  if (Math.abs(s1 - deep) / (sl || 1) < 0.002) {
+    levels[2] = sl - (sl - deep) * 0.35
+    levels[3] = deep
+  }
+  // Tartib: yuqoridan pastga
+  return levels.sort((a, b) => b - a)
+}
+
 export default function HomeAnalyst(){
   const searchParams=useSearchParams()
   const urlSymbol=(searchParams.get('symbol')||'').toUpperCase()
@@ -134,13 +153,7 @@ export default function HomeAnalyst(){
   useEffect(()=>{load()},[coin,interval])
   const r=data?.result
   const tf=tfShort(interval)
-
-  // Uzoq swing support: support massividagi eng past (oxirgi) daraja
-  const deepSupport = r
-    ? (r.support?.length >= 2
-        ? r.support[r.support.length - 1]
-        : (r.support?.[0] ?? r.invalidation))
-    : 0
+  const bearPath = r ? bearishLevels(r) : []
 
   return <section className="homeAnalyst">
     <div className="homeAnalystHead">
@@ -201,7 +214,7 @@ export default function HomeAnalyst(){
           <h3 className="bearText">🔴 BEARISH SENARIY · {tf}</h3>
           <p>{r.bearish}</p>
           <div className="levelPath redPath">
-            {money$(r.invalidation)} ↓ {money$(deepSupport)}
+            {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
           </div>
         </div>
       </div>
