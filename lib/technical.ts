@@ -227,11 +227,17 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const sr = srBreakoutLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
+  // Uzoq swing support: eng past yaqin support yoki support[1]/support[2] (chuqurroq)
+  // support massivi yaqindan uzoqqa: [0]=eng yaqin, oxirgisi=uzoqroq
+  const deepSupport =
+    support.length >= 2
+      ? support[support.length - 1]
+      : support[0] ?? invalidation
+
   const tf = tfLabel(interval)
 
-  // Bullish: TP3 gacha; Bearish: grafikdagi SL (invalidation) — chart bilan mos
   const bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(tp[2])} gacha rebound/breakout ssenariysi kuzatiladi.`
-  const bearish = `Narx EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(invalidation)} support zonasini qayta test qilish xavfini oshiradi.`
+  const bearish = `Narx EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
 
   let summary: string
   if (trend === 'BULLISH') {
