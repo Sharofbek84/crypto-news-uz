@@ -120,23 +120,30 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   )
 }
 
-/** Bearish uchun 4 ta pasayish zonasi: Entry → SL → Support1 → uzoq Support */
+/** Bearish: SL ↓ Support1 ↓ Support2 ↓ uzoq swing support (Entry yo‘q) */
 function bearishLevels(r: Result): number[] {
-  const entry = r.entryHigh
   const sl = r.invalidation
   const supports = (r.support || []).filter(s => s < sl).sort((a, b) => b - a)
-  const s1 = supports[0] ?? sl * 0.99
-  const s2 = supports[1] ?? supports[supports.length - 1] ?? sl * 0.97
-  const deep = supports.length ? supports[supports.length - 1] : sl * 0.97
-  // 4 ta aniq, kamayib boruvchi daraja
-  const levels = [entry, sl, s1, deep]
-  // Agar s1 ≈ deep bo‘lsa, oraliq qo‘shamiz
-  if (Math.abs(s1 - deep) / (sl || 1) < 0.002) {
-    levels[2] = sl - (sl - deep) * 0.35
-    levels[3] = deep
+  const s1 = supports[0] ?? sl * 0.992
+  const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
+  const deep = supports.length >= 3
+    ? supports[supports.length - 1]
+    : supports.length >= 2
+      ? supports[supports.length - 1]
+      : sl * 0.97
+  const levels = [sl, s1, s2, deep]
+  // Yuqoridan pastga, takrorlarni yumshatish
+  const uniq: number[] = []
+  for (const v of levels.sort((a, b) => b - a)) {
+    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (sl || 1) > 0.0015) {
+      uniq.push(v)
+    }
   }
-  // Tartib: yuqoridan pastga
-  return levels.sort((a, b) => b - a)
+  while (uniq.length < 4) {
+    const last = uniq[uniq.length - 1]
+    uniq.push(last * 0.99)
+  }
+  return uniq.slice(0, 4)
 }
 
 export default function HomeAnalyst(){
