@@ -164,7 +164,7 @@ export default function PremiumAnalyst(){
       <div>
         <div className="homeKicker">PREMIUM TAHLIL</div>
         <h2>Kengaytirilgan kripto bozor tahlili</h2>
-        <p>15 ta coin · M15 / H1 / H4 / D1 · BUY/SELL · Entry · TP · SL</p>
+        <p>Jonli market data asosida avtomatik BUY/SELL · Entry · TP · SL va texnik xulosa</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
