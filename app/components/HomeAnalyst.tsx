@@ -142,6 +142,26 @@ function bearishLevels(r: Result): number[] {
   return uniq.slice(0, 4)
 }
 
+/** SELL bullish: Entry ↑ R1 ↑ R2 ↑ SL (4 zona) */
+function sellBullishLevels(r: Result): number[] {
+  const entry = r.entryHigh
+  const sl = r.invalidation
+  const res = (r.resistance || []).filter(x => x > entry && x < sl).sort((a, b) => a - b)
+  const r1 = res[0] ?? entry + (sl - entry) * 0.33
+  const r2 = res[1] ?? entry + (sl - entry) * 0.66
+  const levels = [entry, r1, r2, sl]
+  const uniq: number[] = []
+  for (const v of levels.sort((a, b) => a - b)) {
+    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (Math.abs(sl) || 1) > 0.001) uniq.push(v)
+  }
+  while (uniq.length < 4) {
+    const last = uniq[uniq.length - 1]
+    const next = last + Math.max((sl - entry) * 0.15, 1)
+    uniq.push(next >= sl ? sl : next)
+  }
+  return uniq.slice(0, 3).concat([sl]).sort((a, b) => a - b)
+}
+
 export default function HomeAnalyst(){
   const searchParams=useSearchParams()
   const urlSymbol=(searchParams.get('symbol')||'').toUpperCase()
@@ -157,6 +177,7 @@ export default function HomeAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
+  const sellBull = r && r.side==='SELL' ? sellBullishLevels(r) : []
 
   return <section className="homeAnalyst">
     <div className="homeAnalystHead">
@@ -189,7 +210,7 @@ export default function HomeAnalyst(){
         </div>
 
         <div className="proCard">
-          <div className={`proBox ${r.side==='SELL'?'red':'green'}`}>
+          <div className={`proBox ${r.side==='SELL'?'red':'green'`}>
             <b>KIRISH ZONASI ({r.side==='SELL'?'SELL':'BUY'})</b>
             <strong>{money$(r.entryLow)} – {money$(r.entryHigh)}</strong>
           </div>
@@ -211,7 +232,7 @@ export default function HomeAnalyst(){
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
             {r.side==='SELL'
-              ? <>{money$(r.entryHigh)} ↑ {money$(r.invalidation)}</>
+              ? <>{money$(sellBull[0])} ↑ {money$(sellBull[1])} ↑ {money$(sellBull[2])} ↑ {money$(sellBull[3])}</>
               : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
           </div>
         </div>
