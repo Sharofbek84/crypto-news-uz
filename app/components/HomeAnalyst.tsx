@@ -61,8 +61,11 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
             <linearGradient id="hcMain" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#0a1018"/><stop offset="1" stopColor="#070b11"/>
             </linearGradient>
-            <marker id="hcBull" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <marker id="hcBull" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
               <path d="M0 0L10 5L0 10z" fill="#20d67a"/>
+            </marker>
+            <marker id="hcBear" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0 0L10 5L0 10z" fill="#ff4d5a"/>
             </marker>
           </defs>
 
@@ -105,8 +108,8 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           {rightBox(y(result.tp[0]),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
           {rightBox(y(result.invalidation),`SL  ${money(result.invalidation)}`,'#c52f3a')}
 
-          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" markerEnd={isSell?undefined:'url(#hcBull)'}/>
-          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" markerEnd={isSell?undefined:'url(#hcBull)'} opacity=".88"/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBear)':'url(#hcBull)'}/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBear)':'url(#hcBull)'} opacity=".88"/>
 
           <text x={L} y={RT+6} fill="#e6edf3" fontSize="14" fontWeight="800">RSI 14  {result.rsi.toFixed(2)}</text>
           <polyline points={rs.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2"/>
