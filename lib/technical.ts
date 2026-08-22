@@ -64,12 +64,14 @@ function fmt(n: number) {
 function tfLabel(interval?: string) {
   if (interval === '1d') return 'D1'
   if (interval === '4h') return 'H4'
+  if (interval === '15m') return 'M15'
   return 'H1'
 }
 
 function tfLookback(interval: string) {
   if (interval === '1d') return 10
   if (interval === '4h') return 8
+  if (interval === '15m') return 5
   return 6
 }
 
@@ -112,10 +114,15 @@ function clusterLevels(prices: number[], tolerance: number) {
 
 /** Support / Resistance + Breakout — faqat SL/TP (grafikda chizilmaydi) */
 function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
-  const window = Math.min(candles.length, interval === '1d' ? 60 : interval === '4h' ? 50 : 40)
+  const window = Math.min(
+    candles.length,
+    interval === '1d' ? 60 : interval === '4h' ? 50 : interval === '15m' ? 36 : 40
+  )
   const recent = candles.slice(-window)
   const swings = findSwingPoints(recent, 2, 2)
-  const tol = last * (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
+  const tol =
+    last *
+    (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
   const lb = tfLookback(interval)
 
   const rawLows: number[] = swings.filter(s => s.type === 'low').map(s => s.price)
@@ -145,12 +152,23 @@ function srBreakoutLevels(candles: Candle[], last: number, interval: string) {
 
   const nextResHint = resistances[0] ?? last * 1.01
   const rangeHint = Math.max(nextResHint - structureLow, last * 0.004)
-  const buffer = rangeHint * (interval === '1h' ? 0.08 : interval === '4h' ? 0.1 : 0.12)
+  const buffer =
+    rangeHint *
+    (interval === '15m' ? 0.06 : interval === '1h' ? 0.08 : interval === '4h' ? 0.1 : 0.12)
   let invalidation = structureLow - buffer
 
-  const maxSl = interval === '1h' ? last * 0.015 : interval === '4h' ? last * 0.025 : last * 0.04
+  const maxSl =
+    interval === '15m'
+      ? last * 0.01
+      : interval === '1h'
+        ? last * 0.015
+        : interval === '4h'
+          ? last * 0.025
+          : last * 0.04
   if (last - invalidation > maxSl) invalidation = last - maxSl
-  const minSl = last * (interval === '1h' ? 0.004 : interval === '4h' ? 0.006 : 0.01)
+  const minSl =
+    last *
+    (interval === '15m' ? 0.003 : interval === '1h' ? 0.004 : interval === '4h' ? 0.006 : 0.01)
   if (last - invalidation < minSl) invalidation = last - minSl
 
   const risk = Math.max(last - invalidation, last * 0.003)
@@ -227,8 +245,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const sr = srBreakoutLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
-  // Uzoq swing support: eng past yaqin support yoki support[1]/support[2] (chuqurroq)
-  // support massivi yaqindan uzoqqa: [0]=eng yaqin, oxirgisi=uzoqroq
   const deepSupport =
     support.length >= 2
       ? support[support.length - 1]
