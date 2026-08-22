@@ -217,7 +217,6 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   } else {
     ;[tp1, tp2, tp3] = [last - risk * 1.2, last - risk * 2, last - risk * 3]
   }
-  // TP pastga: last dan past
   tp1 = Math.min(tp1, last - risk * 0.5)
   tp2 = Math.min(tp2, tp1 - risk * 0.4)
   tp3 = Math.min(tp3, tp2 - risk * 0.4)
@@ -273,16 +272,17 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let summary: string
 
   if (side === 'SELL') {
+    // BUY uslubidagi kabi: zona + davom ehtimoli + SL
     bullish = `Narx EMA20 ustiga qaytsa va momentum tiklansa, ${fmt(deepRes)} resistance zonasiga rebound xavfi bor.`
-    bearish = `Narx EMA20/EMA50 ostida va momentum salbiy — ${fmt(tp[2])} gacha pasayish (SELL) ssenariysi kuzatiladi.`
-    summary = `${tf}: BEARISH — SELL. Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL ${fmt(invalidation)} yuqorisida. Maqsad: ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}.`
+    bearish = `Narx EMA20/EMA50 ostida va momentum salbiy bo‘lsa, ${fmt(tp[2])} gacha pasayish ssenariysi kuzatiladi.`
+    summary = `${tf}: BEARISH — SELL. Zona ${fmt(entryLow)}–${fmt(entryHigh)} ostida ushlansa, pastga davom ehtimoli yuqori. ${fmt(invalidation)} yuqoriga buzilsa, rebound kuchayadi.`
   } else {
     bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(tp[2])} gacha rebound/breakout ssenariysi kuzatiladi.`
     bearish = `Narx EMA20/EMA50 ostida qolish va momentum susayishi ${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
     if (trend === 'BULLISH') {
-      summary = `${tf}: BULLISH — BUY. Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida ushlansa, yuqoriga davom ehtimoli yuqori. SL ${fmt(invalidation)}.`
+      summary = `${tf}: BULLISH — BUY. Zona ${fmt(entryLow)}–${fmt(entryHigh)} ustida ushlansa, yuqoriga davom ehtimoli yuqori. ${fmt(invalidation)} pastga buzilsa, pasayish ssenariysi kuchayadi.`
     } else {
-      summary = `${tf}: NEUTRAL — BUY zonasi ${fmt(entryLow)}–${fmt(entryHigh)}. Ushbu zona ustida ushlansa yuqoriga, ${fmt(invalidation)} pastga buzilsa pasayish kuchayadi.`
+      summary = `${tf}: NEUTRAL — BUY. Zona ${fmt(entryLow)}–${fmt(entryHigh)} atrofida. Ushbu zona ustida ushlansa yuqoriga davom ehtimoli bor. ${fmt(invalidation)} pastga buzilsa, pasayish kuchayadi.`
     }
   }
 
