@@ -157,6 +157,10 @@ export default function HomeAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
+  const bullZ1 = r ? r.entryHigh : 0
+  const bullZ2 = r ? (r.side==='SELL' ? r.entryHigh + (r.invalidation - r.entryHigh) * 0.33 : r.tp[0]) : 0
+  const bullZ3 = r ? (r.side==='SELL' ? r.entryHigh + (r.invalidation - r.entryHigh) * 0.66 : r.tp[1]) : 0
+  const bullZ4 = r ? (r.side==='SELL' ? r.invalidation : r.tp[2]) : 0
 
   return <section className="homeAnalyst">
     <div className="homeAnalystHead">
@@ -210,9 +214,7 @@ export default function HomeAnalyst(){
           <h3 className="bullText">🟢 BULLISH SENARIY · {tf}</h3>
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
-            {r.side==='SELL'
-              ? <>{money$(r.entryHigh)} ↑ {money$(r.entryHigh + (r.invalidation - r.entryHigh) * 0.33)} ↑ {money$(r.entryHigh + (r.invalidation - r.entryHigh) * 0.66)} ↑ {money$(r.invalidation)}</>
-              : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
+            {money$(bullZ1)} ↑ {money$(bullZ2)} ↑ {money$(bullZ3)} ↑ {money$(bullZ4)}
           </div>
         </div>
 
