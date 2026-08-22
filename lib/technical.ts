@@ -274,52 +274,60 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const tfLong = tfFull(interval)
   const candleClose = interval === '4h' ? '4H candle' : interval === '1d' ? 'D1 candle' : interval === '15m' ? 'M15 candle' : 'H1 candle'
 
+  const rsiNote =
+    r >= 55
+      ? `RSI ${r.toFixed(1)} — bullish momentum kuchli.`
+      : r >= 50
+        ? `RSI ${r.toFixed(1)} — 50 dan yuqorida, bullish momentum bor.`
+        : r >= 45
+          ? `RSI ${r.toFixed(1)} — neytral zonada.`
+          : `RSI ${r.toFixed(1)} — 50 dan past, momentum susaygan.`
+
   let bullish: string
   let bearish: string
   let summary: string
 
   if (side === 'SELL') {
     bullish =
-      `Narx ${fmt(invalidation)} resistance zonasini qayta test qilib, EMA20 ustiga chiqsa, ` +
-      `qisqa muddatli rebound ehtimoli oshadi va SELL signal bekor bo'lishi mumkin.`
+      `Agar narx ${fmt(invalidation)} resistance zonasini yorib o'tib, EMA20 ustiga chiqsa, ` +
+      `qisqa muddatli rebound boshlanishi va SELL signal bekor bo'lishi mumkin.`
     bearish =
-      `Narx EMA20/EMA50 ostida qolsa va momentum salbiy bo'lsa, ` +
-      `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga pasayish ssenariysi kuchayadi.`
+      `Narx EMA20/EMA50 ostida qolsa va pastga bosim davom etsa, ` +
+      `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga tushish ehtimoli yuqori.`
 
     if (trend === 'BEARISH') {
       summary =
-        `${tfLong} grafikda narx EMA 10/20/50 ostida joylashgan. Bu qisqa muddatli bearish belgi. ` +
-        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy kirish (SELL) zonasiga aylangan. ` +
-        `Agar bu zona ostida ushlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha tushishi mumkin. ` +
-        `Agar ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, yuqoriga bosim kuchayib, rebound ehtimoli oshadi.`
+        `${tfLong} grafikda narx EMA 10/20/50 ostida joylashgan. Bu qisqa muddatli bearish belgi. ${rsiNote} ` +
+        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy SELL (sotish) zonasiga aylangan. ` +
+        `Agar narx shu zona ostida ushlanib qolsa, avval ${fmt(tp[0])}, so'ng ${fmt(tp[1])} va ${fmt(tp[2])} gacha tushishi mumkin. ` +
+        `Aksincha, ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, pastga bosim susayib, rebound ehtimoli oshadi.`
     } else {
       summary =
-        `${tfLong} grafikda trend neytral, biroq pastga bosim sezilmoqda. ` +
+        `${tfLong} grafikda trend hali neytral, lekin pastga bosim sezilmoqda. ${rsiNote} ` +
         `${fmt(entryLow)}–${fmt(entryHigh)} zona muhim SELL zonasiga aylangan. ` +
-        `Agar bu zona ostida ushlansa, ${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} yo'nalishida pasayish ehtimoli bor. ` +
-        `Agar ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, SELL signal bekor bo'lib, rebound boshlanishi mumkin.`
+        `Agar narx shu zona ostida ushlansa, ${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} yo'nalishida pasayish ehtimoli bor. ` +
+        `Agar ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, SELL signal bekor bo'lib, narx yuqoriga qaytishi mumkin.`
     }
   } else {
     // BUY
     bullish =
-      `Narx EMA20 ustida va momentum ijobiy bo'lsa, ` +
-      `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} gacha rebound/breakout ssenariysi kuzatiladi.`
+      `Narx EMA20 ustida qolsa va momentum saqlansa, ` +
+      `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} gacha ko'tarilish ssenariysi ishlaydi.`
     bearish =
-      `Narx EMA20/EMA50 ostida qolish va momentum susayishi ` +
-      `${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
+      `Agar narx EMA20/EMA50 ostiga tushib, momentum susasa, ` +
+      `${fmt(deepSupport)} support zonasini qayta test qilish xavfi oshadi.`
 
     if (trend === 'BULLISH') {
       summary =
-        `${tfLong} grafikda narx EMA 10/20/50 ustidan chiqib oldi. Bu qisqa muddatli bullish belgi. ` +
+        `${tfLong} grafikda narx EMA 10/20/50 ustidan chiqib oldi. Bu qisqa muddatli bullish belgi. ${rsiNote} ` +
         `${fmt(entryLow)}–${fmt(entryHigh)} zona juda muhim qo'llab-quvvatlash (support) zonasiga aylangan. ` +
-        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
-        `Agar ${fmt(invalidation)} pastida ${candleClose} yopilsa, pastga bosim kuchayib, pasayish ssenariysi kuchayadi.`
+        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} va ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
+        `Agar ${fmt(invalidation)} pastida ${candleClose} yopilsa, pastga bosim kuchayib, pasayish ssenariysi ochiladi.`
     } else {
-      // NEUTRAL → still BUY bias
       summary =
-        `${tfLong} grafikda trend NEUTRAL, biroq bullish momentum belgilari ko'rinmoqda. ` +
-        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy kirish (BUY) zonasiga aylangan. ` +
-        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
+        `${tfLong} grafikda trend NEUTRAL, biroq bullish belgilari ko'rinmoqda. ${rsiNote} ` +
+        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy BUY (xarid) zonasiga aylangan. ` +
+        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} va ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
         `Agar ${fmt(invalidation)} pastida ${candleClose} yopilsa, pastga bosim kuchayib, pasayish ehtimoli oshadi.`
     }
   }
