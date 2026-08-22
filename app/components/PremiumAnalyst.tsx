@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number}
-type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
+type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;side?:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
 
 const coins=[
   'BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM',
@@ -23,8 +23,8 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   const W=1700,H=820,L=68,R=210,T=78,MB=540,RT=580,RB=740
   const plotRight=W-R
   const candleRight=L+(plotRight-L)*0.93
-  const min=Math.min(...candles.map(c=>c.low),result.invalidation,result.entryLow)*.997
-  const max=Math.max(...candles.map(c=>c.high),...result.tp)*1.003
+  const min=Math.min(...candles.map(c=>c.low),result.entryLow,...result.tp,result.invalidation)*.997
+  const max=Math.max(...candles.map(c=>c.high),result.entryHigh,...result.tp,result.invalidation)*1.003
   const x=(i:number)=>L+i*(candleRight-L)/Math.max(1,candles.length-1)
   const y=(v:number)=>MB-(v-min)/(max-min)*(MB-T)
   const ry=(v:number)=>RB-(Math.max(0,Math.min(100,v))/100)*(RB-RT)
@@ -41,6 +41,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   const arrowEndX=plotRight-16
   const labelX=plotRight+10
   const tf=tfLong(interval)
+  const isSell=result.side==='SELL'
 
   const rightBox=(yy:number,text:string,bg:string,w=100)=>(
     <g>
@@ -75,7 +76,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           {[0,.2,.4,.6,.8,1].map(v=><line key={v} x1={L} x2={plotRight} y1={T+v*(MB-T)} y2={T+v*(MB-T)} stroke="#182230"/>)}
           {[30,50,70].map(v=><line key={v} x1={L} x2={plotRight} y1={ry(v)} y2={ry(v)} stroke="#3a4658" strokeDasharray="4 6"/>)}
 
-          <text x={L} y="28" fill="#f0b90b" fontSize="18" fontWeight="800">{coin}/USDT · {tf}</text>
+          <text x={L} y="28" fill="#f0b90b" fontSize="18" fontWeight="800">{coin}/USDT · {tf} · {isSell?'SELL':'BUY'}</text>
           <text x={L} y="50" fill="#9aa7b8" fontSize="12">
             O {money(last?.open||0)}   H {money(last?.high||0)}   L {money(last?.low||0)}   C {money(latest)}{'  '}
             <tspan fill={chg>=0?'#20d67a':'#ff5360'}>{chg>=0?'+':''}{money(chg)} ({chgPct>=0?'+':''}{chgPct.toFixed(2)}%)</tspan>
@@ -97,19 +98,19 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9"/>
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9"/>
 
-          <rect x={zoneLeft} y={y(result.entryHigh)} width={zoneW} height={Math.max(12,y(result.entryLow)-y(result.entryHigh))} fill="#1dbf6b" fillOpacity=".18" stroke="#20d67a" strokeOpacity=".55" rx="3"/>
+          <rect x={zoneLeft} y={Math.min(y(result.entryHigh),y(result.entryLow))} width={zoneW} height={Math.max(12,Math.abs(y(result.entryLow)-y(result.entryHigh)))} fill={isSell?'#c52f3a':'#1dbf6b'} fillOpacity=".18" stroke={isSell?'#ff4d5a':'#20d67a'} strokeOpacity=".55" rx="3"/>
 
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2"/>
-          <rect x={labelX} y={y(latest)-13} width="100" height="26" rx="4" fill="#1a9e55"/>
+          <rect x={labelX} y={y(latest)-13} width="100" height="26" rx="4" fill={isSell?'#c52f3a':'#1a9e55'}/>
           <text x={labelX+50} y={y(latest)+5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">{money(latest)}</text>
 
-          {rightBox(y(result.tp[2]||latest*1.03),`TP3  ${money(result.tp[2]||0)}`,'#148f55')}
-          {rightBox(y(result.tp[1]||latest*1.02),`TP2  ${money(result.tp[1]||0)}`,'#148f55')}
-          {rightBox(y(result.tp[0]||latest*1.01),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
+          {rightBox(y(result.tp[2]),`TP3  ${money(result.tp[2]||0)}`,'#148f55')}
+          {rightBox(y(result.tp[1]),`TP2  ${money(result.tp[1]||0)}`,'#148f55')}
+          {rightBox(y(result.tp[0]),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
           {rightBox(y(result.invalidation),`SL  ${money(result.invalidation)}`,'#c52f3a')}
 
-          <line x1={arrowStartX} y1={y(latest)-3} x2={arrowEndX} y2={y(result.tp[0]||latest)} stroke="#20d67a" strokeWidth="2.2" strokeDasharray="8 5" markerEnd="url(#hcBullP)"/>
-          <line x1={arrowStartX} y1={y(latest)-9} x2={arrowEndX} y2={y(result.tp[1]||latest)} stroke="#20d67a" strokeWidth="1.9" strokeDasharray="8 5" markerEnd="url(#hcBullP)" opacity=".88"/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" markerEnd={isSell?undefined:'url(#hcBullP)'}/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" markerEnd={isSell?undefined:'url(#hcBullP)'} opacity=".88"/>
 
           <text x={L} y={RT+6} fill="#e6edf3" fontSize="14" fontWeight="800">RSI 14  {result.rsi.toFixed(2)}</text>
           <polyline points={rs.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2"/>
@@ -126,14 +127,14 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 
 function bearishLevels(r: Result): number[] {
   const sl = r.invalidation
-  const supports = (r.support || []).filter(s => s < sl).sort((a, b) => b - a)
+  const supports = (r.support || []).filter(s => s < (r.side==='SELL'?r.entryHigh:sl)).sort((a, b) => b - a)
   const s1 = supports[0] ?? sl * 0.992
   const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
   const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
-  const levels = [sl, s1, s2, deep]
+  const levels = r.side==='SELL' ? [r.entryHigh, r.tp[0], r.tp[1], r.tp[2]] : [sl, s1, s2, deep]
   const uniq: number[] = []
   for (const v of levels.sort((a, b) => b - a)) {
-    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (sl || 1) > 0.0015) uniq.push(v)
+    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (Math.abs(sl) || 1) > 0.0015) uniq.push(v)
   }
   while (uniq.length < 4) uniq.push(uniq[uniq.length - 1] * 0.99)
   return uniq.slice(0, 4)
@@ -154,8 +155,12 @@ export default function PremiumAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
-  const risk = r ? Math.max(r.entryHigh - r.invalidation, 0) : 0
-  const reward = r ? Math.max(r.tp[0] - r.entryHigh, 0) : 0
+  const risk = r
+    ? (r.side==='SELL' ? Math.max(r.invalidation - r.entryHigh, 0) : Math.max(r.entryHigh - r.invalidation, 0))
+    : 0
+  const reward = r
+    ? (r.side==='SELL' ? Math.max(r.entryHigh - r.tp[0], 0) : Math.max(r.tp[0] - r.entryHigh, 0))
+    : 0
   const rr = risk > 0 ? (reward / risk).toFixed(1) : '—'
 
   return <section className="homeAnalyst">
@@ -163,7 +168,7 @@ export default function PremiumAnalyst(){
       <div>
         <div className="homeKicker">⭐ PREMIUM TAHLIL</div>
         <h2>Kengaytirilgan kripto bozor tahlili</h2>
-        <p>14 ta coin · M15 / H1 / H4 / D1 · Entry · TP · SL · Risk:Reward</p>
+        <p>14 ta coin · M15 / H1 / H4 / D1 · BUY/SELL · Entry · TP · SL · Risk:Reward</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
@@ -180,7 +185,8 @@ export default function PremiumAnalyst(){
       <div className="proAnalysis">
         <div className="proCard">
           <h3>📊 TEXNIK TAHLIL · {tf}</h3>
-          <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral → Bullish momentum'}</strong></div>
+          <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral'}</strong></div>
+          <div className="proRow"><span>SIGNAL</span><strong className={r.side==='SELL'?'bad':'good'}>{r.side==='SELL'?'SELL':'BUY'}</strong></div>
           <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
           <div className="proRow"><span>R:R (TP1)</span><strong className="good">1 : {rr}</strong></div>
           <p className="proNote">{r.rsi>=50?'RSI 50 dan yuqorida, bu bullish momentumni ko‘rsatadi.':'RSI 50 dan past, momentum susaygan.'}</p>
@@ -189,14 +195,14 @@ export default function PremiumAnalyst(){
         </div>
 
         <div className="proCard">
-          <div className="proBox green">
-            <b>KIRISH ZONASI (BUY)</b>
+          <div className={`proBox ${r.side==='SELL'?'red':'green'}`}>
+            <b>KIRISH ZONASI ({r.side==='SELL'?'SELL':'BUY'})</b>
             <strong>{money$(r.entryLow)} – {money$(r.entryHigh)}</strong>
           </div>
           <div className="proBox red">
             <b>STOP LOSS (SL)</b>
             <strong>{money$(r.invalidation)}</strong>
-            <small>pastida {tf} candle yopilsa</small>
+            <small>{r.side==='SELL'?'yuqorisida':'pastida'} {tf} candle yopilsa</small>
           </div>
           <div className="proBox tp">
             <b>TAKE PROFIT (TP)</b>
@@ -210,7 +216,9 @@ export default function PremiumAnalyst(){
           <h3 className="bullText">🟢 BULLISH SENARIY · {tf}</h3>
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
-            {money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
+            {r.side==='SELL'
+              ? <>{money$(r.entryHigh)} ↑ {money$(r.invalidation)}</>
+              : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
           </div>
         </div>
 
@@ -218,7 +226,9 @@ export default function PremiumAnalyst(){
           <h3 className="bearText">🔴 BEARISH SENARIY · {tf}</h3>
           <p>{r.bearish}</p>
           <div className="levelPath redPath">
-            {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
+            {r.side==='SELL'
+              ? <>{money$(r.entryHigh)} ↓ {money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}</>
+              : <>{money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}</>}
           </div>
         </div>
       </div>
