@@ -130,7 +130,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 
 function bearishLevels(r: Result): number[] {
   const sl = r.invalidation
-  const supports = (r.support || []).filter(s => s < (r.side==='SELL'?r.entryHigh:sl)).sort((a, b) => b - a)
+  const supports = (r.support || []).filter(s => (r.side==='SELL' ? r.entryHigh : sl) > s).sort((a, b) => b - a)
   const s1 = supports[0] ?? sl * 0.992
   const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
   const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
