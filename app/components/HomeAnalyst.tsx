@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number}
-type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
+type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;side?:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
 
 const coins=['BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM']
 const intervals=[['1h','H1'],['4h','H4'],['1d','D1']]
@@ -19,8 +19,8 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   const W=1700,H=820,L=68,R=210,T=78,MB=540,RT=580,RB=740
   const plotRight=W-R
   const candleRight=L+(plotRight-L)*0.93
-  const min=Math.min(...candles.map(c=>c.low),result.invalidation,result.entryLow)*.997
-  const max=Math.max(...candles.map(c=>c.high),...result.tp)*1.003
+  const min=Math.min(...candles.map(c=>c.low),result.entryLow,...result.tp,result.invalidation)*.997
+  const max=Math.max(...candles.map(c=>c.high),result.entryHigh,...result.tp,result.invalidation)*1.003
   const x=(i:number)=>L+i*(candleRight-L)/Math.max(1,candles.length-1)
   const y=(v:number)=>MB-(v-min)/(max-min)*(MB-T)
   const ry=(v:number)=>RB-(Math.max(0,Math.min(100,v))/100)*(RB-RT)
@@ -37,6 +37,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   const arrowEndX=plotRight-16
   const labelX=plotRight+10
   const tf=interval==='4h'?'4 soatlik (H4)':interval==='1d'?'1 kunlik (D1)':'1 soatlik (H1)'
+  const isSell=result.side==='SELL'
 
   const rightBox=(yy:number,text:string,bg:string,w=100)=>(
     <g>
@@ -71,7 +72,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           {[0,.2,.4,.6,.8,1].map(v=><line key={v} x1={L} x2={plotRight} y1={T+v*(MB-T)} y2={T+v*(MB-T)} stroke="#182230"/>)}
           {[30,50,70].map(v=><line key={v} x1={L} x2={plotRight} y1={ry(v)} y2={ry(v)} stroke="#3a4658" strokeDasharray="4 6"/>)}
 
-          <text x={L} y="28" fill="#f0b90b" fontSize="18" fontWeight="800">{coin}/USDT · {tf}</text>
+          <text x={L} y="28" fill="#f0b90b" fontSize="18" fontWeight="800">{coin}/USDT · {tf} · {isSell?'SELL':'BUY'}</text>
           <text x={L} y="50" fill="#9aa7b8" fontSize="12">
             O {money(last?.open||0)}   H {money(last?.high||0)}   L {money(last?.low||0)}   C {money(latest)}{'  '}
             <tspan fill={chg>=0?'#20d67a':'#ff5360'}>{chg>=0?'+':''}{money(chg)} ({chgPct>=0?'+':''}{chgPct.toFixed(2)}%)</tspan>
@@ -93,19 +94,19 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9"/>
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9"/>
 
-          <rect x={zoneLeft} y={y(result.entryHigh)} width={zoneW} height={Math.max(12,y(result.entryLow)-y(result.entryHigh))} fill="#1dbf6b" fillOpacity=".18" stroke="#20d67a" strokeOpacity=".55" rx="3"/>
+          <rect x={zoneLeft} y={Math.min(y(result.entryHigh),y(result.entryLow))} width={zoneW} height={Math.max(12,Math.abs(y(result.entryLow)-y(result.entryHigh)))} fill={isSell?'#c52f3a':'#1dbf6b'} fillOpacity=".18" stroke={isSell?'#ff4d5a':'#20d67a'} strokeOpacity=".55" rx="3"/>
 
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2"/>
-          <rect x={labelX} y={y(latest)-13} width="100" height="26" rx="4" fill="#1a9e55"/>
+          <rect x={labelX} y={y(latest)-13} width="100" height="26" rx="4" fill={isSell?'#c52f3a':'#1a9e55'}/>
           <text x={labelX+50} y={y(latest)+5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">{money(latest)}</text>
 
-          {rightBox(y(result.tp[2]||latest*1.03),`TP3  ${money(result.tp[2]||0)}`,'#148f55')}
-          {rightBox(y(result.tp[1]||latest*1.02),`TP2  ${money(result.tp[1]||0)}`,'#148f55')}
-          {rightBox(y(result.tp[0]||latest*1.01),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
+          {rightBox(y(result.tp[2]),`TP3  ${money(result.tp[2]||0)}`,'#148f55')}
+          {rightBox(y(result.tp[1]),`TP2  ${money(result.tp[1]||0)}`,'#148f55')}
+          {rightBox(y(result.tp[0]),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
           {rightBox(y(result.invalidation),`SL  ${money(result.invalidation)}`,'#c52f3a')}
 
-          <line x1={arrowStartX} y1={y(latest)-3} x2={arrowEndX} y2={y(result.tp[0]||latest)} stroke="#20d67a" strokeWidth="2.2" strokeDasharray="8 5" markerEnd="url(#hcBull)"/>
-          <line x1={arrowStartX} y1={y(latest)-9} x2={arrowEndX} y2={y(result.tp[1]||latest)} stroke="#20d67a" strokeWidth="1.9" strokeDasharray="8 5" markerEnd="url(#hcBull)" opacity=".88"/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" markerEnd={isSell?undefined:'url(#hcBull)'}/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" markerEnd={isSell?undefined:'url(#hcBull)'} opacity=".88"/>
 
           <text x={L} y={RT+6} fill="#e6edf3" fontSize="14" fontWeight="800">RSI 14  {result.rsi.toFixed(2)}</text>
           <polyline points={rs.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2"/>
@@ -120,29 +121,21 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   )
 }
 
-/** Bearish: SL ↓ Support1 ↓ Support2 ↓ uzoq swing support (Entry yo‘q) */
 function bearishLevels(r: Result): number[] {
+  if (r.side==='SELL') {
+    return [r.entryHigh, r.tp[0], r.tp[1], r.tp[2]]
+  }
   const sl = r.invalidation
   const supports = (r.support || []).filter(s => s < sl).sort((a, b) => b - a)
   const s1 = supports[0] ?? sl * 0.992
   const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
-  const deep = supports.length >= 3
-    ? supports[supports.length - 1]
-    : supports.length >= 2
-      ? supports[supports.length - 1]
-      : sl * 0.97
+  const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
   const levels = [sl, s1, s2, deep]
-  // Yuqoridan pastga, takrorlarni yumshatish
   const uniq: number[] = []
   for (const v of levels.sort((a, b) => b - a)) {
-    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (sl || 1) > 0.0015) {
-      uniq.push(v)
-    }
+    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (sl || 1) > 0.0015) uniq.push(v)
   }
-  while (uniq.length < 4) {
-    const last = uniq[uniq.length - 1]
-    uniq.push(last * 0.99)
-  }
+  while (uniq.length < 4) uniq.push(uniq[uniq.length - 1] * 0.99)
   return uniq.slice(0, 4)
 }
 
@@ -167,7 +160,7 @@ export default function HomeAnalyst(){
       <div>
         <div className="homeKicker">🤖 AI CRYPTO ANALYST</div>
         <h2>Real vaqtda kripto bozor tahlili</h2>
-        <p>Jonli market data asosida avtomatik Entry · TP1 · TP2 · TP3 · SL va texnik xulosa.</p>
+        <p>Jonli market data asosida avtomatik BUY/SELL · Entry · TP · SL va texnik xulosa.</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
@@ -184,7 +177,8 @@ export default function HomeAnalyst(){
       <div className="proAnalysis">
         <div className="proCard">
           <h3>📊 TEXNIK TAHLIL · {tf}</h3>
-          <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral → Bullish momentum'}</strong></div>
+          <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral'}</strong></div>
+          <div className="proRow"><span>SIGNAL</span><strong className={r.side==='SELL'?'bad':'good'}>{r.side==='SELL'?'SELL':'BUY'}</strong></div>
           <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
           <p className="proNote">{r.rsi>=50?'RSI 50 dan yuqorida, bu bullish momentumni ko‘rsatadi.':'RSI 50 dan past, momentum susaygan.'}</p>
           <div className="proRow"><span>ASOSIY XULOSA</span></div>
@@ -192,14 +186,14 @@ export default function HomeAnalyst(){
         </div>
 
         <div className="proCard">
-          <div className="proBox green">
-            <b>KIRISH ZONASI (BUY)</b>
+          <div className={`proBox ${r.side==='SELL'?'red':'green'}`}>
+            <b>KIRISH ZONASI ({r.side==='SELL'?'SELL':'BUY'})</b>
             <strong>{money$(r.entryLow)} – {money$(r.entryHigh)}</strong>
           </div>
           <div className="proBox red">
             <b>STOP LOSS (SL)</b>
             <strong>{money$(r.invalidation)}</strong>
-            <small>pastida {tf} candle yopilsa</small>
+            <small>{r.side==='SELL'?'yuqorisida':'pastida'} {tf} candle yopilsa</small>
           </div>
           <div className="proBox tp">
             <b>TAKE PROFIT (TP)</b>
@@ -213,7 +207,9 @@ export default function HomeAnalyst(){
           <h3 className="bullText">🟢 BULLISH SENARIY · {tf}</h3>
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
-            {money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
+            {r.side==='SELL'
+              ? <>{money$(r.entryHigh)} ↑ {money$(r.invalidation)}</>
+              : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
           </div>
         </div>
 
