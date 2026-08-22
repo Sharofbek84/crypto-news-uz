@@ -8,7 +8,7 @@ type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signa
 
 const coins=[
   'BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM',
-  'XAUT','XRP','TRX','HYPE','BCH','ZEC','LINK','AVAX','ONDO','WLD',
+  'XRP','BCH','LINK','AVAX',
 ]
 const intervals=[['15m','M15'],['1h','H1'],['4h','H4'],['1d','D1']]
 function money(n:number){if(n>=1000)return n.toLocaleString('en-US',{maximumFractionDigits:0});if(n>=1)return n.toFixed(2);return n.toFixed(5)}
