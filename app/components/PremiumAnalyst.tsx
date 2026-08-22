@@ -130,7 +130,8 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 
 function bearishLevels(r: Result): number[] {
   const sl = r.invalidation
-  const supports = (r.support || []).filter(s => s < (r.side==='SELL'?r.entryHigh:sl)).sort((a, b) => b - a)
+  const threshold = r.side==='SELL' ? r.entryHigh : sl
+  const supports = (r.support || []).filter(s => threshold > s).sort((a, b) => b - a)
   const s1 = supports[0] ?? sl * 0.992
   const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
   const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
@@ -143,11 +144,11 @@ function bearishLevels(r: Result): number[] {
   return uniq.slice(0, 4)
 }
 
-/** SELL bullish: Entry ↑ R1 ↑ R2 ↑ SL (4 zona) */
+/** SELL bullish: Entry - R1 - R2 - SL (4 zona) */
 function sellBullishLevels(r: Result): number[] {
   const entry = r.entryHigh
   const sl = r.invalidation
-  const res = (r.resistance || []).filter(x => x > entry && x < sl).sort((a, b) => a - b)
+  const res = (r.resistance || []).filter(x => x > entry && sl > x).sort((a, b) => a - b)
   const r1 = res[0] ?? entry + (sl - entry) * 0.33
   const r2 = res[1] ?? entry + (sl - entry) * 0.66
   const levels = [entry, r1, r2, sl]
@@ -186,9 +187,10 @@ export default function PremiumAnalyst(){
   const reward = r
     ? (r.side==='SELL' ? Math.max(r.entryHigh - r.tp[0], 0) : Math.max(r.tp[0] - r.entryHigh, 0))
     : 0
-  const rr = risk > 0 ? (reward / risk).toFixed(1) : '—'
+  const rr = risk > 0 ? (reward / risk).toFixed(1) : '-'
 
-  return <section className="homeAnalyst">
+  return (
+    <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
         <div className="homeKicker">⭐ PREMIUM TAHLIL</div>
@@ -261,4 +263,5 @@ export default function PremiumAnalyst(){
       <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o‘zingiz tahlil qiling.</p>
     </>}
   </section>
+  )
 }
