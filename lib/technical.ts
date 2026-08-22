@@ -83,6 +83,13 @@ function tfLookback(interval: string) {
   return 6
 }
 
+function minSlGap(interval: string, last: number) {
+  // SL must sit clearly outside the entry zone
+  const pct =
+    interval === '15m' ? 0.0018 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.004 : 0.006
+  return last * pct
+}
+
 function findSwingPoints(candles: Candle[], left = 2, right = 2) {
   const swings: { price: number; type: 'high' | 'low'; index: number }[] = []
   for (let i = left; i < candles.length - right; i++) {
@@ -128,15 +135,15 @@ function structureParams(interval: string, last: number) {
     (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
   const lb = tfLookback(interval)
   const bufferMul =
-    interval === '15m' ? 0.06 : interval === '1h' ? 0.08 : interval === '4h' ? 0.1 : 0.12
+    interval === '15m' ? 0.08 : interval === '1h' ? 0.1 : interval === '4h' ? 0.12 : 0.14
   const maxSlPct =
-    interval === '15m' ? 0.01 : interval === '1h' ? 0.015 : interval === '4h' ? 0.025 : 0.04
+    interval === '15m' ? 0.012 : interval === '1h' ? 0.018 : interval === '4h' ? 0.028 : 0.045
   const minSlPct =
-    interval === '15m' ? 0.003 : interval === '1h' ? 0.004 : interval === '4h' ? 0.006 : 0.01
+    interval === '15m' ? 0.004 : interval === '1h' ? 0.005 : interval === '4h' ? 0.007 : 0.012
   return { window, tol, lb, bufferMul, maxSlPct, minSlPct }
 }
 
-/** Long (BUY): SL pastida, TP yuqorida */
+/** Long (BUY): SL pastida, TP yuqorida — SL always below entry zone */
 function longLevels(candles: Candle[], last: number, interval: string) {
   const { window, tol, lb, bufferMul, maxSlPct, minSlPct } = structureParams(interval, last)
   const recent = candles.slice(-Math.min(candles.length, window))
@@ -158,6 +165,25 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   if (last - invalidation > last * maxSlPct) invalidation = last - last * maxSlPct
   if (last - invalidation < last * minSlPct) invalidation = last - last * minSlPct
 
+  const gap = minSlGap(interval, last)
+  const entryHigh = last
+  // entry zone sits above SL with a clear gap
+  let entryLow = Math.min(last * 0.9985, Math.max(invalidation + gap, structureLow))
+  if (entryLow >= entryHigh) entryLow = entryHigh * 0.999
+
+  // enforce: SL strictly below entryLow by at least gap
+  if (entryLow - invalidation < gap) {
+    invalidation = entryLow - gap
+  }
+  // re-clamp max distance from price
+  if (last - invalidation > last * maxSlPct) {
+    invalidation = last - last * maxSlPct
+    entryLow = Math.min(entryHigh * 0.999, invalidation + gap)
+  }
+  if (invalidation >= entryLow) {
+    invalidation = entryLow - gap
+  }
+
   const risk = Math.max(last - invalidation, last * 0.003)
   let tp1: number, tp2: number, tp3: number
   if (resistances.length >= 3) {
@@ -178,9 +204,6 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   if (!supportArr.length) supportArr.push(structureLow)
   if (!resistanceArr.length) resistanceArr.push(tp1)
 
-  const entryHigh = last
-  const entryLow = Math.min(last, Math.max(invalidation + risk * 0.2, structureLow))
-
   return {
     support: supportArr,
     resistance: resistanceArr,
@@ -191,7 +214,7 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   }
 }
 
-/** Short (SELL): SL yuqorida, TP pastda */
+/** Short (SELL): SL yuqorida, TP pastda — SL always above entry zone */
 function shortLevels(candles: Candle[], last: number, interval: string) {
   const { window, tol, lb, bufferMul, maxSlPct, minSlPct } = structureParams(interval, last)
   const recent = candles.slice(-Math.min(candles.length, window))
@@ -213,6 +236,23 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   if (invalidation - last > last * maxSlPct) invalidation = last + last * maxSlPct
   if (invalidation - last < last * minSlPct) invalidation = last + last * minSlPct
 
+  const gap = minSlGap(interval, last)
+  const entryLow = last
+  let entryHigh = Math.max(last * 1.0015, Math.min(invalidation - gap, structureHigh))
+  if (entryHigh <= entryLow) entryHigh = entryLow * 1.001
+
+  // enforce: SL strictly above entryHigh by at least gap
+  if (invalidation - entryHigh < gap) {
+    invalidation = entryHigh + gap
+  }
+  if (invalidation - last > last * maxSlPct) {
+    invalidation = last + last * maxSlPct
+    entryHigh = Math.max(entryLow * 1.001, invalidation - gap)
+  }
+  if (invalidation <= entryHigh) {
+    invalidation = entryHigh + gap
+  }
+
   const risk = Math.max(invalidation - last, last * 0.003)
   let tp1: number, tp2: number, tp3: number
   if (supports.length >= 3) {
@@ -232,9 +272,6 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   const resistanceArr = resistances.slice(0, 3)
   if (!supportArr.length) supportArr.push(tp1)
   if (!resistanceArr.length) resistanceArr.push(structureHigh)
-
-  const entryLow = last
-  const entryHigh = Math.max(last, Math.min(invalidation - risk * 0.2, structureHigh))
 
   return {
     support: supportArr,
