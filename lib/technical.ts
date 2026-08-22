@@ -129,7 +129,7 @@ function clusterLevels(prices: number[], tolerance: number) {
 
 function structureParams(interval: string, last: number) {
   const window =
-    interval === '1d' ? 60 : interval === '4h' ? 50 : interval === '15m' ? 40 : 45
+    interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 80 : 60
   const tol =
     last *
     (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
@@ -199,9 +199,25 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   tp2 = Math.max(tp2, tp1 + risk * 0.4)
   tp3 = Math.max(tp3, tp2 + risk * 0.4)
 
-  const supportArr = supports.slice(0, 3)
-  const resistanceArr = resistances.slice(0, 3)
+  // Nearest supports + eng uzoq (deep) support
+  const fullWindowLow = Math.min(...recent.map(c => c.low))
+  const deepLevel = supports.length
+    ? Math.min(supports[supports.length - 1], fullWindowLow)
+    : fullWindowLow
+  const supportArr: number[] = []
+  for (const s of supports) {
+    if (supportArr.length >= 2) break
+    if (!supportArr.length || Math.abs(supportArr[supportArr.length - 1] - s) / last > 0.0015) {
+      supportArr.push(s)
+    }
+  }
+  // Always append deepest support if meaningfully lower
+  if (deepLevel < last && (!supportArr.length || deepLevel < Math.min(...supportArr) - last * 0.002)) {
+    supportArr.push(deepLevel)
+  }
   if (!supportArr.length) supportArr.push(lastMin)
+
+  const resistanceArr = resistances.slice(0, 3)
   if (!resistanceArr.length) resistanceArr.push(tp1)
 
   return {
@@ -305,8 +321,12 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const sr = side === 'SELL' ? shortLevels(candles, last, interval) : longLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
-  const deepSupport =
-    support.length >= 2 ? support[support.length - 1] : support[0] ?? (side === 'SELL' ? tp[2] : invalidation)
+  // Bearish senariy: eng uzoq (eng past) support
+  const deepSupport = support.length
+    ? Math.min(...support)
+    : side === 'SELL'
+      ? tp[2]
+      : Math.min(invalidation, last * 0.97)
 
   const tf = tfLabel(interval)
   const tfLong = tfFull(interval)
