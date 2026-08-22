@@ -69,6 +69,13 @@ function tfLabel(interval?: string) {
   return 'H1'
 }
 
+function tfFull(interval?: string) {
+  if (interval === '1d') return '1 kunlik (D1)'
+  if (interval === '4h') return '4 soatlik (H4)'
+  if (interval === '15m') return '15 daqiqalik (M15)'
+  return '1 soatlik (H1)'
+}
+
 function tfLookback(interval: string) {
   if (interval === '1d') return 10
   if (interval === '4h') return 8
@@ -264,6 +271,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     support.length >= 2 ? support[support.length - 1] : support[0] ?? (side === 'SELL' ? tp[2] : invalidation)
 
   const tf = tfLabel(interval)
+  const tfLong = tfFull(interval)
+  const candleClose =
+    interval === '4h' ? '4H candle' : interval === '1d' ? 'D1 candle' : interval === '15m' ? 'M15 candle' : 'H1 candle'
 
   let bullish: string
   let bearish: string
@@ -277,10 +287,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA20/EMA50 ostida qolsa va momentum salbiy bo'lsa, ` +
       `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga pasayish ssenariysi kuchayadi.`
 
-    summary =
-      trend === 'BEARISH'
-        ? `${tf}: Resistance ${fmt(resistance[0] ?? entryHigh)} bosimi. Support ${fmt(support[0] ?? tp[0])} yorilsa pasayish. Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL ${fmt(invalidation)}.`
-        : `${tf}: Pastga bosim sezilmoqda. SELL zona ${fmt(entryLow)}–${fmt(entryHigh)}. TP ${fmt(tp[0])} / ${fmt(tp[1])} / ${fmt(tp[2])}. SL ${fmt(invalidation)}.`
+    if (trend === 'BEARISH') {
+      summary =
+        `${tfLong} grafikda narx EMA 10/20/50 ostida joylashgan. Bu qisqa muddatli bearish belgi. ` +
+        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy kirish (SELL) zonasiga aylangan. ` +
+        `Agar bu zona ostida ushlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha tushishi mumkin. ` +
+        `Agar ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, yuqoriga bosim kuchayib, rebound ehtimoli oshadi.`
+    } else {
+      summary =
+        `${tfLong} grafikda trend neytral, biroq pastga bosim sezilmoqda. ` +
+        `${fmt(entryLow)}–${fmt(entryHigh)} zona muhim SELL zonasiga aylangan. ` +
+        `Agar bu zona ostida ushlansa, ${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} yo'nalishida pasayish ehtimoli bor. ` +
+        `Agar ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, SELL signal bekor bo'lib, rebound boshlanishi mumkin.`
+    }
   } else {
     bullish =
       `Narx EMA20 ustida va momentum ijobiy bo'lsa, ` +
@@ -289,10 +308,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA20/EMA50 ostida qolish va momentum susayishi ` +
       `${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
 
-    summary =
-      trend === 'BULLISH'
-        ? `${tf}: Support ${fmt(support[0] ?? invalidation)} ushlanib, resistance ${fmt(resistance[0] ?? tp[0])} sari. Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL ${fmt(invalidation)}.`
-        : `${tf}: S/R oralig'ida. Support ${fmt(support[0] ?? invalidation)}, resistance ${fmt(resistance[0] ?? tp[0])}. Kirish ${fmt(entryLow)}–${fmt(entryHigh)}, SL ${fmt(invalidation)}.`
+    if (trend === 'BULLISH') {
+      summary =
+        `${tfLong} grafikda narx EMA 10/20/50 ustidan chiqib oldi. Bu qisqa muddatli bullish belgi. ` +
+        `${fmt(entryLow)}–${fmt(entryHigh)} zona juda muhim qo'llab-quvvatlash (support) zonasiga aylangan. ` +
+        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
+        `Agar ${fmt(invalidation)} pastida ${candleClose} yopilsa, pastga bosim kuchayib, pasayish ssenariysi kuchayadi.`
+    } else {
+      summary =
+        `${tfLong} grafikda trend NEUTRAL, biroq bullish momentum belgilari ko'rinmoqda. ` +
+        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy kirish (BUY) zonasiga aylangan. ` +
+        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
+        `Agar ${fmt(invalidation)} pastida ${candleClose} yopilsa, pastga bosim kuchayib, pasayish ehtimoli oshadi.`
+    }
   }
 
   return {
