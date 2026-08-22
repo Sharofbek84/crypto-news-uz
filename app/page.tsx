@@ -52,9 +52,12 @@ export default async function Home() {
   return (
     <>
       <header className="header">
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
           <div className="logo">GOLDENWEB<span>.UZ</span></div>
-          <Link href="/obuna" className="headerCta">Obuna bo‘lish</Link>
+          <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <Link href="/premium" style={{ color: '#f0b90b', fontSize: 14, fontWeight: 700 }}>Premium</Link>
+            <Link href="/obuna" className="headerCta">Obuna bo‘lish</Link>
+          </nav>
         </div>
       </header>
 
