@@ -129,7 +129,7 @@ function bearishLevels(r: Result): number[] {
     return [r.tp[0], r.tp[1], r.tp[2]]
   }
   const sl = r.invalidation
-  const supports = (r.support || []).filter(s => s < sl).sort((a, b) => b - a)
+  const supports = (r.support || []).filter(s => sl > s).sort((a, b) => b - a)
   const s1 = supports[0] ?? sl * 0.992
   const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
   const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
@@ -158,28 +158,30 @@ export default function HomeAnalyst(){
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
 
-  return <section className="homeAnalyst">
+  return (
+    <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
-        <div className="homeKicker">🤖 AI CRYPTO ANALYST</div>
+        <div className="homeKicker">AI CRYPTO ANALYST</div>
         <h2>Real vaqtda kripto bozor tahlili</h2>
         <p>Jonli market data asosida avtomatik BUY/SELL · Entry · TP · SL va texnik xulosa.</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
         <select value={interval} onChange={e=>setInterval(e.target.value)}>{intervals.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select>
-        <button onClick={load}>↻ Yangilash</button>
+        <button onClick={load}>Yangilash</button>
       </div>
     </div>
 
-    {loading?<div className="homeLoading">Grafik va tahlil yuklanmoqda...</div>:error?<div className="homeLoading error">{error}</div>:r&&<>
+    {loading?<div className="homeLoading">Grafik va tahlil yuklanmoqda...</div>:error?<div className="homeLoading error">{error}</div>:r&&(
+      <>
       <div className="homeChartPanel">
         <CleanChart candles={data.candles} result={r} coin={coin} interval={interval}/>
       </div>
 
       <div className="proAnalysis">
         <div className="proCard">
-          <h3>📊 TEXNIK TAHLIL · {tf}</h3>
+          <h3>TEXNIK TAHLIL · {tf}</h3>
           <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral'}</strong></div>
           <div className="proRow"><span>SIGNAL</span><strong className={r.side==='SELL'?'bad':'good'}>{r.side==='SELL'?'SELL':'BUY'}</strong></div>
           <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
@@ -207,7 +209,7 @@ export default function HomeAnalyst(){
         </div>
 
         <div className="proCard bullCard">
-          <h3 className="bullText">🟢 BULLISH SENARIY · {tf}</h3>
+          <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
             {r.side==='SELL'
@@ -217,7 +219,7 @@ export default function HomeAnalyst(){
         </div>
 
         <div className="proCard bearCard">
-          <h3 className="bearText">🔴 BEARISH SENARIY · {tf}</h3>
+          <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
           <p>{r.bearish}</p>
           <div className="levelPath redPath">
             {r.side==='SELL'
@@ -227,7 +229,9 @@ export default function HomeAnalyst(){
         </div>
       </div>
 
-      <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz tahlil qiling.</p>
+      <p className="homeDisclaimer">Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz tahlil qiling.</p>
     </>
+    )}
   </section>
+  )
 }
