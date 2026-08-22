@@ -157,13 +157,6 @@ export default function PremiumAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
-  const risk = r
-    ? (r.side==='SELL' ? Math.max(r.invalidation - r.entryHigh, 0) : Math.max(r.entryHigh - r.invalidation, 0))
-    : 0
-  const reward = r
-    ? (r.side==='SELL' ? Math.max(r.entryHigh - r.tp[0], 0) : Math.max(r.tp[0] - r.entryHigh, 0))
-    : 0
-  const rr = risk > 0 ? (reward / risk).toFixed(1) : '-'
 
   return (
     <section className="homeAnalyst">
@@ -171,7 +164,7 @@ export default function PremiumAnalyst(){
       <div>
         <div className="homeKicker">PREMIUM TAHLIL</div>
         <h2>Kengaytirilgan kripto bozor tahlili</h2>
-        <p>15 ta coin · M15 / H1 / H4 / D1 · BUY/SELL · Entry · TP · SL · Risk:Reward</p>
+        <p>15 ta coin · M15 / H1 / H4 / D1 · BUY/SELL · Entry · TP · SL</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
@@ -192,7 +185,6 @@ export default function PremiumAnalyst(){
           <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral'}</strong></div>
           <div className="proRow"><span>SIGNAL</span><strong className={r.side==='SELL'?'bad':'good'}>{r.side==='SELL'?'SELL':'BUY'}</strong></div>
           <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
-          <div className="proRow"><span>R:R (TP1)</span><strong className="good">1 : {rr}</strong></div>
           <p className="proNote">{r.rsi>=50?"RSI 50 dan yuqorida, bu bullish momentumni ko'rsatadi.":"RSI 50 dan past, momentum susaygan."}</p>
           <div className="proRow"><span>ASOSIY XULOSA</span></div>
           <p className="proSummary">{r.summary}</p>
