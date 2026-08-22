@@ -188,7 +188,7 @@ export default function HomeAnalyst(){
             <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral'}</strong></div>
             <div className="proRow"><span>SIGNAL</span><strong className={r.side==='SELL'?'bad':'good'}>{r.side==='SELL'?'SELL':'BUY'}</strong></div>
             <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
-            <p className="proNote">{r.rsi>=50?'RSI 50 dan yuqorida, bu bullish momentumni ko\'rsatadi.':'RSI 50 dan past, momentum susaygan.'}</p>
+            <p className="proNote">{r.rsi>=50?"RSI 50 dan yuqorida, bu bullish momentumni korsatadi.":"RSI 50 dan past, momentum susaygan."}</p>
             <div className="proRow"><span>ASOSIY XULOSA</span></div>
             <p className="proSummary">{r.summary}</p>
           </div>
@@ -232,7 +232,7 @@ export default function HomeAnalyst(){
           </div>
         </div>
 
-        <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz tahlil qiling.</p>
+        <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin ozingiz tahlil qiling.</p>
       </>}
     </section>
   )
