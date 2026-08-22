@@ -11,7 +11,7 @@ const intervals=[['1h','H1'],['4h','H4'],['1d','D1']]
 function money(n:number){if(n>=1000)return n.toLocaleString('en-US',{maximumFractionDigits:0});if(n>=1)return n.toFixed(2);return n.toFixed(5)}
 function money$(n:number){return '$'+money(n)}
 function tfShort(interval:string){return interval==='4h'?'H4':interval==='1d'?'D1':'H1'}
-function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i<c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))}}return out}
+function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i!==c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))}}return out}
 function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.map((x,i)=>{if(i)a=x.close*k+a*(1-k);return a})}
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
@@ -138,7 +138,7 @@ function bearishLevels(r: Result): number[] {
   for (const v of levels.sort((a, b) => b - a)) {
     if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (sl || 1) > 0.0015) uniq.push(v)
   }
-  while (uniq.length < 4) uniq.push(uniq[uniq.length - 1] * 0.99)
+  while (!(uniq.length >= 4)) uniq.push(uniq[uniq.length - 1] * 0.99)
   return uniq.slice(0, 4)
 }
 
@@ -157,12 +157,9 @@ export default function HomeAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
-  const bullZ1 = r ? r.entryHigh : 0
-  const bullZ2 = r ? (r.side==='SELL' ? r.entryHigh + (r.invalidation - r.entryHigh) * 0.33 : r.tp[0]) : 0
-  const bullZ3 = r ? (r.side==='SELL' ? r.entryHigh + (r.invalidation - r.entryHigh) * 0.66 : r.tp[1]) : 0
-  const bullZ4 = r ? (r.side==='SELL' ? r.invalidation : r.tp[2]) : 0
 
-  return <section className="homeAnalyst">
+  return (
+    <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
         <div className="homeKicker">🤖 AI CRYPTO ANALYST</div>
@@ -214,7 +211,9 @@ export default function HomeAnalyst(){
           <h3 className="bullText">🟢 BULLISH SENARIY · {tf}</h3>
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
-            {money$(bullZ1)} ↑ {money$(bullZ2)} ↑ {money$(bullZ3)} ↑ {money$(bullZ4)}
+            {r.side==='SELL'
+              ? <>{money$(r.entryHigh)} ↑ {money$(r.invalidation)}</>
+              : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
           </div>
         </div>
 
@@ -230,4 +229,5 @@ export default function HomeAnalyst(){
       <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o‘zingiz tahlil qiling.</p>
     </>}
   </section>
+  )
 }

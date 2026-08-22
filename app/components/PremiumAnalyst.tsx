@@ -15,7 +15,7 @@ function money(n:number){if(n>=1000)return n.toLocaleString('en-US',{maximumFrac
 function money$(n:number){return '$'+money(n)}
 function tfShort(interval:string){return interval==='15m'?'M15':interval==='4h'?'H4':interval==='1d'?'D1':'H1'}
 function tfLong(interval:string){return interval==='15m'?'15 daqiqalik (M15)':interval==='4h'?'4 soatlik (H4)':interval==='1d'?'1 kunlik (D1)':'1 soatlik (H1)'}
-function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i<c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))}}return out}
+function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i!==c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))}}return out}
 function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.map((x,i)=>{if(i)a=x.close*k+a*(1-k);return a})}
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
@@ -130,7 +130,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 
 function bearishLevels(r: Result): number[] {
   const sl = r.invalidation
-  const supports = (r.support || []).filter(s => (r.side==='SELL' ? r.entryHigh : sl) > s).sort((a, b) => b - a)
+  const supports = (r.support || []).filter(s => (r.side==='SELL'?r.entryHigh:sl) > s).sort((a, b) => b - a)
   const s1 = supports[0] ?? sl * 0.992
   const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
   const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
@@ -139,7 +139,7 @@ function bearishLevels(r: Result): number[] {
   for (const v of levels.sort((a, b) => b - a)) {
     if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (Math.abs(sl) || 1) > 0.0015) uniq.push(v)
   }
-  while (uniq.length < 4) uniq.push(uniq[uniq.length - 1] * 0.99)
+  while (!(uniq.length >= 4)) uniq.push(uniq[uniq.length - 1] * 0.99)
   return uniq.slice(0, 4)
 }
 
@@ -165,12 +165,9 @@ export default function PremiumAnalyst(){
     ? (r.side==='SELL' ? Math.max(r.entryHigh - r.tp[0], 0) : Math.max(r.tp[0] - r.entryHigh, 0))
     : 0
   const rr = risk > 0 ? (reward / risk).toFixed(1) : '—'
-  const bullZ1 = r ? r.entryHigh : 0
-  const bullZ2 = r ? (r.side==='SELL' ? r.entryHigh + (r.invalidation - r.entryHigh) * 0.33 : r.tp[0]) : 0
-  const bullZ3 = r ? (r.side==='SELL' ? r.entryHigh + (r.invalidation - r.entryHigh) * 0.66 : r.tp[1]) : 0
-  const bullZ4 = r ? (r.side==='SELL' ? r.invalidation : r.tp[2]) : 0
 
-  return <section className="homeAnalyst">
+  return (
+    <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
         <div className="homeKicker">⭐ PREMIUM TAHLIL</div>
@@ -223,7 +220,9 @@ export default function PremiumAnalyst(){
           <h3 className="bullText">🟢 BULLISH SENARIY · {tf}</h3>
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
-            {money$(bullZ1)} ↑ {money$(bullZ2)} ↑ {money$(bullZ3)} ↑ {money$(bullZ4)}
+            {r.side==='SELL'
+              ? <>{money$(r.entryHigh)} ↑ {money$(r.invalidation)}</>
+              : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
           </div>
         </div>
 
@@ -241,4 +240,5 @@ export default function PremiumAnalyst(){
       <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o‘zingiz tahlil qiling.</p>
     </>}
   </section>
+  )
 }
