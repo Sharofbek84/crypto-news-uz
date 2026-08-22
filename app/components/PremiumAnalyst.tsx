@@ -130,8 +130,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 
 function bearishLevels(r: Result): number[] {
   const sl = r.invalidation
-  const threshold = r.side==='SELL' ? r.entryHigh : sl
-  const supports = (r.support || []).filter(s => threshold > s).sort((a, b) => b - a)
+  const supports = (r.support || []).filter(s => s < (r.side==='SELL'?r.entryHigh:sl)).sort((a, b) => b - a)
   const s1 = supports[0] ?? sl * 0.992
   const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
   const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
@@ -142,27 +141,6 @@ function bearishLevels(r: Result): number[] {
   }
   while (uniq.length < 4) uniq.push(uniq[uniq.length - 1] * 0.99)
   return uniq.slice(0, 4)
-}
-
-/** SELL bullish: Entry - R1 - R2 - SL (4 zona) */
-function sellBullishLevels(r: Result): number[] {
-  const entry = r.entryHigh
-  const sl = r.invalidation
-  const res = (r.resistance || []).filter(x => x > entry && sl > x).sort((a, b) => a - b)
-  const r1 = res[0] ?? entry + (sl - entry) * 0.33
-  const r2 = res[1] ?? entry + (sl - entry) * 0.66
-  const levels = [entry, r1, r2, sl]
-  const uniq: number[] = []
-  for (const v of levels.sort((a, b) => a - b)) {
-    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (Math.abs(sl) || 1) > 0.001) uniq.push(v)
-  }
-  while (uniq.length < 4) {
-    const last = uniq[uniq.length - 1]
-    const next = last + Math.max((sl - entry) * 0.15, 1)
-    uniq.push(next >= sl ? sl : next)
-  }
-  const out = uniq.slice(0, 3).concat([sl])
-  return out.sort((a, b) => a - b)
 }
 
 export default function PremiumAnalyst(){
@@ -180,17 +158,15 @@ export default function PremiumAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
-  const sellBull = r && r.side==='SELL' ? sellBullishLevels(r) : []
   const risk = r
     ? (r.side==='SELL' ? Math.max(r.invalidation - r.entryHigh, 0) : Math.max(r.entryHigh - r.invalidation, 0))
     : 0
   const reward = r
     ? (r.side==='SELL' ? Math.max(r.entryHigh - r.tp[0], 0) : Math.max(r.tp[0] - r.entryHigh, 0))
     : 0
-  const rr = risk > 0 ? (reward / risk).toFixed(1) : '-'
+  const rr = risk > 0 ? (reward / risk).toFixed(1) : '—'
 
-  return (
-    <section className="homeAnalyst">
+  return <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
         <div className="homeKicker">⭐ PREMIUM TAHLIL</div>
@@ -244,7 +220,7 @@ export default function PremiumAnalyst(){
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
             {r.side==='SELL'
-              ? <>{money$(sellBull[0])} ↑ {money$(sellBull[1])} ↑ {money$(sellBull[2])} ↑ {money$(sellBull[3])}</>
+              ? <>{money$(r.entryHigh)} ↑ {money$(r.entryHigh + (r.invalidation - r.entryHigh) * 0.33)} ↑ {money$(r.entryHigh + (r.invalidation - r.entryHigh) * 0.66)} ↑ {money$(r.invalidation)}</>
               : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
           </div>
         </div>
@@ -263,5 +239,4 @@ export default function PremiumAnalyst(){
       <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o‘zingiz tahlil qiling.</p>
     </>}
   </section>
-  )
 }
