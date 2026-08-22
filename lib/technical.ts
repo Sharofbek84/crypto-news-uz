@@ -272,9 +272,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let summary: string
 
   if (side === 'SELL') {
-    // BUY uslubidagi kabi: zona + davom ehtimoli + SL
-    bullish = `Narx EMA20 ustiga qaytsa va momentum tiklansa, ${fmt(deepRes)} resistance zonasiga rebound xavfi bor.`
-    bearish = `Narx EMA20/EMA50 ostida va momentum salbiy bo‘lsa, ${fmt(tp[2])} gacha pasayish ssenariysi kuzatiladi.`
+    // BUY bilan bir xil uslub (teskari yo‘nalish)
+    bullish = `Narx EMA20 ustiga qaytsa va momentum tiklansa, ${fmt(invalidation)} resistance zonasini qayta test qilish xavfini oshiradi.`
+    bearish = `Narx EMA20/EMA50 ostida va momentum salbiy bo‘lsa, ${fmt(tp[2])} gacha pasayish/breakdown ssenariysi kuzatiladi.`
     summary = `${tf}: BEARISH — SELL. Zona ${fmt(entryLow)}–${fmt(entryHigh)} ostida ushlansa, pastga davom ehtimoli yuqori. ${fmt(invalidation)} yuqoriga buzilsa, rebound kuchayadi.`
   } else {
     bullish = `Narx EMA20 ustida va momentum ijobiy bo‘lsa, ${fmt(tp[2])} gacha rebound/breakout ssenariysi kuzatiladi.`
