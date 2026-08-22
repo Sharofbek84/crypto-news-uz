@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-const coins=['BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM','XRP','BCH','LINK','AVAX']
+const coins=['BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM','XRP','XLM','BCH','LINK','AVAX']
 const intervals=[['15m','M15'],['1h','H1'],['4h','H4'],['1d','D1']] as const
 type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;side?:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
 
@@ -159,7 +159,7 @@ export default function PremiumAnalyst(){
       <div>
         <div className="homeKicker">⭐ PREMIUM TAHLIL</div>
         <h2>Kengaytirilgan kripto bozor tahlili</h2>
-        <p>14 ta coin · M15 / H1 / H4 / D1 · BUY/SELL · Entry · TP · SL · Risk:Reward</p>
+        <p>15 ta coin · M15 / H1 / H4 / D1 · BUY/SELL · Entry · TP · SL · Risk:Reward</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
@@ -180,7 +180,7 @@ export default function PremiumAnalyst(){
           <div className="proRow"><span>SIGNAL</span><strong className={r.side==='SELL'?'bad':'good'}>{r.side==='SELL'?'SELL':'BUY'}</strong></div>
           <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
           <div className="proRow"><span>R:R (TP1)</span><strong className="good">1 : {rr}</strong></div>
-          <p className="proNote">{r.rsi>=50?'RSI 50 dan yuqorida, bu bullish momentumni ko‘rsatadi.':'RSI 50 dan past, momentum susaygan.'}</p>
+          <p className="proNote">{r.rsi>=50?'RSI 50 dan yuqorida, bu bullish momentumni ko\'rsatadi.':'RSI 50 dan past, momentum susaygan.'}</p>
           <div className="proRow"><span>ASOSIY XULOSA</span></div>
           <p className="proSummary">{r.summary}</p>
         </div>
@@ -224,7 +224,7 @@ export default function PremiumAnalyst(){
         </div>
       </div>
 
-      <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o‘zingiz tahlil qiling.</p>
+      <p className="homeDisclaimer">⚠️ Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o\'zingiz tahlil qiling.</p>
     </>
   </section>
 }
