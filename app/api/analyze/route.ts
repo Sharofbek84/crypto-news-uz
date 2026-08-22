@@ -4,19 +4,19 @@ import { analyze, Candle } from '@/lib/technical'
 const ALIASES: Record<string, string> = {
   BTC: 'BTCUSDT', ETH: 'ETHUSDT', LTC: 'LTCUSDT', SOL: 'SOLUSDT', BNB: 'BNBUSDT',
   NEAR: 'NEARUSDT', GRAM: 'TONUSDT', SUI: 'SUIUSDT', APT: 'APTUSDT', ATOM: 'ATOMUSDT',
-  XAUT: 'XAUTUSDT', XRP: 'XRPUSDT', TRX: 'TRXUSDT', HYPE: 'HYPEUSDT', BCH: 'BCHUSDT',
+  XAUT: 'XAUTUSDT', XRP: 'XRPUSDT', XLM: 'XLMUSDT', TRX: 'TRXUSDT', HYPE: 'HYPEUSDT', BCH: 'BCHUSDT',
   ZEC: 'ZECUSDT', LINK: 'LINKUSDT', AVAX: 'AVAXUSDT', ONDO: 'ONDOUSDT', WLD: 'WLDUSDT',
 }
 
 const COINBASE_PRODUCTS: Record<string, string> = {
   BTC: 'BTC-USD', ETH: 'ETH-USD', LTC: 'LTC-USD', SOL: 'SOL-USD', BNB: 'BNB-USD',
   NEAR: 'NEAR-USD', SUI: 'SUI-USD', APT: 'APT-USD', ATOM: 'ATOM-USD',
-  XRP: 'XRP-USD', BCH: 'BCH-USD', LINK: 'LINK-USD', AVAX: 'AVAX-USD',
+  XRP: 'XRP-USD', XLM: 'XLM-USD', BCH: 'BCH-USD', LINK: 'LINK-USD', AVAX: 'AVAX-USD',
 }
 
 const KRAKEN_PAIRS: Record<string, string> = {
   BTC: 'XBTUSD', ETH: 'ETHUSD', LTC: 'LTCUSD', SOL: 'SOLUSD',
-  XRP: 'XRPUSD', BCH: 'BCHUSD', LINK: 'LINKUSD', AVAX: 'AVAXUSD',
+  XRP: 'XRPUSD', XLM: 'XLMUSD', BCH: 'BCHUSD', LINK: 'LINKUSD', AVAX: 'AVAXUSD',
   ATOM: 'ATOMUSD', NEAR: 'NEARUSD', SUI: 'SUIUSD',
 }
 
@@ -31,7 +31,7 @@ function intervalConfig(interval: string) {
 
 async function fetchCoinbase(symbol: string, interval: string): Promise<Candle[]> {
   const product = COINBASE_PRODUCTS[symbol]
-  if (!product) throw new Error('Coinbase pair yo‘q')
+  if (!product) throw new Error('Coinbase pair yo\'q')
   const granularity = intervalConfig(interval).coinbase
   const url = `https://api.exchange.coinbase.com/products/${encodeURIComponent(product)}/candles?granularity=${granularity}`
   const res = await fetch(url, {
@@ -48,7 +48,7 @@ async function fetchCoinbase(symbol: string, interval: string): Promise<Candle[]
 
 async function fetchKraken(symbol: string, interval: string): Promise<Candle[]> {
   const pair = KRAKEN_PAIRS[symbol]
-  if (!pair) throw new Error('Kraken pair yo‘q')
+  if (!pair) throw new Error('Kraken pair yo\'q')
   const intervalMinutes = intervalConfig(interval).kraken
   const url = `https://api.kraken.com/0/public/OHLC?pair=${encodeURIComponent(pair)}&interval=${intervalMinutes}`
   const res = await fetch(url, {
@@ -119,6 +119,6 @@ export async function GET(req: NextRequest) {
     const result = analyze(candles, interval)
     return NextResponse.json({ symbol, interval, provider, candles, result, generatedAt: new Date().toISOString() })
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Market data serveriga ulanib bo‘lmadi.' }, { status: 502 })
+    return NextResponse.json({ error: e?.message || 'Market data serveriga ulanib bo\'lmadi.' }, { status: 502 })
   }
 }
