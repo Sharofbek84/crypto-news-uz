@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
-const MODEL = 'gpt-5.6-luna'
+const MODEL = process.env.AGENTROUTER_MODEL || 'gpt-5.5'
+const BASE_URL = (process.env.AGENTROUTER_BASE_URL || 'https://co.agentrouter.org/v1').replace(/\/$/, '')
 
 function clean(value: unknown, max = 4000) {
   return String(value ?? '').slice(0, max)
@@ -10,9 +11,9 @@ function clean(value: unknown, max = 4000) {
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY
+    const apiKey = process.env.AGENTROUTER_API_KEY
     if (!apiKey) {
-      return NextResponse.json({ error: 'OPENAI_API_KEY Vercel Environment Variables da topilmadi.' }, { status: 500 })
+      return NextResponse.json({ error: 'AGENTROUTER_API_KEY Vercel Environment Variables da topilmadi.' }, { status: 500 })
     }
 
     const body = await request.json()
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
       bearish: clean(analysis.bearish, 1800),
     }
 
-    const response = await fetch('https://api.openai.com/v1/responses', {
+    const response = await fetch(`${BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,17 +58,23 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: MODEL,
-        instructions: `Sen GOLDENWEB.UZ saytining “Kripto tahlilchi AI” yordamchisisan. Faqat o‘zbek tilida, aniq va sodda javob ber. Foydalanuvchi hozir Premium tahlil sahifasida. Berilgan Premium texnik tahlil ma’lumotlarini asosiy kontekst sifatida ishlat. Raqamlarni o‘zgartirib yuborma va mavjud ma’lumot yo‘q bo‘lsa, uydirma qilma. Bu moliyaviy maslahat emasligini kerak bo‘lsa eslat. Savol Entry, TP, SL, trend, RSI yoki boshqa texnik ko‘rsatkich haqida bo‘lsa, aynan shu tahlildagi qiymatlarga tayangan holda tushuntir. Foydalanuvchi boshqa coin haqida so‘rasa, bu oynadagi tahlil faqat hozirgi coin uchun ekanini ayt.\n\nHOZIRGI PREMIUM TAHLIL:\n${JSON.stringify(context)}`,
-        input: safeMessages,
+        messages: [
+          {
+            role: 'system',
+            content: `Sen GOLDENWEB.UZ saytining “Kripto tahlilchi AI” yordamchisisan. Faqat o‘zbek tilida, aniq va sodda javob ber. Foydalanuvchi hozir Premium tahlil sahifasida. Berilgan Premium texnik tahlil ma’lumotlarini asosiy kontekst sifatida ishlat. Raqamlarni o‘zgartirib yuborma va mavjud ma’lumot yo‘q bo‘lsa, uydirma qilma. Bu moliyaviy maslahat emasligini kerak bo‘lsa eslat. Savol Entry, TP, SL, trend, RSI yoki boshqa texnik ko‘rsatkich haqida bo‘lsa, aynan shu tahlildagi qiymatlarga tayangan holda tushuntir. Foydalanuvchi boshqa coin haqida so‘rasa, bu oynadagi tahlil faqat hozirgi coin uchun ekanini ayt.\n\nHOZIRGI PREMIUM TAHLIL:\n${JSON.stringify(context)}`,
+          },
+          ...safeMessages,
+        ],
       }),
     })
 
     const data = await response.json()
     if (!response.ok) {
-      return NextResponse.json({ error: data?.error?.message || 'OpenAI API xatosi.' }, { status: response.status })
+      return NextResponse.json({ error: data?.error?.message || 'AgentRouter API xatosi.' }, { status: response.status })
     }
 
-    return NextResponse.json({ text: data.output_text || 'AI javob qaytarmadi.' })
+    const text = data?.choices?.[0]?.message?.content
+    return NextResponse.json({ text: text || 'AI javob qaytarmadi.' })
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'AI server xatosi.' }, { status: 500 })
   }
