@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server'
 export const runtime = 'edge'
 
 const MODEL = 'gpt-5.6-sol'
-const BASE_URL = 'https://co.agentrouter.org/v1'
+// AgentRouter's current docs also document this host for OpenAI-compatible clients.
+// The /v1 path is required for Chat Completions.
+const BASE_URL = 'https://agentrouter.org/v1'
 
 function clean(value: unknown, max = 4000) {
   return String(value ?? '').slice(0, max)
