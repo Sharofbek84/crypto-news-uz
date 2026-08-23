@@ -68,9 +68,15 @@ export async function POST(request: Request) {
       }),
     })
 
-    const data = await response.json()
+    const raw = await response.text()
+    let data: any = null
+    try { data = JSON.parse(raw) } catch {}
+
     if (!response.ok) {
-      return NextResponse.json({ error: data?.error?.message || 'AgentRouter API xatosi.' }, { status: response.status })
+      const providerMessage = data?.error?.message || data?.message || raw.slice(0, 1000)
+      return NextResponse.json({
+        error: `AgentRouter ${response.status}: ${providerMessage}`,
+      }, { status: response.status })
     }
 
     const text = data?.choices?.[0]?.message?.content
