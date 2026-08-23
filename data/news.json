@@ -1,21 +1,12 @@
 [
   {
-    "slug": "bitcoin-77k-haftalik-rally",
-    "title": "Bitcoin $77,000 atrofida — haftalik o‘sish 22–24% saqlanib qoldi",
-    "summary": "BTC $79,500 yuqorisidan flash crash bilan $76,500 gacha tushib, $77,000 atrofida barqarorlashdi. Haftalik eng kuchli o‘sishlardan biri.",
-    "body": "Bitcoin 21-avgustda $79,400–$79,500 oralig‘iga chiqqandan so‘ng, 22-avgustdagi flash crash bilan $76,500 gacha tushdi va $77,000 atrofida konsolidatsiya qilmoqda.\n\nHaftalik o‘sish hali ham 22–24% darajasida — 2024-yil martidan beri eng kuchli natijalardan biri.\n\nAsosiy omillar: AQSh G‘aznachiligi buybacklari, ETF oqimlari va short squeeze. Muhim support $70,500, resistance $78,800–$80,000.\n\nBozor kapitallashuvi $2,7 trillion atrofida. Leverage tozalanishi davom etmoqda.",
+    "slug": "bitcoin-77k-konsolidatsiya",
+    "title": "Bitcoin $77,000 atrofida — haftalik 22%+ o‘sishdan keyin konsolidatsiya",
+    "summary": "BTC $79,500 yuqorisidan tushib $76,500–$77,500 oralig‘ida barqarorlashdi. Haftalik eng kuchli o‘sishlardan biri saqlanib qoldi.",
+    "body": "Bitcoin 21–22 avgustda $79,400–$79,500 oralig‘iga chiqqandan so‘ng, flash crash va foyda olish bilan $76,500 gacha tushdi va $77,000 atrofida konsolidatsiya qilmoqda.\n\nHaftalik o‘sish 22–24% darajasida — 2023-yil martidan beri eng kuchli natijalardan biri.\n\nAsosiy omillar: AQSh G‘aznachiligi long-dated bond buybacklarini kamida ikki baravar oshirish, ETF oqimlari ($1,9+ mlrd BTC ETF) va $3 mlrd+ short squeeze.\n\nMuhim support $75,000–$76,000, resistance $78,800–$80,000. Bozor kapitallashuvi $2,7 trillion atrofida.",
     "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-23"
-  },
-  {
-    "slug": "zcash-850-grayscale-etf",
-    "title": "Zcash $850 yaqiniga chiqdi — Grayscale spot ETF jarayoni tezlashmoqda",
-    "summary": "ZEC 8 yillik eng yuqori darajaga yaqinlashdi. Grayscale 5-chi tuzatishni topshirdi, listing 25-avgust atrofida kutilmoqda.",
-    "body": "Zcash (ZEC) 22-avgustda $850 atrofida 2018-yildan beri eng yuqori darajaga chiqdi (ba’zi manbalarda $855). 24 soatda 40%+ o‘sish kuzatildi.\n\nGrayscale Zcash Trustni spot ETF ga aylantirish uchun 5-chi tuzatishni SEC ga topshirdi. Yangi nomi “The Zcash ETF”, ticker ZCSH yoki ZCH, NYSE Arca da savdo, yillik to‘lov 2,5%.\n\nFutures hajmi milliardlab dollarga yetdi. DCG 200 ming ZEC qo‘shishi mumkinligi haqida gapirilmoqda.\n\nBu privacy-coin uchun birinchi AQSh spot ETF bo‘lishi mumkin.",
-    "url": "https://www.theblock.co/news/ecosystems/2026-08-22-zcash-hits-eight-year-high-near-850-with-futures-volume-near-10-billion-amid-grayscale-etf-push-412528",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-23"
+    "date": "2026-08-24"
   },
   {
     "slug": "etf-inflows-26-milliard",
@@ -24,6 +15,33 @@
     "body": "Bitcoin va Ethereum spot ETF’lari 22-avgustga qadar bo‘lgan haftada $2,6 milliard sof oqim jalb qildi — 2025-oktabrdan beri eng kuchli natija.\n\nBir kunlik cho‘qqilar $600 mln+ bo‘ldi. BlackRock iShares Bitcoin Trust eng katta ulushni oldi.\n\nBu oqimlar rallyni qo‘llab-quvvatladi va institutsional talab hali kuchli ekanligini ko‘rsatdi.\n\nSolana ETF’lari ham jami $1 mlrd+ oqim to‘plagan.\n\nBozor kayfiyati risk-on bo‘lib qolmoqda.",
     "url": "https://www.theblock.co/directory/this-week",
     "source": "GOLDENWEB.UZ",
+    "date": "2026-08-24"
+  },
+  {
+    "slug": "term-finance-exploit",
+    "title": "Term Finance DeFi protokoli $8,5 mln yo‘qotdi — governance exploit",
+    "summary": "DeFi lending protokoli Term Finance governance exploit tufayli taxminan $8,5 million yo‘qotdi.",
+    "body": "Term Finance DeFi lending protokoli 23-avgustda governance exploit tufayli taxminan $8,5 million yo‘qotdi.\n\nHujum governance mexanizmidan foydalanib amalga oshirildi. Jamoa holatni tekshirmoqda va foydalanuvchilarga xabar berishda.\n\nBu 2026-yilda DeFi sektoridagi yirik xavfsizlik hodisalaridan biri.\n\nFoydalanuvchilar rasmiy e’lonlarni kuzatishlari va shubhali takliflardan saqlanishlari kerak.",
+    "url": "https://www.theblock.co/news",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-24"
+  },
+  {
+    "slug": "tether-uruguay-mining",
+    "title": "Tether’ning $120 mln Uruguay bitcoin mining loyihasi barbod bo‘ldi",
+    "summary": "Tether’ning Uruguay’dagi $120 millionlik bitcoin mining loyihasi elektr shartnomasi nizosidan quladi.",
+    "body": "Tether’ning Uruguay’dagi $120 millionlik bitcoin mining loyihasi elektr energiyasi shartnomasi bo‘yicha nizo tufayli barbod bo‘ldi (Reuters xabari).\n\nLoyiha past narxdagi energiya manbalariga asoslangan edi, biroq shartnoma shartlari buzilishi loyihani to‘xtatdi.\n\nBu Tether’ning mining strategiyasiga ta’sir qilishi mumkin. Boshqa mintaqalardagi loyihalar davom etishi kutilmoqda.\n\nBitcoin mining sektorida AI va energiya xarajatlari muhim omil bo‘lib qolmoqda.",
+    "url": "https://www.theblock.co/news",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-24"
+  },
+  {
+    "slug": "zcash-850-grayscale-etf",
+    "title": "Zcash $850 yaqiniga chiqdi — Grayscale spot ETF jarayoni tezlashmoqda",
+    "summary": "ZEC 8 yillik eng yuqori darajaga yaqinlashdi. Grayscale 5-chi tuzatishni topshirdi.",
+    "body": "Zcash (ZEC) 22-avgustda $850 atrofida 2018-yildan beri eng yuqori darajaga chiqdi. 24 soatda 40%+ o‘sish kuzatildi.\n\nGrayscale Zcash Trustni spot ETF ga aylantirish uchun 5-chi tuzatishni SEC ga topshirdi. Yangi nomi “The Zcash ETF”, ticker ZCSH yoki ZCH.\n\nFutures hajmi milliardlab dollarga yetdi. Bu privacy-coin uchun birinchi AQSh spot ETF bo‘lishi mumkin.\n\nBozor privacy aktivlarga qiziqish oshganini ko‘rsatmoqda.",
+    "url": "https://www.theblock.co/news",
+    "source": "GOLDENWEB.UZ",
     "date": "2026-08-23"
   },
   {
@@ -31,16 +49,7 @@
     "title": "Solana asosiy tarmoqda slot vaqtini 350 ms ga tushirdi — 200 ms maqsadiga qarab",
     "summary": "Solana blok vaqtini 400 ms dan 350 ms ga qisqartirdi. Keyingi bosqich 200 ms.",
     "body": "Solana asosiy tarmog‘ida slot (blok) vaqtini 350 millisekundga tushirish boshlandi. Bu 400 ms dan sezilarli yaxshilanish.\n\nMaqsad — keyinchalik 200 ms ga yetish, bu tranzaksiya tezligini deyarli ikki baravar oshiradi.\n\nTarmoq unumdorligini oshirish bo‘yicha bosqichma-bosqich yangilanish.\n\nSOL narxi ham haftalik 25–28% o‘sish bilan kuchli ko‘tarildi.\n\nBu yangilik Solana ekotizimini yanada raqobatbardosh qiladi.",
-    "url": "https://www.theblock.co/news/ecosystems/2026-08-22-solana-cuts-mainnet-slot-time-to-350-milliseconds-in-first-step-toward-200ms-goal",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-23"
-  },
-  {
-    "slug": "sandbox-bridge-exploit",
-    "title": "The Sandbox Base va BNB zanjirlarida bridgingni to‘xtatdi — exploit tufayli",
-    "summary": "Web3 o‘yin tarmog‘i Sandbox exploitdan keyin Base va BNB dagi bridgingni o‘chirdi. Ta’sir 0,01% dan kam.",
-    "body": "The Sandbox Web3 gaming tarmog‘i exploit tufayli Base va BNB Chain dagi bridging funksiyasini to‘xtatdi.\n\nMaqsad — tokenlarni izolyatsiya qilish. Foydalanuvchilarga Base va BNB dagi SAND ni savdo qilmaslik tavsiya etildi.\n\nTa’sir umumiy supply ning 0,01% dan kam. Jamoa tokenlarni himoya qilish choralarini ko‘rmoqda.\n\nBu Web3 o‘yin sektoridagi xavfsizlik muammolarini yana bir bor eslatdi.\n\nFoydalanuvchilar rasmiy e’lonlarni kuzatishlari kerak.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
+    "url": "https://www.theblock.co/news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-23"
   }
