@@ -75,6 +75,8 @@ export async function POST(request: Request) {
     })
 
     const raw = await response.text()
+    console.log('[AgentRouter] status=', response.status, 'content-type=', response.headers.get('content-type'), 'length=', raw.length, 'prefix=', raw.slice(0, 300))
+
     if (!response.ok) {
       let data: any = null; try { data = JSON.parse(raw) } catch {}
       const providerMessage = data?.error?.message || data?.msg || data?.message || raw.slice(0, 1000)
@@ -82,9 +84,13 @@ export async function POST(request: Request) {
     }
 
     const text = parseResponse(raw)
-    if (!text) return NextResponse.json({ error: 'AgentRouter javob berdi, ammo javob matni aniqlanmadi.' }, { status: 502 })
+    if (!text) {
+      console.error('[AgentRouter] Empty parsed response. Raw prefix=', raw.slice(0, 1000))
+      return NextResponse.json({ error: 'AgentRouter javob berdi, ammo javob matni aniqlanmadi.' }, { status: 502 })
+    }
     return NextResponse.json({ text })
   } catch (error: any) {
+    console.error('[AgentRouter] Exception=', error?.message || error)
     return NextResponse.json({ error: error?.message || 'AI server xatosi.' }, { status: 500 })
   }
 }
