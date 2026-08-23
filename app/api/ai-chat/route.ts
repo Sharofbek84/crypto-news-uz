@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 export const runtime = 'edge'
 
 const MODEL = 'gpt-5.6-sol'
-const BASE_URL = 'https://agentrouter.org/v1'
+const BASE_URL = 'https://co.agentrouter.org/v1'
 
 function clean(value: unknown, max = 4000) { return String(value ?? '').slice(0, max) }
 
@@ -28,13 +28,8 @@ function extractSseText(raw: string): string {
     if (!trimmed.startsWith('data:')) continue
     const payload = trimmed.slice(5).trim()
     if (!payload || payload === '[DONE]') continue
-    try {
-      const parsed = JSON.parse(payload)
-      const text = extractText(parsed)
-      if (text) parts.push(text)
-    } catch {
-      if (payload) parts.push(payload)
-    }
+    try { const parsed = JSON.parse(payload); const text = extractText(parsed); if (text) parts.push(text) }
+    catch { if (payload) parts.push(payload) }
   }
   return parts.join('').trim()
 }
@@ -63,7 +58,13 @@ export async function POST(request: Request) {
     }
 
     const response = await fetch(`${BASE_URL}/chat/completions`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        'User-Agent': 'GoldenWeb-Crypto-Analyst/1.0',
+        Accept: 'application/json',
+      },
       body: JSON.stringify({
         model: MODEL, temperature: 0.4, stream: false,
         messages: [
