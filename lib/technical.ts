@@ -70,17 +70,28 @@ function tfLabel(interval?: string) {
 }
 
 function tfLookback(interval: string) {
-  if (interval === '1d') return 12
-  if (interval === '4h') return 10
-  if (interval === '15m') return 8
-  return 8
+  if (interval === '1d') return 20
+  if (interval === '4h') return 16
+  if (interval === '15m') return 12
+  return 14
 }
 
-/** Buffer beyond swing extreme (slightly under min / over max) */
-function swingBuffer(interval: string, last: number) {
-  const pct =
-    interval === '15m' ? 0.0006 : interval === '1h' ? 0.001 : interval === '4h' ? 0.0015 : 0.0025
-  return Math.max(last * pct, last * 0.0003)
+/** SL masofa: narxdan minimal uzoqlik, kirish zonasi bilan bo'shliq, swing buffer */
+function slParams(interval: string, last: number) {
+  const minPct =
+    interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.012 : 0.018
+  const gapPct =
+    interval === '15m' ? 0.003 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.006 : 0.009
+  const bufPct =
+    interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.0035 : 0.005
+  const maxPct =
+    interval === '15m' ? 0.025 : interval === '1h' ? 0.04 : interval === '4h' ? 0.055 : 0.08
+  return {
+    minSl: last * minPct,
+    entryGap: last * gapPct,
+    buf: last * bufPct,
+    maxSl: last * maxPct,
+  }
 }
 
 function findSwingPoints(candles: Candle[], left = 2, right = 2) {
@@ -127,10 +138,7 @@ function structureParams(interval: string, last: number) {
     last *
     (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
   const lb = tfLookback(interval)
-  // Max SL distance from price (safety cap only)
-  const maxSlPct =
-    interval === '15m' ? 0.02 : interval === '1h' ? 0.03 : interval === '4h' ? 0.045 : 0.06
-  return { window, tol, lb, maxSlPct }
+  return { window, tol, lb }
 }
 
 /**
@@ -138,7 +146,8 @@ function structureParams(interval: string, last: number) {
  * Entry zone = current price at top, above SL
  */
 function longLevels(candles: Candle[], last: number, interval: string) {
-  const { window, tol, lb, maxSlPct } = structureParams(interval, last)
+  const { window, tol, lb } = structureParams(interval, last)
+  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
@@ -155,27 +164,24 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   const supports = clusterLevels(rawLows, tol).filter(p => p < last).sort((a, b) => b - a)
   const resistances = clusterLevels(rawHighs, tol).filter(p => p > last).sort((a, b) => a - b)
 
-  // Oxirgi minimum: eng so'nggi swing low (narxdan past), yo'q bo'lsa window low
+  // Struktura past: narxdan yetarlicha uzoq swing low (eng yaqin, lekin minSl dan uzoq)
+  const farLows = swingLows.filter(s => last - s.price >= minSl * 0.7)
   const lastSwingMin = swingLows.find(s => s.price < last)?.price
-  const lastMin = lastSwingMin != null ? Math.min(lastSwingMin, windowLow) : windowLow
+  const structureLow = farLows.length
+    ? Math.max(...farLows.map(s => s.price))
+    : Math.min(lastSwingMin ?? windowLow, windowLow, last - minSl)
 
-  const buf = swingBuffer(interval, last)
-  // SL always under the last minimum
-  let invalidation = lastMin - buf
+  let invalidation = structureLow - buf
+  if (last - invalidation < minSl) invalidation = last - minSl
+  if (last - invalidation > maxSl) invalidation = last - maxSl
 
-  // Safety: agar SL juda uzoq bo'lsa, oxirgi minimumni saqlab, faqat ekstremal holatda qisqartirish
-  if (last - invalidation > last * maxSlPct) {
-    // Prefer staying under lastMin; only cap if lastMin itself is extreme
-    const capped = last - last * maxSlPct
-    invalidation = Math.min(capped, lastMin - buf)
-  }
-
-  // Entry zone: from slightly above SL up to current price
+  // Kirish zonasi narxga yaqin; SL bilan ko'rinadigan bo'shliq qoladi
   const entryHigh = last
-  let entryLow = Math.min(last * 0.999, Math.max(invalidation + buf * 2, lastMin))
-  if (entryLow >= entryHigh) entryLow = entryHigh * 0.9995
-  // Never let entry include SL
-  if (entryLow <= invalidation) entryLow = Math.min(entryHigh * 0.9995, invalidation + buf * 2)
+  const riskRange = Math.max(last - invalidation, last * 0.004)
+  let entryLow = last - riskRange * 0.4
+  if (entryLow - invalidation < entryGap) entryLow = invalidation + entryGap
+  if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(riskRange * 0.3, last * 0.004)
+  if (entryLow <= invalidation) entryLow = invalidation + entryGap
 
   const risk = Math.max(last - invalidation, last * 0.002)
   let tp1: number, tp2: number, tp3: number
@@ -208,7 +214,7 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   if (deepLevel < last && (!supportArr.length || deepLevel < Math.min(...supportArr) - last * 0.002)) {
     supportArr.push(deepLevel)
   }
-  if (!supportArr.length) supportArr.push(lastMin)
+  if (!supportArr.length) supportArr.push(structureLow)
 
   const resistanceArr = resistances.slice(0, 3)
   if (!resistanceArr.length) resistanceArr.push(tp1)
@@ -228,7 +234,8 @@ function longLevels(candles: Candle[], last: number, interval: string) {
  * Entry zone = current price at bottom, below SL
  */
 function shortLevels(candles: Candle[], last: number, interval: string) {
-  const { window, tol, lb, maxSlPct } = structureParams(interval, last)
+  const { window, tol, lb } = structureParams(interval, last)
+  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
@@ -245,23 +252,23 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   const supports = clusterLevels(rawLows, tol).filter(p => p < last).sort((a, b) => b - a)
   const resistances = clusterLevels(rawHighs, tol).filter(p => p > last).sort((a, b) => a - b)
 
-  // Oxirgi maksimum: eng so'nggi swing high (narxdan yuqori), yo'q bo'lsa window high
+  // Struktura yuqori: narxdan yetarlicha uzoq swing high
+  const farHighs = swingHighs.filter(s => s.price - last >= minSl * 0.7)
   const lastSwingMax = swingHighs.find(s => s.price > last)?.price
-  const lastMax = lastSwingMax != null ? Math.max(lastSwingMax, windowHigh) : windowHigh
+  const structureHigh = farHighs.length
+    ? Math.min(...farHighs.map(s => s.price))
+    : Math.max(lastSwingMax ?? windowHigh, windowHigh, last + minSl)
 
-  const buf = swingBuffer(interval, last)
-  // SL always above the last maximum
-  let invalidation = lastMax + buf
-
-  if (invalidation - last > last * maxSlPct) {
-    const capped = last + last * maxSlPct
-    invalidation = Math.max(capped, lastMax + buf)
-  }
+  let invalidation = structureHigh + buf
+  if (invalidation - last < minSl) invalidation = last + minSl
+  if (invalidation - last > maxSl) invalidation = last + maxSl
 
   const entryLow = last
-  let entryHigh = Math.max(last * 1.001, Math.min(invalidation - buf * 2, lastMax))
-  if (entryHigh <= entryLow) entryHigh = entryLow * 1.0005
-  if (entryHigh >= invalidation) entryHigh = Math.max(entryLow * 1.0005, invalidation - buf * 2)
+  const riskRange = Math.max(invalidation - last, last * 0.004)
+  let entryHigh = last + riskRange * 0.4
+  if (invalidation - entryHigh < entryGap) entryHigh = invalidation - entryGap
+  if (entryHigh <= entryLow) entryHigh = entryLow + Math.min(riskRange * 0.3, last * 0.004)
+  if (entryHigh >= invalidation) entryHigh = invalidation - entryGap
 
   const risk = Math.max(invalidation - last, last * 0.002)
   let tp1: number, tp2: number, tp3: number
@@ -281,7 +288,7 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   const supportArr = supports.slice(0, 3)
   const resistanceArr = resistances.slice(0, 3)
   if (!supportArr.length) supportArr.push(tp1)
-  if (!resistanceArr.length) resistanceArr.push(lastMax)
+  if (!resistanceArr.length) resistanceArr.push(structureHigh)
 
   return {
     support: supportArr,
