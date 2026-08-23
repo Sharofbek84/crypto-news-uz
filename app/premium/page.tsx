@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
 import PremiumAnalyst from '../components/PremiumAnalyst'
+import CryptoAnalystAI from '../components/CryptoAnalystAI'
 
 export const metadata = {
   title: 'Premium tahlil | GOLDENWEB.UZ',
@@ -27,6 +28,8 @@ export default function PremiumPage() {
           <PremiumAnalyst />
         </Suspense>
       </main>
+
+      <CryptoAnalystAI />
 
       <footer className="footer">
         GOLDENWEB.UZ • Premium AI texnik tahlil • {new Date().getFullYear()}
