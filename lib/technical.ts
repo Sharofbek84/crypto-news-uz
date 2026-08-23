@@ -69,13 +69,6 @@ function tfLabel(interval?: string) {
   return 'H1'
 }
 
-function tfFull(interval?: string) {
-  if (interval === '1d') return '1 kunlik (D1)'
-  if (interval === '4h') return '4 soatlik (H4)'
-  if (interval === '15m') return '15 daqiqalik (M15)'
-  return '1 soatlik (H1)'
-}
-
 function tfLookback(interval: string) {
   if (interval === '1d') return 12
   if (interval === '4h') return 10
@@ -329,9 +322,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       : Math.min(invalidation, last * 0.97)
 
   const tf = tfLabel(interval)
-  const tfLong = tfFull(interval)
-  const candleClose =
-    interval === '4h' ? '4H candle' : interval === '1d' ? 'D1 candle' : interval === '15m' ? 'M15 candle' : 'H1 candle'
 
   let bullish: string
   let bearish: string
@@ -347,16 +337,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'BEARISH') {
       summary =
-        `${tfLong} grafikda narx EMA 10/20/50 ostida joylashgan. Bu qisqa muddatli bearish belgi. ` +
-        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy kirish (SELL) zonasiga aylangan. ` +
-        `Agar bu zona ostida ushlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha tushishi mumkin. ` +
-        `Agar ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, yuqoriga bosim kuchayib, rebound ehtimoli oshadi.`
+        `${tf} grafikda trend BEARISH. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx pastga tushishi mumkin. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
     } else {
       summary =
-        `${tfLong} grafikda trend neytral, biroq pastga bosim sezilmoqda. ` +
-        `${fmt(entryLow)}–${fmt(entryHigh)} zona muhim SELL zonasiga aylangan. ` +
-        `Agar bu zona ostida ushlansa, ${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} yo'nalishida pasayish ehtimoli bor. ` +
-        `Agar ${fmt(invalidation)} yuqorisida ${candleClose} yopilsa, SELL signal bekor bo'lib, rebound boshlanishi mumkin.`
+        `${tf} grafikda trend NEUTRAL, biroq bearish momentum belgilari mavjud. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx pastga tushishi mumkin. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
     }
   } else {
     bullish =
@@ -368,16 +356,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'BULLISH') {
       summary =
-        `${tfLong} grafikda narx EMA 10/20/50 ustidan chiqib oldi. Bu qisqa muddatli bullish belgi. ` +
-        `${fmt(entryLow)}–${fmt(entryHigh)} zona juda muhim qo'llab-quvvatlash (support) zonasiga aylangan. ` +
-        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
-        `Agar ${fmt(invalidation)} pastida ${candleClose} yopilsa, pastga bosim kuchayib, pasayish ssenariysi kuchayadi.`
+        `${tf} grafikda trend BULLISH. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx tepaga ko'tarilishi mumkin. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
     } else {
       summary =
-        `${tfLong} grafikda trend NEUTRAL, biroq bullish momentum belgilari ko'rinmoqda. ` +
-        `${fmt(entryLow)}–${fmt(entryHigh)} zona asosiy kirish (BUY) zonasiga aylangan. ` +
-        `Agar bu zona saqlanib qolsa, narx avval ${fmt(tp[0])}, keyin ${fmt(tp[1])} – ${fmt(tp[2])} gacha ko'tarilishi mumkin. ` +
-        `Agar ${fmt(invalidation)} pastida ${candleClose} yopilsa, pastga bosim kuchayib, pasayish ehtimoli oshadi.`
+        `${tf} grafikda trend NEUTRAL, biroq bullish momentum belgilari mavjud. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx tepaga ko'tarilishi mumkin. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
     }
   }
 
