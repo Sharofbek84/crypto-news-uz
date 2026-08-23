@@ -142,6 +142,19 @@ function bearishLevels(r: Result): number[] {
   return uniq.slice(0, 4)
 }
 
+function bullishSellLevels(r: Result): number[] {
+  const sl = r.invalidation
+  const above = (r.resistance || []).filter(x => x > sl).sort((a, b) => a - b)
+  const r1 = above[0] ?? sl * 1.008
+  const r2 = above[1] ?? (above[0] ? above[0] * 1.006 : sl * 1.016)
+  const uniq: number[] = []
+  for (const v of [sl, r1, r2].sort((a, b) => a - b)) {
+    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (Math.abs(sl) || 1) > 0.0015) uniq.push(v)
+  }
+  while (uniq.length < 3) uniq.push(uniq[uniq.length - 1] * 1.008)
+  return uniq.slice(0, 3)
+}
+
 export default function HomeAnalyst(){
   const searchParams=useSearchParams()
   const urlSymbol=(searchParams.get('symbol')||'').toUpperCase()
@@ -157,6 +170,7 @@ export default function HomeAnalyst(){
   const r=data?.result
   const tf=tfShort(interval)
   const bearPath = r ? bearishLevels(r) : []
+  const bullSellPath = r && r.side==='SELL' ? bullishSellLevels(r) : []
 
   return (
     <section className="homeAnalyst">
@@ -213,7 +227,7 @@ export default function HomeAnalyst(){
           <p>{r.bullish}</p>
           <div className="levelPath greenPath">
             {r.side==='SELL'
-              ? <>{money$(r.entryHigh)} ↑ {money$(r.invalidation)}</>
+              ? <>{money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}</>
               : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
           </div>
         </div>
