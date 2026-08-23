@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 export const runtime = 'edge'
 
-const MODEL = 'gpt-5.6-sol'
+const MODEL = 'gpt-5.5'
 const BASE_URL = 'https://co.agentrouter.org/v1'
 
 function clean(value: unknown, max = 4000) { return String(value ?? '').slice(0, max) }
