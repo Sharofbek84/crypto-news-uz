@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server'
 export const runtime = 'edge'
 
 const BASE_URL = 'https://api.blockchain.info/ai/api/v1'
-// June documents OpenAI-compatible model IDs such as openai/gpt-latest.
 const MODEL = process.env.JUNE_MODEL || 'openai/gpt-latest'
 
 function clean(value: unknown, max = 4000) { return String(value ?? '').slice(0, max) }
@@ -65,7 +64,7 @@ export async function POST(request: Request) {
         temperature: 0.4,
         stream: false,
         messages: [
-          { role: 'system', content: `Sen GOLDENWEB.UZ saytining “Kripto tahlilchi AI” yordamchisisan. Faqat o‘zbek tilida, aniq va foydali javob ber. Foydalanuvchi istalgan mavzuda savol berishi mumkin: kripto, trading, texnologiya, sayt, umumiy savollar va boshqalar. Kripto/Premium tahlil savollarida berilgan tahlil ma’lumotlarini asosiy kontekst sifatida ishlat. Raqamlarni o‘zgartirma va mavjud ma’lumot yo‘q bo‘lsa uydirma qilma. Entry, TP, SL, trend, RSI va indikatorlarni aynan berilgan qiymatlar bilan tushuntir. Boshqa mavzularda ham savolga bevosita javob ber.\n\nHOZIRGI PREMIUM TAHLIL:\n${JSON.stringify(context)}` },
+          { role: 'system', content: `Sen GOLDENWEB.UZ saytining “Kripto tahlilchi AI” yordamchisisan. Faqat o‘zbek tilida, aniq va foydali javob ber. Foydalanuvchi istalgan mavzuda savol berishi mumkin: kripto, trading, texnologiya, sayt, umumiy savollar va boshqalar. Kripto/Premium tahlil savollarida berilgan tahlil ma’lumotlarini asosiy kontekst sifatida ishlat. Raqamlarni o‘zgartirma va mavjud ma’lumot yo‘q bo‘lsa uydirma qilma. Entry, TP, SL, trend, RSI va indikatorlarni aynan berilgan qiymatlar bilan tushuntir. Javob formatida narxlarni odatda maksimal 2 ta kasr xonasi bilan ko‘rsat (masalan 77276.563571 → 77,276.56), RSI, foiz va shunga o‘xshash indikatorlarni maksimal 1 ta kasr xonasi bilan ko‘rsat (masalan 53.2590 → 53.3). Juda uzun o‘nliklarni hech qachon ko‘rsatma. Mingliklarni o‘qish qulay bo‘lishi uchun vergul bilan ajrat. Hisob-kitob uchun ichki aniqlikni saqla, lekin foydalanuvchiga faqat yaxlitlangan ko‘rinishni chiqar. Entry/TP/SL qiymatlarini o‘zboshimchalik bilan o‘zgartirma. Boshqa mavzularda ham savolga bevosita javob ber.\n\nHOZIRGI PREMIUM TAHLIL:\n${JSON.stringify(context)}` },
           ...safeMessages,
         ],
       }),
