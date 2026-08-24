@@ -9,11 +9,11 @@ type Candle={time:number;open:number;high:number;low:number;close:number;volume:
 type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;side?:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
 
 const coins=['BTC','ETH','LTC','SOL','BNB','NEAR','GRAM','SUI','APT','ATOM','XRP','XLM','BCH','LINK','AVAX']
-const intervals=[['15m','M15'],['1h','H1'],['4h','H4'],['1d','D1']] as const
+const intervals=[['1h','H1'],['4h','H4'],['1d','D1']] as const
 function money(n:number){if(!Number.isFinite(n))return'-';if(n>=1000)return n.toLocaleString('en-US',{maximumFractionDigits:2});if(n>=1)return n.toFixed(4);return n.toPrecision(4)}
 function money$(n:number){return '$'+money(n)}
-function tfShort(i:string){return({ '15m':'M15','1h':'H1','4h':'H4','1d':'D1' } as any)[i]||i}
-function tfLong(i:string){return i==='15m'?'15 daqiqalik (M15)':i==='4h'?'4 soatlik (H4)':i==='1d'?'1 kunlik (D1)':'1 soatlik (H1)'}
+function tfShort(i:string){return({ '1h':'H1','4h':'H4','1d':'D1' } as any)[i]||i}
+function tfLong(i:string){return i==='4h'?'4 soatlik (H4)':i==='1d'?'1 kunlik (D1)':'1 soatlik (H1)'}
 function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i<c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))}}return out}
 function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.map((x,i)=>{if(i)a=x.close*k+a*(1-k);return a})}
 
