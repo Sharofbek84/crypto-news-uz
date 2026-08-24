@@ -6,8 +6,6 @@ export type SignalInput = {
   ema20: number
   ema50: number
   rsi: number
-  support?: number[]
-  resistance?: number[]
 }
 
 export type Signal = {
@@ -23,16 +21,21 @@ export type Signal = {
   tp3: number
 }
 
+/**
+ * AI-free, deterministic signal rules. All inputs are calculated from the
+ * candle itself and earlier candles, so historical markers do not depend on
+ * today's support/resistance levels.
+ */
 export function calculateSignal(c: SignalInput): Signal | null {
   const bullishTrend = c.ema20 > c.ema50
   const bearishTrend = c.ema20 < c.ema50
   const bullishRsi = c.rsi >= 50 && c.rsi < 70
   const bearishRsi = c.rsi <= 50 && c.rsi > 30
-  const nearSupport = (c.support ?? []).some(v => Math.abs(c.close - v) / Math.max(c.close, 1) <= 0.004)
-  const nearResistance = (c.resistance ?? []).some(v => Math.abs(c.close - v) / Math.max(c.close, 1) <= 0.004)
+  const aboveEma20 = c.close >= c.ema20
+  const belowEma20 = c.close <= c.ema20
 
-  const buyScore = (bullishTrend ? 30 : 0) + (bullishRsi ? 25 : 0) + (nearSupport ? 25 : 0) + (c.close >= c.ema20 ? 20 : 0)
-  const sellScore = (bearishTrend ? 30 : 0) + (bearishRsi ? 25 : 0) + (nearResistance ? 25 : 0) + (c.close <= c.ema20 ? 20 : 0)
+  const buyScore = (bullishTrend ? 35 : 0) + (bullishRsi ? 30 : 0) + (aboveEma20 ? 35 : 0)
+  const sellScore = (bearishTrend ? 35 : 0) + (bearishRsi ? 30 : 0) + (belowEma20 ? 35 : 0)
 
   if (buyScore >= 70 && buyScore > sellScore) return makeSignal('BUY', c, buyScore)
   if (sellScore >= 70) return makeSignal('SELL', c, sellScore)
@@ -63,8 +66,8 @@ function makeSignal(type: SignalType, c: SignalInput, strength: number): Signal 
 }
 
 /**
- * Pass CLOSED candles only. A marker is returned only when the signal type
- * changes, so repeated BUY/SELL states do not fill the chart with markers.
+ * Pass CLOSED candles only. Only the first signal after a state change is
+ * returned, keeping the chart clean instead of printing repeated markers.
  */
 export function detectFirstSignals(candles: SignalInput[]): Signal[] {
   const result: Signal[] = []
