@@ -1,56 +1,47 @@
 [
   {
-    "slug": "bitcoin-77k-konsolidatsiya",
-    "title": "Bitcoin $77,000 atrofida — haftalik 22%+ o‘sishdan keyin konsolidatsiya",
-    "summary": "BTC $79,500 yuqorisidan tushib $76,500–$77,500 oralig‘ida barqarorlashdi. Haftalik eng kuchli o‘sishlardan biri saqlanib qoldi.",
-    "body": "Bitcoin 21–22 avgustda $79,400–$79,500 oralig‘iga chiqqandan so‘ng, flash crash va foyda olish bilan $76,500 gacha tushdi va $77,000 atrofida konsolidatsiya qilmoqda.\n\nHaftalik o‘sish 22–24% darajasida — 2023-yil martidan beri eng kuchli natijalardan biri.\n\nAsosiy omillar: AQSh G‘aznachiligi long-dated bond buybacklarini kamida ikki baravar oshirish, ETF oqimlari ($1,9+ mlrd BTC ETF) va $3 mlrd+ short squeeze.\n\nMuhim support $75,000–$76,000, resistance $78,800–$80,000. Bozor kapitallashuvi $2,7 trillion atrofida.",
+    "slug": "bitcoin-77k-haftalik-rally",
+    "title": "Bitcoin $77,000 atrofida — haftalik 23%+ o‘sishdan keyin konsolidatsiya",
+    "summary": "BTC $79,500 yuqorisidan tushib $76,800–$77,500 oralig‘ida barqarorlashdi. Haftalik eng kuchli o‘sish 2023-yildan beri.",
+    "body": "Bitcoin 21-avgustda $79,400–$79,500 oralig‘iga chiqqandan so‘ng, foyda olish va flash crash bilan $76,800 gacha tushdi va $77,000 atrofida konsolidatsiya qilmoqda.\n\nHaftalik o‘sish 22–24% darajasida — 2023-yil martidan beri eng kuchli natijalardan biri.\n\nAsosiy omillar: AQSh G‘aznachiligi long-dated bond buybacklarini kamida ikki baravar oshirish, ETF oqimlari va yirik short squeeze.\n\nMuhim support $75,000–$76,000, resistance $78,800–$80,000. Bozor kapitallashuvi $2,7 trillion atrofida.",
     "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-24"
   },
   {
-    "slug": "etf-inflows-26-milliard",
-    "title": "Bitcoin va Ethereum ETF’lariga $2,6 mlrd oqim — oktabrdan beri eng kuchli hafta",
-    "summary": "AQSh spot BTC va ETH ETF’lari so‘nggi haftada $2,6 milliard sof oqim oldi. BlackRock yetakchilik qilmoqda.",
-    "body": "Bitcoin va Ethereum spot ETF’lari 22-avgustga qadar bo‘lgan haftada $2,6 milliard sof oqim jalb qildi — 2025-oktabrdan beri eng kuchli natija.\n\nBir kunlik cho‘qqilar $600 mln+ bo‘ldi. BlackRock iShares Bitcoin Trust eng katta ulushni oldi.\n\nBu oqimlar rallyni qo‘llab-quvvatladi va institutsional talab hali kuchli ekanligini ko‘rsatdi.\n\nSolana ETF’lari ham jami $1 mlrd+ oqim to‘plagan.\n\nBozor kayfiyati risk-on bo‘lib qolmoqda.",
-    "url": "https://www.theblock.co/directory/this-week",
+    "slug": "xrp-50-foiz-haftalik-osish",
+    "title": "XRP 21 oy ichidagi eng kuchli haftalik o‘sishni ko‘rsatmoqda — 50%+",
+    "summary": "XRP narxi haftada 50% dan ortiq ko‘tarildi. Treasury buyback va institutsional umidlar asosiy omil.",
+    "body": "XRP 21 oy ichidagi eng yaxshi haftalik natijani qayd etdi — narx 50% dan ortiq o‘sdi.\n\nAsosiy omillar: AQSh G‘aznachiligi bond buybacklari (curve control umidlari), institutsional qiziqish va umumiy altcoin rally.\n\nXRP avvalgi haftalarda ham kuchli harakat qilgan, biroq 22-avgustdagi flash crash vaqtinchalik tuzatish keltirdi.\n\nBozor hali ham XRP va boshqa yirik altcoinlarga qiziqishni saqlab qolmoqda.",
+    "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-24"
   },
   {
-    "slug": "term-finance-exploit",
-    "title": "Term Finance DeFi protokoli $8,5 mln yo‘qotdi — governance exploit",
-    "summary": "DeFi lending protokoli Term Finance governance exploit tufayli taxminan $8,5 million yo‘qotdi.",
-    "body": "Term Finance DeFi lending protokoli 23-avgustda governance exploit tufayli taxminan $8,5 million yo‘qotdi.\n\nHujum governance mexanizmidan foydalanib amalga oshirildi. Jamoa holatni tekshirmoqda va foydalanuvchilarga xabar berishda.\n\nBu 2026-yilda DeFi sektoridagi yirik xavfsizlik hodisalaridan biri.\n\nFoydalanuvchilar rasmiy e’lonlarni kuzatishlari va shubhali takliflardan saqlanishlari kerak.",
-    "url": "https://www.theblock.co/news",
+    "slug": "crypto-card-1-milliard",
+    "title": "Kripto kartalar orqali xarajat $1 milliarddan oshdi — stablecoinlar yetakchilik qilmoqda",
+    "summary": "Kuzatilgan karta hajmi bir yilda uch baravar oshdi. USDC va USDT tranzaksiyalarning 70%+ qismini tashkil etadi.",
+    "body": "Kripto kartalar orqali kunlik xarajatlar $1 milliarddan oshdi. Hajm bir yilda uch baravardan ko‘proq o‘sdi.\n\nUSDC va USDT tranzaksiyalarning 70% dan ortig‘ini moliyalashtirmoqda. Foydalanuvchilar oziq-ovqat, transport va obunalarni to‘lashda stablecoinlardan foydalanmoqda.\n\nBu stablecoinlarning kundalik hayotga kirib borayotganini ko‘rsatadi va Visa kabi kompaniyalar infratuzilmani kengaytirmoqda.\n\nInstitutsional va retail qabul o‘sishi davom etmoqda.",
+    "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-24"
   },
   {
-    "slug": "tether-uruguay-mining",
-    "title": "Tether’ning $120 mln Uruguay bitcoin mining loyihasi barbod bo‘ldi",
-    "summary": "Tether’ning Uruguay’dagi $120 millionlik bitcoin mining loyihasi elektr shartnomasi nizosidan quladi.",
-    "body": "Tether’ning Uruguay’dagi $120 millionlik bitcoin mining loyihasi elektr energiyasi shartnomasi bo‘yicha nizo tufayli barbod bo‘ldi (Reuters xabari).\n\nLoyiha past narxdagi energiya manbalariga asoslangan edi, biroq shartnoma shartlari buzilishi loyihani to‘xtatdi.\n\nBu Tether’ning mining strategiyasiga ta’sir qilishi mumkin. Boshqa mintaqalardagi loyihalar davom etishi kutilmoqda.\n\nBitcoin mining sektorida AI va energiya xarajatlari muhim omil bo‘lib qolmoqda.",
-    "url": "https://www.theblock.co/news",
+    "slug": "sec-reg-crypto-taklifi",
+    "title": "SEC ‘Reg Crypto’ taklifini e’lon qildi — 60 kunlik muhokama boshlandi",
+    "summary": "AQSh SEC kripto aktivlar uchun yangi tartibga solish taklifini chiqardi. Jamoatchilik 60 kun ichida fikr bildirishi mumkin.",
+    "body": "AQSh Qimmatli qog‘ozlar va birjalar komissiyasi (SEC) o‘tgan hafta ‘Regulation Crypto Assets’ taklifini e’lon qildi.\n\nTaklif ba’zi kripto aktivlar va tranzaksiyalarga federal qimmatli qog‘ozlar qonunlarini qo‘llashni aniqlashtiradi. $5 milliongacha bo‘lgan takliflar uchun 4 yil ichida, 12 oy ichida $75 milliongacha bo‘lgan ommaviy takliflar uchun imtiyozlar ko‘zda tutilgan.\n\nJamoatchilik 60 kun ichida fikr-mulohaza bildirishi mumkin.\n\nBu AQShda kripto tartibga solishning muhim bosqichi hisoblanadi.",
+    "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-24"
   },
   {
-    "slug": "zcash-850-grayscale-etf",
-    "title": "Zcash $850 yaqiniga chiqdi — Grayscale spot ETF jarayoni tezlashmoqda",
-    "summary": "ZEC 8 yillik eng yuqori darajaga yaqinlashdi. Grayscale 5-chi tuzatishni topshirdi.",
-    "body": "Zcash (ZEC) 22-avgustda $850 atrofida 2018-yildan beri eng yuqori darajaga chiqdi. 24 soatda 40%+ o‘sish kuzatildi.\n\nGrayscale Zcash Trustni spot ETF ga aylantirish uchun 5-chi tuzatishni SEC ga topshirdi. Yangi nomi “The Zcash ETF”, ticker ZCSH yoki ZCH.\n\nFutures hajmi milliardlab dollarga yetdi. Bu privacy-coin uchun birinchi AQSh spot ETF bo‘lishi mumkin.\n\nBozor privacy aktivlarga qiziqish oshganini ko‘rsatmoqda.",
-    "url": "https://www.theblock.co/news",
+    "slug": "ai-agentlar-stablecoin",
+    "title": "Kriptoning keyingi milliard foydalanuvchisi AI agentlar bo‘lishi mumkin — to‘lovlar stablecoinlarda",
+    "summary": "Coinbase AI mahsulot rahbari: hozir agentik to‘lovlarning ‘Napster/LimeWire’ davri. Stablecoinlar asosiy vosita.",
+    "body": "Coinbase AI mahsulot rahbari fikricha, kriptoning keyingi milliard foydalanuvchisi odamlar emas, balki AI agentlar bo‘lishi mumkin.\n\nAgentlar bozor tahlili, savdo va to‘lovlarni avtomatik bajaradi. Hozirgi bosqich ‘Napster/LimeWire’ davriga o‘xshash — dastlabki, lekin tez o‘sayotgan.\n\nTo‘lovlar asosan stablecoinlar (USDC, USDT) orqali amalga oshirilmoqda.\n\nBinance ham Agent OS platformasini ishga tushirib, AI agentlarga savdo va to‘lov imkoniyatini berdi.\n\nBu tendensiya kripto infratuzilmasini yanada avtomatlashtirishga olib kelishi mumkin.",
+    "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-23"
-  },
-  {
-    "slug": "solana-350ms-slot",
-    "title": "Solana asosiy tarmoqda slot vaqtini 350 ms ga tushirdi — 200 ms maqsadiga qarab",
-    "summary": "Solana blok vaqtini 400 ms dan 350 ms ga qisqartirdi. Keyingi bosqich 200 ms.",
-    "body": "Solana asosiy tarmog‘ida slot (blok) vaqtini 350 millisekundga tushirish boshlandi. Bu 400 ms dan sezilarli yaxshilanish.\n\nMaqsad — keyinchalik 200 ms ga yetish, bu tranzaksiya tezligini deyarli ikki baravar oshiradi.\n\nTarmoq unumdorligini oshirish bo‘yicha bosqichma-bosqich yangilanish.\n\nSOL narxi ham haftalik 25–28% o‘sish bilan kuchli ko‘tarildi.\n\nBu yangilik Solana ekotizimini yanada raqobatbardosh qiladi.",
-    "url": "https://www.theblock.co/news",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-23"
+    "date": "2026-08-24"
   }
 ]
