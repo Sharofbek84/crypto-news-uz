@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server'
 export const runtime = 'edge'
 
 const BASE_URL = 'https://api.blockchain.info/ai/api/v1'
-const MODEL = process.env.JUNE_MODEL || 'gpt-5.5'
+// June documents OpenAI-compatible model IDs such as openai/gpt-latest.
+const MODEL = process.env.JUNE_MODEL || 'openai/gpt-latest'
 
 function clean(value: unknown, max = 4000) { return String(value ?? '').slice(0, max) }
 
