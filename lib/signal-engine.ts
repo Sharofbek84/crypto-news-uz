@@ -1,11 +1,18 @@
 export type SignalType = 'BUY' | 'SELL'
 
+export type HigherTimeframe = {
+  ema20: number
+  ema50: number
+  rsi: number
+}
+
 export type SignalInput = {
   time: number
   close: number
   ema20: number
   ema50: number
   rsi: number
+  higherTimeframe?: HigherTimeframe
 }
 
 export type Signal = {
@@ -22,9 +29,15 @@ export type Signal = {
 }
 
 /**
- * AI-free, deterministic signal rules. All inputs are calculated from the
- * candle itself and earlier candles, so historical markers do not depend on
- * today's support/resistance levels.
+ * AI-free, deterministic signal rules.
+ *
+ * If higherTimeframe is supplied, the lower-timeframe signal must agree with
+ * the higher-timeframe EMA20/EMA50 trend and RSI direction:
+ * BUY requires HTF EMA20 > EMA50 and RSI >= 50.
+ * SELL requires HTF EMA20 < EMA50 and RSI <= 50.
+ *
+ * This keeps the engine backward compatible: callers that do not yet provide
+ * HTF data continue to use the local timeframe rules.
  */
 export function calculateSignal(c: SignalInput): Signal | null {
   const bullishTrend = c.ema20 > c.ema50
@@ -37,8 +50,15 @@ export function calculateSignal(c: SignalInput): Signal | null {
   const buyScore = (bullishTrend ? 35 : 0) + (bullishRsi ? 30 : 0) + (aboveEma20 ? 35 : 0)
   const sellScore = (bearishTrend ? 35 : 0) + (bearishRsi ? 30 : 0) + (belowEma20 ? 35 : 0)
 
-  if (buyScore >= 70 && buyScore > sellScore) return makeSignal('BUY', c, buyScore)
-  if (sellScore >= 70) return makeSignal('SELL', c, sellScore)
+  const htfBuyAllowed = !c.higherTimeframe || (
+    c.higherTimeframe.ema20 > c.higherTimeframe.ema50 && c.higherTimeframe.rsi >= 50
+  )
+  const htfSellAllowed = !c.higherTimeframe || (
+    c.higherTimeframe.ema20 < c.higherTimeframe.ema50 && c.higherTimeframe.rsi <= 50
+  )
+
+  if (buyScore >= 70 && buyScore > sellScore && htfBuyAllowed) return makeSignal('BUY', c, buyScore)
+  if (sellScore >= 70 && htfSellAllowed) return makeSignal('SELL', c, sellScore)
   return null
 }
 
