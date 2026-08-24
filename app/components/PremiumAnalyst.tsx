@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import CryptoAnalystAI from './CryptoAnalystAI'
+import { detectFirstSignals } from '../../lib/signal-engine'
 
 type Candle={time:number;open:number;high:number;low:number;close:number;volume:number}
 type Result={ema10:number;ema20:number;ema50:number;rsi:number;macd:number;signal:number;histogram:number;trend:string;side?:string;support:number[];resistance:number[];entryLow:number;entryHigh:number;invalidation:number;tp:number[];bullish:string;bearish:string;summary:string}
@@ -42,6 +43,18 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   const tf=tfLong(interval)
   const isSell=result.side==='SELL'
 
+  const signalInputs=candles.map((c,i)=>({
+    time:c.time,
+    close:c.close,
+    ema20:e20[i]??result.ema20,
+    ema50:e50[i]??result.ema50,
+    rsi:rs[i]??result.rsi,
+    support:result.support||[],
+    resistance:result.resistance||[],
+  }))
+  const signalMarkers=detectFirstSignals(signalInputs)
+  const signalIndex=new Map(candles.map((c,i)=>[c.time,i]))
+
   const rightBox=(yy:number,text:string,bg:string,w=100)=>(
     <g>
       <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke={bg} strokeWidth="1.4" strokeDasharray="7 6" opacity=".85"/>
@@ -64,8 +77,6 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
             <linearGradient id="hcMainP" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#0a1018"/><stop offset="1" stopColor="#070b11"/>
             </linearGradient>
-            <marker id="hcBullP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#20d67a"/></marker>
-            <marker id="hcBearP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff4d5a"/></marker>
           </defs>
           <rect width={W} height={H} fill="url(#hcMainP)"/>
           <rect x="0" y={RT-16} width={W} height={RB-RT+50} fill="#0e1320"/>
@@ -80,6 +91,7 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           <polyline points={poly(e10)} fill="none" stroke="#ff9f0a" strokeWidth="1.9"/>
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9"/>
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9"/>
+          {signalMarkers.map(signal=>{const i=signalIndex.get(signal.time);if(i==null)return null;const yy=signal.type==='BUY'?y(candles[i].low)+28:y(candles[i].high)-28;const size=8;const color=signal.type==='BUY'?'#20d67a':'#ff4d5a';const points=signal.type==='BUY'?`${x(i)},${yy-size} ${x(i)-size},${yy+size} ${x(i)+size},${yy+size}`:`${x(i)},${yy+size} ${x(i)-size},${yy-size} ${x(i)+size},${yy-size}`;return <g key={`${signal.type}-${signal.time}`}><title>{`${signal.type} signal · ${coin}/USDT · ${tf} · ${money(signal.price)} · strength ${signal.strength}/100`}</title><polygon points={points} fill={color} stroke="#071018" strokeWidth="2"/></g>})}
           <rect x={zoneLeft} y={Math.min(y(result.entryHigh),y(result.entryLow))} width={zoneW} height={Math.max(12,Math.abs(y(result.entryLow)-y(result.entryHigh)))} fill={isSell?'#c52f3a':'#1dbf6b'} fillOpacity=".18" stroke={isSell?'#ff4d5a':'#20d67a'} strokeOpacity=".55" rx="3"/>
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2"/>
           <rect x={labelX} y={y(latest)-13} width="100" height="26" rx="4" fill={isSell?'#c52f3a':'#1a9e55'}/>
@@ -88,8 +100,8 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
           {rightBox(y(result.tp[1]),`TP2  ${money(result.tp[1]||0)}`,'#148f55')}
           {rightBox(y(result.tp[0]),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
           {rightBox(y(result.invalidation),`SL  ${money(result.invalidation)}`,'#c52f3a')}
-          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBearP)':'url(#hcBullP)'}/>
-          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBearP)':'url(#hcBullP)'} opacity=".88"/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" opacity=".55"/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" opacity=".42"/>
           <text x={L} y={RT+6} fill="#e6edf3" fontSize="14" fontWeight="800">RSI 14  {result.rsi.toFixed(2)}</text>
           <polyline points={rs.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2"/>
           <rect x={labelX} y={ry(result.rsi)-12} width="70" height="24" rx="4" fill="#5b4a9a"/>
