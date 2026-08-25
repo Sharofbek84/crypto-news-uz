@@ -14,7 +14,7 @@ export async function sendTelegramNews(item: NewsItem): Promise<void> {
 
   const link = item.url || `https://goldenweb.uz/yangiliklar/${item.slug}`
   const message = [
-    '📰 YANGI YANGILIK',
+    '📰 SO‘NGGI YANGILIK',
     '',
     item.title,
     '',
