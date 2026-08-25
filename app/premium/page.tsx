@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
 import PremiumAnalyst from '../components/PremiumAnalyst'
+import TelegramPremiumButton from '../components/TelegramPremiumButton'
 
 export const metadata = {
   title: 'Premium tahlil | GOLDENWEB.UZ',
@@ -26,6 +27,7 @@ export default function PremiumPage() {
         <Suspense fallback={<div className="homeLoading">Premium tahlil yuklanmoqda...</div>}>
           <PremiumAnalyst />
         </Suspense>
+        <TelegramPremiumButton />
       </main>
 
       <footer className="footer">
