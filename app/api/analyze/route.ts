@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
-import { detectFirstSignals, SignalInput } from '@/lib/signal-engine'
+import { calculateSignal, SignalInput } from '@/lib/signal-engine'
 import { sendTelegramSignal } from '@/lib/telegram'
 
 const ALIASES: Record<string, string> = {
@@ -33,79 +33,47 @@ function intervalConfig(interval: string) {
 
 async function fetchCoinbase(symbol: string, interval: string): Promise<Candle[]> {
   const product = COINBASE_PRODUCTS[symbol]
-  if (!product) throw new Error('Coinbase pair yo\'q')
+  if (!product) throw new Error("Coinbase pair yo'q")
   const granularity = intervalConfig(interval).coinbase
   const url = `https://api.exchange.coinbase.com/products/${encodeURIComponent(product)}/candles?granularity=${granularity}`
-  const res = await fetch(url, {
-    cache: 'no-store',
-    headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' },
-  })
+  const res = await fetch(url, { cache: 'no-store', headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' } })
   if (!res.ok) throw new Error(`Coinbase ${res.status}`)
   const data = await res.json()
   if (!Array.isArray(data) || data.length < 60) throw new Error('Coinbase insufficient candles')
-  return data
-    .map((k: number[]) => ({ time: k[0] * 1000, low: +k[1], high: +k[2], open: +k[3], close: +k[4], volume: +k[5] }))
-    .sort((a, b) => a.time - b.time)
+  return data.map((k: number[]) => ({ time: k[0] * 1000, low: +k[1], high: +k[2], open: +k[3], close: +k[4], volume: +k[5] })).sort((a, b) => a.time - b.time)
 }
 
 async function fetchKraken(symbol: string, interval: string): Promise<Candle[]> {
   const pair = KRAKEN_PAIRS[symbol]
-  if (!pair) throw new Error('Kraken pair yo\'q')
+  if (!pair) throw new Error("Kraken pair yo'q")
   const intervalMinutes = intervalConfig(interval).kraken
   const url = `https://api.kraken.com/0/public/OHLC?pair=${encodeURIComponent(pair)}&interval=${intervalMinutes}`
-  const res = await fetch(url, {
-    cache: 'no-store',
-    headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' },
-  })
+  const res = await fetch(url, { cache: 'no-store', headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' } })
   if (!res.ok) throw new Error(`Kraken ${res.status}`)
   const json = await res.json()
   if (json.error?.length) throw new Error(`Kraken ${json.error.join(', ')}`)
   const key = Object.keys(json.result || {}).find(k => k !== 'last')
   const data = key ? json.result[key] : null
   if (!Array.isArray(data) || data.length < 60) throw new Error('Kraken insufficient candles')
-  return data
-    .map((k: any[]) => ({ time: +k[0] * 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[6] }))
-    .sort((a, b) => a.time - b.time)
+  return data.map((k: any[]) => ({ time: +k[0] * 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[6] })).sort((a, b) => a.time - b.time)
 }
 
 async function fetchBinance(symbol: string, interval: string): Promise<Candle[]> {
   const binanceSymbol = ALIASES[symbol] || `${symbol}USDT`
   const binanceInterval = intervalConfig(interval).binance
   const url = `https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(binanceSymbol)}&interval=${encodeURIComponent(binanceInterval)}&limit=150`
-  const res = await fetch(url, {
-    cache: 'no-store',
-    headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' },
-  })
+  const res = await fetch(url, { cache: 'no-store', headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' } })
   if (!res.ok) throw new Error(`Binance ${res.status}`)
   const rawData = await res.json()
   if (!Array.isArray(rawData) || rawData.length < 60) throw new Error('Binance insufficient candles')
-  return rawData.map((k: any[]) => ({
-    time: +k[0],
-    open: +k[1],
-    high: +k[2],
-    low: +k[3],
-    close: +k[4],
-    volume: +k[5],
-  }))
+  return rawData.map((k: any[]) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5] }))
 }
 
 async function fetchMarketData(symbol: string, interval: string) {
   const errors: string[] = []
-  try {
-    return { candles: await fetchCoinbase(symbol, interval), provider: 'Coinbase Exchange' }
-  } catch (e: any) {
-    errors.push(e?.message || 'Coinbase error')
-  }
-  try {
-    return { candles: await fetchKraken(symbol, interval), provider: 'Kraken' }
-  } catch (e: any) {
-    errors.push(e?.message || 'Kraken error')
-  }
-  try {
-    return { candles: await fetchBinance(symbol, interval), provider: 'Binance' }
-  } catch (e: any) {
-    errors.push(e?.message || 'Binance error')
-  }
+  try { return { candles: await fetchCoinbase(symbol, interval), provider: 'Coinbase Exchange' } } catch (e: any) { errors.push(e?.message || 'Coinbase error') }
+  try { return { candles: await fetchKraken(symbol, interval), provider: 'Kraken' } } catch (e: any) { errors.push(e?.message || 'Kraken error') }
+  try { return { candles: await fetchBinance(symbol, interval), provider: 'Binance' } } catch (e: any) { errors.push(e?.message || 'Binance error') }
   throw new Error(`Market data topilmadi. ${errors.join(' | ')}`)
 }
 
@@ -113,10 +81,7 @@ function emaSeries(candles: Candle[], period: number): number[] {
   const first = candles[0]?.close || 0
   const k = 2 / (period + 1)
   let ema = first
-  return candles.map((c, i) => {
-    if (i > 0) ema = c.close * k + ema * (1 - k)
-    return ema
-  })
+  return candles.map((c, i) => { if (i > 0) ema = c.close * k + ema * (1 - k); return ema })
 }
 
 function rsiSeries(candles: Candle[], period = 14): number[] {
@@ -129,8 +94,7 @@ function rsiSeries(candles: Candle[], period = 14): number[] {
     const g = Math.max(d, 0)
     const l = Math.max(-d, 0)
     if (i <= period) {
-      gain += g
-      loss += l
+      gain += g; loss += l
       out.push(i === period ? (loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) : 50)
     } else {
       gain = (gain * (period - 1) + g) / period
@@ -147,13 +111,9 @@ function higherInterval(interval: string): string | null {
   return null
 }
 
-let lastTelegramSignalKey = ''
-
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!candles.length || interval === '15m') return
 
-  // Signal Engine works on closed candles. Most exchange endpoints include the
-  // currently forming candle, so exclude the last candle from notification logic.
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
   if (closedCandles.length < 60) return
 
@@ -167,34 +127,22 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     try {
       const higherData = await fetchMarketData(symbol, higher)
       const higherResult = analyze(higherData.candles, higher)
-      higherTimeframe = {
-        ema20: higherResult.ema20,
-        ema50: higherResult.ema50,
-        rsi: higherResult.rsi,
-      }
+      higherTimeframe = { ema20: higherResult.ema20, ema50: higherResult.ema50, rsi: higherResult.rsi }
     } catch {
-      // If HTF data is unavailable, do not block the normal signal engine.
       higherTimeframe = undefined
     }
   }
 
-  const inputs: SignalInput[] = closedCandles.map((c, i) => ({
-    time: c.time,
-    close: c.close,
-    ema20: ema20[i],
-    ema50: ema50[i],
-    rsi: rsi[i],
-    higherTimeframe,
-  }))
+  const inputs: SignalInput[] = closedCandles.map((c, i) => ({ time: c.time, close: c.close, ema20: ema20[i], ema50: ema50[i], rsi: rsi[i], higherTimeframe }))
+  const latest = inputs[inputs.length - 1]
+  const previous = inputs[inputs.length - 2]
+  const latestSignal = calculateSignal(latest)
+  const previousSignal = calculateSignal(previous)
 
-  const signals = detectFirstSignals(inputs)
-  const latestClosed = closedCandles[closedCandles.length - 1]
-  const latestSignal = signals[signals.length - 1]
-
-  if (!latestSignal || latestSignal.time !== latestClosed.time) return
-
-  const key = `${symbol}:${interval}:${latestSignal.type}:${latestSignal.time}`
-  if (key === lastTelegramSignalKey) return
+  // Stateless edge detection: the same signal is not resent on every cron run.
+  // A notification is emitted only when the latest closed candle enters a
+  // signal state that differs from the immediately preceding closed candle.
+  if (!latestSignal || latestSignal.type === previousSignal?.type) return
 
   await sendTelegramSignal({
     side: latestSignal.type,
@@ -205,8 +153,6 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
     sl: latestSignal.stopLoss,
   })
-
-  lastTelegramSignalKey = key
 }
 
 export async function GET(req: NextRequest) {
@@ -219,16 +165,9 @@ export async function GET(req: NextRequest) {
   try {
     const { candles, provider } = await fetchMarketData(symbol, interval)
     const result = analyze(candles, interval)
-
-    // Telegram failures must never break the Premium chart response.
-    try {
-      await notifyTelegramForNewSignal(symbol, interval, candles)
-    } catch (telegramError) {
-      console.error('Telegram signal notification failed:', telegramError)
-    }
-
+    try { await notifyTelegramForNewSignal(symbol, interval, candles) } catch (telegramError) { console.error('Telegram signal notification failed:', telegramError) }
     return NextResponse.json({ symbol, interval, provider, candles, result, generatedAt: new Date().toISOString() })
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Market data serveriga ulanib bo\'lmadi.' }, { status: 502 })
+    return NextResponse.json({ error: e?.message || "Market data serveriga ulanib bo'lmadi." }, { status: 502 })
   }
 }
