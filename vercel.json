@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/signal-scanner",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/news-telegram",
