@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import newsData from '../../../data/news.json'
+import { claimNews, markNewsSent, releaseNewsClaim } from '../../../lib/news-dedup'
 import { sendTelegramNews } from '../../../lib/telegram-news'
 
 export const dynamic = 'force-dynamic'
@@ -22,6 +23,20 @@ export async function GET(request: Request) {
 
   if (!latest) return NextResponse.json({ ok: true, sent: false, reason: 'No news' })
 
-  await sendTelegramNews(latest)
-  return NextResponse.json({ ok: true, sent: true, slug: latest.slug })
+  const claim = await claimNews(latest.slug)
+  if (claim.alreadySent) {
+    return NextResponse.json({ ok: true, sent: false, reason: 'Already sent', slug: latest.slug })
+  }
+  if (claim.locked) {
+    return NextResponse.json({ ok: true, sent: false, reason: 'Already processing', slug: latest.slug })
+  }
+
+  try {
+    await sendTelegramNews(latest)
+    await markNewsSent(latest.slug)
+    return NextResponse.json({ ok: true, sent: true, slug: latest.slug })
+  } catch (error) {
+    await releaseNewsClaim(latest.slug)
+    throw error
+  }
 }
