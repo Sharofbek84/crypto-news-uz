@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
+import { detectFirstSignals, SignalInput } from '@/lib/signal-engine'
+import { sendTelegramSignal } from '@/lib/telegram'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTCUSDT', ETH: 'ETHUSDT', LTC: 'LTCUSDT', SOL: 'SOLUSDT', BNB: 'BNBUSDT',
@@ -107,6 +109,106 @@ async function fetchMarketData(symbol: string, interval: string) {
   throw new Error(`Market data topilmadi. ${errors.join(' | ')}`)
 }
 
+function emaSeries(candles: Candle[], period: number): number[] {
+  const first = candles[0]?.close || 0
+  const k = 2 / (period + 1)
+  let ema = first
+  return candles.map((c, i) => {
+    if (i > 0) ema = c.close * k + ema * (1 - k)
+    return ema
+  })
+}
+
+function rsiSeries(candles: Candle[], period = 14): number[] {
+  const out: number[] = []
+  let gain = 0
+  let loss = 0
+  for (let i = 0; i < candles.length; i++) {
+    if (i === 0) { out.push(50); continue }
+    const d = candles[i].close - candles[i - 1].close
+    const g = Math.max(d, 0)
+    const l = Math.max(-d, 0)
+    if (i <= period) {
+      gain += g
+      loss += l
+      out.push(i === period ? (loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) : 50)
+    } else {
+      gain = (gain * (period - 1) + g) / period
+      loss = (loss * (period - 1) + l) / period
+      out.push(loss === 0 ? 100 : 100 - 100 / (1 + gain / loss))
+    }
+  }
+  return out
+}
+
+function higherInterval(interval: string): string | null {
+  if (interval === '1h') return '4h'
+  if (interval === '4h') return '1d'
+  return null
+}
+
+let lastTelegramSignalKey = ''
+
+async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
+  if (!candles.length || interval === '15m') return
+
+  // Signal Engine works on closed candles. Most exchange endpoints include the
+  // currently forming candle, so exclude the last candle from notification logic.
+  const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
+  if (closedCandles.length < 60) return
+
+  const ema20 = emaSeries(closedCandles, 20)
+  const ema50 = emaSeries(closedCandles, 50)
+  const rsi = rsiSeries(closedCandles)
+
+  let higherTimeframe: SignalInput['higherTimeframe'] | undefined
+  const higher = higherInterval(interval)
+  if (higher) {
+    try {
+      const higherData = await fetchMarketData(symbol, higher)
+      const higherResult = analyze(higherData.candles, higher)
+      higherTimeframe = {
+        ema20: higherResult.ema20,
+        ema50: higherResult.ema50,
+        rsi: higherResult.rsi,
+      }
+    } catch {
+      // If HTF data is unavailable, do not block the normal signal engine.
+      higherTimeframe = undefined
+    }
+  }
+
+  const inputs: SignalInput[] = closedCandles.map((c, i) => ({
+    time: c.time,
+    close: c.close,
+    ema20: ema20[i],
+    ema50: ema50[i],
+    rsi: rsi[i],
+    higherTimeframe,
+  }))
+
+  const signals = detectFirstSignals(inputs)
+  const latestClosed = closedCandles[closedCandles.length - 1]
+  const latestSignal = signals[signals.length - 1]
+
+  if (!latestSignal || latestSignal.time !== latestClosed.time) return
+
+  const key = `${symbol}:${interval}:${latestSignal.type}:${latestSignal.time}`
+  if (key === lastTelegramSignalKey) return
+
+  await sendTelegramSignal({
+    side: latestSignal.type,
+    symbol,
+    timeframe: interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1',
+    entryLow: latestSignal.entryLow,
+    entryHigh: latestSignal.entryHigh,
+    tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
+    sl: latestSignal.stopLoss,
+  })
+
+  lastTelegramSignalKey = key
+}
+
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams
   const raw = (q.get('symbol') || 'BTC').toUpperCase()
@@ -117,6 +219,14 @@ export async function GET(req: NextRequest) {
   try {
     const { candles, provider } = await fetchMarketData(symbol, interval)
     const result = analyze(candles, interval)
+
+    // Telegram failures must never break the Premium chart response.
+    try {
+      await notifyTelegramForNewSignal(symbol, interval, candles)
+    } catch (telegramError) {
+      console.error('Telegram signal notification failed:', telegramError)
+    }
+
     return NextResponse.json({ symbol, interval, provider, candles, result, generatedAt: new Date().toISOString() })
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || 'Market data serveriga ulanib bo\'lmadi.' }, { status: 502 })
