@@ -1,45 +1,45 @@
 [
   {
-    "slug": "bitcoin-80k-qayta-ochdi",
-    "title": "Bitcoin $80,000 ni qayta ochdi — may oyidan beri birinchi marta",
-    "summary": "BTC $80,000 dan oshdi. O‘tgan hafta 23–24% o‘sish, $3 mlrd short squeeze, ETF oqimlari va G‘aznachilik buybacklari sabab bo‘ldi.",
-    "body": "Bitcoin 25-avgustda $80,000 darajasini may oyidan beri birinchi marta qayta ochdi va $80,000–$81,000 atrofida savdo qilmoqda.\n\nO‘tgan hafta BTC taxminan 23–24% o‘sdi (2023-yil martidan beri eng kuchli natijalardan biri). Asosiy katalizatorlar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar buybacklarini $4 mlrd gacha oshirishi, spot Bitcoin ETF’lariga $1,9 mlrd+ oqim, $3 mlrd dan ortiq short likvidatsiyasi va CLARITY Act atrofidagi ijobiy kayfiyat.\n\nTahlilchilar $80,000 dan yuqorida yengil likvidlik sharoitida keskin harakatlar bo‘lishi mumkinligini, lekin konsolidatsiya rallyni mustahkamlashi mumkinligini aytmoqda.\n\nMuhim support: $76,000–$78,000. Keyingi resistance: $82,000–$85,000.",
+    "slug": "bitcoin-80k-konsolidatsiya",
+    "title": "Bitcoin $80,000 ni ochdi va qayta konsolidatsiya qilmoqda — 7 kunlik o‘sish ~25%",
+    "summary": "BTC may oyidan beri birinchi marta $80,000 dan oshdi, keyin $78,000–$80,000 oralig‘ida savdo qilmoqda. ETF oqimlari va Treasury buybacklari asosiy katalizator.",
+    "body": "Bitcoin 25-avgustda $80,000–$81,200 oralig‘ini may oyidan beri birinchi marta ochdi va 7 kunlik o‘sish taxminan 23–25% ni tashkil etdi.\n\nAsosiy sabablar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar buybacklarini $4 mlrd gacha oshirishi, spot Bitcoin ETF’lariga ketma-ket oqimlar ($300 mln+ kunlik), short likvidatsiyalari va Clarity Act atrofidagi ijobiy kayfiyat.\n\nHozir BTC $78,500–$80,000 atrofida konsolidatsiya qilmoqda. Tahlilchilar $80,000 dan yuqorida mustahkam yopilish keyingi $82,000–$87,000 diapazonini ochishi mumkinligini aytmoqda. Support: $76,000–$78,000.\n\nUmumiy kripto bozor kapitallashuvi ~$2.7–2.8 trln atrofida.",
     "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-25"
+    "date": "2026-08-26"
+  },
+  {
+    "slug": "layerzero-atlas-zro",
+    "title": "LayerZero ATLAS savdo infratuzilmasini ochdi — ZRO keskin o‘sdi",
+    "summary": "LayerZero Zero blockchain asosida kripto va tokenlashtirilgan bozorlar uchun yangi trading infrastructure taqdim etdi. Citadel Securities qo‘llab-quvvatlaydi.",
+    "body": "LayerZero ATLAS deb nomlangan yangi savdo infratuzilmasini e’lon qildi.\n\nU Zero blockchain ustida ishlaydi va kripto hamda tokenlashtirilgan aktivlar bozorlari uchun mo‘ljallangan. Citadel Securities qo‘llab-quvvatlagan, DTCC va ICE institutsiyaviy qo‘llanilishni o‘rganmoqda.\n\nZRO tokeni e’lon ortidan sezilarli o‘sish ko‘rsatdi (ba’zi manbalarda ~20%).\n\nBu on-chain savdo va RWA (real-world assets) integratsiyasini tezlashtirishga qaratilgan muhim qadam hisoblanadi.",
+    "url": "https://www.coindesk.com/latest-crypto-news",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-26"
+  },
+  {
+    "slug": "bitwise-tokenized-portfolios",
+    "title": "Bitwise Coinbase tokenlashtirilgan aksiyalaridan AI va robototexnika portfellarini yaratdi",
+    "summary": "Bitwise Coinbase Base’dagi tokenlashtirilgan aksiyalarni avtomatlashtirilgan AI, robototexnika va texnologiya tematik portfellariga aylantirdi.",
+    "body": "Crypto ETF emitenti Bitwise Coinbase Base tarmog‘idagi tokenlashtirilgan aksiyalarni (Apple, Nvidia, Meta, Alphabet va boshqalar) asosida avtomatlashtirilgan portfellarni ishga tushirdi.\n\nMaqsad — on-chain aktiv boshqaruvini chuqurlashtirish va tokenizatsiya orqali yangi investitsiya usullarini yaratish.\n\nBu RWA tendensiyasining davomi: an’anaviy aksiyalarni blokcheynga olib chiqish va ulardan tematik (AI, robotics, Mag 7) portfellarni qurish.\n\nInstitutsional va chakana investorlar uchun yangi imkoniyatlar ochilmoqda.",
+    "url": "https://www.coindesk.com/latest-crypto-news",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-26"
+  },
+  {
+    "slug": "posco-avalanche-tokenization",
+    "title": "Janubiy Koreya POSCO Avalanche’da savdo debitorliklarini tokenlashtirdi",
+    "summary": "$22 milliardlik savdo kompaniyasi Olea va Intain bilan Avalanche’da trade receivables tokenizatsiyasini amalga oshirdi.",
+    "body": "Janubiy Koreyaning yirik savdo kompaniyasi POSCO Avalanche tarmog‘ida savdo debitorliklarini (trade receivables) tokenlashtirishni boshladi.\n\nLoyiha Olea va Intain bilan birgalikda amalga oshirildi. Bu oldingi Injective + LG CNS pilotidan keyingi navbatdagi yirik tokenizatsiya qadami.\n\nReal-world assets (RWA) bo‘yicha korporativ foydalanish o‘sib bormoqda. Avalanche va boshqa L1/L2 tarmoqlar institutsiyaviy tokenizatsiya uchun platforma sifatida ko‘rilmoqda.\n\nBu tendensiya 2026-yilda yanada kuchayishi kutilmoqda.",
+    "url": "https://www.coindesk.com/latest-crypto-news",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-26"
   },
   {
     "slug": "coinbase-tokenized-stocks-base",
     "title": "Coinbase Base tarmog‘ida tokenlashtirilgan aksiyalarni ishga tushirdi — Apple, Nvidia, Meta va Alphabet",
     "summary": "Coinbase Abu Dhabi doirasida tokenlashtirilgan aksiyalarni Base tarmog‘ida chiqardi. Bu aktsiyalarni blokcheynga olib chiqish poygasida muhim qadam.",
     "body": "Coinbase Base tarmog‘ida tokenlashtirilgan aksiyalarni rasman ishga tushirdi.\n\nBirinchi navbatda Apple, Nvidia, Meta va Alphabet aksiyalarining tokenlashtirilgan versiyalari chiqarildi. Bu ish Abu Dhabi doirasidagi yangi tartibga solish mexanizmi asosida amalga oshirilmoqda.\n\nBu qadam kripto birjalari va an’anaviy moliya o‘rtasidagi chegarani yumshatadi va real aktivlarni (RWA) on-chain qilish tendensiyasini kuchaytiradi.\n\nBoshqa yirik platformalar ham shunga o‘xshash mahsulotlarni tayyorlamoqda.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-25"
-  },
-  {
-    "slug": "bitmine-81m-eth",
-    "title": "Tom Lee’ning Bitmine kompaniyasi $81 millionlik ETH sotib oldi — iyuldan beri eng katta haftalik xarid",
-    "summary": "Bitmine ETH bo‘yicha eng katta haftalik xaridni amalga oshirdi. Tom Lee 30% haftalik o‘sish yanada katta harakatning boshlanishi bo‘lishi mumkinligini aytdi.",
-    "body": "Tom Lee boshchiligidagi Bitmine treasury kompaniyasi $81 millionlik Ethereum sotib oldi.\n\nBu iyul oyining boshidan beri eng katta haftalik xarid hisoblanadi. ETH o‘tgan haftada taxminan 30% o‘sgan edi va $2,500 atrofida savdo qilmoqda.\n\nTom Lee bu o‘sish yanada katta harakatning signalı bo‘lishi mumkinligini ta’kidladi.\n\nInstitutsional treasury kompaniyalarining ETH to‘plashlari davom etmoqda va bu altcoinlarga qiziqishni qo‘llab-quvvatlamoqda.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-25"
-  },
-  {
-    "slug": "strategy-2b-raise",
-    "title": "Strategy $2 milliard yig‘di — MSTR sotuvi orqali yangi USD Cash pool yaratildi",
-    "summary": "Michael Saylor kompaniyasi ATM dasturi orqali $2 mlrd yig‘di va yangi naqd pul rezervi yaratdi. Bitcoin treasury strategiyasi davom etmoqda.",
-    "body": "Strategy (eski MicroStrategy) 17–23 avgust oralig‘ida 18,26 million MSTR aksiyasini sotib, taxminan $2 milliard yig‘di.\n\nKompaniya yangi USD Cash pool yaratdi. Bu Bitcoin xaridlarini davom ettirish va likvidlikni saqlash uchun mo‘ljallangan.\n\nMichael Saylor Bitcoinni global raqamli kapital sifatida ko‘radi. Strategy Bitcoin treasury strategiyasini saqlab qolmoqda va bozor rallisi davomida qo‘shimcha resurslar to‘pladi.\n\nBu harakat institutsional Bitcoin talabini qo‘llab-quvvatlaydi.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-25"
-  },
-  {
-    "slug": "solana-burn-vote",
-    "title": "Solana yangi ovoz berish SOL yoqib yuborishni kuniga $800,000 gacha oshirishi mumkin",
-    "summary": "Takliflar SOL inflyatsiyasini tezroq kamaytirish va kunlik fee burn miqdorini sezilarli oshirishni ko‘zda tutadi.",
-    "body": "Solana jamoasi yangi ovoz berish jarayonini boshladi.\n\nTakliflar orasida:\n• SOL supply o‘sishini sekinlashtirish (inflyatsiyani tezroq kamaytirish)\n• Kunlik fee burn miqdorini taxminan 650 SOL dan 9,000 SOL gacha oshirish (taxminan $800,000)\n• Yangi token yaratishni sekinlashtirish\n\nAgar takliflar qabul qilinsa, SOL deflyatsion xususiyati kuchayadi va tarmoq faolligi oshgan sari burn hajmi ham oshadi.\n\nBu Solana ekotizimining uzoq muddatli iqtisodiy modelini mustahkamlashga qaratilgan muhim qadam hisoblanadi.",
     "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-25"
