@@ -24,7 +24,7 @@ export default function TelegramPremiumButton() {
 
         <div style={{ flex: '1 1 420px', minWidth: 0 }}>
           <div style={{ color: '#f0b90b', fontSize: 11, fontWeight: 800, letterSpacing: 1.4, marginBottom: 5 }}>
-            PREMIUM TELEGRAM
+            PREMIUM SIGNALLAR
           </div>
           <h2 id="telegram-premium-title" style={{ color: '#f3f6f9', fontSize: 18, lineHeight: 1.3, margin: '0 0 7px' }}>
             Yangi signallarni o‘z vaqtida qabul qiling
