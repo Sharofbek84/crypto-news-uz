@@ -1,47 +1,47 @@
 [
   {
-    "slug": "bitcoin-80k-konsolidatsiya",
-    "title": "Bitcoin $80,000 ni ochdi va qayta konsolidatsiya qilmoqda — 7 kunlik o‘sish ~25%",
-    "summary": "BTC may oyidan beri birinchi marta $80,000 dan oshdi, keyin $78,000–$80,000 oralig‘ida savdo qilmoqda. ETF oqimlari va Treasury buybacklari asosiy katalizator.",
-    "body": "Bitcoin 25-avgustda $80,000–$81,200 oralig‘ini may oyidan beri birinchi marta ochdi va 7 kunlik o‘sish taxminan 23–25% ni tashkil etdi.\n\nAsosiy sabablar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar buybacklarini $4 mlrd gacha oshirishi, spot Bitcoin ETF’lariga ketma-ket oqimlar ($300 mln+ kunlik), short likvidatsiyalari va Clarity Act atrofidagi ijobiy kayfiyat.\n\nHozir BTC $78,500–$80,000 atrofida konsolidatsiya qilmoqda. Tahlilchilar $80,000 dan yuqorida mustahkam yopilish keyingi $82,000–$87,000 diapazonini ochishi mumkinligini aytmoqda. Support: $76,000–$78,000.\n\nUmumiy kripto bozor kapitallashuvi ~$2.7–2.8 trln atrofida.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
+    "slug": "bitcoin-80k-rally-pause",
+    "title": "Bitcoin $80,000 dan oshdi, keyin biroz orqaga qaytdi — 7 kunlik o‘sish ~25%",
+    "summary": "BTC may oyidan beri birinchi marta $81,200 atrofiga chiqdi. Treasury buybacklari, ETF oqimlari va short likvidatsiyalari asosiy sabab.",
+    "body": "Bitcoin 25-avgustda $80,000–$81,200 oralig‘ini may oyidan beri birinchi marta ochdi va 7 kunlik o‘sish taxminan 23–25% ni tashkil etdi.\n\nAsosiy katalizatorlar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar buybacklarini $4 mlrd gacha oshirishi, spot Bitcoin ETF’lariga ketma-ket oqimlar (oxirgi 6 kunda ~$2.2–2.3 mlrd), yirik short likvidatsiyalari va Clarity Act atrofidagi ijobiy kayfiyat.\n\n26-avgustda BTC $78,500–$79,500 atrofida konsolidatsiya qilmoqda. Tahlilchilar $80,000 dan yuqorida mustahkam yopilish keyingi $82,000–$87,000 diapazonini ochishi mumkinligini aytmoqda.\n\nUmumiy kripto bozor kapitallashuvi ~$2.73 trln atrofida.",
+    "url": "https://www.coindesk.com/markets/2026/08/25/bitcoin-extends-7-day-advance-to-roughly-25",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-26"
+  },
+  {
+    "slug": "bankchain-alliance-2027",
+    "title": "39 ta AQSh shtat bank uyushmalari BankChain Alliance yaratdi — 2027 yilga blockchain tarmoq",
+    "summary": "Banklar o‘zlarining sanoatga tegishli blockchain tarmog‘ini qurishmoqda: stablecoin, tokenlashtirilgan depozitlar va smart to‘lovlar uchun.",
+    "body": "39 ta AQSh shtat bank uyushmalari BankChain Alliance ni e’lon qildi. Maqsad — 2027 yilga qadar sanoatga tegishli, sanoat tomonidan boshqariladigan milliy blockchain tarmoqini ishga tushirish.\n\nTarmoq smart to‘lovlar, tokenlashtirilgan depozitlar, stablecoinlar va avtomatlashtirilgan hisob-kitoblarni qo‘llab-quvvatlaydi. U boshqa tarmoqlar bilan interoperabel bo‘lishi rejalashtirilgan.\n\nLoyihaga Florida Bankers Association rahbari Kathy Kraninger vaqtinchalik raislik qilmoqda. Minglab banklar ishtirok etishi kutilmoqda.\n\nBu banklarning kripto va RWA sohasidagi o‘z infratuzilmasini qurishga urinishi hisoblanadi.",
+    "url": "https://www.coindesk.com/policy/2026/08/25/u-s-state-banking-associations-plan-to-launch-their-own-nationwide-blockchain-network",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-26"
+  },
+  {
+    "slug": "bitcoin-etf-inflows-august",
+    "title": "Bitcoin ETF’lariga 6 kunlik oqim ~$2.3 mlrd — avgustda eng kuchli oy",
+    "summary": "AQSh spot Bitcoin ETF’lari ketma-ket oqimlarni saqlab qoldi. IBIT va FBTC yetakchilik qilmoqda, aktivlar $98+ mlrd yaqinlashmoqda.",
+    "body": "AQSh spot Bitcoin ETF’lari 6 savdo kuni davomida taxminan $2.2–2.3 milliard sof oqim jalb qildi. 24-avgustda yolg‘iz $337 mln qo‘shildi.\n\nBlackRock IBIT kunlik oqimlarda yetakchi bo‘ldi ($200+ mln). Fidelity FBTC ham sezilarli ulush oldi.\n\nAvgust oyi 2026-yildagi eng kuchli oylardan biri bo‘lishi kutilmoqda. Umumiy aktivlar $98 mlrd atrofiga yaqinlashdi va $100 mlrd chegarasiga yaqin.\n\nBu institutsional talabning tiklanishini ko‘rsatadi va Bitcoin rallysini qo‘llab-quvvatlaydi.",
+    "url": "https://cryptoslate.com/bitcoin-etfs-inflow-streak-reaches-2-2-billion-in-6-days-as-assets-near-100-billion/",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-26"
   },
   {
     "slug": "layerzero-atlas-zro",
     "title": "LayerZero ATLAS savdo infratuzilmasini ochdi — ZRO keskin o‘sdi",
-    "summary": "LayerZero Zero blockchain asosida kripto va tokenlashtirilgan bozorlar uchun yangi trading infrastructure taqdim etdi. Citadel Securities qo‘llab-quvvatlaydi.",
+    "summary": "LayerZero kripto va tokenlashtirilgan bozorlar uchun yangi trading infrastructure taqdim etdi. Citadel Securities qo‘llab-quvvatlaydi.",
     "body": "LayerZero ATLAS deb nomlangan yangi savdo infratuzilmasini e’lon qildi.\n\nU Zero blockchain ustida ishlaydi va kripto hamda tokenlashtirilgan aktivlar bozorlari uchun mo‘ljallangan. Citadel Securities qo‘llab-quvvatlagan, DTCC va ICE institutsiyaviy qo‘llanilishni o‘rganmoqda.\n\nZRO tokeni e’lon ortidan sezilarli o‘sish ko‘rsatdi (ba’zi manbalarda ~20%).\n\nBu on-chain savdo va RWA (real-world assets) integratsiyasini tezlashtirishga qaratilgan muhim qadam hisoblanadi.",
     "url": "https://www.coindesk.com/latest-crypto-news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-26"
   },
   {
-    "slug": "bitwise-tokenized-portfolios",
-    "title": "Bitwise Coinbase tokenlashtirilgan aksiyalaridan AI va robototexnika portfellarini yaratdi",
-    "summary": "Bitwise Coinbase Base’dagi tokenlashtirilgan aksiyalarni avtomatlashtirilgan AI, robototexnika va texnologiya tematik portfellariga aylantirdi.",
-    "body": "Crypto ETF emitenti Bitwise Coinbase Base tarmog‘idagi tokenlashtirilgan aksiyalarni (Apple, Nvidia, Meta, Alphabet va boshqalar) asosida avtomatlashtirilgan portfellarni ishga tushirdi.\n\nMaqsad — on-chain aktiv boshqaruvini chuqurlashtirish va tokenizatsiya orqali yangi investitsiya usullarini yaratish.\n\nBu RWA tendensiyasining davomi: an’anaviy aksiyalarni blokcheynga olib chiqish va ulardan tematik (AI, robotics, Mag 7) portfellarni qurish.\n\nInstitutsional va chakana investorlar uchun yangi imkoniyatlar ochilmoqda.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
+    "slug": "wlfi-usd1-canton",
+    "title": "World Liberty Financial USD1 stablecoinini Canton Network’da ishga tushirdi",
+    "summary": "WLFI USD1 ni institutsional hisob-kitob va tokenlashtirilgan aktivlar bozorlariga kengaytirmoqda.",
+    "body": "World Liberty Financial o‘zining USD1 stablecoinini Canton Network’da nativ tarzda ishga tushirdi.\n\nBu qadam stablecoinni institutsional settlement va tokenlashtirilgan aktivlar bozorlariga kengaytirishga qaratilgan.\n\nCanton Network institutsional foydalanish uchun mo‘ljallangan permissioned blockchain hisoblanadi.\n\nWLFI tokeni atrofida ham faollik kuzatilmoqda, ba’zi yirik xaridorlar haqida xabarlar chiqmoqda.",
+    "url": "https://www.altcoinbuzz.io/category/crypto-news",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-26"
-  },
-  {
-    "slug": "posco-avalanche-tokenization",
-    "title": "Janubiy Koreya POSCO Avalanche’da savdo debitorliklarini tokenlashtirdi",
-    "summary": "$22 milliardlik savdo kompaniyasi Olea va Intain bilan Avalanche’da trade receivables tokenizatsiyasini amalga oshirdi.",
-    "body": "Janubiy Koreyaning yirik savdo kompaniyasi POSCO Avalanche tarmog‘ida savdo debitorliklarini (trade receivables) tokenlashtirishni boshladi.\n\nLoyiha Olea va Intain bilan birgalikda amalga oshirildi. Bu oldingi Injective + LG CNS pilotidan keyingi navbatdagi yirik tokenizatsiya qadami.\n\nReal-world assets (RWA) bo‘yicha korporativ foydalanish o‘sib bormoqda. Avalanche va boshqa L1/L2 tarmoqlar institutsiyaviy tokenizatsiya uchun platforma sifatida ko‘rilmoqda.\n\nBu tendensiya 2026-yilda yanada kuchayishi kutilmoqda.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-26"
-  },
-  {
-    "slug": "coinbase-tokenized-stocks-base",
-    "title": "Coinbase Base tarmog‘ida tokenlashtirilgan aksiyalarni ishga tushirdi — Apple, Nvidia, Meta va Alphabet",
-    "summary": "Coinbase Abu Dhabi doirasida tokenlashtirilgan aksiyalarni Base tarmog‘ida chiqardi. Bu aktsiyalarni blokcheynga olib chiqish poygasida muhim qadam.",
-    "body": "Coinbase Base tarmog‘ida tokenlashtirilgan aksiyalarni rasman ishga tushirdi.\n\nBirinchi navbatda Apple, Nvidia, Meta va Alphabet aksiyalarining tokenlashtirilgan versiyalari chiqarildi. Bu ish Abu Dhabi doirasidagi yangi tartibga solish mexanizmi asosida amalga oshirilmoqda.\n\nBu qadam kripto birjalari va an’anaviy moliya o‘rtasidagi chegarani yumshatadi va real aktivlarni (RWA) on-chain qilish tendensiyasini kuchaytiradi.\n\nBoshqa yirik platformalar ham shunga o‘xshash mahsulotlarni tayyorlamoqda.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-25"
   }
 ]
