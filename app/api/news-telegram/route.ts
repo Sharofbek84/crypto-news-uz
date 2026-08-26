@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import newsData from '../../../data/news.json'
-import { claimNews, markNewsSent, releaseNewsClaim } from '../../../lib/news-dedup'
+import { claimDailyNews, markDailyNewsSent, releaseDailyNewsClaim } from '../../../lib/news-dedup'
 import { sendTelegramNews } from '../../../lib/telegram-news'
 
 export const dynamic = 'force-dynamic'
@@ -16,27 +16,33 @@ export async function GET(request: Request) {
     slug: string; title: string; summary?: string; url?: string; source?: string; date?: string
   }>
 
-  const latest = news
-    .filter(item => item.slug && item.title)
-    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
-    .slice(0, 1)[0]
+  const validNews = news.filter(item => item.slug && item.title)
+  if (!validNews.length) return NextResponse.json({ ok: true, sent: false, reason: 'No news' })
 
-  if (!latest) return NextResponse.json({ ok: true, sent: false, reason: 'No news' })
+  const latestDate = validNews.reduce((latest, item) => {
+    const date = String(item.date || '')
+    return date > latest ? date : latest
+  }, '')
 
-  const claim = await claimNews(latest.slug)
+  const latestNews = validNews
+    .filter(item => String(item.date || '') === latestDate)
+    .sort((a, b) => String(b.slug).localeCompare(String(a.slug)))
+
+  const digestDate = new Date().toISOString().slice(0, 10)
+  const claim = await claimDailyNews(digestDate)
   if (claim.alreadySent) {
-    return NextResponse.json({ ok: true, sent: false, reason: 'Already sent', slug: latest.slug })
+    return NextResponse.json({ ok: true, sent: false, reason: 'Daily digest already sent', date: digestDate })
   }
   if (claim.locked) {
-    return NextResponse.json({ ok: true, sent: false, reason: 'Already processing', slug: latest.slug })
+    return NextResponse.json({ ok: true, sent: false, reason: 'Daily digest already processing', date: digestDate })
   }
 
   try {
-    await sendTelegramNews(latest)
-    await markNewsSent(latest.slug)
-    return NextResponse.json({ ok: true, sent: true, slug: latest.slug })
+    await sendTelegramNews(latestNews)
+    await markDailyNewsSent(digestDate)
+    return NextResponse.json({ ok: true, sent: true, date: digestDate, newsCount: latestNews.length })
   } catch (error) {
-    await releaseNewsClaim(latest.slug)
+    await releaseDailyNewsClaim(digestDate)
     throw error
   }
 }
