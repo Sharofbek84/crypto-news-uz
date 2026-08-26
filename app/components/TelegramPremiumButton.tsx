@@ -38,9 +38,9 @@ export default function TelegramPremiumButton() {
           href="https://t.me/+Q8d8pPnjKwMxZjUy"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 44, padding: '11px 18px', borderRadius: 10, background: '#229ED9', color: '#ffffff', fontWeight: 800, fontSize: 13, textDecoration: 'none', boxShadow: '0 8px 22px rgba(34,158,217,.24)', whiteSpace: 'nowrap' }}
+          style={{ flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9, minHeight: 44, padding: '10px 18px', borderRadius: 10, background: '#229ED9', color: '#ffffff', fontWeight: 800, fontSize: 13, textDecoration: 'none', boxShadow: '0 8px 22px rgba(34,158,217,.24)', whiteSpace: 'nowrap' }}
         >
-          <span aria-hidden="true">✈️</span>
+          <img src="https://telegram.org/img/t_logo.svg" alt="Telegram" width="23" height="23" style={{ display: 'block', width: 23, height: 23 }} />
           KANALGA OBUNA BO‘LING
         </a>
       </div>
