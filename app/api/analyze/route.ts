@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
 import { calculateSignal, SignalInput } from '@/lib/signal-engine'
 import { sendTelegramSignal } from '@/lib/telegram'
+import { getRedis } from '@/lib/redis'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTCUSDT', ETH: 'ETHUSDT', LTC: 'LTCUSDT', SOL: 'SOLUSDT', BNB: 'BNBUSDT',
@@ -139,20 +140,43 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   const latestSignal = calculateSignal(latest)
   const previousSignal = calculateSignal(previous)
 
-  // Stateless edge detection: the same signal is not resent on every cron run.
-  // A notification is emitted only when the latest closed candle enters a
-  // signal state that differs from the immediately preceding closed candle.
   if (!latestSignal || latestSignal.type === previousSignal?.type) return
 
-  await sendTelegramSignal({
-    side: latestSignal.type,
+  const fingerprint = [
     symbol,
-    timeframe: interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1',
-    entryLow: latestSignal.entryLow,
-    entryHigh: latestSignal.entryHigh,
-    tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
-    sl: latestSignal.stopLoss,
-  })
+    interval,
+    latest.time,
+    latestSignal.type,
+    latestSignal.entryLow,
+    latestSignal.entryHigh,
+    latestSignal.tp1,
+    latestSignal.tp2,
+    latestSignal.tp3,
+    latestSignal.stopLoss,
+  ].map(String).join(':')
+
+  const redis = getRedis()
+  const redisKey = `goldenweb:telegram-signal:${fingerprint}`
+
+  if (redis) {
+    const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
+    if (claimed !== 'OK') return
+  }
+
+  try {
+    await sendTelegramSignal({
+      side: latestSignal.type,
+      symbol,
+      timeframe: interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1',
+      entryLow: latestSignal.entryLow,
+      entryHigh: latestSignal.entryHigh,
+      tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
+      sl: latestSignal.stopLoss,
+    })
+  } catch (error) {
+    if (redis) await redis.del(redisKey)
+    throw error
+  }
 }
 
 export async function GET(req: NextRequest) {
