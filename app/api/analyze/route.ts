@@ -142,39 +142,33 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
 
   if (!latestSignal || latestSignal.type === previousSignal?.type) return
 
-  const fingerprint = [
+  const signal = {
+    side: latestSignal.type,
     symbol,
-    interval,
-    latest.time,
-    latestSignal.type,
-    latestSignal.entryLow,
-    latestSignal.entryHigh,
-    latestSignal.tp1,
-    latestSignal.tp2,
-    latestSignal.tp3,
-    latestSignal.stopLoss,
-  ].map(String).join(':')
+    timeframe: interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1',
+    entryLow: latestSignal.entryLow,
+    entryHigh: latestSignal.entryHigh,
+    tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
+    sl: latestSignal.stopLoss,
+  } as const
 
   const redis = getRedis()
-  const redisKey = `goldenweb:telegram-signal:${fingerprint}`
-
-  if (redis) {
-    const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
-    if (claimed !== 'OK') return
+  if (!redis) {
+    console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured')
+    return
   }
 
+  // One Telegram signal per symbol + timeframe + closed candle + direction.
+  // Do not include changing TP/SL values in the key: a single candle must
+  // never generate repeated notifications across scanner runs.
+  const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${latest.time}:${latestSignal.type}`
+  const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
+  if (claimed !== 'OK') return
+
   try {
-    await sendTelegramSignal({
-      side: latestSignal.type,
-      symbol,
-      timeframe: interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1',
-      entryLow: latestSignal.entryLow,
-      entryHigh: latestSignal.entryHigh,
-      tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
-      sl: latestSignal.stopLoss,
-    })
+    await sendTelegramSignal(signal)
   } catch (error) {
-    if (redis) await redis.del(redisKey)
+    await redis.del(redisKey)
     throw error
   }
 }
