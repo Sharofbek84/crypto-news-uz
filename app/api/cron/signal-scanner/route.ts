@@ -24,8 +24,15 @@ async function scanOne(baseUrl: string, symbol: string, interval: string) {
 }
 
 export async function GET(request: NextRequest) {
+  const expectedSecret = process.env.CRON_SECRET
   const authorization = request.headers.get('authorization')
-  if (authorization !== `Bearer ${process.env.CRON_SECRET}`) {
+  const externalSecret = request.headers.get('x-cron-secret')
+
+  const authorized =
+    Boolean(expectedSecret) &&
+    (authorization === `Bearer ${expectedSecret}` || externalSecret === expectedSecret)
+
+  if (!authorized) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
