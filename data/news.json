@@ -1,47 +1,48 @@
 [
   {
-    "slug": "bitcoin-80k-rally-pause",
-    "title": "Bitcoin $80,000 dan oshdi, keyin biroz orqaga qaytdi — 7 kunlik o‘sish ~25%",
-    "summary": "BTC may oyidan beri birinchi marta $81,200 atrofiga chiqdi. Treasury buybacklari, ETF oqimlari va short likvidatsiyalari asosiy sabab.",
-    "body": "Bitcoin 25-avgustda $80,000–$81,200 oralig‘ini may oyidan beri birinchi marta ochdi va 7 kunlik o‘sish taxminan 23–25% ni tashkil etdi.\n\nAsosiy katalizatorlar: AQSh G‘aznachiligining uzoq muddatli obligatsiyalar buybacklarini $4 mlrd gacha oshirishi, spot Bitcoin ETF’lariga ketma-ket oqimlar (oxirgi 6 kunda ~$2.2–2.3 mlrd), yirik short likvidatsiyalari va Clarity Act atrofidagi ijobiy kayfiyat.\n\n26-avgustda BTC $78,500–$79,500 atrofida konsolidatsiya qilmoqda. Tahlilchilar $80,000 dan yuqorida mustahkam yopilish keyingi $82,000–$87,000 diapazonini ochishi mumkinligini aytmoqda.\n\nUmumiy kripto bozor kapitallashuvi ~$2.73 trln atrofida.",
-    "url": "https://www.coindesk.com/markets/2026/08/25/bitcoin-extends-7-day-advance-to-roughly-25",
+    "slug": "bitcoin-79k-consolidation-pce",
+    "title": "Bitcoin $79,000 atrofida konsolidatsiya qilmoqda — PCE va GDP ma’lumotlari kutilyapti",
+    "summary": "BTC $81,200 cho‘qqisidan keyin $78,500–$79,500 oralig‘ida. Whales 3 kunda $1.2 mlrd foyda olishdi. Jackson Hole va makro ma’lumotlar diqqat markazida.",
+    "body": "Bitcoin 25-avgustda $81,200 atrofida uch oylik eng yuqori nuqtaga chiqqanidan so‘ng 26–27 avgustda $78,500–$79,500 oralig‘ida konsolidatsiya qilmoqda.\n\nQisqa muddatli holders (whales) oxirgi 3 kunda rekord $1.2 milliard foyda olishdi. Bu foyda olish va $82,800–$83,000 qarshilik zonasiga yaqinlashish rally momentumini biroz sekinlashtirdi.\n\nSavdogarlar AQSh PCE inflyatsiya va Q2 GDP ma’lumotlarini, shuningdek Fed raisi Kevin Warshning Jackson Hole nutqini (27–29 avgust) kutmoqda. Tahlilchilar $80,000 dan yuqorida mustahkam yopilish keyingi o‘sishni ochishi mumkinligini aytmoqda.\n\nUmumiy kripto bozor kapitallashuvi ~$2.65–2.68 trln atrofida. Fear & Greed indeksi 80 — “extreme greed”.",
+    "url": "https://economictimes.indiatimes.com/markets/cryptocurrency/crypto-news/bitcoin-consolidates-near-79k-ahead-of-us-pce-gdp-data-whales-book-record-1-2-billion-profit-in-3-days/articleshow/133536752.cms",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-26"
+    "date": "2026-08-27"
   },
   {
-    "slug": "bankchain-alliance-2027",
-    "title": "39 ta AQSh shtat bank uyushmalari BankChain Alliance yaratdi — 2027 yilga blockchain tarmoq",
-    "summary": "Banklar o‘zlarining sanoatga tegishli blockchain tarmog‘ini qurishmoqda: stablecoin, tokenlashtirilgan depozitlar va smart to‘lovlar uchun.",
-    "body": "39 ta AQSh shtat bank uyushmalari BankChain Alliance ni e’lon qildi. Maqsad — 2027 yilga qadar sanoatga tegishli, sanoat tomonidan boshqariladigan milliy blockchain tarmoqini ishga tushirish.\n\nTarmoq smart to‘lovlar, tokenlashtirilgan depozitlar, stablecoinlar va avtomatlashtirilgan hisob-kitoblarni qo‘llab-quvvatlaydi. U boshqa tarmoqlar bilan interoperabel bo‘lishi rejalashtirilgan.\n\nLoyihaga Florida Bankers Association rahbari Kathy Kraninger vaqtinchalik raislik qilmoqda. Minglab banklar ishtirok etishi kutilmoqda.\n\nBu banklarning kripto va RWA sohasidagi o‘z infratuzilmasini qurishga urinishi hisoblanadi.",
-    "url": "https://www.coindesk.com/policy/2026/08/25/u-s-state-banking-associations-plan-to-launch-their-own-nationwide-blockchain-network",
+    "slug": "coinbase-bitcoin-mortgages",
+    "title": "Coinbase AQShda Bitcoin ta’minotli ipoteka kreditlarini ishga tushirdi",
+    "summary": "Coinbase foydalanuvchilari Bitcoinni garov qilib uy-joy kreditlari olishlari mumkin. Institutsional va retail qulayliklar kengaymoqda.",
+    "body": "Coinbase AQShda Bitcoin ta’minotli (Bitcoin-backed) ipoteka kreditlarini ishga tushirdi.\n\nBu xizmat foydalanuvchilarga Bitcoinlarini sotmasdan uy-joy yoki boshqa mulk uchun kredit olish imkonini beradi. Kripto aktivlarini likvid qilmasdan kapitaldan foydalanish imkoniyati ochiladi.\n\nBu qadam Coinbase’ning an’anaviy moliya xizmatlarini kengaytirish strategiyasining bir qismi hisoblanadi va institutsional hamda retail investorlar uchun yangi qulaylik yaratadi.\n\nBozor ishtirokchilari bu yangilikni Bitcoinning real iqtisodiyotga integratsiyasining yana bir belgisideb baholamoqda.",
+    "url": "https://u.today/latest-cryptocurrency-news",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-26"
+    "date": "2026-08-27"
   },
   {
-    "slug": "bitcoin-etf-inflows-august",
-    "title": "Bitcoin ETF’lariga 6 kunlik oqim ~$2.3 mlrd — avgustda eng kuchli oy",
-    "summary": "AQSh spot Bitcoin ETF’lari ketma-ket oqimlarni saqlab qoldi. IBIT va FBTC yetakchilik qilmoqda, aktivlar $98+ mlrd yaqinlashmoqda.",
-    "body": "AQSh spot Bitcoin ETF’lari 6 savdo kuni davomida taxminan $2.2–2.3 milliard sof oqim jalb qildi. 24-avgustda yolg‘iz $337 mln qo‘shildi.\n\nBlackRock IBIT kunlik oqimlarda yetakchi bo‘ldi ($200+ mln). Fidelity FBTC ham sezilarli ulush oldi.\n\nAvgust oyi 2026-yildagi eng kuchli oylardan biri bo‘lishi kutilmoqda. Umumiy aktivlar $98 mlrd atrofiga yaqinlashdi va $100 mlrd chegarasiga yaqin.\n\nBu institutsional talabning tiklanishini ko‘rsatadi va Bitcoin rallysini qo‘llab-quvvatlaydi.",
-    "url": "https://cryptoslate.com/bitcoin-etfs-inflow-streak-reaches-2-2-billion-in-6-days-as-assets-near-100-billion/",
+    "slug": "revolut-eurr-stablecoin",
+    "title": "Revolut Yevropa bozorlarida EURR euro stablecoinini ishga tushirdi",
+    "summary": "Revolut o‘zining birinchi stablecoini — EURR ni Daniya, Polsha va Portugaliyada tanlangan mijozlarga ochdi.",
+    "body": "Revolut o‘zining birinchi stablecoini — euroga bog‘langan EURR ni ishga tushirdi.\n\nBirinchi bosqichda Daniya, Polsha va Portugaliyadagi tanlangan mijozlarga ochildi. Keyinchalik boshqa Yevropa Iqtisodiy Hududi (EEA) mamlakatlariga kengaytiriladi.\n\nEURR Revolut ekotizimida to‘lovlar, o‘tkazmalar va savdo uchun mo‘ljallangan. Bu Yevropa fintech kompaniyalarining stablecoin bozoriga kirishining muhim qadami.\n\nRegulyatsiya va operatsion tayyorgarlikka qarab bosqichma-bosqich kengayish rejalashtirilgan.",
+    "url": "https://www.lcx.com/en/cryptonews/heres-what-happened-in-crypto-today",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-26"
+    "date": "2026-08-27"
   },
   {
-    "slug": "layerzero-atlas-zro",
-    "title": "LayerZero ATLAS savdo infratuzilmasini ochdi — ZRO keskin o‘sdi",
-    "summary": "LayerZero kripto va tokenlashtirilgan bozorlar uchun yangi trading infrastructure taqdim etdi. Citadel Securities qo‘llab-quvvatlaydi.",
-    "body": "LayerZero ATLAS deb nomlangan yangi savdo infratuzilmasini e’lon qildi.\n\nU Zero blockchain ustida ishlaydi va kripto hamda tokenlashtirilgan aktivlar bozorlari uchun mo‘ljallangan. Citadel Securities qo‘llab-quvvatlagan, DTCC va ICE institutsiyaviy qo‘llanilishni o‘rganmoqda.\n\nZRO tokeni e’lon ortidan sezilarli o‘sish ko‘rsatdi (ba’zi manbalarda ~20%).\n\nBu on-chain savdo va RWA (real-world assets) integratsiyasini tezlashtirishga qaratilgan muhim qadam hisoblanadi.",
-    "url": "https://www.coindesk.com/latest-crypto-news",
+    "slug": "thailand-sec-crypto-etf",
+    "title": "Tailand SEC kripto ETF qoidalari bo‘yicha jamoatchilik muhokamasini boshladi",
+    "summary": "Tailand qimmatli qog‘ozlar komissiyasi Bitcoin va Ether ETF’lari hamda chet el kustodianlari talablari bo‘yicha maslahatlashuv ochdi.",
+    "body": "Tailand SEC (qimmatli qog‘ozlar va birjalar komissiyasi) kripto ETF qoidalari bo‘yicha jamoatchilik maslahatlashuvini ochdi.\n\nHujjat Bitcoin va Ether ETF’larini, shuningdek chet el kustodianlariga qo‘yiladigan talablarni qamrab oladi. Maqsad — institutsional investorlar uchun xavfsiz va shaffof mahsulotlar yaratish.\n\nBu Osiyodagi tartibga solish tendensiyasining davomi: ko‘plab mamlakatlar spot kripto ETF’larini ruxsat etishga tayyorgarlik ko‘rmoqda.\n\nMuhokama natijalari keyinchalik yakuniy qoidalarga aylanishi kutilmoqda.",
+    "url": "https://coinstats.app/ai/a/crypto-news-update-26-August-2026",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-26"
+    "date": "2026-08-27"
   },
   {
-    "slug": "wlfi-usd1-canton",
-    "title": "World Liberty Financial USD1 stablecoinini Canton Network’da ishga tushirdi",
-    "summary": "WLFI USD1 ni institutsional hisob-kitob va tokenlashtirilgan aktivlar bozorlariga kengaytirmoqda.",
-    "body": "World Liberty Financial o‘zining USD1 stablecoinini Canton Network’da nativ tarzda ishga tushirdi.\n\nBu qadam stablecoinni institutsional settlement va tokenlashtirilgan aktivlar bozorlariga kengaytirishga qaratilgan.\n\nCanton Network institutsional foydalanish uchun mo‘ljallangan permissioned blockchain hisoblanadi.\n\nWLFI tokeni atrofida ham faollik kuzatilmoqda, ba’zi yirik xaridorlar haqida xabarlar chiqmoqda.",
-    "url": "https://www.altcoinbuzz.io/category/crypto-news",
+    "slug": "ripple-rlusd-2b",
+    "title": "Ripple RLUSD stablecoini $2 milliard miqyosini oshib ketdi",
+    "summary": "RLUSD kapitallashuvi $2 mlrd dan oshdi. XRP atrofidagi faollik va ETF oqimlari davom etmoqda.",
+    "body": "Ripple’ning RLUSD stablecoini $2 milliard kapitallashuv chegarasini oshib ketdi.\n\nBu o‘sish XRP atrofidagi yangilangan qiziqish va institutsional talab bilan birga kelmoqda. XRP ETF’lari ketma-ket oqimlarni saqlab qolmoqda (ba’zi kunlarda 9-kunlik seriya).
+\nRLUSD asosan institutsional hisob-kitoblar va cross-border to‘lovlar uchun mo‘ljallangan. Uning o‘sishi Ripple ekotizimining mustahkamlanishini ko‘rsatadi.\n\nXRP o‘tgan haftada ~45% atrofida o‘sish ko‘rsatgan bo‘lsa-da, so‘nggi 24 soatda foyda olish tufayli biroz tushdi.",
+    "url": "https://u.today/latest-cryptocurrency-news",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-26"
+    "date": "2026-08-27"
   }
 ]
