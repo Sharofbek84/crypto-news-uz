@@ -18,9 +18,8 @@ const COINBASE_PRODUCTS: Record<string, string> = {
 }
 
 const KRAKEN_PAIRS: Record<string, string> = {
-  BTC: 'XBTUSD', ETH: 'ETHUSD', LTC: 'LTCUSD', SOL: 'SOLUSD',
-  XRP: 'XRPUSD', XLM: 'XLMUSD', BCH: 'BCHUSD', LINK: 'LINKUSD', AVAX: 'AVAXUSD',
-  ATOM: 'ATOMUSD', NEAR: 'NEARUSD', SUI: 'SUIUSD',
+  BTC: 'XBTUSD', ETH: 'ETHUSD', LTC: 'LTCUSD', SOL: 'SOLUSD', XRP: 'XRPUSD', XLM: 'XLMUSD',
+  BCH: 'BCHUSD', LINK: 'LINKUSD', AVAX: 'AVAXUSD', ATOM: 'ATOMUSD', NEAR: 'NEARUSD', SUI: 'SUIUSD',
 }
 
 const ALLOWED_INTERVALS = ['15m', '1h', '4h', '1d']
@@ -87,13 +86,11 @@ function emaSeries(candles: Candle[], period: number): number[] {
 
 function rsiSeries(candles: Candle[], period = 14): number[] {
   const out: number[] = []
-  let gain = 0
-  let loss = 0
+  let gain = 0, loss = 0
   for (let i = 0; i < candles.length; i++) {
     if (i === 0) { out.push(50); continue }
     const d = candles[i].close - candles[i - 1].close
-    const g = Math.max(d, 0)
-    const l = Math.max(-d, 0)
+    const g = Math.max(d, 0), l = Math.max(-d, 0)
     if (i <= period) {
       gain += g; loss += l
       out.push(i === period ? (loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) : 50)
@@ -114,7 +111,6 @@ function higherInterval(interval: string): string | null {
 
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!candles.length || interval === '15m') return
-
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
   if (closedCandles.length < 60) return
 
@@ -129,9 +125,7 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
       const higherData = await fetchMarketData(symbol, higher)
       const higherResult = analyze(higherData.candles, higher)
       higherTimeframe = { ema20: higherResult.ema20, ema50: higherResult.ema50, rsi: higherResult.rsi }
-    } catch {
-      higherTimeframe = undefined
-    }
+    } catch { higherTimeframe = undefined }
   }
 
   const inputs: SignalInput[] = closedCandles.map((c, i) => ({ time: c.time, close: c.close, ema20: ema20[i], ema50: ema50[i], rsi: rsi[i], higherTimeframe }))
@@ -139,10 +133,9 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   const previous = inputs[inputs.length - 2]
   const latestSignal = calculateSignal(latest)
   const previousSignal = calculateSignal(previous)
-
   if (!latestSignal || latestSignal.type === previousSignal?.type) return
 
-  const signal = {
+  const signal: { side: typeof latestSignal.type; symbol: string; timeframe: 'H1' | 'H4' | 'D1'; entryLow: number; entryHigh: number; tp: number[]; sl: number } = {
     side: latestSignal.type,
     symbol,
     timeframe: interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1',
@@ -150,7 +143,7 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     entryHigh: latestSignal.entryHigh,
     tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
     sl: latestSignal.stopLoss,
-  } as const
+  }
 
   const redis = getRedis()
   if (!redis) {
@@ -158,19 +151,12 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     return
   }
 
-  // One Telegram signal per symbol + timeframe + closed candle + direction.
-  // Do not include changing TP/SL values in the key: a single candle must
-  // never generate repeated notifications across scanner runs.
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${latest.time}:${latestSignal.type}`
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
   if (claimed !== 'OK') return
 
-  try {
-    await sendTelegramSignal(signal)
-  } catch (error) {
-    await redis.del(redisKey)
-    throw error
-  }
+  try { await sendTelegramSignal(signal) }
+  catch (error) { await redis.del(redisKey); throw error }
 }
 
 export async function GET(req: NextRequest) {
