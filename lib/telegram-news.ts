@@ -7,21 +7,25 @@ type NewsItem = {
   date?: string
 }
 
-export async function sendTelegramNews(item: NewsItem): Promise<void> {
+export async function sendTelegramNews(items: NewsItem[]): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_CHAT_ID
   if (!token || !chatId) throw new Error('Telegram Environment Variables topilmadi')
+  if (!items.length) return
 
-  const link = item.url || `https://goldenweb.uz/yangiliklar/${item.slug}`
-  const message = [
-    '📰 SO‘NGGI YANGILIK',
-    '',
-    item.title,
-    '',
-    item.summary || '',
-    '',
-    `🔗 Batafsil: ${link}`,
-  ].join('\n')
+  const sections = items.map((item, index) => {
+    const link = item.url || `https://goldenweb.uz/yangiliklar/${item.slug}`
+    return [
+      `${index + 1}. ${item.title}`,
+      item.summary || '',
+      `🔗 ${link}`,
+    ].filter(Boolean).join('\n')
+  })
+
+  let message = ['📰 SO‘NGGI YANGILIKLAR', '', ...sections].join('\n\n')
+  if (message.length > 4096) {
+    message = message.slice(0, 4050).trimEnd() + '\n\n…'
+  }
 
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
