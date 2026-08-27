@@ -3,6 +3,17 @@
 import Link from 'next/link'
 import { signOut, useSession } from 'next-auth/react'
 
+const outlineBtn: React.CSSProperties = {
+  background: 'transparent',
+  border: '1px solid #2b3139',
+  color: '#eaecef',
+  padding: '6px 14px',
+  borderRadius: 8,
+  fontSize: 14,
+  fontWeight: 600,
+  textDecoration: 'none',
+}
+
 export default function HeaderAuth() {
   const { data: session, status } = useSession()
 
@@ -48,22 +59,10 @@ export default function HeaderAuth() {
 
   return (
     <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-      <Link
-        href="/sign-in"
-        style={{
-          background: 'transparent',
-          border: '1px solid #2b3139',
-          color: '#eaecef',
-          padding: '6px 14px',
-          borderRadius: 8,
-          fontSize: 14,
-          fontWeight: 600,
-          textDecoration: 'none',
-        }}
-      >
+      <Link href="/sign-in" style={outlineBtn}>
         Kirish
       </Link>
-      <Link href="/sign-up" className="headerCta">
+      <Link href="/sign-up" style={outlineBtn}>
         Ro‘yxatdan o‘tish
       </Link>
     </nav>
