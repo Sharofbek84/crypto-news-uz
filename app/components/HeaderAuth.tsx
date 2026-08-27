@@ -7,16 +7,25 @@ export default function HeaderAuth() {
   const { data: session, status } = useSession()
 
   if (status === 'loading') {
-    return <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}><span style={{ color: '#848e9c', fontSize: 14 }}>...</span></nav>
+    return (
+      <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <span style={{ color: '#848e9c', fontSize: 14 }}>...</span>
+      </nav>
+    )
   }
 
   if (session?.user) {
+    const premium = (session.user as { premium?: boolean }).premium
     return (
       <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <Link href="/premium" style={{ color: '#f0b90b', fontSize: 14, fontWeight: 700 }}>
-          Premium
+        <Link href="/kabinet" style={{ color: '#eaecef', fontSize: 14, fontWeight: 600 }}>
+          Kabinet
         </Link>
-        <Link href="/obuna" className="headerCta">Obuna</Link>
+        {premium && (
+          <Link href="/premium" style={{ color: '#f0b90b', fontSize: 14, fontWeight: 700 }}>
+            Premium
+          </Link>
+        )}
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: '/' })}
@@ -54,7 +63,9 @@ export default function HeaderAuth() {
       >
         Kirish
       </Link>
-      <Link href="/sign-up" className="headerCta">Ro‘yxatdan o‘tish</Link>
+      <Link href="/sign-up" className="headerCta">
+        Ro‘yxatdan o‘tish
+      </Link>
     </nav>
   )
 }
