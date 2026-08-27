@@ -25,6 +25,14 @@ const PRICE_TIERS = [
   { label: '$190 / 1 yilga', note: '12 oy' },
 ]
 
+function formatDateDDMMYYYY(iso: string): string {
+  const d = new Date(iso)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}.${month}.${year}`
+}
+
 function KabinetContent() {
   const { data: session, status, update } = useSession()
   const router = useRouter()
@@ -113,11 +121,7 @@ function KabinetContent() {
 
   const premium = me?.premium ?? false
   const endsAt = me?.user.subscriptionEndsAt
-    ? new Date(me.user.subscriptionEndsAt).toLocaleDateString('uz-UZ', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+    ? formatDateDDMMYYYY(me.user.subscriptionEndsAt)
     : null
 
   return (
