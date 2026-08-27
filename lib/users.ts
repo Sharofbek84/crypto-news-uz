@@ -100,7 +100,11 @@ export async function verifyPassword(email: string, password: string): Promise<A
   const user = await findUserByEmail(email)
   if (!user) return null
   const match = await bcrypt.compare(password, user.passwordHash)
-  return match ? user : null
+  if (!match) return null
+  // Eski foydalanuvchilarni admin ro‘yxatiga qo‘shish
+  const redis = getRedis()
+  if (redis) await redis.sadd(USERS_INDEX, user.email.toLowerCase())
+  return user
 }
 
 export async function activatePremium(email: string, days = 30): Promise<PublicUser | null> {
