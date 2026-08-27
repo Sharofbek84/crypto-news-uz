@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import { Suspense } from 'react'
 import PremiumAnalyst from '../components/PremiumAnalyst'
 import TelegramPremiumButton from '../components/TelegramPremiumButton'
-import HeaderAuth from '../components/HeaderAuth'
+import SiteHeader from '../components/SiteHeader'
 
 export const metadata = {
   title: 'Premium tahlil | GOLDENWEB.UZ',
@@ -12,14 +11,7 @@ export const metadata = {
 export default function PremiumPage() {
   return (
     <>
-      <header className="header">
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
-          <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
-            GOLDENWEB<span>.UZ</span>
-          </Link>
-          <HeaderAuth />
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="container">
         <Suspense fallback={<div className="homeLoading">Premium tahlil yuklanmoqda...</div>}>

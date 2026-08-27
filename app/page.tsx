@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
 import HomeAnalyst from './components/HomeAnalyst'
-import HeaderAuth from './components/HeaderAuth'
+import SiteHeader from './components/SiteHeader'
 import newsData from '../data/news.json'
 
 /** Tartib: BTC, ETH, LTC, SOL, BNB, NEAR, GRAM, SUI, APT, ATOM */
@@ -52,12 +52,7 @@ export default async function Home() {
 
   return (
     <>
-      <header className="header">
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
-          <div className="logo">GOLDENWEB<span>.UZ</span></div>
-          <HeaderAuth />
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="container">
         <div id="tahlil">

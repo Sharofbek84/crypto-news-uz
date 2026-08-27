@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useCallback, useEffect, useState } from 'react'
-import HeaderAuth from '../components/HeaderAuth'
+import SiteHeader from '../components/SiteHeader'
 
 type MeResponse = {
   user: {
@@ -279,22 +279,7 @@ function KabinetContent() {
 export default function KabinetPage() {
   return (
     <>
-      <header className="header">
-        <div
-          className="container"
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 16,
-          }}
-        >
-          <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
-            GOLDENWEB<span>.UZ</span>
-          </Link>
-          <HeaderAuth />
-        </div>
-      </header>
+      <SiteHeader />
 
       <Suspense fallback={<p style={{ color: '#848e9c', padding: 24 }}>Yuklanmoqda...</p>}>
         <KabinetContent />

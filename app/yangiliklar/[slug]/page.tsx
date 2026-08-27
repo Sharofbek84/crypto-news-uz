@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import SiteHeader from '../../components/SiteHeader'
 import newsData from '../../../data/news.json'
 
 type NewsItem = {
@@ -35,12 +36,7 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
 
   return (
     <>
-      <header className="header">
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" className="logo">GOLDENWEB<span>.UZ</span></Link>
-          <Link href="/yangiliklar" style={{ color: '#9aa7b8', fontSize: '.9rem', fontWeight: 600 }}>← Yangiliklar</Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
         <article className="articlePage">

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import SiteHeader from '../components/SiteHeader'
 
 export default function ObunaPage() {
   const { data: session, status } = useSession()
@@ -9,19 +10,7 @@ export default function ObunaPage() {
 
   return (
     <>
-      <header className="header">
-        <div
-          className="container"
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-        >
-          <Link href="/" className="logo">
-            GOLDENWEB<span>.UZ</span>
-          </Link>
-          <Link href="/" style={{ color: '#9aa7b8', fontSize: '.9rem', fontWeight: 600 }}>
-            ← Bosh sahifa
-          </Link>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
         <section className="subscribeSection">
@@ -96,7 +85,7 @@ export default function ObunaPage() {
           </div>
 
           <div className="subscribeNote">
-            Obunani shaxsiy kabinetdan boshqarasiz. To‘lov (Stripe / Payme / Click) keyin ulanadi.
+            Obunani shaxsiy kabinetdan boshqarasiz. To‘lov (Payme / Click) keyin ulanadi.
           </div>
         </section>
       </main>
