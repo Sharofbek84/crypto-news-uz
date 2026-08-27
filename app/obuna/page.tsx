@@ -37,25 +37,16 @@ export default function ObunaPage() {
 
             <div className="planCard featured">
               <div className="planBadge">Tez orada</div>
-              <div className="planName">Pro</div>
-              <div className="planPrice">$9<span>/oy</span></div>
+              <div className="planName">Premium</div>
+              <div className="planPrice">$19<span>/oy</span></div>
               <ul>
                 <li>Kengaytirilgan AI tahlil</li>
                 <li>Ko‘p juftlik signalari</li>
                 <li>Kunlik hisobot</li>
-                <li>Prioritet yangilanishlar</li>
-              </ul>
-              <button className="planBtn" disabled>Tez orada</button>
-            </div>
-
-            <div className="planCard">
-              <div className="planName">Elite</div>
-              <div className="planPrice">$29<span>/oy</span></div>
-              <ul>
-                <li>Barcha Pro imkoniyatlar</li>
                 <li>Shaxsiy signal kanali</li>
                 <li>Haftalik chuqur tahlil</li>
                 <li>VIP qo‘llab-quvvatlash</li>
+                <li>Prioritet yangilanishlar</li>
               </ul>
               <button className="planBtn" disabled>Tez orada</button>
             </div>
