@@ -19,6 +19,12 @@ type MeResponse = {
   premium: boolean
 }
 
+const PRICE_TIERS = [
+  { label: '$19 / oyiga', note: '1 oy' },
+  { label: '$100 / 6 oyga', note: '6 oy' },
+  { label: '$190 / 1 yilga', note: '12 oy' },
+]
+
 function KabinetContent() {
   const { data: session, status, update } = useSession()
   const router = useRouter()
@@ -185,11 +191,32 @@ function KabinetContent() {
           marginBottom: 20,
         }}
       >
-        <h2 style={{ fontSize: 16, margin: '0 0 8px', color: '#eaecef' }}>Premium obuna</h2>
-        <p style={{ color: '#848e9c', fontSize: 13, marginBottom: 16 }}>
-          $19 / oy — kengaytirilgan AI tahlil, AI yordamchi, Telegram signal, haftalik tahlil, VIP
-          qo‘llab-quvvatlash.
-        </p>
+        <h2 style={{ fontSize: 16, margin: '0 0 12px', color: '#eaecef' }}>Premium obuna</h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 10,
+            marginBottom: 18,
+          }}
+        >
+          {PRICE_TIERS.map((tier) => (
+            <div
+              key={tier.label}
+              style={{
+                background: '#0d1117',
+                border: '1px solid #2b3139',
+                borderRadius: 10,
+                padding: '12px 10px',
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#f0b90b' }}>{tier.label}</div>
+              <div style={{ fontSize: 12, color: '#848e9c', marginTop: 4 }}>{tier.note}</div>
+            </div>
+          ))}
+        </div>
 
         <ul style={{ color: '#9aa7b8', fontSize: 14, marginBottom: 20, paddingLeft: 18 }}>
           <li>Kengaytirilgan AI tahlili</li>
