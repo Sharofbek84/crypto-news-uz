@@ -1,12 +1,11 @@
-import Link from 'next/link'
-import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs'
+'use client'
 
-export const metadata = {
-  title: 'Obuna bo‘lish | GOLDENWEB.UZ',
-  description: 'GOLDENWEB.UZ premium obuna rejalari — kengaytirilgan AI tahlil, signal va hisobotlar.',
-}
+import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export default function ObunaPage() {
+  const { data: session, status } = useSession()
+
   return (
     <>
       <header className="header">
@@ -47,21 +46,22 @@ export default function ObunaPage() {
                 <li>Haftalik chuqur tahlil</li>
                 <li>VIP qo‘llab-quvvatlash</li>
               </ul>
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <button type="button" className="planBtn">Avval kirish / ro‘yxat</button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
+              {status === 'loading' ? (
+                <button className="planBtn" disabled>...</button>
+              ) : session ? (
                 <Link href="/premium" className="planBtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
                   Premium ga o‘tish
                 </Link>
-              </SignedIn>
+              ) : (
+                <Link href="/sign-up" className="planBtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+                  Avval ro‘yxatdan o‘ting
+                </Link>
+              )}
             </div>
           </div>
 
           <div className="subscribeNote">
-            To‘lov tizimi (Stripe / Payme / Click) keyinchalik ulanadi. Hozircha kirish talab qilinadi; to‘lov keyin qo‘shiladi.
+            To‘lov tizimi (Stripe / Payme / Click) keyinchalik ulanadi. Hozircha kirish talab qilinadi.
           </div>
         </section>
       </main>

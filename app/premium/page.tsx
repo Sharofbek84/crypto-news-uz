@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { UserButton } from '@clerk/nextjs'
 import PremiumAnalyst from '../components/PremiumAnalyst'
 import TelegramPremiumButton from '../components/TelegramPremiumButton'
+import HeaderAuth from '../components/HeaderAuth'
 
 export const metadata = {
   title: 'Premium tahlil | GOLDENWEB.UZ',
@@ -17,11 +17,7 @@ export default function PremiumPage() {
           <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
             GOLDENWEB<span>.UZ</span>
           </Link>
-          <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Link href="/" style={{ color: '#9aa7b8', fontSize: 14 }}>Bosh sahifa</Link>
-            <Link href="/obuna" className="headerCta">Obuna</Link>
-            <UserButton afterSignOutUrl="/" />
-          </nav>
+          <HeaderAuth />
         </div>
       </header>
 
