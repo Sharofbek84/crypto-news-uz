@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/premium'
+  const callbackUrl = searchParams.get('callbackUrl') || '/kabinet'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
