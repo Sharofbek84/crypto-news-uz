@@ -22,7 +22,6 @@ function intervalConfig(interval: string) {
 async function fetchCoinbase(symbol: string, interval: string): Promise<Candle[]> {
   const product = COINBASE_PRODUCTS[symbol]
   if (!product) throw new Error("Coinbase pair yo'q")
-  // Coinbase Exchange does not provide a native 4h candle. Do not request an unsupported 14400s granularity.
   if (interval === '4h') throw new Error('Coinbase 4h granularity unsupported')
   const granularity = intervalConfig(interval).coinbase
   const res = await fetch(`https://api.exchange.coinbase.com/products/${encodeURIComponent(product)}/candles?granularity=${granularity}`, { cache: 'no-store', headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' } })
@@ -58,7 +57,6 @@ async function fetchBinance(symbol: string, interval: string): Promise<Candle[]>
 
 async function fetchMarketData(symbol: string, interval: string) {
   const errors: string[] = []
-  // For H4, use Binance first because it has native 4h candles. This avoids Coinbase's unsupported 14400s granularity.
   const providers = interval === '4h'
     ? [
         ['Binance', fetchBinance],
@@ -134,7 +132,8 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   if (!redis) { console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured'); return }
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${latest.time}:${latestSignal.type}`
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
-  if (claimed !== 'OK') return
+  // Upstash: "OK" | null; ba'zi clientlar true | null qaytaradi
+  if (claimed !== 'OK' && claimed !== true) return
   try { await sendTelegramSignal(signal) } catch (error) { await redis.del(redisKey); throw error }
 }
 
