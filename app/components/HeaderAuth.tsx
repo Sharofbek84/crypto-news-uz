@@ -27,8 +27,14 @@ export default function HeaderAuth() {
 
   if (session?.user) {
     const premium = (session.user as { premium?: boolean }).premium
+    const isAdmin = (session.user as { isAdmin?: boolean }).isAdmin
     return (
-      <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <nav style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        {isAdmin && (
+          <Link href="/admin" style={{ color: '#f0b90b', fontSize: 14, fontWeight: 700 }}>
+            Admin
+          </Link>
+        )}
         <Link href="/kabinet" style={{ color: '#eaecef', fontSize: 14, fontWeight: 600 }}>
           Kabinet
         </Link>

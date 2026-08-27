@@ -1,5 +1,6 @@
 import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { isAdminEmail } from './admin'
 import { findUserByEmail, isPremiumActive, verifyPassword } from './users'
 
 export const authOptions: NextAuthOptions = {
@@ -28,7 +29,7 @@ export const authOptions: NextAuthOptions = {
     error: '/sign-in',
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
         token.email = user.email
@@ -40,9 +41,7 @@ export const authOptions: NextAuthOptions = {
         token.subscriptionStatus = dbUser?.subscriptionStatus || 'none'
         token.subscriptionEndsAt = dbUser?.subscriptionEndsAt || null
         token.name = dbUser?.name || token.name
-      }
-      if (trigger === 'update') {
-        // session update chaqirilganda qayta o‘qiladi (yuqorida)
+        token.isAdmin = isAdminEmail(email)
       }
       return token
     },
@@ -50,6 +49,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         ;(session.user as { id?: string }).id = token.id as string
         ;(session.user as { premium?: boolean }).premium = Boolean(token.premium)
+        ;(session.user as { isAdmin?: boolean }).isAdmin = Boolean(token.isAdmin)
         ;(session.user as { subscriptionStatus?: string }).subscriptionStatus =
           (token.subscriptionStatus as string) || 'none'
         ;(session.user as { subscriptionEndsAt?: string | null }).subscriptionEndsAt =

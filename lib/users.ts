@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import { getRedis } from './redis'
+import { isAdminEmail } from './admin'
 
 export type SubscriptionStatus = 'none' | 'active' | 'cancelled'
 
@@ -15,6 +16,8 @@ export type AppUser = {
 }
 
 export type PublicUser = Omit<AppUser, 'passwordHash'>
+
+const USERS_INDEX = 'users:index'
 
 function userKey(email: string) {
   return `user:${email.toLowerCase().trim()}`
@@ -48,6 +51,7 @@ export async function saveUser(user: AppUser): Promise<void> {
   const redis = getRedis()
   if (!redis) throw new Error('Redis sozlanmagan')
   await redis.set(userKey(user.email), user)
+  await redis.sadd(USERS_INDEX, user.email.toLowerCase())
 }
 
 export async function createUser(params: {
@@ -86,6 +90,7 @@ export async function createUser(params: {
   }
 
   await redis.set(userKey(email), user)
+  await redis.sadd(USERS_INDEX, email)
 
   const { passwordHash: _, ...publicUser } = user
   return { ok: true, user: publicUser }
@@ -124,4 +129,40 @@ export async function cancelPremium(email: string): Promise<PublicUser | null> {
 export function toPublicUser(user: AppUser): PublicUser {
   const { passwordHash: _, ...pub } = user
   return pub
+}
+
+export type AdminUserRow = PublicUser & {
+  premium: boolean
+  isAdmin: boolean
+}
+
+export async function listAllUsers(): Promise<AdminUserRow[]> {
+  const redis = getRedis()
+  if (!redis) return []
+
+  const emails = await redis.smembers(USERS_INDEX)
+  if (!emails || emails.length === 0) return []
+
+  const rows: AdminUserRow[] = []
+  for (const email of emails) {
+    const user = await findUserByEmail(String(email))
+    if (!user) continue
+    const pub = toPublicUser(user)
+    rows.push({
+      ...pub,
+      premium: isPremiumActive(user),
+      isAdmin: isAdminEmail(user.email),
+    })
+  }
+
+  rows.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+  return rows
+}
+
+export function computeUserStats(users: AdminUserRow[]) {
+  const total = users.length
+  const premium = users.filter((u) => u.premium).length
+  const free = total - premium
+  const cancelled = users.filter((u) => u.subscriptionStatus === 'cancelled' && !u.premium).length
+  return { total, premium, free, cancelled }
 }

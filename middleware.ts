@@ -6,9 +6,12 @@ export default withAuth(
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
-    // Premium faqat aktiv obuna bilan
     if (path.startsWith('/premium') && !token?.premium) {
       return NextResponse.redirect(new URL('/kabinet?need=premium', req.url))
+    }
+
+    if (path.startsWith('/admin') && !token?.isAdmin) {
+      return NextResponse.redirect(new URL('/kabinet', req.url))
     }
 
     return NextResponse.next()
@@ -17,7 +20,11 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const path = req.nextUrl.pathname
-        if (path.startsWith('/kabinet') || path.startsWith('/premium')) {
+        if (
+          path.startsWith('/kabinet') ||
+          path.startsWith('/premium') ||
+          path.startsWith('/admin')
+        ) {
           return !!token
         }
         return true
@@ -27,5 +34,5 @@ export default withAuth(
 )
 
 export const config = {
-  matcher: ['/premium/:path*', '/kabinet/:path*'],
+  matcher: ['/premium/:path*', '/kabinet/:path*', '/admin/:path*'],
 }
