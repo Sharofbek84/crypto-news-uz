@@ -131,9 +131,9 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   const redis = getRedis()
   if (!redis) { console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured'); return }
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${latest.time}:${latestSignal.type}`
+  // NX: kalit bo'sh bo'lsa o'rnatiladi. Muvaffaqiyat: "OK" yoki truthy; takror: null/undefined
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
-  // Upstash: "OK" | null; ba'zi clientlar true | null qaytaradi
-  if (claimed !== 'OK' && claimed !== true) return
+  if (claimed == null) return
   try { await sendTelegramSignal(signal) } catch (error) { await redis.del(redisKey); throw error }
 }
 
