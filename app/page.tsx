@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
 import HomeAnalyst from './components/HomeAnalyst'
+import HeaderAuth from './components/HeaderAuth'
 import newsData from '../data/news.json'
 
 /** Tartib: BTC, ETH, LTC, SOL, BNB, NEAR, GRAM, SUI, APT, ATOM */
@@ -54,9 +55,7 @@ export default async function Home() {
       <header className="header">
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
           <div className="logo">GOLDENWEB<span>.UZ</span></div>
-          <nav style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Link href="/obuna" className="headerCta">Obuna bo‘lish</Link>
-          </nav>
+          <HeaderAuth />
         </div>
       </header>
 

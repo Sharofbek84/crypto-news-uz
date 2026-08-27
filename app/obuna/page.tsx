@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs'
 
 export const metadata = {
   title: 'Obuna bo‘lish | GOLDENWEB.UZ',
@@ -20,7 +21,7 @@ export default function ObunaPage() {
           <div className="subscribeHead">
             <div className="subscribeKicker">💎 PREMIUM</div>
             <h2>Obuna bo‘lish</h2>
-            <p>Tez orada pullik obuna orqali kengaytirilgan tahlillar, signal va maxsus hisobotlarga kirish ochiladi.</p>
+            <p>Ro‘yxatdan o‘ting va Premium orqali kengaytirilgan tahlillar, signal va maxsus hisobotlarga kiring.</p>
           </div>
 
           <div className="planGrid">
@@ -46,12 +47,21 @@ export default function ObunaPage() {
                 <li>Haftalik chuqur tahlil</li>
                 <li>VIP qo‘llab-quvvatlash</li>
               </ul>
-              <button className="planBtn" disabled>Tez orada</button>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button type="button" className="planBtn">Avval kirish / ro‘yxat</button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/premium" className="planBtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+                  Premium ga o‘tish
+                </Link>
+              </SignedIn>
             </div>
           </div>
 
           <div className="subscribeNote">
-            To‘lov tizimi (Stripe / Payme / Click) keyinchalik ulanadi. Hozircha reja va narxlar namuna sifatida ko‘rsatilgan.
+            To‘lov tizimi (Stripe / Payme / Click) keyinchalik ulanadi. Hozircha kirish talab qilinadi; to‘lov keyin qo‘shiladi.
           </div>
         </section>
       </main>
