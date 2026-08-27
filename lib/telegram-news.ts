@@ -7,6 +7,14 @@ type NewsItem = {
   date?: string
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 export async function sendTelegramNews(items: NewsItem[]): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_CHAT_ID
@@ -14,15 +22,15 @@ export async function sendTelegramNews(items: NewsItem[]): Promise<void> {
   if (!items.length) return
 
   const sections = items.map((item, index) => {
-    const link = item.url || `https://goldenweb.uz/yangiliklar/${item.slug}`
     return [
-      `${index + 1}. ${item.title}`,
-      item.summary || '',
-      `🔗 ${link}`,
+      `<b>${index + 1}. ${escapeHtml(item.title)}</b>`,
+      item.summary ? escapeHtml(item.summary) : '',
     ].filter(Boolean).join('\n')
   })
 
-  let message = ['📰 SO‘NGGI YANGILIKLAR', '', ...sections].join('\n\n')
+  const footer = 'Yangiliklarning to\'liq matni bilan GOLDENWEB.UZ ning Yangiliklar sahifasida tanishing.\nhttps://goldenweb.vercel.app/yangiliklar'
+  let message = `<b>📰 SO‘NGGI YANGILIKLAR</b>\n\n${sections.join('\n\n')}\n\n${footer}`
+
   if (message.length > 4096) {
     message = message.slice(0, 4050).trimEnd() + '\n\n…'
   }
@@ -30,7 +38,12 @@ export async function sendTelegramNews(items: NewsItem[]): Promise<void> {
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text: message, disable_web_page_preview: false }),
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: message,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+    }),
   })
 
   if (!response.ok) throw new Error(`Telegram API xatosi: ${response.status} ${await response.text()}`)
