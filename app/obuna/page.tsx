@@ -40,13 +40,11 @@ export default function ObunaPage() {
               <div className="planName">Premium</div>
               <div className="planPrice">$19<span>/oy</span></div>
               <ul>
-                <li>Kengaytirilgan AI tahlil</li>
-                <li>Ko‘p juftlik signalari</li>
-                <li>Kunlik hisobot</li>
-                <li>Shaxsiy signal kanali</li>
+                <li>Kengaytirilgan AI tahlili</li>
+                <li>AI yordamchi</li>
+                <li>Telegram signal kanali</li>
                 <li>Haftalik chuqur tahlil</li>
                 <li>VIP qo‘llab-quvvatlash</li>
-                <li>Prioritet yangilanishlar</li>
               </ul>
               <button className="planBtn" disabled>Tez orada</button>
             </div>
