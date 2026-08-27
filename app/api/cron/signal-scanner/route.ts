@@ -2,17 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
 const INTERVALS = ['1h', '4h', '1d'] as const
-const CONCURRENCY = 6
+const CONCURRENCY = 4
 
-async function scanOne(baseUrl: string, symbol: string, interval: string) {
+async function scanOne(baseUrl: string, symbol: string, interval: string, secret: string) {
   const url = new URL('/api/analyze', baseUrl)
   url.searchParams.set('symbol', symbol)
   url.searchParams.set('interval', interval)
 
-  const response = await fetch(url, {
+  const response = await fetch(url.toString(), {
     method: 'GET',
     cache: 'no-store',
-    headers: { 'User-Agent': 'GoldenWeb-Signal-Scanner/1.0' },
+    headers: {
+      'User-Agent': 'GoldenWeb-Signal-Scanner/1.0',
+      // /api/analyze Telegram yuborishi uchun shu header majburiy
+      'x-signal-scanner-secret': secret,
+    },
   })
 
   if (!response.ok) {
@@ -36,18 +40,26 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
-  const baseUrl = request.url
-  const jobs = COINS.flatMap(symbol => INTERVALS.map(interval => ({ symbol, interval })))
+  // request.url to'liq path — origin ishlatish kerak
+  const baseUrl = new URL(request.url).origin
+  const jobs = COINS.flatMap((symbol) => INTERVALS.map((interval) => ({ symbol, interval })))
   const completed: Array<{ symbol: string; interval: string; ok: boolean }> = []
   const errors: string[] = []
 
   for (let i = 0; i < jobs.length; i += CONCURRENCY) {
     const batch = jobs.slice(i, i + CONCURRENCY)
-    const results = await Promise.allSettled(batch.map(job => scanOne(baseUrl, job.symbol, job.interval)))
+    const results = await Promise.allSettled(
+      batch.map((job) => scanOne(baseUrl, job.symbol, job.interval, expectedSecret!))
+    )
 
     results.forEach((result, index) => {
       if (result.status === 'fulfilled') completed.push(result.value)
-      else errors.push(result.reason instanceof Error ? result.reason.message : `${batch[index].symbol}/${batch[index].interval}: unknown error`)
+      else
+        errors.push(
+          result.reason instanceof Error
+            ? result.reason.message
+            : `${batch[index].symbol}/${batch[index].interval}: unknown error`
+        )
     })
   }
 
