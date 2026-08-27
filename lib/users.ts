@@ -11,8 +11,9 @@ export type AppUser = {
   createdAt: string
   plan: 'free' | 'premium'
   subscriptionStatus: SubscriptionStatus
-  /** ISO date — obuna tugash sanasi */
   subscriptionEndsAt: string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
 }
 
 export type PublicUser = Omit<AppUser, 'passwordHash'>
@@ -27,6 +28,8 @@ function normalizeUser(raw: AppUser): AppUser {
     plan: raw.plan || 'free',
     subscriptionStatus: raw.subscriptionStatus || 'none',
     subscriptionEndsAt: raw.subscriptionEndsAt ?? null,
+    stripeCustomerId: raw.stripeCustomerId ?? null,
+    stripeSubscriptionId: raw.stripeSubscriptionId ?? null,
   }
 }
 
@@ -45,10 +48,21 @@ export async function findUserByEmail(email: string): Promise<AppUser | null> {
   return normalizeUser(data)
 }
 
+export async function findUserByStripeCustomerId(customerId: string): Promise<AppUser | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  const email = await redis.get<string>(`stripe_customer:${customerId}`)
+  if (!email) return null
+  return findUserByEmail(email)
+}
+
 export async function saveUser(user: AppUser): Promise<void> {
   const redis = getRedis()
   if (!redis) throw new Error('Redis sozlanmagan')
   await redis.set(userKey(user.email), user)
+  if (user.stripeCustomerId) {
+    await redis.set(`stripe_customer:${user.stripeCustomerId}`, user.email)
+  }
 }
 
 export async function createUser(params: {
@@ -84,6 +98,8 @@ export async function createUser(params: {
     plan: 'free',
     subscriptionStatus: 'none',
     subscriptionEndsAt: null,
+    stripeCustomerId: null,
+    stripeSubscriptionId: null,
   }
 
   await redis.set(userKey(email), user)
@@ -99,28 +115,45 @@ export async function verifyPassword(email: string, password: string): Promise<A
   return match ? user : null
 }
 
-export async function activatePremium(email: string, days = 30): Promise<PublicUser | null> {
+export async function setStripeCustomerId(email: string, customerId: string): Promise<void> {
   const user = await findUserByEmail(email)
-  if (!user) return null
-  const ends = new Date()
-  ends.setDate(ends.getDate() + days)
-  user.plan = 'premium'
-  user.subscriptionStatus = 'active'
-  user.subscriptionEndsAt = ends.toISOString()
+  if (!user) return
+  user.stripeCustomerId = customerId
   await saveUser(user)
-  const { passwordHash: _, ...pub } = user
-  return pub
 }
 
-export async function cancelPremium(email: string): Promise<PublicUser | null> {
-  const user = await findUserByEmail(email)
+export async function applyStripeSubscription(params: {
+  email?: string
+  customerId?: string
+  subscriptionId: string
+  status: string
+  currentPeriodEnd?: number | null
+}): Promise<AppUser | null> {
+  let user: AppUser | null = null
+  if (params.email) user = await findUserByEmail(params.email)
+  if (!user && params.customerId) user = await findUserByStripeCustomerId(params.customerId)
   if (!user) return null
-  user.plan = 'free'
-  user.subscriptionStatus = 'cancelled'
-  // endsAt saqlanadi — muddat tugaguncha ko‘rsatish mumkin
+
+  if (params.customerId) user.stripeCustomerId = params.customerId
+  user.stripeSubscriptionId = params.subscriptionId
+
+  const activeStatuses = ['active', 'trialing']
+  if (activeStatuses.includes(params.status)) {
+    user.plan = 'premium'
+    user.subscriptionStatus = 'active'
+    user.subscriptionEndsAt = params.currentPeriodEnd
+      ? new Date(params.currentPeriodEnd * 1000).toISOString()
+      : null
+  } else if (params.status === 'canceled' || params.status === 'unpaid' || params.status === 'incomplete_expired') {
+    user.plan = 'free'
+    user.subscriptionStatus = 'cancelled'
+    if (params.currentPeriodEnd) {
+      user.subscriptionEndsAt = new Date(params.currentPeriodEnd * 1000).toISOString()
+    }
+  }
+
   await saveUser(user)
-  const { passwordHash: _, ...pub } = user
-  return pub
+  return user
 }
 
 export function toPublicUser(user: AppUser): PublicUser {

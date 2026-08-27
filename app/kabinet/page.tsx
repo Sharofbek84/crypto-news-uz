@@ -24,6 +24,7 @@ function KabinetContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const needPremium = searchParams.get('need') === 'premium'
+  const checkoutStatus = searchParams.get('checkout')
 
   const [me, setMe] = useState<MeResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -53,23 +54,41 @@ function KabinetContent() {
       router.replace('/sign-in?callbackUrl=/kabinet')
       return
     }
-    if (status === 'authenticated') loadMe()
-  }, [status, router, loadMe])
+    if (status === 'authenticated') {
+      loadMe().then(() => update())
+    }
+  }, [status, router, loadMe, update])
 
-  async function activate() {
+  useEffect(() => {
+    if (checkoutStatus === 'success') {
+      setMessage('To‘lov qabul qilindi. Obuna holati bir necha soniyada yangilanadi.')
+      const t = setTimeout(() => {
+        loadMe()
+        update()
+      }, 2000)
+      return () => clearTimeout(t)
+    }
+    if (checkoutStatus === 'cancel') {
+      setMessage('To‘lov bekor qilindi.')
+    }
+  }, [checkoutStatus, loadMe, update])
+
+  async function startCheckout() {
     setActionLoading(true)
     setMessage('')
     setError('')
     try {
-      const res = await fetch('/api/subscription/activate', { method: 'POST' })
+      const res = await fetch('/api/stripe/checkout', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Xato')
+        setError(data.error || 'Checkout xatosi')
         return
       }
-      setMessage(data.message || 'Premium faollashtirildi')
-      await update()
-      await loadMe()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
+      setError('Checkout URL topilmadi')
     } catch {
       setError('So‘rov bajarilmadi')
     } finally {
@@ -77,21 +96,22 @@ function KabinetContent() {
     }
   }
 
-  async function cancel() {
-    if (!confirm('Premium obunani bekor qilmoqchimisiz?')) return
+  async function openPortal() {
     setActionLoading(true)
     setMessage('')
     setError('')
     try {
-      const res = await fetch('/api/subscription/cancel', { method: 'POST' })
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Xato')
+        setError(data.error || 'Portal xatosi')
         return
       }
-      setMessage(data.message || 'Obuna bekor qilindi')
-      await update()
-      await loadMe()
+      if (data.url) {
+        window.location.href = data.url
+        return
+      }
+      setError('Portal URL topilmadi')
     } catch {
       setError('So‘rov bajarilmadi')
     } finally {
@@ -133,7 +153,7 @@ function KabinetContent() {
             fontSize: 14,
           }}
         >
-          Premium sahifaga kirish uchun avval obunani faollashtiring.
+          Premium sahifaga kirish uchun avval Stripe orqali obuna bo‘ling.
         </div>
       )}
 
@@ -169,7 +189,7 @@ function KabinetContent() {
           </div>
           {endsAt && (
             <div>
-              <span style={{ color: '#848e9c' }}>Obuna tugashi: </span>
+              <span style={{ color: '#848e9c' }}>Keyingi to‘lov / tugash: </span>
               {endsAt}
             </div>
           )}
@@ -212,10 +232,10 @@ function KabinetContent() {
               type="button"
               className="planBtn muted"
               disabled={actionLoading}
-              onClick={cancel}
+              onClick={openPortal}
               style={{ cursor: 'pointer' }}
             >
-              {actionLoading ? '...' : 'Obunani bekor qilish'}
+              {actionLoading ? '...' : 'Obunani boshqarish (Stripe)'}
             </button>
           </div>
         ) : (
@@ -224,14 +244,13 @@ function KabinetContent() {
               type="button"
               className="planBtn"
               disabled={actionLoading}
-              onClick={activate}
-              style={{ cursor: 'pointer', maxWidth: 280 }}
+              onClick={startCheckout}
+              style={{ cursor: 'pointer', maxWidth: 320 }}
             >
-              {actionLoading ? 'Faollashtirilmoqda...' : 'Premium ni faollashtirish (demo 30 kun)'}
+              {actionLoading ? 'Stripe ochilmoqda...' : 'Premium ga obuna bo‘lish — $19/oy'}
             </button>
             <p style={{ color: '#848e9c', fontSize: 12, margin: 0 }}>
-              To‘lov (Stripe / Payme / Click) keyin ulanadi. Hozircha demo obuna orqali Premium
-              ochiladi.
+              Xavfsiz to‘lov Stripe orqali. Karta ma’lumotlari saytimizda saqlanmaydi.
             </p>
           </div>
         )}
@@ -252,7 +271,12 @@ export default function KabinetPage() {
       <header className="header">
         <div
           className="container"
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 16,
+          }}
         >
           <Link href="/" className="logo" style={{ textDecoration: 'none' }}>
             GOLDENWEB<span>.UZ</span>
