@@ -1,12 +1,18 @@
+import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
+import { authOptions } from '@/lib/auth'
+import { cancelPremium } from '@/lib/users'
 
-/** Bekor qilish Stripe Customer Portal orqali */
 export async function POST() {
-  return NextResponse.json(
-    {
-      error: 'Obunani Stripe portal orqali boshqaring.',
-      use: '/api/stripe/portal',
-    },
-    { status: 410 }
-  )
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Avval tizimga kiring' }, { status: 401 })
+  }
+
+  const user = await cancelPremium(session.user.email)
+  if (!user) {
+    return NextResponse.json({ error: 'Foydalanuvchi topilmadi' }, { status: 404 })
+  }
+
+  return NextResponse.json({ ok: true, user, message: 'Premium obuna bekor qilindi.' })
 }

@@ -24,7 +24,6 @@ function KabinetContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const needPremium = searchParams.get('need') === 'premium'
-  const checkoutStatus = searchParams.get('checkout')
 
   const [me, setMe] = useState<MeResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -54,41 +53,23 @@ function KabinetContent() {
       router.replace('/sign-in?callbackUrl=/kabinet')
       return
     }
-    if (status === 'authenticated') {
-      loadMe().then(() => update())
-    }
-  }, [status, router, loadMe, update])
+    if (status === 'authenticated') loadMe()
+  }, [status, router, loadMe])
 
-  useEffect(() => {
-    if (checkoutStatus === 'success') {
-      setMessage('To‘lov qabul qilindi. Obuna holati bir necha soniyada yangilanadi.')
-      const t = setTimeout(() => {
-        loadMe()
-        update()
-      }, 2000)
-      return () => clearTimeout(t)
-    }
-    if (checkoutStatus === 'cancel') {
-      setMessage('To‘lov bekor qilindi.')
-    }
-  }, [checkoutStatus, loadMe, update])
-
-  async function startCheckout() {
+  async function activate() {
     setActionLoading(true)
     setMessage('')
     setError('')
     try {
-      const res = await fetch('/api/stripe/checkout', { method: 'POST' })
+      const res = await fetch('/api/subscription/activate', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Checkout xatosi')
+        setError(data.error || 'Xato')
         return
       }
-      if (data.url) {
-        window.location.href = data.url
-        return
-      }
-      setError('Checkout URL topilmadi')
+      setMessage(data.message || 'Premium faollashtirildi')
+      await update()
+      await loadMe()
     } catch {
       setError('So‘rov bajarilmadi')
     } finally {
@@ -96,22 +77,21 @@ function KabinetContent() {
     }
   }
 
-  async function openPortal() {
+  async function cancel() {
+    if (!confirm('Premium obunani bekor qilmoqchimisiz?')) return
     setActionLoading(true)
     setMessage('')
     setError('')
     try {
-      const res = await fetch('/api/stripe/portal', { method: 'POST' })
+      const res = await fetch('/api/subscription/cancel', { method: 'POST' })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Portal xatosi')
+        setError(data.error || 'Xato')
         return
       }
-      if (data.url) {
-        window.location.href = data.url
-        return
-      }
-      setError('Portal URL topilmadi')
+      setMessage(data.message || 'Obuna bekor qilindi')
+      await update()
+      await loadMe()
     } catch {
       setError('So‘rov bajarilmadi')
     } finally {
@@ -153,7 +133,7 @@ function KabinetContent() {
             fontSize: 14,
           }}
         >
-          Premium sahifaga kirish uchun avval Stripe orqali obuna bo‘ling.
+          Premium sahifaga kirish uchun avval obunani faollashtiring.
         </div>
       )}
 
@@ -189,7 +169,7 @@ function KabinetContent() {
           </div>
           {endsAt && (
             <div>
-              <span style={{ color: '#848e9c' }}>Keyingi to‘lov / tugash: </span>
+              <span style={{ color: '#848e9c' }}>Obuna tugashi: </span>
               {endsAt}
             </div>
           )}
@@ -232,10 +212,10 @@ function KabinetContent() {
               type="button"
               className="planBtn muted"
               disabled={actionLoading}
-              onClick={openPortal}
+              onClick={cancel}
               style={{ cursor: 'pointer' }}
             >
-              {actionLoading ? '...' : 'Obunani boshqarish (Stripe)'}
+              {actionLoading ? '...' : 'Obunani bekor qilish'}
             </button>
           </div>
         ) : (
@@ -244,13 +224,13 @@ function KabinetContent() {
               type="button"
               className="planBtn"
               disabled={actionLoading}
-              onClick={startCheckout}
-              style={{ cursor: 'pointer', maxWidth: 320 }}
+              onClick={activate}
+              style={{ cursor: 'pointer', maxWidth: 300 }}
             >
-              {actionLoading ? 'Stripe ochilmoqda...' : 'Premium ga obuna bo‘lish — $19/oy'}
+              {actionLoading ? 'Faollashtirilmoqda...' : 'Premium ni faollashtirish (demo 30 kun)'}
             </button>
             <p style={{ color: '#848e9c', fontSize: 12, margin: 0 }}>
-              Xavfsiz to‘lov Stripe orqali. Karta ma’lumotlari saytimizda saqlanmaydi.
+              Hozircha demo rejim. To‘lov (Payme / Click yoki boshqa) keyin ulanadi.
             </p>
           </div>
         )}

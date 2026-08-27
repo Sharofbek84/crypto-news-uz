@@ -1,12 +1,23 @@
+import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
+import { authOptions } from '@/lib/auth'
+import { activatePremium } from '@/lib/users'
 
-/** Demo yo‘li o‘chirilgan — Stripe Checkout ishlating */
+/** Demo obuna: 30 kun Premium (to‘lov tizimi keyin ulanadi) */
 export async function POST() {
-  return NextResponse.json(
-    {
-      error: 'Demo obuna o‘chirilgan. Kabinetdan Stripe orqali to‘lov qiling.',
-      use: '/api/stripe/checkout',
-    },
-    { status: 410 }
-  )
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Avval tizimga kiring' }, { status: 401 })
+  }
+
+  const user = await activatePremium(session.user.email, 30)
+  if (!user) {
+    return NextResponse.json({ error: 'Foydalanuvchi topilmadi' }, { status: 404 })
+  }
+
+  return NextResponse.json({
+    ok: true,
+    user,
+    message: 'Premium 30 kunga faollashtirildi (demo).',
+  })
 }
