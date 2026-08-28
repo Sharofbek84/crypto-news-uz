@@ -1,56 +1,47 @@
 [
   {
-    "slug": "btc-80k-jackson-hole-28-avg",
-    "title": "Bitcoin $80,000 atrofida — Jackson Hole nutqi oldidan bozor ehtiyot",
-    "summary": "BTC 27-avgustda $80,000 ni qayta oldi. Bugun Fed raisi Kevin Warshning Jackson Hole nutqi kutilmoqda.",
-    "body": "28-avgust holatiga Bitcoin taxminan $80,000–$80,400 oralig‘ida savdo qilmoqda. 27-avgust sessiyasida narx $78,600 atrofidan $80,800 gacha ko‘tarilib, $80,000 darajasini qayta mustahkamladi.\n\nAvvalgi haftada BTC $60 mingdan $81 minggacha oshgan edi — 2026-yildagi eng tez haftalik o‘sishlardan biri. Hozir bozor foyda olish va yangi katalizator kutish holatida.\n\nBugungi asosiy voqea — Federal rezerv raisi Kevin Warshning Jackson Hole simpoziumidagi nutqi. Savdogarlar dollar, foiz stavkalari va moliyaviy innovatsiyalar haqidagi ishoralarni kuzatmoqda.\n\nQisqa muddatda $78,000–$78,800 qo‘llab-quvvatlash, $81,000–$83,000 esa qarshilik sifatida qolmoqda. Umumiy kripto bozor kapitallashuvi $2,65–2,7 trln atrofida.",
+    "slug": "btc-80k-warsh-jackson-hole-28-avg",
+    "title": "Bitcoin $80 mingda: bugun Warshning Jackson Hole nutqi",
+    "summary": "BTC $80,000–$80,500 atrofida. Fed raisi Kevin Warsh 28-avgustda nutq so‘zlaydi.",
+    "body": "28-avgust holatiga Bitcoin taxminan $80,000–$80,500 oralig‘ida savdo qilmoqda. Oxirgi 10 kunda narx $60 mingdan $81 minggacha ko‘tarilib, 2026-yildagi eng tez tiklanishlardan birini ko‘rsatdi.\n\nBugungi asosiy voqea — Federal rezerv raisi Kevin Warshning Jackson Hole simpoziumidagi birinchi raislik nutqi (AQSh vaqti bilan ertalab). Mavzu: «Moliyaviy innovatsiya: to‘lovlar va siyosat». Savdogarlar inflyatsiya, foiz stavkalari, dollar va likvidlik ishoralarini kutmoqda.\n\nIyul PCE 3,7% chiqqach, sentabrda stavka oshirish ehtimoli oshgan. Tahlilchilar nutq hawkish chiqsa rally sekinlashishi, yumshoqroq ohang esa $81,000–$83,000 sari yo‘l ochishi mumkinligini aytmoqda.\n\nQisqa muddatda $78,000–$78,800 qo‘llab-quvvatlash, $81,000–$83,000 qarshilik. Umumiy kripto bozor kapitallashuvi $2,65–2,7 trln atrofida.",
+    "url": "https://www.coindesk.com/markets/2026/08/27/bitcoin-holds-near-usd80-000-as-traders-brace-for-warsh-s-jackson-hole-fed-speech",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-08-28"
+  },
+  {
+    "slug": "spot-btc-etf-avgust-3mlrd-8kun",
+    "title": "Spot Bitcoin ETF’lari avgustda $3 mlrddan oshdi",
+    "summary": "8 kunlik kirim seriyasi. Institutsional talab rallyning asosiy haydovchisi.",
+    "body": "AQSh spot Bitcoin ETF’lari ketma-ket sakkizinchi savdo kunida ham sof kirim qayd etdi. SoSoValue ma’lumotiga ko‘ra, oxirgi to‘lqin davomida fondlarga taxminan $2,8 milliard kelgan.\n\nAvgust oyi kirimlari $3 milliarddan oshdi — bu 2026-yildagi eng yaxshi oy va aprel natijasidan taxminan ikki baravar ko‘p. Fondlarning sof aktivlari avgust o‘rtalaridagi ~$77 mlrddan $99 mlrd atrofiga chiqdi.\n\nEthereum spot ETF’lari ham bir necha kun ketma-ket kirim olmoqda; bir haftada ~$697 mln, keyingi kunlarda yana yuzlab millionlar. Solana ETF’lariga ham $90 mln atrofida oqim qayd etildi.\n\nTahlilchilar avgust rallysini asosan ETF oqimlari, short-covering va kutilmalar o‘zgarishi haydaganini, chakana savdo esa ikkinchi planda qolganini ta’kidlamoqda.",
     "url": "https://www.coindesk.com/business/2026/08/27/live-updates-bitcoin-etf-inflows-hit-eight-straight-days-as-august-tops-usd3-billion",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-28"
   },
   {
-    "slug": "spot-btc-etf-avgust-3mlrd",
-    "title": "AQSh spot Bitcoin ETF’lari avgustda $3 mlrddan oshdi — 8 kunlik kirim seriyasi",
-    "summary": "Institutsional talab saqlanmoqda. Avgust 2026-yildagi eng kuchli oylik oqimga aylandi.",
-    "body": "AQSh spot Bitcoin ETF’lari ketma-ket sakkizinchi savdo kunida ham sof kirim qayd etdi. SoSoValue ma’lumotiga ko‘ra, oxirgi to‘lqin davomida fondlarga taxminan $2,8 milliard kelgan.\n\nAvgust oyi kirimlari $3 milliarddan oshdi — bu 2026-yildagi eng yaxshi oy va aprel natijasidan taxminan ikki baravar ko‘p. Fondlarning sof aktivlari avgust o‘rtalaridagi ~$77 mlrddan $99 mlrd atrofiga chiqdi; buning katta qismi narx o‘sishidan kelgan.\n\nEthereum spot ETF’lari ham bir necha kun ketma-ket kirim olmoqda. Solana ETF’lariga ham millionlab dollar oqimi qayd etildi.\n\nTahlilchilar rallyning asosiy haydovchisi chakana savdo emas, balki ETF oqimlari, short-covering va kutilmalar o‘zgarishi ekanini aytmoqda.",
-    "url": "https://www.cryptotimes.io/2026/08/27/inside-cryptos-fastest-week-of-2026-bitcoins-august-price-rally-was-not-a-retail-story/",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-28"
-  },
-  {
-    "slug": "eth-sol-ada-avgust-rally",
-    "title": "Ethereum, Solana va Cardano avgust rallysida Bitcoinni quvib o‘tdi",
-    "summary": "ETH ~$2,450–2,510, SOL $100 atrofida. Cardano oy davomida ~36% o‘sdi.",
-    "body": "Altcoinlar avgust oyida keng rally qildi. Ethereum haftalik ~29% o‘sishdan so‘ng $2,450–$2,510 oralig‘ida savdo qilmoqda. Solana $100 atrofida mustahkamlanib, ayrim sessiyalarda 5% dan ortiq o‘sgan.\n\nOy kesimida Cardano (~36%) va XRP (~35%) yetakchilik qildi. Ether va Solana ham ~30% atrofida o‘sdi, Bitcoin esa ~25% atrofida.\n\nBozor ishtirokchilari institutsional talab, AQSh tartibga solish umidlari va “debasement trade” (qarz o‘sishi fonida BTC va oltinga oqim) ni asosiy omil deb ko‘rsatmoqda.\n\nShu bilan birga, tezkor o‘sishdan keyin foyda olish va leverage yuvilishi xavfi saqlanadi. Savdogarlar $80,000 ustida yopilish va ETF oqimlarining davomiyligini kuzatmoqda.",
+    "slug": "eth-sol-ada-xrp-avgust-rally-28",
+    "title": "ETH, SOL va ADA avgustda Bitcoinni quvib o‘tdi",
+    "summary": "Cardano ~36%, XRP ~35%, Ether va Solana ~30%. BTC oyiga ~25%.",
+    "body": "Altcoinlar avgust oyida keng rally qildi. Ethereum haftalik ~29% o‘sishdan so‘ng $2,450–$2,510 oralig‘ida. Solana $100 atrofida mustahkamlanib, ayrim sessiyalarda 5% dan ortiq o‘sgan.\n\nOy kesimida Cardano (~36%) va XRP (~35%) yetakchilik qildi. Ether va Solana ham ~30% atrofida, Bitcoin ~25%. XRP oldingi haftada ~45–70% gacha o‘sib, keyin foyda olish tufayli 4% atrofida tushgan.\n\nOmillar: institutsional ETF talabi, AQShdagi Clarity Act kutishlari, G‘aznachilikning uzoq muddatli obligatsiyalarni qayta sotib olishini kengaytirishi.\n\nTezkor o‘sishdan keyin leverage yuvilishi va foyda olish xavfi saqlanadi. Bozor $80,000 ustida yopilish va ETF oqimining davomiyligini kuzatmoqda.",
     "url": "https://www.cnbctv18.com/market/cryptocurrency/best-performing-crypto-in-august-cardano-leads-with-36-gain-bitcoin-hits-80000-19977232.htm",
     "source": "GOLDENWEB.UZ",
     "date": "2026-08-28"
   },
   {
-    "slug": "blackrock-bitcoin-us-debt",
-    "title": "BlackRock: AQShning $40 trln qarzi Bitcoinni himoya aktiviga aylantirmoqda",
-    "summary": "Robbie Mitchnick federal qarz $40,05 trlnga yetganini aytdi. BTC “debasement trade”ning markazida.",
-    "body": "BlackRock Digital Assets rahbari Robbie Mitchnick Bitcoinning so‘nggi o‘sishi AQSh federal qarzining o‘sishi bilan bog‘liqligini ta’kidladi.\n\nG‘aznachilik ma’lumotlariga ko‘ra, AQSh davlat qarzi $40,05 trillion dollarga yetgan — 2017-yildagidan ikki baravar ko‘p.\n\nTahlilchilar buni “debasement trade” deb atamoqda: investorlar hukumat chopib susaytira olmaydigan aktivlarga — oltin va Bitcoin ETF’lariga — mablag‘ kiritmoqda.\n\nBu narrativ institutsional investorlarning BTC’ga uzoq muddatli talabini qo‘llab-quvvatlamoqda. Bitcoin hali 2025-yil oktabrdagi ~$126,000 cho‘qqisidan ancha past.",
-    "url": "https://www.coingabbar.com/en/crypto-currency-news/crypto-news-today-27-august-bitcoin-eth-bitlayer-crypto-tax",
+    "slug": "sec-kripto-kustodiya-qoidalari-oira",
+    "title": "SEC kripto-kustodiya qoidalarini OIRA’ga yubordi",
+    "summary": "Investitsiya maslahatchilari va fondlar uchun saqlash qoidalari qayta ko‘rib chiqilmoqda.",
+    "body": "AQSh Qimmatli qog‘ozlar va birja komissiyasi (SEC) investitsiya maslahatchilari va investitsiya kompaniyalari uchun kustodiya qoidalariga o‘zgartirish loyihasini Oq uy qoshidagi OIRA’ga ko‘rib chiqishga yubordi.\n\nBu hali yakuniy qoida emas va ommaviy muhokamaga chiqmagan. Lekin institutsional saqlov, broker-dilerlar va kripto-aktivlarni balansda tutish tartibi o‘zgarishi mumkinligi bozorni qiziqtirmoqda.\n\nAgar qoidalar yumshatilsa, banklar va fondlar raqamli aktivlarni saqlashni kengaytirishi mumkin. Qattiqroq variant esa compliance xarajatini oshiradi.\n\nBu qadam Clarity Act va sentabr Senat ovozi kutishlari bilan birga tartibga solish frontini jonlantirdi.",
+    "url": "https://coinstats.app/ai/a/crypto-news-update-27-August-2026",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-27"
+    "date": "2026-08-28"
   },
   {
-    "slug": "grayscale-zcash-etf",
-    "title": "Grayscale AQShda birinchi Zcash spot ETF’ini ishga tushirdi",
-    "summary": "ZCSH NYSE Arca’da ochildi. ZEC rallysi va $313,5 mln trust konversiyasi fonida.",
-    "body": "Grayscale AQShda maxfiylik coin’i Zcash uchun birinchi spot ETF — ZCSH ni NYSE Arca’da ishga tushirdi.\n\nMahsulot kompaniyaning taxminan $313,5 millionlik Zcash trustini konversiya qilish orqali paydo bo‘ldi. ZEC tokeni ETF kutishlari fonida keskin o‘sgan edi.\n\nBu qadam Bitcoin va Ether’dan tashqari altcoin ETF’larining AQShda kengayishini ko‘rsatadi. Investorlar endi an’anaviy broker orqali ZEC’ga ta’sir olishlari mumkin.\n\nBozor ishtirokchilari boshqa maxfiylik va L1 tokenlari uchun ham ETF arizalari ko‘payishi mumkinligini aytmoqda.",
-    "url": "https://www.cryptowisser.com/news/?lang=fr",
+    "slug": "blackrock-aqsh-qarzi-btc-debasement",
+    "title": "BlackRock: $40 trln AQSh qarzi Bitcoinga talabni oshirmoqda",
+    "summary": "Robbie Mitchnick BTC ni «debasement trade» markazida deb atadi.",
+    "body": "BlackRock Digital Assets rahbari Robbie Mitchnick Bitcoinning so‘nggi o‘sishini AQSh federal qarzining o‘sishi bilan bog‘ladi.\n\nG‘aznachilik ma’lumotlariga ko‘ra, AQSh davlat qarzi $40,05 trillion dollarga yetgan — 2017-yildagidan ikki baravar ko‘p. G‘aznachilik uzoq muddatli obligatsiyalarni qayta sotib olish hajmini oshirgach, daromadlilik tushib, dollar zaiflashdi va xavfli aktivlarga talab oshdi.\n\nTahlilchilar buni «debasement trade» deb atamoqda: investorlar hukumat chopib susaytira olmaydigan aktivlarga — oltin va Bitcoin ETF’lariga — mablag‘ kiritmoqda.\n\nBitcoin hali 2025-yil oktabrdagi ~$126,000 cho‘qqisidan ancha past. Bernstein kabi uoll-strit uylari 2026 oxiriga $125,000 ssenariysini saqlab qolishgan.",
+    "url": "https://www.cryptotimes.io/2026/08/27/inside-cryptos-fastest-week-of-2026-bitcoins-august-price-rally-was-not-a-retail-story/",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-08-27"
-  },
-  {
-    "slug": "bernstein-btc-125k-2026",
-    "title": "Bernstein: Bitcoin 2026 oxirigacha $125,000 ni qaytarishi mumkin",
-    "summary": "Uoll-strit tahlilchilari sikl cho‘qqisi va institutsional xaridlarga tayanib BTC prognozini saqlab qolishdi.",
-    "body": "Bernstein tadqiqotiga ko‘ra, Bitcoin 2026-yil oxirigacha $125,000 darajasini qayta olishi mumkin. Ayrim ssenariylarda 2027 o‘rtalariga $150,000 ham tilga olinmoqda.\n\nKompaniya BTC’ning 2025-yil oktabrdagi cho‘qqisidan ~50% tushganini, so‘nggi 10 kunda esa keskin tiklanganini qayd etdi. Oldingi sikllardagi 75–90% tushishlarga nisbatan bu yumshoqroq.\n\nSabab sifatida ETF’lar, korporativ xaridorlar va institutsional likvidlik ko‘rsatiladi.\n\nQisqa muddatda $80,000–$83,000 qarshilik, uzoqroqda esa sikl cho‘qqisi narrativi saqlanmoqda.",
-    "url": "https://www.lcx.com/en/cryptonews/heres-what-happened-in-crypto-today",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-27"
+    "date": "2026-08-28"
   }
 ]
