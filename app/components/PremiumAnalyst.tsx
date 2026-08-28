@@ -529,7 +529,7 @@ export default function PremiumAnalyst() {
                 <p className="proSummary">{r.summary}</p>
               </div>
               <div className="proCard">
-                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'`}>
+                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
                   <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
                   <strong>
                     {money$(r.entryLow)} – {money$(r.entryHigh)}

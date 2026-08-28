@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 type TrackedSignal = {
   id: string
@@ -71,12 +72,19 @@ function formatWhen(ms: number) {
 }
 
 export default function SignalStatsPanel() {
+  const { data: session, status } = useSession()
+  const isAdmin = Boolean((session?.user as { isAdmin?: boolean } | undefined)?.isAdmin)
   const [stats, setStats] = useState<Stats | null>(null)
   const [recent, setRecent] = useState<TrackedSignal[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (status === 'loading') return
+    if (!isAdmin) {
+      setLoading(false)
+      return
+    }
     let cancelled = false
     async function load() {
       setLoading(true)
@@ -98,7 +106,12 @@ export default function SignalStatsPanel() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [status, isAdmin])
+
+  // Faqat admin ko'radi
+  if (status === 'loading' || !isAdmin) {
+    return null
+  }
 
   return (
     <div className="sigStats">
