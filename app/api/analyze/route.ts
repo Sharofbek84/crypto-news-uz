@@ -40,7 +40,7 @@ async function fetchCoinbase4h(symbol: string): Promise<Candle[]> {
     if (!existing) groups.set(bucket, { time: bucket, open: candle.open, high: candle.high, low: candle.low, close: candle.close, volume: candle.volume })
     else { existing.high = Math.max(existing.high, candle.high); existing.low = Math.min(existing.low, candle.low); existing.close = candle.close; existing.volume += candle.volume }
   }
-  const candles = [...groups.values()].sort((a, b) => a.time - b.time)
+  const candles = Array.from(groups.values()).sort((a, b) => a.time - b.time)
   if (candles.length < 60) throw new Error('Coinbase aggregated 4h candles insufficient')
   return candles
 }
