@@ -31,6 +31,35 @@ async function fetchCoinbase(symbol: string, interval: string): Promise<Candle[]
   return data.map((k: number[]) => ({ time: k[0] * 1000, low: +k[1], high: +k[2], open: +k[3], close: +k[4], volume: +k[5] })).sort((a, b) => a.time - b.time)
 }
 
+async function fetchCoinbase4h(symbol: string): Promise<Candle[]> {
+  const hourly = await fetchCoinbase(symbol, '1h')
+  const groups = new Map<number, Candle>()
+
+  for (const candle of hourly) {
+    const bucket = Math.floor(candle.time / (4 * 60 * 60 * 1000)) * (4 * 60 * 60 * 1000)
+    const existing = groups.get(bucket)
+    if (!existing) {
+      groups.set(bucket, {
+        time: bucket,
+        open: candle.open,
+        high: candle.high,
+        low: candle.low,
+        close: candle.close,
+        volume: candle.volume,
+      })
+    } else {
+      existing.high = Math.max(existing.high, candle.high)
+      existing.low = Math.min(existing.low, candle.low)
+      existing.close = candle.close
+      existing.volume += candle.volume
+    }
+  }
+
+  const candles = [...groups.values()].sort((a, b) => a.time - b.time)
+  if (candles.length < 60) throw new Error('Coinbase aggregated 4h candles insufficient')
+  return candles
+}
+
 async function fetchKraken(symbol: string, interval: string): Promise<Candle[]> {
   const pair = KRAKEN_PAIRS[symbol]
   if (!pair) throw new Error("Kraken pair yo'q")
@@ -60,6 +89,7 @@ async function fetchMarketData(symbol: string, interval: string) {
   const providers = interval === '4h'
     ? [
         ['Binance', fetchBinance],
+        ['Coinbase Exchange (1h→4h)', fetchCoinbase4h],
         ['Kraken', fetchKraken],
       ] as const
     : [
