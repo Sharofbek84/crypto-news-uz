@@ -33,7 +33,7 @@ type DivLine = {
   b: Pivot
 }
 
-const coins = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
+const coins = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
 const intervals = [
   ['1h', 'H1'],
   ['4h', 'H4'],
