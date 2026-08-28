@@ -108,7 +108,6 @@ function findPivots(candles: Candle[], rs: number[], left = 3, right = 3) {
   return { highs, lows }
 }
 
-/** Regular + hidden (konvergensiya) RSI divergensiyalari */
 function detectRsiDivergences(candles: Candle[], rs: number[]): DivLine[] {
   if (candles.length < 30) return []
   const { highs, lows } = findPivots(candles, rs, 3, 3)
@@ -198,7 +197,6 @@ function CleanChart({
   const tf = tfLong(interval)
   const isSell = result.side === 'SELL'
   const divergences = detectRsiDivergences(candles, rs)
-  const arrowMarker = isSell ? 'url(#hcBearP)' : 'url(#hcBullP)'
 
   const rightBox = (yy: number, text: string, bg: string, w = 100) => (
     <g>
@@ -224,7 +222,7 @@ function CleanChart({
           className="homeChart"
           style={{ width: `${zoom * 100}%`, maxWidth: 'none' }}
           role="img"
-          aria-label={`${coin} ${interval} premium technical analysis`}
+          aria-label={coin + ' ' + interval + ' premium technical analysis'}
         >
           <defs>
             <linearGradient id="hcMainP" x1="0" y1="0" x2="0" y2="1">
@@ -258,10 +256,10 @@ function CleanChart({
             </tspan>
           </text>
           <text x={L} y="70" fill="#ff9f0a" fontSize="12" fontWeight="700">
-            EMA 10 (to'q sariq): {money(result.ema10)}
+            EMA 10 (to&apos;q sariq): {money(result.ema10)}
           </text>
           <text x={L + 260} y="70" fill="#00c7e6" fontSize="12" fontWeight="700">
-            EMA 20 (ko'k): {money(result.ema20)}
+            EMA 20 (ko&apos;k): {money(result.ema20)}
           </text>
           <text x={L + 500} y="70" fill="#4aa8ff" fontSize="12" fontWeight="700">
             EMA 50 (havorang): {money(result.ema50)}
@@ -298,7 +296,7 @@ function CleanChart({
           {divergences.map((d, idx) => {
             const color = divColor(d.kind)
             return (
-              <g key={`px-${idx}`}>
+              <g key={'px-' + idx}>
                 <line
                   x1={x(d.a.i)}
                   y1={y(d.a.price)}
@@ -331,10 +329,10 @@ function CleanChart({
           <text x={labelX + 50} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
             {money(latest)}
           </text>
-          {rightBox(y(result.tp[2]), `TP3  ${money(result.tp[2] || 0)}`, '#148f55')}
-          {rightBox(y(result.tp[1]), `TP2  ${money(result.tp[1] || 0)}`, '#148f55')}
-          {rightBox(y(result.tp[0]), `TP1  ${money(result.tp[0] || 0)}`, '#148f55')}
-          {rightBox(y(result.invalidation), `SL  ${money(result.invalidation)}`, '#c52f3a')}
+          {rightBox(y(result.tp[2]), 'TP3  ' + money(result.tp[2] || 0), '#148f55')}
+          {rightBox(y(result.tp[1]), 'TP2  ' + money(result.tp[1] || 0), '#148f55')}
+          {rightBox(y(result.tp[0]), 'TP1  ' + money(result.tp[0] || 0), '#148f55')}
+          {rightBox(y(result.invalidation), 'SL  ' + money(result.invalidation), '#c52f3a')}
           <line
             x1={arrowStartX}
             y1={y(latest)}
@@ -343,7 +341,7 @@ function CleanChart({
             stroke={isSell ? '#ff4d5a' : '#20d67a'}
             strokeWidth="2.2"
             strokeDasharray="8 5"
-            markerEnd={arrowMarker}
+            markerEnd={isSell ? 'url(#hcBearP)' : 'url(#hcBullP)'}
             opacity=".88"
           />
           <line
@@ -354,7 +352,7 @@ function CleanChart({
             stroke={isSell ? '#ff4d5a' : '#20d67a'}
             strokeWidth="1.9"
             strokeDasharray="8 5"
-            markerEnd={arrowMarker}
+            markerEnd={isSell ? 'url(#hcBearP)' : 'url(#hcBullP)'}
             opacity=".72"
           />
 
@@ -371,7 +369,7 @@ function CleanChart({
           {divergences.map((d, idx) => {
             const color = divColor(d.kind)
             return (
-              <g key={`rsi-${idx}`}>
+              <g key={'rsi-' + idx}>
                 <line
                   x1={x(d.a.i)}
                   y1={ry(d.a.rsi)}
@@ -450,7 +448,7 @@ export default function PremiumAnalyst() {
     setLoading(true)
     setError('')
     try {
-      const r = await fetch(`/api/analyze?symbol=${coin}&interval=${interval}`)
+      const r = await fetch('/api/analyze?symbol=' + coin + '&interval=' + interval)
       const j = await r.json()
       if (!r.ok) throw new Error(j.error || 'Market data xatosi')
       setData(j)
@@ -530,7 +528,7 @@ export default function PremiumAnalyst() {
                 <p className="proSummary">{r.summary}</p>
               </div>
               <div className="proCard">
-                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'`}>
+                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
                   <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
                   <strong>
                     {money$(r.entryLow)} – {money$(r.entryHigh)}
@@ -591,7 +589,7 @@ export default function PremiumAnalyst() {
               </div>
             </div>
             <p className="homeDisclaimer">
-              Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz
+              Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o&apos;zingiz
               tahlil qiling.
             </p>
             <CryptoAnalystAI analysis={r} coin={coin} interval={interval} />
