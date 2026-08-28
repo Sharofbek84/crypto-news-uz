@@ -3,6 +3,7 @@ import { analyze, Candle } from '@/lib/technical'
 import { calculateSignal, SignalInput } from '@/lib/signal-engine'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
+import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTC', ETH: 'ETH', LTC: 'LTC', SOL: 'SOL', BNB: 'BNB', NEAR: 'NEAR', GRAM: 'GRAM', SUI: 'SUI', APT: 'APT', ATOM: 'ATOM', XAUT: 'XAUT', XRP: 'XRP', XLM: 'XLM', TRX: 'TRX', HYPE: 'HYPE', BCH: 'BCH', ZEC: 'ZEC', LINK: 'LINK', AVAX: 'AVAX', ONDO: 'ONDO', WLD: 'WLD',
@@ -61,12 +62,16 @@ function rsiSeries(candles: Candle[], period = 14): number[] {
   let gain = 0
   let loss = 0
   for (let i = 0; i < candles.length; i++) {
-    if (i === 0) { out.push(50); continue }
+    if (i === 0) {
+      out.push(50)
+      continue
+    }
     const d = candles[i].close - candles[i - 1].close
     const g = Math.max(d, 0)
     const l = Math.max(-d, 0)
     if (i <= period) {
-      gain += g; loss += l
+      gain += g
+      loss += l
       out.push(i === period ? (loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) : 50)
     } else {
       gain = (gain * (period - 1) + g) / period
@@ -83,7 +88,6 @@ function higherInterval(interval: string): AllowedInterval | null {
   return null
 }
 
-/** Signal Engine: yangi BUY/SELL holati o‘zgarganda Telegram (Entry/TP/SL = Premium grafik bilan bir xil) */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!candles.length) return
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
@@ -119,13 +123,13 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   const previousSignal = calculateSignal(previous)
   if (!latestSignal || latestSignal.type === previousSignal?.type) return
 
-  // Premium grafikdagi Entry / TP / SL bilan bir xil parametrlar
   const premium = analyze(closedCandles, interval)
+  const timeframe = (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1'
 
   const signal = {
     side: latestSignal.type,
     symbol,
-    timeframe: (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1',
+    timeframe,
     entryLow: premium.entryLow,
     entryHigh: premium.entryHigh,
     tp: [premium.tp[0], premium.tp[1], premium.tp[2]],
@@ -145,6 +149,20 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
 
   try {
     await sendTelegramSignal(signal)
+    await saveTrackedSignal({
+      id: buildSignalId(symbol, interval, latest.time, latestSignal.type),
+      symbol,
+      interval,
+      timeframe,
+      side: latestSignal.type,
+      entryLow: premium.entryLow,
+      entryHigh: premium.entryHigh,
+      tp1: premium.tp[0],
+      tp2: premium.tp[1],
+      tp3: premium.tp[2],
+      sl: premium.invalidation,
+      signalTime: latest.time,
+    })
   } catch (error) {
     await redis.del(redisKey)
     throw error

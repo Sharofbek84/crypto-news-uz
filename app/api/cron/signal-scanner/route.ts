@@ -14,7 +14,6 @@ async function scanOne(baseUrl: string, symbol: string, interval: string, secret
     cache: 'no-store',
     headers: {
       'User-Agent': 'GoldenWeb-Signal-Scanner/1.0',
-      // /api/analyze Telegram yuborishi uchun shu header majburiy
       'x-signal-scanner-secret': secret,
     },
   })
@@ -25,6 +24,23 @@ async function scanOne(baseUrl: string, symbol: string, interval: string, secret
   }
 
   return { symbol, interval, ok: true }
+}
+
+async function runTracker(baseUrl: string, secret: string) {
+  const url = new URL('/api/cron/signal-tracker', baseUrl)
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    cache: 'no-store',
+    headers: {
+      'User-Agent': 'GoldenWeb-Signal-Scanner/1.0',
+      'x-cron-secret': secret,
+    },
+  })
+  if (!response.ok) {
+    const body = await response.text()
+    throw new Error(`tracker: ${response.status} ${body.slice(0, 180)}`)
+  }
+  return response.json()
 }
 
 export async function GET(request: NextRequest) {
@@ -40,7 +56,6 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
-  // request.url to'liq path — origin ishlatish kerak
   const baseUrl = new URL(request.url).origin
   const jobs = COINS.flatMap((symbol) => INTERVALS.map((interval) => ({ symbol, interval })))
   const completed: Array<{ symbol: string; interval: string; ok: boolean }> = []
@@ -63,10 +78,18 @@ export async function GET(request: NextRequest) {
     })
   }
 
+  let tracker: unknown = null
+  try {
+    tracker = await runTracker(baseUrl, expectedSecret!)
+  } catch (e: any) {
+    errors.push(e?.message || 'tracker failed')
+  }
+
   return NextResponse.json({
     ok: errors.length === 0,
     scanned: jobs.length,
     completed: completed.length,
+    tracker,
     errors,
     generatedAt: new Date().toISOString(),
   })
