@@ -40,7 +40,7 @@ export type SignalStats = {
 const OPEN_SET = 'goldenweb:signals:open'
 const ALL_SET = 'goldenweb:signals:all'
 const SIGNAL_PREFIX = 'goldenweb:signal:'
-const MAX_AGE_MS = 60 * 60 * 24 * 21 // 21 kun — ochiq signal muddati
+const MAX_AGE_MS = 10 * 24 * 60 * 60 * 1000 // 10 kun — ochiq signal muddati (ms)
 
 function signalKey(id: string) {
   return `${SIGNAL_PREFIX}${id}`
@@ -182,6 +182,46 @@ export async function closeTrackedSignal(
     await redis.srem(OPEN_SET, signal.id)
   }
   return updated
+}
+
+/** Tracker uchun: ochiq + noto'g'ri expired (hali muddati ichida) signallar */
+export async function getTrackableSignals(): Promise<TrackedSignal[]> {
+  const redis = getRedis()
+  if (!redis) return []
+  const ids = (await redis.smembers(ALL_SET)) || []
+  const now = Date.now()
+  const out: TrackedSignal[] = []
+  for (const id of ids) {
+    const s = await getTrackedSignal(redis, String(id))
+    if (!s) continue
+    if (s.status === 'open') {
+      out.push(s)
+      continue
+    }
+    // Noto'g'ri expired: hali MAX_AGE ichida va TP/SL tegmagan
+    if (s.status === 'expired' && now - s.signalTime <= MAX_AGE_MS) {
+      const reopened: TrackedSignal = {
+        id: s.id,
+        symbol: s.symbol,
+        interval: s.interval,
+        timeframe: s.timeframe,
+        side: s.side,
+        entryLow: s.entryLow,
+        entryHigh: s.entryHigh,
+        tp1: s.tp1,
+        tp2: s.tp2,
+        tp3: s.tp3,
+        sl: s.sl,
+        signalTime: s.signalTime,
+        createdAt: s.createdAt,
+        status: 'open',
+      }
+      await redis.set(signalKey(s.id), JSON.stringify(reopened), { ex: 60 * 60 * 24 * 60 })
+      await redis.sadd(OPEN_SET, s.id)
+      out.push(reopened)
+    }
+  }
+  return out
 }
 
 export async function computeStats(): Promise<SignalStats | null> {
