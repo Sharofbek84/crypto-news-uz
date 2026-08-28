@@ -6,6 +6,8 @@ type TelegramSignal = {
   entryHigh: number
   tp: number[]
   sl: number
+  trend?: string
+  rsi?: number
 }
 
 function formatPrice(value: number): string {
@@ -28,17 +30,24 @@ export async function sendTelegramSignal(signal: TelegramSignal): Promise<void> 
   }
 
   const emoji = signal.side === 'BUY' ? '🟢' : '🔴'
+  const trendLine = signal.trend
+    ? `📊 Trend: ${signal.trend}${typeof signal.rsi === 'number' ? ` · RSI ${signal.rsi.toFixed(1)}` : ''}`
+    : null
+
   const message = [
     `${emoji} ${signal.symbol}/USDT — ${signal.side} SIGNAL`,
     '',
     `⏱ ${signal.timeframe}`,
+    trendLine,
     '',
     `🎯 Entry: ${formatEntry(signal.entryLow, signal.entryHigh)}`,
     `TP1: ${formatPrice(signal.tp[0])}`,
     `TP2: ${formatPrice(signal.tp[1])}`,
     `TP3: ${formatPrice(signal.tp[2])}`,
     `🛑 SL: ${formatPrice(signal.sl)}`,
-  ].join('\n')
+  ]
+    .filter((line) => line !== null)
+    .join('\n')
 
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
