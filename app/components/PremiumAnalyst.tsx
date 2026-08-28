@@ -436,7 +436,7 @@ export default function PremiumAnalyst() {
   const urlSymbol = (searchParams.get('symbol') || '').toUpperCase()
   const initial = coins.includes(urlSymbol) ? urlSymbol : 'BTC'
   const [coin, setCoin] = useState(initial)
-  const [interval, setInterval] = useState('1h')
+  const [interval, setInterval] = useState('4h')
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

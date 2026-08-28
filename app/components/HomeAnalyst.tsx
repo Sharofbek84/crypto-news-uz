@@ -159,7 +159,7 @@ export default function HomeAnalyst(){
   const searchParams=useSearchParams()
   const urlSymbol=(searchParams.get('symbol')||'').toUpperCase()
   const initial=coins.includes(urlSymbol)?urlSymbol:'BTC'
-  const [coin,setCoin]=useState(initial),[interval,setInterval]=useState('1h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
+  const [coin,setCoin]=useState(initial),[interval,setInterval]=useState('4h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
 
   useEffect(()=>{
     if(coins.includes(urlSymbol) && urlSymbol!==coin) setCoin(urlSymbol)
