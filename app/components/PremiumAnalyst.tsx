@@ -108,7 +108,6 @@ function findPivots(candles: Candle[], rs: number[], left = 3, right = 3) {
   return { highs, lows }
 }
 
-/** Regular + hidden (konvergensiya) RSI divergensiyalari */
 function detectRsiDivergences(candles: Candle[], rs: number[]): DivLine[] {
   if (candles.length < 30) return []
   const { highs, lows } = findPivots(candles, rs, 3, 3)
@@ -119,9 +118,7 @@ function detectRsiDivergences(candles: Candle[], rs: number[]): DivLine[] {
     const a = lows[lows.length - 2]
     const b = lows[lows.length - 1]
     if (b.i - a.i >= minGap) {
-      // Bullish divergence: narx pastroq low, RSI yuqoriroq low
       if (b.price < a.price && b.rsi > a.rsi) out.push({ kind: 'bull-div', a, b })
-      // Hidden bullish (konvergensiya): narx yuqoriroq low, RSI pastroq low
       else if (b.price > a.price && b.rsi < a.rsi) out.push({ kind: 'bull-hid', a, b })
     }
   }
@@ -130,9 +127,7 @@ function detectRsiDivergences(candles: Candle[], rs: number[]): DivLine[] {
     const a = highs[highs.length - 2]
     const b = highs[highs.length - 1]
     if (b.i - a.i >= minGap) {
-      // Bearish divergence: narx yuqoriroq high, RSI pastroq high
       if (b.price > a.price && b.rsi < a.rsi) out.push({ kind: 'bear-div', a, b })
-      // Hidden bearish: narx pastroq high, RSI yuqoriroq high
       else if (b.price < a.price && b.rsi > a.rsi) out.push({ kind: 'bear-hid', a, b })
     }
   }
@@ -175,10 +170,8 @@ function CleanChart({
   const RB = 740
   const plotRight = W - R
   const candleRight = L + (plotRight - L) * 0.93
-  const min =
-    Math.min(...candles.map((c) => c.low), result.entryLow, ...result.tp, result.invalidation) * 0.997
-  const max =
-    Math.max(...candles.map((c) => c.high), result.entryHigh, ...result.tp, result.invalidation) * 1.003
+  const min = Math.min(...candles.map((c) => c.low), result.entryLow, ...result.tp, result.invalidation) * 0.997
+  const max = Math.max(...candles.map((c) => c.high), result.entryHigh, ...result.tp, result.invalidation) * 1.003
   const span = Math.max(max - min, 1e-9)
   const n = candles.length
   const visible = Math.max(35, Math.floor(n / zoom))
@@ -191,7 +184,6 @@ function CleanChart({
   const ema50 = emaSeries(candles, 50)
   const divs = detectRsiDivergences(candles, rs)
   const last = candles[candles.length - 1]
-  const lastX = L + Math.max(0, data.length - 1) * xStep
   const bodyW = Math.max(2, Math.min(12, xStep * 0.62))
   const support = result.support || []
   const resistance = result.resistance || []
@@ -265,8 +257,8 @@ function CleanChart({
           const x1 = L + (d.a.i - start) * xStep
           const x2 = L + (d.b.i - start) * xStep
           if (x1 < L || x2 > plotRight) return null
-          const yy1 = d.kind.startsWith('bull') ? y(d.a.price) : y(d.a.price)
-          const yy2 = d.kind.startsWith('bull') ? y(d.b.price) : y(d.b.price)
+          const yy1 = y(d.a.price)
+          const yy2 = y(d.b.price)
           return <g key={`div-${idx}`}><line x1={x1} y1={yy1} x2={x2} y2={yy2} stroke={divColor(d.kind)} strokeWidth="3" /><text x={(x1 + x2) / 2} y={Math.min(yy1, yy2) - 8} fill={divColor(d.kind)} fontSize="12" fontWeight="700">{divLabel(d.kind)}</text></g>
         })}
 
@@ -284,7 +276,7 @@ function CleanChart({
 export default function PremiumAnalyst() {
   const sp = useSearchParams()
   const [coin, setCoin] = useState(sp.get('coin')?.toUpperCase() || 'BTC')
-  const [interval, setInterval] = useState(sp.get('interval') || '1h')
+  const [interval, setInterval] = useState(sp.get('interval') || '4h')
   const [candles, setCandles] = useState<Candle[]>([])
   const [result, setResult] = useState<Result | null>(null)
   const [loading, setLoading] = useState(true)
