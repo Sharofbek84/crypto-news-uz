@@ -175,26 +175,10 @@ function CleanChart({
   const RB = 740
   const plotRight = W - R
   const candleRight = L + (plotRight - L) * 0.93
-  const supports = (result.support || []).filter((v) => Number.isFinite(v))
-  const resistances = (result.resistance || []).filter((v) => Number.isFinite(v))
   const min =
-    Math.min(
-      ...candles.map((c) => c.low),
-      result.entryLow,
-      ...result.tp,
-      result.invalidation,
-      ...supports,
-      ...resistances
-    ) * 0.997
+    Math.min(...candles.map((c) => c.low), result.entryLow, ...result.tp, result.invalidation) * 0.997
   const max =
-    Math.max(
-      ...candles.map((c) => c.high),
-      result.entryHigh,
-      ...result.tp,
-      result.invalidation,
-      ...supports,
-      ...resistances
-    ) * 1.003
+    Math.max(...candles.map((c) => c.high), result.entryHigh, ...result.tp, result.invalidation) * 1.003
   const x = (i: number) => L + (i * (candleRight - L)) / Math.max(1, candles.length - 1)
   const y = (v: number) => MB - ((v - min) / (max - min)) * (MB - T)
   const ry = (v: number) => RB - (Math.max(0, Math.min(100, v)) / 100) * (RB - RT)
@@ -279,52 +263,6 @@ function CleanChart({
           <text x={L + 500} y="70" fill="#4aa8ff" fontSize="12" fontWeight="700">
             EMA 50 (havorang): {money(result.ema50)}
           </text>
-
-          {/* Support chiziqlari — ingichka yashil */}
-          {supports.map((s, i) => {
-            const yy = y(s)
-            if (yy < T || yy > MB) return null
-            return (
-              <g key={`sup-${i}`}>
-                <line
-                  x1={L}
-                  x2={plotRight}
-                  y1={yy}
-                  y2={yy}
-                  stroke="#20d67a"
-                  strokeWidth="1"
-                  strokeDasharray="5 4"
-                  opacity="0.55"
-                />
-                <text x={L + 4} y={yy - 4} fill="#20d67a" fontSize="10" fontWeight="600" opacity="0.75">
-                  S {money(s)}
-                </text>
-              </g>
-            )
-          })}
-
-          {/* Resistance chiziqlari — ingichka qizil */}
-          {resistances.map((r, i) => {
-            const yy = y(r)
-            if (yy < T || yy > MB) return null
-            return (
-              <g key={`res-${i}`}>
-                <line
-                  x1={L}
-                  x2={plotRight}
-                  y1={yy}
-                  y2={yy}
-                  stroke="#ff5360"
-                  strokeWidth="1"
-                  strokeDasharray="5 4"
-                  opacity="0.55"
-                />
-                <text x={L + 4} y={yy - 4} fill="#ff5360" fontSize="10" fontWeight="600" opacity="0.75">
-                  R {money(r)}
-                </text>
-              </g>
-            )
-          })}
 
           {candles.map((c, i) => {
             const up = c.close >= c.open
