@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server'
-import { computeStats, listRecentSignals } from '@/lib/signal-tracker'
+import { computeStats, getTrackableSignals, listRecentSignals } from '@/lib/signal-tracker'
 
 export async function GET() {
+  // Noto'g'ri expired signallarni qayta ochadi (10 kun ichida)
+  try {
+    await getTrackableSignals()
+  } catch {
+    // ignore heal errors — still return whatever is in Redis
+  }
+
   const stats = await computeStats()
   if (!stats) {
     return NextResponse.json({
