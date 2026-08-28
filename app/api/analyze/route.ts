@@ -83,7 +83,7 @@ function higherInterval(interval: string): AllowedInterval | null {
   return null
 }
 
-/** Signal Engine: yangi BUY/SELL holati o‘zgarganda Telegram */
+/** Signal Engine: yangi BUY/SELL holati o‘zgarganda Telegram (Entry/TP/SL = Premium grafik bilan bir xil) */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!candles.length) return
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
@@ -105,21 +105,33 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     }
   }
 
-  const inputs: SignalInput[] = closedCandles.map((c, i) => ({ time: c.time, close: c.close, ema20: ema20[i], ema50: ema50[i], rsi: rsi[i], higherTimeframe }))
+  const inputs: SignalInput[] = closedCandles.map((c, i) => ({
+    time: c.time,
+    close: c.close,
+    ema20: ema20[i],
+    ema50: ema50[i],
+    rsi: rsi[i],
+    higherTimeframe,
+  }))
   const latest = inputs[inputs.length - 1]
   const previous = inputs[inputs.length - 2]
   const latestSignal = calculateSignal(latest)
   const previousSignal = calculateSignal(previous)
   if (!latestSignal || latestSignal.type === previousSignal?.type) return
 
+  // Premium grafikdagi Entry / TP / SL bilan bir xil parametrlar
+  const premium = analyze(closedCandles, interval)
+
   const signal = {
     side: latestSignal.type,
     symbol,
     timeframe: (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1',
-    entryLow: latestSignal.entryLow,
-    entryHigh: latestSignal.entryHigh,
-    tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
-    sl: latestSignal.stopLoss,
+    entryLow: premium.entryLow,
+    entryHigh: premium.entryHigh,
+    tp: [premium.tp[0], premium.tp[1], premium.tp[2]],
+    sl: premium.invalidation,
+    trend: premium.trend,
+    rsi: premium.rsi,
   }
 
   const redis = getRedis()
@@ -131,8 +143,12 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
   if (claimed == null) return
 
-  try { await sendTelegramSignal(signal) }
-  catch (error) { await redis.del(redisKey); throw error }
+  try {
+    await sendTelegramSignal(signal)
+  } catch (error) {
+    await redis.del(redisKey)
+    throw error
+  }
 }
 
 export async function GET(req: NextRequest) {
@@ -140,7 +156,9 @@ export async function GET(req: NextRequest) {
   const raw = (q.get('symbol') || 'BTC').toUpperCase()
   const symbol = raw.replace(/[^A-Z0-9]/g, '')
   const requested = q.get('interval') || '1h'
-  const interval: AllowedInterval = ALLOWED_INTERVALS.includes(requested as AllowedInterval) ? requested as AllowedInterval : '1h'
+  const interval: AllowedInterval = ALLOWED_INTERVALS.includes(requested as AllowedInterval)
+    ? (requested as AllowedInterval)
+    : '1h'
 
   try {
     const { candles, provider } = await fetchMarketData(symbol, interval)
@@ -149,11 +167,24 @@ export async function GET(req: NextRequest) {
     const scannerHeader = req.headers.get('x-signal-scanner-secret')
     const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
     if (isScannerRequest) {
-      try { await notifyTelegramForNewSignal(symbol, interval, candles) }
-      catch (telegramError) { console.error('Telegram signal notification failed:', telegramError) }
+      try {
+        await notifyTelegramForNewSignal(symbol, interval, candles)
+      } catch (telegramError) {
+        console.error('Telegram signal notification failed:', telegramError)
+      }
     }
-    return NextResponse.json({ symbol, interval, provider, candles, result, generatedAt: new Date().toISOString() })
+    return NextResponse.json({
+      symbol,
+      interval,
+      provider,
+      candles,
+      result,
+      generatedAt: new Date().toISOString(),
+    })
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Market data serveriga ulanib bo'lmadi." }, { status: 502 })
+    return NextResponse.json(
+      { error: e?.message || "Market data serveriga ulanib bo'lmadi." },
+      { status: 502 }
+    )
   }
 }
