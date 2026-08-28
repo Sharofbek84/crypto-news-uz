@@ -5,11 +5,11 @@ import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
 
 const ALIASES: Record<string, string> = {
-  BTC: 'BTCUSDT', ETH: 'ETHUSDT', LTC: 'LTCUSDT', SOL: 'SOLUSDT', BNB: 'BNBUSDT', NEAR: 'NEARUSDT', GRAM: 'TONUSDT', SUI: 'SUIUSDT', APT: 'APTUSDT', ATOM: 'ATOMUSDT', XAUT: 'XAUTUSDT', XRP: 'XRPUSDT', XLM: 'XLMUSDT', TRX: 'TRXUSDT', HYPE: 'HYPEUSDT', BCH: 'BCHUSDT', ZEC: 'ZECUSDT', LINK: 'LINKUSDT', AVAX: 'AVAXUSDT', ONDO: 'ONDOUSDT', WLD: 'WLDUSDT',
+  BTC: 'BTCUSDT', ETH: 'ETHUSDT', LTC: 'LTCUSDT', SOL: 'SOLUSDT', BNB: 'BNBUSDT', NEAR: 'NEARUSDT', GRAM: 'GRAMUSDT', SUI: 'SUIUSDT', APT: 'APTUSDT', ATOM: 'ATOMUSDT', XAUT: 'XAUTUSDT', XRP: 'XRPUSDT', XLM: 'XLMUSDT', TRX: 'TRXUSDT', HYPE: 'HYPEUSDT', BCH: 'BCHUSDT', ZEC: 'ZECUSDT', LINK: 'LINKUSDT', AVAX: 'AVAXUSDT', ONDO: 'ONDOUSDT', WLD: 'WLDUSDT',
 }
 
-const COINBASE_PRODUCTS: Record<string, string> = { BTC: 'BTC-USD', ETH: 'ETH-USD', LTC: 'LTC-USD', SOL: 'SOL-USD', BNB: 'BNB-USD', NEAR: 'NEAR-USD', SUI: 'SUI-USD', APT: 'APT-USD', ATOM: 'ATOM-USD', XRP: 'XRP-USD', XLM: 'XLM-USD', BCH: 'BCH-USD', LINK: 'LINK-USD', AVAX: 'AVAX-USD' }
-const KRAKEN_PAIRS: Record<string, string> = { BTC: 'XBTUSD', ETH: 'ETHUSD', LTC: 'LTCUSD', SOL: 'SOLUSD', XRP: 'XRPUSD', XLM: 'XLMUSD', BCH: 'BCHUSD', LINK: 'LINKUSD', AVAX: 'AVAXUSD', ATOM: 'ATOMUSD', NEAR: 'NEARUSD', SUI: 'SUIUSD', APT: 'APTUSD' }
+const COINBASE_PRODUCTS: Record<string, string> = { BTC: 'BTC-USD', ETH: 'ETH-USD', LTC: 'LTC-USD', SOL: 'SOL-USD', BNB: 'BNB-USD', NEAR: 'NEAR-USD', GRAM: 'GRAM-USD', SUI: 'SUI-USD', APT: 'APT-USD', ATOM: 'ATOM-USD', XRP: 'XRP-USD', XLM: 'XLM-USD', BCH: 'BCH-USD', LINK: 'LINK-USD', AVAX: 'AVAX-USD' }
+const KRAKEN_PAIRS: Record<string, string> = { BTC: 'XBTUSD', ETH: 'ETHUSD', LTC: 'LTCUSD', SOL: 'SOLUSD', GRAM: 'GRAMUSD', XRP: 'XRPUSD', XLM: 'XLMUSD', BCH: 'BCHUSD', LINK: 'LINKUSD', AVAX: 'AVAXUSD', ATOM: 'ATOMUSD', NEAR: 'NEARUSD', SUI: 'SUIUSD', APT: 'APTUSD' }
 const ALLOWED_INTERVALS = ['15m', '1h', '4h', '1d']
 
 function intervalConfig(interval: string) {
@@ -34,27 +34,12 @@ async function fetchCoinbase(symbol: string, interval: string): Promise<Candle[]
 async function fetchCoinbase4h(symbol: string): Promise<Candle[]> {
   const hourly = await fetchCoinbase(symbol, '1h')
   const groups = new Map<number, Candle>()
-
   for (const candle of hourly) {
     const bucket = Math.floor(candle.time / (4 * 60 * 60 * 1000)) * (4 * 60 * 60 * 1000)
     const existing = groups.get(bucket)
-    if (!existing) {
-      groups.set(bucket, {
-        time: bucket,
-        open: candle.open,
-        high: candle.high,
-        low: candle.low,
-        close: candle.close,
-        volume: candle.volume,
-      })
-    } else {
-      existing.high = Math.max(existing.high, candle.high)
-      existing.low = Math.min(existing.low, candle.low)
-      existing.close = candle.close
-      existing.volume += candle.volume
-    }
+    if (!existing) groups.set(bucket, { time: bucket, open: candle.open, high: candle.high, low: candle.low, close: candle.close, volume: candle.volume })
+    else { existing.high = Math.max(existing.high, candle.high); existing.low = Math.min(existing.low, candle.low); existing.close = candle.close; existing.volume += candle.volume }
   }
-
   const candles = [...groups.values()].sort((a, b) => a.time - b.time)
   if (candles.length < 60) throw new Error('Coinbase aggregated 4h candles insufficient')
   return candles
@@ -87,25 +72,12 @@ async function fetchBinance(symbol: string, interval: string): Promise<Candle[]>
 async function fetchMarketData(symbol: string, interval: string) {
   const errors: string[] = []
   const providers = interval === '4h'
-    ? [
-        ['Binance', fetchBinance],
-        ['Coinbase Exchange (1h→4h)', fetchCoinbase4h],
-        ['Kraken', fetchKraken],
-      ] as const
-    : [
-        ['Coinbase Exchange', fetchCoinbase],
-        ['Kraken', fetchKraken],
-        ['Binance', fetchBinance],
-      ] as const
-
+    ? [['Binance', fetchBinance], ['Coinbase Exchange (1h→4h)', fetchCoinbase4h], ['Kraken', fetchKraken]] as const
+    : [['Coinbase Exchange', fetchCoinbase], ['Kraken', fetchKraken], ['Binance', fetchBinance]] as const
   for (const [provider, fetcher] of providers) {
-    try {
-      return { candles: await fetcher(symbol, interval), provider }
-    } catch (e: any) {
-      errors.push(`${provider}: ${e?.message || 'error'}`)
-    }
+    try { return { candles: await fetcher(symbol, interval), provider } }
+    catch (e: any) { errors.push(`${provider}: ${e?.message || 'error'}`) }
   }
-
   throw new Error(`Market data topilmadi. ${errors.join(' | ')}`)
 }
 
@@ -117,124 +89,41 @@ function emaSeries(candles: Candle[], period: number): number[] {
 }
 
 function rsiSeries(candles: Candle[], period = 14): number[] {
-  const out: number[] = []
-  let gain = 0
-  let loss = 0
+  const out: number[] = []; let gain = 0; let loss = 0
   for (let i = 0; i < candles.length; i++) {
     if (i === 0) { out.push(50); continue }
-    const d = candles[i].close - candles[i - 1].close
-    const g = Math.max(d, 0)
-    const l = Math.max(-d, 0)
-    if (i <= period) {
-      gain += g; loss += l
-      out.push(i === period ? (loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) : 50)
-    } else {
-      gain = (gain * (period - 1) + g) / period
-      loss = (loss * (period - 1) + l) / period
-      out.push(loss === 0 ? 100 : 100 - 100 / (1 + gain / loss))
-    }
+    const d = candles[i].close - candles[i - 1].close; const g = Math.max(d, 0); const l = Math.max(-d, 0)
+    if (i <= period) { gain += g; loss += l; out.push(i === period ? (loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) : 50) }
+    else { gain = (gain * (period - 1) + g) / period; loss = (loss * (period - 1) + l) / period; out.push(loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) }
   }
   return out
 }
 
-function higherInterval(interval: string): string | null {
-  if (interval === '1h') return '4h'
-  if (interval === '4h') return '1d'
-  return null
-}
+function higherInterval(interval: string): string | null { if (interval === '1h') return '4h'; if (interval === '4h') return '1d'; return null }
 
-/** Signal Engine: yangi BUY/SELL holati o‘zgarganda Telegram */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!candles.length || interval === '15m') return
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
   if (closedCandles.length < 60) return
-
-  const ema20 = emaSeries(closedCandles, 20)
-  const ema50 = emaSeries(closedCandles, 50)
-  const rsi = rsiSeries(closedCandles)
-
+  const ema20 = emaSeries(closedCandles, 20); const ema50 = emaSeries(closedCandles, 50); const rsi = rsiSeries(closedCandles)
   let higherTimeframe: SignalInput['higherTimeframe'] | undefined
   const higher = higherInterval(interval)
-  if (higher) {
-    try {
-      const higherData = await fetchMarketData(symbol, higher)
-      const higherResult = analyze(higherData.candles, higher)
-      higherTimeframe = {
-        ema20: higherResult.ema20,
-        ema50: higherResult.ema50,
-        rsi: higherResult.rsi,
-      }
-    } catch {
-      higherTimeframe = undefined
-    }
-  }
-
-  const inputs: SignalInput[] = closedCandles.map((c, i) => ({
-    time: c.time,
-    close: c.close,
-    ema20: ema20[i],
-    ema50: ema50[i],
-    rsi: rsi[i],
-    higherTimeframe,
-  }))
-
-  const latest = inputs[inputs.length - 1]
-  const previous = inputs[inputs.length - 2]
-  const latestSignal = calculateSignal(latest)
-  const previousSignal = calculateSignal(previous)
-
+  if (higher) { try { const higherData = await fetchMarketData(symbol, higher); const higherResult = analyze(higherData.candles, higher); higherTimeframe = { ema20: higherResult.ema20, ema50: higherResult.ema50, rsi: higherResult.rsi } } catch { higherTimeframe = undefined } }
+  const inputs: SignalInput[] = closedCandles.map((c, i) => ({ time: c.time, close: c.close, ema20: ema20[i], ema50: ema50[i], rsi: rsi[i], higherTimeframe }))
+  const latest = inputs[inputs.length - 1]; const previous = inputs[inputs.length - 2]; const latestSignal = calculateSignal(latest); const previousSignal = calculateSignal(previous)
   if (!latestSignal || latestSignal.type === previousSignal?.type) return
-
-  const signal = {
-    side: latestSignal.type,
-    symbol,
-    timeframe: (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1',
-    entryLow: latestSignal.entryLow,
-    entryHigh: latestSignal.entryHigh,
-    tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3],
-    sl: latestSignal.stopLoss,
-  }
-
-  const redis = getRedis()
-  if (!redis) {
-    console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured')
-    return
-  }
-
+  const signal = { side: latestSignal.type, symbol, timeframe: (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1', entryLow: latestSignal.entryLow, entryHigh: latestSignal.entryHigh, tp: [latestSignal.tp1, latestSignal.tp2, latestSignal.tp3], sl: latestSignal.stopLoss }
+  const redis = getRedis(); if (!redis) { console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured'); return }
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${latest.time}:${latestSignal.type}`
-  const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
-  if (claimed == null) return
-
-  try {
-    await sendTelegramSignal(signal)
-  } catch (error) {
-    await redis.del(redisKey)
-    throw error
-  }
+  const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 }); if (claimed == null) return
+  try { await sendTelegramSignal(signal) } catch (error) { await redis.del(redisKey); throw error }
 }
 
 export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams
-  const raw = (q.get('symbol') || 'BTC').toUpperCase()
-  const symbol = raw.replace(/[^A-Z0-9]/g, '')
-  const requested = q.get('interval') || '1h'
-  const interval = ALLOWED_INTERVALS.includes(requested) ? requested : '1h'
-
+  const q = req.nextUrl.searchParams; const raw = (q.get('symbol') || 'BTC').toUpperCase(); const symbol = raw.replace(/[^A-Z0-9]/g, ''); const requested = q.get('interval') || '1h'; const interval = ALLOWED_INTERVALS.includes(requested) ? requested : '1h'
   try {
-    const { candles, provider } = await fetchMarketData(symbol, interval)
-    const result = analyze(candles, interval)
-    const scannerSecret = process.env.CRON_SECRET
-    const scannerHeader = req.headers.get('x-signal-scanner-secret')
-    const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
-    if (isScannerRequest) {
-      try {
-        await notifyTelegramForNewSignal(symbol, interval, candles)
-      } catch (telegramError) {
-        console.error('Telegram signal notification failed:', telegramError)
-      }
-    }
+    const { candles, provider } = await fetchMarketData(symbol, interval); const result = analyze(candles, interval); const scannerSecret = process.env.CRON_SECRET; const scannerHeader = req.headers.get('x-signal-scanner-secret'); const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
+    if (isScannerRequest) { try { await notifyTelegramForNewSignal(symbol, interval, candles) } catch (telegramError) { console.error('Telegram signal notification failed:', telegramError) } }
     return NextResponse.json({ symbol, interval, provider, candles, result, generatedAt: new Date().toISOString() })
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Market data serveriga ulanib bo'lmadi." }, { status: 502 })
-  }
+  } catch (e: any) { return NextResponse.json({ error: e?.message || "Market data serveriga ulanib bo'lmadi." }, { status: 502 }) }
 }
