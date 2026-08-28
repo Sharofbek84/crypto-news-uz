@@ -364,11 +364,9 @@ function CleanChart({
           </text>
           <polyline points={rs.map((v, i) => `${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2" />
 
-          {/* RSI divergensiya / konvergensiya — RSI paneli */}
+          {/* RSI divergensiya / konvergensiya — RSI paneli (faqat chiziq, yozuvsiz) */}
           {divergences.map((d, idx) => {
             const color = divColor(d.kind)
-            const midX = (x(d.a.i) + x(d.b.i)) / 2
-            const midY = (ry(d.a.rsi) + ry(d.b.rsi)) / 2
             return (
               <g key={`rsi-${idx}`}>
                 <line
@@ -382,10 +380,6 @@ function CleanChart({
                 />
                 <circle cx={x(d.a.i)} cy={ry(d.a.rsi)} r="4.5" fill={color} stroke="#0e1320" strokeWidth="1" />
                 <circle cx={x(d.b.i)} cy={ry(d.b.rsi)} r="4.5" fill={color} stroke="#0e1320" strokeWidth="1" />
-                <rect x={midX - 36} y={midY - 22} width="72" height="18" rx="4" fill={color} opacity="0.92" />
-                <text x={midX} y={midY - 9} textAnchor="middle" fill="#0b0f14" fontSize="11" fontWeight="800">
-                  {divLabel(d.kind)}
-                </text>
               </g>
             )
           })}
