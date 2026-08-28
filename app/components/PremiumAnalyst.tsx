@@ -119,9 +119,7 @@ function detectRsiDivergences(candles: Candle[], rs: number[]): DivLine[] {
     const a = lows[lows.length - 2]
     const b = lows[lows.length - 1]
     if (b.i - a.i >= minGap) {
-      // Bullish divergence: narx pastroq low, RSI yuqoriroq low
       if (b.price < a.price && b.rsi > a.rsi) out.push({ kind: 'bull-div', a, b })
-      // Hidden bullish (konvergensiya): narx yuqoriroq low, RSI pastroq low
       else if (b.price > a.price && b.rsi < a.rsi) out.push({ kind: 'bull-hid', a, b })
     }
   }
@@ -130,9 +128,7 @@ function detectRsiDivergences(candles: Candle[], rs: number[]): DivLine[] {
     const a = highs[highs.length - 2]
     const b = highs[highs.length - 1]
     if (b.i - a.i >= minGap) {
-      // Bearish divergence: narx yuqoriroq high, RSI pastroq high
       if (b.price > a.price && b.rsi < a.rsi) out.push({ kind: 'bear-div', a, b })
-      // Hidden bearish: narx pastroq high, RSI yuqoriroq high
       else if (b.price < a.price && b.rsi > a.rsi) out.push({ kind: 'bear-hid', a, b })
     }
   }
@@ -202,6 +198,7 @@ function CleanChart({
   const tf = tfLong(interval)
   const isSell = result.side === 'SELL'
   const divergences = detectRsiDivergences(candles, rs)
+  const arrowMarker = isSell ? 'url(#hcBearP)' : 'url(#hcBullP)'
 
   const rightBox = (yy: number, text: string, bg: string, w = 100) => (
     <g>
@@ -234,6 +231,12 @@ function CleanChart({
               <stop offset="0" stopColor="#0a1018" />
               <stop offset="1" stopColor="#070b11" />
             </linearGradient>
+            <marker id="hcBullP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0 0L10 5L0 10z" fill="#20d67a" />
+            </marker>
+            <marker id="hcBearP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0 0L10 5L0 10z" fill="#ff4d5a" />
+            </marker>
           </defs>
           <rect width={W} height={H} fill="url(#hcMainP)" />
           <rect x="0" y={RT - 16} width={W} height={RB - RT + 50} fill="#0e1320" />
@@ -292,7 +295,6 @@ function CleanChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
-          {/* RSI divergensiya / konvergensiya — narx paneli */}
           {divergences.map((d, idx) => {
             const color = divColor(d.kind)
             return (
@@ -341,7 +343,8 @@ function CleanChart({
             stroke={isSell ? '#ff4d5a' : '#20d67a'}
             strokeWidth="2.2"
             strokeDasharray="8 5"
-            opacity=".55"
+            markerEnd={arrowMarker}
+            opacity=".88"
           />
           <line
             x1={arrowStartX}
@@ -351,7 +354,8 @@ function CleanChart({
             stroke={isSell ? '#ff4d5a' : '#20d67a'}
             strokeWidth="1.9"
             strokeDasharray="8 5"
-            opacity=".42"
+            markerEnd={arrowMarker}
+            opacity=".72"
           />
 
           <text x={L} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
@@ -364,7 +368,6 @@ function CleanChart({
           </text>
           <polyline points={rs.map((v, i) => `${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2" />
 
-          {/* RSI divergensiya / konvergensiya — RSI paneli (faqat chiziq, yozuvsiz) */}
           {divergences.map((d, idx) => {
             const color = divColor(d.kind)
             return (
@@ -527,7 +530,7 @@ export default function PremiumAnalyst() {
                 <p className="proSummary">{r.summary}</p>
               </div>
               <div className="proCard">
-                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
+                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'`}>
                   <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
                   <strong>
                     {money$(r.entryLow)} – {money$(r.entryHigh)}
