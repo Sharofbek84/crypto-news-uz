@@ -3,8 +3,7 @@ import { getRedis } from '@/lib/redis'
 import {
   closeTrackedSignal,
   evaluateOutcome,
-  getOpenSignalIds,
-  getTrackedSignal,
+  getTrackableSignals,
 } from '@/lib/signal-tracker'
 
 async function fetchGateCandles(symbol: string, interval: string) {
@@ -46,7 +45,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Redis not configured' }, { status: 503 })
   }
 
-  const openIds = await getOpenSignalIds(redis)
+  const trackable = await getTrackableSignals()
   const closed: Array<{ id: string; status: string; symbol: string }> = []
   const errors: string[] = []
   const stillOpen: string[] = []
@@ -54,13 +53,9 @@ export async function GET(request: NextRequest) {
   // Cache candles per symbol+interval
   const candleCache = new Map<string, Array<{ time: number; high: number; low: number; close: number }>>()
 
-  for (const id of openIds) {
+  for (const signal of trackable) {
     try {
-      const signal = await getTrackedSignal(redis, id)
-      if (!signal || signal.status !== 'open') {
-        await redis.srem('goldenweb:signals:open', id)
-        continue
-      }
+      if (signal.status !== 'open') continue
 
       const cacheKey = `${signal.symbol}:${signal.interval}`
       let candles = candleCache.get(cacheKey)
@@ -71,20 +66,20 @@ export async function GET(request: NextRequest) {
 
       const outcome = evaluateOutcome(signal, candles)
       if (!outcome) {
-        stillOpen.push(id)
+        stillOpen.push(signal.id)
         continue
       }
 
       await closeTrackedSignal(redis, signal, outcome.status, outcome.outcomePrice, outcome.outcomeAt)
-      closed.push({ id, status: outcome.status, symbol: signal.symbol })
+      closed.push({ id: signal.id, status: outcome.status, symbol: signal.symbol })
     } catch (e: any) {
-      errors.push(`${id}: ${e?.message || 'error'}`)
+      errors.push(`${signal.id}: ${e?.message || 'error'}`)
     }
   }
 
   return NextResponse.json({
     ok: errors.length === 0,
-    openBefore: openIds.length,
+    openBefore: trackable.length,
     closed: closed.length,
     stillOpen: stillOpen.length,
     results: closed,
