@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
+const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
 const INTERVALS = ['1h', '4h', '1d'] as const
 const CONCURRENCY = 4
 
