@@ -61,7 +61,7 @@ async function fetchBinance(symbol:string,interval:string):Promise<Candle[]>{
 
 async function fetchMarketData(symbol:string,interval:string){
   const errors:string[]=[]
-  const providers = symbol==='GRAM'
+  const providers = symbol==='GRAM' || (symbol==='BNB' && interval==='4h')
     ? [['Gate',fetchGate],['Binance',fetchBinance],['Coinbase Exchange (1h→4h)',fetchCoinbase4h],['Coinbase Exchange',fetchCoinbase],['Kraken',fetchKraken]] as const
     : interval==='4h'
       ? [['Binance',fetchBinance],['Coinbase Exchange (1h→4h)',fetchCoinbase4h],['Kraken',fetchKraken]] as const
