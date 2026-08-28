@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import CryptoAnalystAI from './CryptoAnalystAI'
+import SignalStatsPanel from './SignalStatsPanel'
 
 type Candle = { time: number; open: number; high: number; low: number; close: number; volume: number }
 type Result = {
@@ -528,7 +529,7 @@ export default function PremiumAnalyst() {
                 <p className="proSummary">{r.summary}</p>
               </div>
               <div className="proCard">
-                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
+                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'`}>
                   <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
                   <strong>
                     {money$(r.entryLow)} – {money$(r.entryHigh)}
@@ -596,6 +597,7 @@ export default function PremiumAnalyst() {
           </>
         )
       )}
+      <SignalStatsPanel />
     </section>
   )
 }
