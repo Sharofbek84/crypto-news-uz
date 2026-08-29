@@ -19,7 +19,7 @@ export async function GET() {
     })
   }
 
-  const recent = await listRecentSignals(10)
+  const recent = await listRecentSignals(20)
 
   return NextResponse.json({
     stats: {
