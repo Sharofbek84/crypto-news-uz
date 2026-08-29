@@ -113,12 +113,18 @@ export default function SignalStatsPanel() {
     return null
   }
 
+  const recentCount = recent.length
+
   return (
     <div className="sigStats">
       <div className="sigStatsHead">
         <div>
           <div className="homeKicker">PREMIUM SIGNALLAR STATISTIKASI</div>
-          <h3>Oxirgi 20 ta signal natijasi</h3>
+          <h3>
+            {recentCount > 0
+              ? `Oxirgi ${recentCount} ta signal natijasi`
+              : 'Oxirgi signal natijalari'}
+          </h3>
           <p>Telegramga yuborilgan signallarning TP / SL bo‘yicha kuzatuvi</p>
         </div>
       </div>
@@ -162,42 +168,46 @@ export default function SignalStatsPanel() {
             </div>
           </div>
 
-          <div className="sigTableWrap">
-            <table className="sigTable">
-              <thead>
-                <tr>
-                  <th>Vaqt</th>
-                  <th>Coin</th>
-                  <th>TF</th>
-                  <th>Side</th>
-                  <th>Entry</th>
-                  <th>TP1</th>
-                  <th>SL</th>
-                  <th>Natija</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recent.map((s) => (
-                  <tr key={s.id}>
-                    <td>{formatWhen(s.signalTime)}</td>
-                    <td>
-                      <b>{s.symbol}</b>
-                    </td>
-                    <td>{s.timeframe || s.interval}</td>
-                    <td className={s.side === 'BUY' ? 'good' : 'bad'}>{s.side}</td>
-                    <td>
-                      {money(s.entryLow)}–{money(s.entryHigh)}
-                    </td>
-                    <td>{money(s.tp1)}</td>
-                    <td>{money(s.sl)}</td>
-                    <td>
-                      <span className={'sigBadge ' + statusClass(s.status)}>{statusLabel(s.status)}</span>
-                    </td>
+          {recentCount === 0 ? (
+            <div className="sigStatsEmpty">Hali jadval uchun signal yo‘q.</div>
+          ) : (
+            <div className="sigTableWrap">
+              <table className="sigTable">
+                <thead>
+                  <tr>
+                    <th>Vaqt</th>
+                    <th>Coin</th>
+                    <th>TF</th>
+                    <th>Side</th>
+                    <th>Entry</th>
+                    <th>TP1</th>
+                    <th>SL</th>
+                    <th>Natija</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {recent.map((s) => (
+                    <tr key={s.id}>
+                      <td>{formatWhen(s.signalTime)}</td>
+                      <td>
+                        <b>{s.symbol}</b>
+                      </td>
+                      <td>{s.timeframe || s.interval}</td>
+                      <td className={s.side === 'BUY' ? 'good' : 'bad'}>{s.side}</td>
+                      <td>
+                        {money(s.entryLow)}–{money(s.entryHigh)}
+                      </td>
+                      <td>{money(s.tp1)}</td>
+                      <td>{money(s.sl)}</td>
+                      <td>
+                        <span className={'sigBadge ' + statusClass(s.status)}>{statusLabel(s.status)}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </>
       )}
     </div>
