@@ -118,7 +118,7 @@ export default function SignalStatsPanel() {
       <div className="sigStatsHead">
         <div>
           <div className="homeKicker">PREMIUM SIGNALLAR STATISTIKASI</div>
-          <h3>Oxirgi 10 ta signal natijasi</h3>
+          <h3>Oxirgi 20 ta signal natijasi</h3>
           <p>Telegramga yuborilgan signallarning TP / SL bo‘yicha kuzatuvi</p>
         </div>
       </div>
