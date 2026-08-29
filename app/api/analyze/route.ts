@@ -47,9 +47,33 @@ async function fetchMarketData(symbol: string, interval: string) {
 }
 
 /**
+ * H1 signal uchun H4 filtr: H4 side H1 bilan bir xil bo'lishi shart.
+ * H4 olinmasa yoki side mos kelmasa — signal yuborilmaydi.
+ */
+async function passesHigherTimeframeFilter(
+  symbol: string,
+  interval: string,
+  side: 'BUY' | 'SELL'
+): Promise<boolean> {
+  if (interval !== '1h') return true
+
+  try {
+    const { candles: h4Candles } = await fetchMarketData(symbol, '4h')
+    const h4Closed = h4Candles.length > 1 ? h4Candles.slice(0, -1) : h4Candles
+    if (h4Closed.length < 60) return false
+
+    const h4 = analyze(h4Closed, '4h')
+    return h4.side === side
+  } catch (e) {
+    console.error(`H4 filter failed for ${symbol}:`, e)
+    return false
+  }
+}
+
+/**
  * A variant: Telegram signal = Premium analyze() natijasi.
  * Side, Entry, TP, SL — hammasi bir xil manbadan.
- * Signal faqat yopilgan candle'lar asosida va side o'zgarganda yuboriladi.
+ * H1 uchun qo'shimcha H4 side filtri qo'llaniladi.
  */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!candles.length) return
@@ -66,6 +90,10 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
 
   // Side o'zgarmagan bo'lsa — yangi signal yo'q
   if (current.side === previous.side) return
+
+  // H1 → H4 filtri: katta timeframe side mos kelishi shart
+  const htfOk = await passesHigherTimeframeFilter(symbol, interval, current.side)
+  if (!htfOk) return
 
   const signalTime = closedCandles[closedCandles.length - 1].time
   const timeframe = (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1'
