@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
-import { calculateSignal, SignalInput } from '@/lib/signal-engine'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
 import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
@@ -47,95 +46,40 @@ async function fetchMarketData(symbol: string, interval: string) {
   return { candles: await fetchGate(symbol, interval), provider: 'Gate.io' }
 }
 
-function emaSeries(candles: Candle[], period: number): number[] {
-  const first = candles[0]?.close || 0
-  const k = 2 / (period + 1)
-  let ema = first
-  return candles.map((c, i) => {
-    if (i > 0) ema = c.close * k + ema * (1 - k)
-    return ema
-  })
-}
-
-function rsiSeries(candles: Candle[], period = 14): number[] {
-  const out: number[] = []
-  let gain = 0
-  let loss = 0
-  for (let i = 0; i < candles.length; i++) {
-    if (i === 0) {
-      out.push(50)
-      continue
-    }
-    const d = candles[i].close - candles[i - 1].close
-    const g = Math.max(d, 0)
-    const l = Math.max(-d, 0)
-    if (i <= period) {
-      gain += g
-      loss += l
-      out.push(i === period ? (loss === 0 ? 100 : 100 - 100 / (1 + gain / loss)) : 50)
-    } else {
-      gain = (gain * (period - 1) + g) / period
-      loss = (loss * (period - 1) + l) / period
-      out.push(loss === 0 ? 100 : 100 - 100 / (1 + gain / loss))
-    }
-  }
-  return out
-}
-
-function higherInterval(interval: string): AllowedInterval | null {
-  if (interval === '1h') return '4h'
-  if (interval === '4h') return '1d'
-  return null
-}
-
+/**
+ * A variant: Telegram signal = Premium analyze() natijasi.
+ * Side, Entry, TP, SL — hammasi bir xil manbadan.
+ * Signal faqat yopilgan candle'lar asosida va side o'zgarganda yuboriladi.
+ */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!candles.length) return
+
+  // Joriy (ochiq) candle'ni chiqarib tashlaymiz — faqat yopilgan candle'lar
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
   if (closedCandles.length < 60) return
 
-  const ema20 = emaSeries(closedCandles, 20)
-  const ema50 = emaSeries(closedCandles, 50)
-  const rsi = rsiSeries(closedCandles)
+  const current = analyze(closedCandles, interval)
+  const previousCandles = closedCandles.slice(0, -1)
+  if (previousCandles.length < 60) return
 
-  let higherTimeframe: SignalInput['higherTimeframe'] | undefined
-  const higher = higherInterval(interval)
-  if (higher) {
-    try {
-      const higherData = await fetchMarketData(symbol, higher)
-      const higherResult = analyze(higherData.candles, higher)
-      higherTimeframe = { ema20: higherResult.ema20, ema50: higherResult.ema50, rsi: higherResult.rsi }
-    } catch {
-      higherTimeframe = undefined
-    }
-  }
+  const previous = analyze(previousCandles, interval)
 
-  const inputs: SignalInput[] = closedCandles.map((c, i) => ({
-    time: c.time,
-    close: c.close,
-    ema20: ema20[i],
-    ema50: ema50[i],
-    rsi: rsi[i],
-    higherTimeframe,
-  }))
-  const latest = inputs[inputs.length - 1]
-  const previous = inputs[inputs.length - 2]
-  const latestSignal = calculateSignal(latest)
-  const previousSignal = calculateSignal(previous)
-  if (!latestSignal || latestSignal.type === previousSignal?.type) return
+  // Side o'zgarmagan bo'lsa — yangi signal yo'q
+  if (current.side === previous.side) return
 
-  const premium = analyze(closedCandles, interval)
+  const signalTime = closedCandles[closedCandles.length - 1].time
   const timeframe = (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1'
 
   const signal = {
-    side: latestSignal.type,
+    side: current.side,
     symbol,
     timeframe,
-    entryLow: premium.entryLow,
-    entryHigh: premium.entryHigh,
-    tp: [premium.tp[0], premium.tp[1], premium.tp[2]],
-    sl: premium.invalidation,
-    trend: premium.trend,
-    rsi: premium.rsi,
+    entryLow: current.entryLow,
+    entryHigh: current.entryHigh,
+    tp: [current.tp[0], current.tp[1], current.tp[2]],
+    sl: current.invalidation,
+    trend: current.trend,
+    rsi: current.rsi,
   }
 
   const redis = getRedis()
@@ -143,25 +87,27 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured')
     return
   }
-  const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${latest.time}:${latestSignal.type}`
+
+  // Bir xil signalni qayta yubormaslik uchun dedup kaliti
+  const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${signalTime}:${current.side}`
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
   if (claimed == null) return
 
   try {
     await sendTelegramSignal(signal)
     await saveTrackedSignal({
-      id: buildSignalId(symbol, interval, latest.time, latestSignal.type),
+      id: buildSignalId(symbol, interval, signalTime, current.side),
       symbol,
       interval,
       timeframe,
-      side: latestSignal.type,
-      entryLow: premium.entryLow,
-      entryHigh: premium.entryHigh,
-      tp1: premium.tp[0],
-      tp2: premium.tp[1],
-      tp3: premium.tp[2],
-      sl: premium.invalidation,
-      signalTime: latest.time,
+      side: current.side,
+      entryLow: current.entryLow,
+      entryHigh: current.entryHigh,
+      tp1: current.tp[0],
+      tp2: current.tp[1],
+      tp3: current.tp[2],
+      sl: current.invalidation,
+      signalTime,
     })
   } catch (error) {
     await redis.del(redisKey)
