@@ -141,6 +141,79 @@ function structureParams(interval: string, last: number) {
   return { window, tol, lb }
 }
 
+/** ATR (14) — risk pastki chegarasi uchun */
+function atr(candles: Candle[], period = 14): number {
+  if (candles.length < 2) return 0
+  const trs: number[] = []
+  for (let i = 1; i < candles.length; i++) {
+    const c = candles[i]
+    const p = candles[i - 1]
+    trs.push(Math.max(c.high - c.low, Math.abs(c.high - p.close), Math.abs(c.low - p.close)))
+  }
+  const slice = trs.slice(-period)
+  if (!slice.length) return 0
+  return slice.reduce((a, b) => a + b, 0) / slice.length
+}
+
+/**
+ * TP1/TP2/TP3 — asosan R:R (1R / 2R / 3R).
+ * Yaqin struktura (support/resistance) bo'lsa, unga "snap" qilinadi.
+ * Oraliqlar hech qachon 0.45R dan kichik bo'lmaydi.
+ */
+function buildTakeProfits(
+  last: number,
+  risk: number,
+  direction: 'long' | 'short',
+  structureLevels: number[]
+): [number, number, number] {
+  const r = Math.max(risk, last * 0.002)
+  const mults = [1, 2, 3]
+  const minGap = r * 0.45
+  const snapBand = r * 0.35 // struktura RR targetga shu masofada bo'lsa — snap
+
+  const rrTargets = mults.map((m) =>
+    direction === 'long' ? last + r * m : last - r * m
+  )
+
+  const levels =
+    direction === 'long'
+      ? structureLevels.filter((p) => p > last).sort((a, b) => a - b)
+      : structureLevels.filter((p) => p < last).sort((a, b) => b - a)
+
+  const tps: number[] = []
+  for (let i = 0; i < 3; i++) {
+    let tp = rrTargets[i]
+
+    // Yaqin struktura darajasiga snap
+    for (const lvl of levels) {
+      if (Math.abs(lvl - rrTargets[i]) <= snapBand) {
+        // Oldingi TP dan minGap saqlansin
+        if (tps.length === 0 || Math.abs(lvl - tps[tps.length - 1]) >= minGap) {
+          tp = lvl
+          break
+        }
+      }
+    }
+
+    // Min gap kafolati
+    if (tps.length > 0) {
+      if (direction === 'long') {
+        tp = Math.max(tp, tps[tps.length - 1] + minGap)
+      } else {
+        tp = Math.min(tp, tps[tps.length - 1] - minGap)
+      }
+    } else {
+      // TP1 kamida 0.7R
+      if (direction === 'long') tp = Math.max(tp, last + r * 0.7)
+      else tp = Math.min(tp, last - r * 0.7)
+    }
+
+    tps.push(tp)
+  }
+
+  return [tps[0], tps[1], tps[2]]
+}
+
 /**
  * BUY: SL = oxirgi minimum (recent swing low / window low) TAGIDA
  * Entry zone = current price at top, above SL
@@ -151,31 +224,29 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
-  const swingLows = swings.filter(s => s.type === 'low').sort((a, b) => b.index - a.index)
-  const swingHighs = swings.filter(s => s.type === 'high').sort((a, b) => b.index - a.index)
+  const swingLows = swings.filter((s) => s.type === 'low').sort((a, b) => b.index - a.index)
+  const swingHighs = swings.filter((s) => s.type === 'high').sort((a, b) => b.index - a.index)
 
-  const rawLows = swingLows.map(s => s.price)
-  const rawHighs = swingHighs.map(s => s.price)
-  const windowLow = Math.min(...recent.slice(-lb).map(c => c.low))
-  const windowHigh = Math.max(...recent.slice(-lb).map(c => c.high))
+  const rawLows = swingLows.map((s) => s.price)
+  const rawHighs = swingHighs.map((s) => s.price)
+  const windowLow = Math.min(...recent.slice(-lb).map((c) => c.low))
+  const windowHigh = Math.max(...recent.slice(-lb).map((c) => c.high))
   if (!rawLows.length) rawLows.push(windowLow)
   if (!rawHighs.length) rawHighs.push(windowHigh)
 
-  const supports = clusterLevels(rawLows, tol).filter(p => p < last).sort((a, b) => b - a)
-  const resistances = clusterLevels(rawHighs, tol).filter(p => p > last).sort((a, b) => a - b)
+  const supports = clusterLevels(rawLows, tol).filter((p) => p < last).sort((a, b) => b - a)
+  const resistances = clusterLevels(rawHighs, tol).filter((p) => p > last).sort((a, b) => a - b)
 
-  // Struktura past: narxdan yetarlicha uzoq swing low (eng yaqin, lekin minSl dan uzoq)
-  const farLows = swingLows.filter(s => last - s.price >= minSl * 0.7)
-  const lastSwingMin = swingLows.find(s => s.price < last)?.price
+  const farLows = swingLows.filter((s) => last - s.price >= minSl * 0.7)
+  const lastSwingMin = swingLows.find((s) => s.price < last)?.price
   const structureLow = farLows.length
-    ? Math.max(...farLows.map(s => s.price))
+    ? Math.max(...farLows.map((s) => s.price))
     : Math.min(lastSwingMin ?? windowLow, windowLow, last - minSl)
 
   let invalidation = structureLow - buf
   if (last - invalidation < minSl) invalidation = last - minSl
   if (last - invalidation > maxSl) invalidation = last - maxSl
 
-  // Kirish zonasi narxga yaqin; SL bilan ko'rinadigan bo'shliq qoladi
   const entryHigh = last
   const riskRange = Math.max(last - invalidation, last * 0.004)
   let entryLow = last - riskRange * 0.4
@@ -183,23 +254,12 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(riskRange * 0.3, last * 0.004)
   if (entryLow <= invalidation) entryLow = invalidation + entryGap
 
-  const risk = Math.max(last - invalidation, last * 0.002)
-  let tp1: number, tp2: number, tp3: number
-  if (resistances.length >= 3) {
-    ;[tp1, tp2, tp3] = [resistances[0], resistances[1], resistances[2]]
-  } else if (resistances.length === 2) {
-    ;[tp1, tp2, tp3] = [resistances[0], resistances[1], resistances[1] + risk]
-  } else if (resistances.length === 1) {
-    ;[tp1, tp2, tp3] = [resistances[0], resistances[0] + risk, resistances[0] + risk * 2]
-  } else {
-    ;[tp1, tp2, tp3] = [last + risk * 1.2, last + risk * 2, last + risk * 3]
-  }
-  tp1 = Math.max(tp1, last + risk * 0.5)
-  tp2 = Math.max(tp2, tp1 + risk * 0.4)
-  tp3 = Math.max(tp3, tp2 + risk * 0.4)
+  // Risk = SL masofasi, ATR pastki chegara sifatida
+  const atrVal = atr(recent)
+  const risk = Math.max(last - invalidation, atrVal * 0.8, last * 0.002)
+  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'long', resistances)
 
-  // Nearest supports + eng uzoq (deep) support
-  const fullWindowLow = Math.min(...recent.map(c => c.low))
+  const fullWindowLow = Math.min(...recent.map((c) => c.low))
   const deepLevel = supports.length
     ? Math.min(supports[supports.length - 1], fullWindowLow)
     : fullWindowLow
@@ -210,7 +270,6 @@ function longLevels(candles: Candle[], last: number, interval: string) {
       supportArr.push(s)
     }
   }
-  // Always append deepest support if meaningfully lower
   if (deepLevel < last && (!supportArr.length || deepLevel < Math.min(...supportArr) - last * 0.002)) {
     supportArr.push(deepLevel)
   }
@@ -239,24 +298,23 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
-  const swingLows = swings.filter(s => s.type === 'low').sort((a, b) => b.index - a.index)
-  const swingHighs = swings.filter(s => s.type === 'high').sort((a, b) => b.index - a.index)
+  const swingLows = swings.filter((s) => s.type === 'low').sort((a, b) => b.index - a.index)
+  const swingHighs = swings.filter((s) => s.type === 'high').sort((a, b) => b.index - a.index)
 
-  const rawLows = swingLows.map(s => s.price)
-  const rawHighs = swingHighs.map(s => s.price)
-  const windowLow = Math.min(...recent.slice(-lb).map(c => c.low))
-  const windowHigh = Math.max(...recent.slice(-lb).map(c => c.high))
+  const rawLows = swingLows.map((s) => s.price)
+  const rawHighs = swingHighs.map((s) => s.price)
+  const windowLow = Math.min(...recent.slice(-lb).map((c) => c.low))
+  const windowHigh = Math.max(...recent.slice(-lb).map((c) => c.high))
   if (!rawLows.length) rawLows.push(windowLow)
   if (!rawHighs.length) rawHighs.push(windowHigh)
 
-  const supports = clusterLevels(rawLows, tol).filter(p => p < last).sort((a, b) => b - a)
-  const resistances = clusterLevels(rawHighs, tol).filter(p => p > last).sort((a, b) => a - b)
+  const supports = clusterLevels(rawLows, tol).filter((p) => p < last).sort((a, b) => b - a)
+  const resistances = clusterLevels(rawHighs, tol).filter((p) => p > last).sort((a, b) => a - b)
 
-  // Struktura yuqori: narxdan yetarlicha uzoq swing high
-  const farHighs = swingHighs.filter(s => s.price - last >= minSl * 0.7)
-  const lastSwingMax = swingHighs.find(s => s.price > last)?.price
+  const farHighs = swingHighs.filter((s) => s.price - last >= minSl * 0.7)
+  const lastSwingMax = swingHighs.find((s) => s.price > last)?.price
   const structureHigh = farHighs.length
-    ? Math.min(...farHighs.map(s => s.price))
+    ? Math.min(...farHighs.map((s) => s.price))
     : Math.max(lastSwingMax ?? windowHigh, windowHigh, last + minSl)
 
   let invalidation = structureHigh + buf
@@ -270,20 +328,9 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   if (entryHigh <= entryLow) entryHigh = entryLow + Math.min(riskRange * 0.3, last * 0.004)
   if (entryHigh >= invalidation) entryHigh = invalidation - entryGap
 
-  const risk = Math.max(invalidation - last, last * 0.002)
-  let tp1: number, tp2: number, tp3: number
-  if (supports.length >= 3) {
-    ;[tp1, tp2, tp3] = [supports[0], supports[1], supports[2]]
-  } else if (supports.length === 2) {
-    ;[tp1, tp2, tp3] = [supports[0], supports[1], supports[1] - risk]
-  } else if (supports.length === 1) {
-    ;[tp1, tp2, tp3] = [supports[0], supports[0] - risk, supports[0] - risk * 2]
-  } else {
-    ;[tp1, tp2, tp3] = [last - risk * 1.2, last - risk * 2, last - risk * 3]
-  }
-  tp1 = Math.min(tp1, last - risk * 0.5)
-  tp2 = Math.min(tp2, tp1 - risk * 0.4)
-  tp3 = Math.min(tp3, tp2 - risk * 0.4)
+  const atrVal = atr(recent)
+  const risk = Math.max(invalidation - last, atrVal * 0.8, last * 0.002)
+  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'short', supports)
 
   const supportArr = supports.slice(0, 3)
   const resistanceArr = resistances.slice(0, 3)
@@ -301,7 +348,7 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
 }
 
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
-  const closes = candles.map(c => c.close)
+  const closes = candles.map((c) => c.close)
   const last = closes.at(-1) ?? 0
   const e10 = ema(closes, 10)
   const e20 = ema(closes, 20)
@@ -321,7 +368,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const sr = side === 'SELL' ? shortLevels(candles, last, interval) : longLevels(candles, last, interval)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
-  // Bearish senariy: eng uzoq (eng past) support
   const deepSupport = support.length
     ? Math.min(...support)
     : side === 'SELL'
