@@ -1,30 +1,14 @@
 import Link from 'next/link'
 import SiteHeader from '../components/SiteHeader'
-import newsData from '../../data/news.json'
+import { getRecentNews } from '@/lib/news'
 
 export const metadata = {
   title: 'So‘nggi Yangiliklar | GOLDENWEB.UZ',
   description: 'Kriptovalyuta bozori haqida o‘zbek tilidagi so‘nggi yangiliklar va tahlillar.',
 }
 
-type NewsItem = {
-  slug: string
-  title: string
-  summary?: string
-  body?: string
-  url?: string
-  source?: string
-  date?: string
-}
-
-const MAX_NEWS = 10
-
 export default function YangiliklarPage() {
-  const all = (Array.isArray(newsData) ? newsData : []) as NewsItem[]
-  // Oxirgi 10 ta: sana bo‘yicha yangidan eski ga, keyin limit
-  const news = [...all]
-    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.slug).localeCompare(String(a.slug)))
-    .slice(0, MAX_NEWS)
+  const news = getRecentNews()
 
   return (
     <>
@@ -38,21 +22,25 @@ export default function YangiliklarPage() {
         </div>
 
         <div className="newsList">
-          {news.map((item) => (
-            <article key={item.slug} className="newsCard">
-              <div className="newsCardMeta">
-                <span>{item.source || 'GOLDENWEB.UZ'}</span>
-                {item.date ? <span>• {item.date}</span> : null}
-              </div>
-              <h2>
-                <Link href={`/yangiliklar/${item.slug}`}>{item.title}</Link>
-              </h2>
-              {item.summary ? <p className="newsCardSummary">{item.summary}</p> : null}
-              <Link href={`/yangiliklar/${item.slug}`} className="newsReadMore">
-                Batafsil o‘qish →
-              </Link>
-            </article>
-          ))}
+          {news.length === 0 ? (
+            <p style={{ color: '#8b98a6' }}>Hozircha ko‘rsatish uchun yangilik yo‘q.</p>
+          ) : (
+            news.map((item) => (
+              <article key={item.slug} className="newsCard">
+                <div className="newsCardMeta">
+                  <span>{item.source || 'GOLDENWEB.UZ'}</span>
+                  {item.date ? <span>• {item.date}</span> : null}
+                </div>
+                <h2>
+                  <Link href={`/yangiliklar/${item.slug}`}>{item.title}</Link>
+                </h2>
+                {item.summary ? <p className="newsCardSummary">{item.summary}</p> : null}
+                <Link href={`/yangiliklar/${item.slug}`} className="newsReadMore">
+                  Batafsil o‘qish →
+                </Link>
+              </article>
+            ))
+          )}
         </div>
       </main>
 

@@ -1,26 +1,14 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import SiteHeader from '../../components/SiteHeader'
-import newsData from '../../../data/news.json'
-
-type NewsItem = {
-  slug: string
-  title: string
-  summary?: string
-  body?: string
-  url?: string
-  source?: string
-  date?: string
-}
-
-const news = (Array.isArray(newsData) ? newsData : []) as NewsItem[]
+import { getNewsBySlug, getRecentNews } from '@/lib/news'
 
 export function generateStaticParams() {
-  return news.map((item) => ({ slug: item.slug }))
+  return getRecentNews().map((item) => ({ slug: item.slug }))
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
-  const item = news.find((n) => n.slug === params.slug)
+  const item = getNewsBySlug(params.slug)
   if (!item) return { title: 'Yangilik topilmadi | GOLDENWEB.UZ' }
   return {
     title: `${item.title} | GOLDENWEB.UZ`,
@@ -29,7 +17,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 }
 
 export default function YangilikDetailPage({ params }: { params: { slug: string } }) {
-  const item = news.find((n) => n.slug === params.slug)
+  const item = getNewsBySlug(params.slug)
   if (!item) notFound()
 
   const paragraphs = (item.body || item.summary || '').split('\n\n').filter(Boolean)

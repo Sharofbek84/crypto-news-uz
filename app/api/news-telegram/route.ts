@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import newsData from '../../../data/news.json'
-import { claimDailyNews, markDailyNewsSent, releaseDailyNewsClaim } from '../../../lib/news-dedup'
-import { sendTelegramNews } from '../../../lib/telegram-news'
+import { getRecentNews } from '@/lib/news'
+import { claimDailyNews, markDailyNewsSent, releaseDailyNewsClaim } from '@/lib/news-dedup'
+import { sendTelegramNews } from '@/lib/telegram-news'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,20 +12,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  const news = (Array.isArray(newsData) ? newsData : []) as Array<{
-    slug: string; title: string; summary?: string; url?: string; source?: string; date?: string
-  }>
+  const news = getRecentNews().filter((item) => item.slug && item.title)
+  if (!news.length) return NextResponse.json({ ok: true, sent: false, reason: 'No news' })
 
-  const validNews = news.filter(item => item.slug && item.title)
-  if (!validNews.length) return NextResponse.json({ ok: true, sent: false, reason: 'No news' })
-
-  const latestDate = validNews.reduce((latest, item) => {
+  const latestDate = news.reduce((latest, item) => {
     const date = String(item.date || '')
     return date > latest ? date : latest
   }, '')
 
-  const latestNews = validNews
-    .filter(item => String(item.date || '') === latestDate)
+  const latestNews = news
+    .filter((item) => String(item.date || '') === latestDate)
     .sort((a, b) => String(b.slug).localeCompare(String(a.slug)))
 
   const digestDate = new Date().toISOString().slice(0, 10)

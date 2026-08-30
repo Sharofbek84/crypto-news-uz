@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import HomeAnalyst from './components/HomeAnalyst'
 import SiteHeader from './components/SiteHeader'
-import newsData from '../data/news.json'
+import { getRecentNews } from '@/lib/news'
 
 /** Tartib: BTC, ETH, LTC, SOL, BNB, NEAR, GRAM, SUI, APT, ATOM */
 const TOP_COINS: { symbol: string; geckoId: string }[] = [
@@ -18,11 +18,9 @@ const TOP_COINS: { symbol: string; geckoId: string }[] = [
   { symbol: 'ATOM', geckoId: 'cosmos' },
 ]
 
-const MAX_NEWS = 10
-
 async function getPrices() {
   try {
-    const ids = TOP_COINS.map(c => c.geckoId).join(',')
+    const ids = TOP_COINS.map((c) => c.geckoId).join(',')
     const res = await fetch(
       `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
       { next: { revalidate: 60 }, headers: { Accept: 'application/json' } }
@@ -33,7 +31,15 @@ async function getPrices() {
     const byId = new Map(data.map((c: any) => [c.id, c]))
     return TOP_COINS.map(({ symbol, geckoId }) => {
       const c = byId.get(geckoId)
-      if (!c) return { id: geckoId, symbol, name: symbol, image: '', current_price: null, price_change_percentage_24h: null }
+      if (!c)
+        return {
+          id: geckoId,
+          symbol,
+          name: symbol,
+          image: '',
+          current_price: null,
+          price_change_percentage_24h: null,
+        }
       return { ...c, symbol }
     })
   } catch {
@@ -50,10 +56,7 @@ function fmt(p: number) {
 
 export default async function Home() {
   const prices = await getPrices()
-  const allNews = Array.isArray(newsData) ? newsData : []
-  const news = [...allNews]
-    .sort((a: any, b: any) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.slug || '').localeCompare(String(a.slug || '')))
-    .slice(0, MAX_NEWS)
+  const news = getRecentNews()
 
   return (
     <>
@@ -100,16 +103,18 @@ export default async function Home() {
         )}
 
         <div className="sectionRow">
-          <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>So‘nggi Yangiliklar</h2>
-          <Link href="/yangiliklar" className="sectionMore">Barchasi →</Link>
+          <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
+            So‘nggi Yangiliklar
+          </h2>
+          <Link href="/yangiliklar" className="sectionMore">
+            Barchasi →
+          </Link>
         </div>
         <div className="news">
-          {news.map((item: any) => (
+          {news.map((item) => (
             <article key={item.slug || item.title} className="item">
               <h3>
-                <Link href={item.slug ? `/yangiliklar/${item.slug}` : '/yangiliklar'}>
-                  {item.title}
-                </Link>
+                <Link href={item.slug ? `/yangiliklar/${item.slug}` : '/yangiliklar'}>{item.title}</Link>
               </h3>
               <div className="meta">
                 {item.source || 'GOLDENWEB.UZ'}
