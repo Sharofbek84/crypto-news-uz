@@ -63,6 +63,7 @@ function fmt(n: number) {
 }
 
 function tfLabel(interval?: string) {
+  if (interval === '1w') return 'W1'
   if (interval === '1d') return 'D1'
   if (interval === '4h') return 'H4'
   if (interval === '15m') return 'M15'
@@ -70,6 +71,7 @@ function tfLabel(interval?: string) {
 }
 
 function tfLookback(interval: string) {
+  if (interval === '1w') return 26
   if (interval === '1d') return 20
   if (interval === '4h') return 16
   if (interval === '15m') return 12
@@ -82,13 +84,13 @@ function tfLookback(interval: string) {
  */
 function slParams(interval: string, last: number, wider = false) {
   let minPct =
-    interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.012 : 0.018
+    interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.012 : interval === '1w' ? 0.025 : 0.018
   let gapPct =
-    interval === '15m' ? 0.003 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.006 : 0.009
+    interval === '15m' ? 0.003 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.006 : interval === '1w' ? 0.012 : 0.009
   let bufPct =
-    interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.0035 : 0.005
+    interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.0035 : interval === '1w' ? 0.007 : 0.005
   const maxPct =
-    interval === '15m' ? 0.025 : interval === '1h' ? 0.04 : interval === '4h' ? 0.055 : 0.08
+    interval === '15m' ? 0.025 : interval === '1h' ? 0.04 : interval === '4h' ? 0.055 : interval === '1w' ? 0.12 : 0.08
 
   // Neytral H1: choppy bozor — SL kirishdan biroz uzoqroq
   if (wider && interval === '1h') {
@@ -144,10 +146,10 @@ function clusterLevels(prices: number[], tolerance: number) {
 
 function structureParams(interval: string, last: number) {
   const window =
-    interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 80 : 60
+    interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 80 : 60
   const tol =
     last *
-    (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.005)
+    (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.008 : 0.005)
   const lb = tfLookback(interval)
   return { window, tol, lb }
 }
