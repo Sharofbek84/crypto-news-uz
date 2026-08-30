@@ -8,10 +8,13 @@ const ALIASES: Record<string, string> = {
   BTC: 'BTC', ETH: 'ETH', LTC: 'LTC', SOL: 'SOL', BNB: 'BNB', NEAR: 'NEAR', GRAM: 'GRAM', SUI: 'SUI', APT: 'APT', ATOM: 'ATOM', XAUT: 'XAUT', XRP: 'XRP', XLM: 'XLM', TRX: 'TRX', HYPE: 'HYPE', BCH: 'BCH', ZEC: 'ZEC', LINK: 'LINK', AVAX: 'AVAX', ONDO: 'ONDO', WLD: 'WLD',
 }
 
-const ALLOWED_INTERVALS = ['1h', '4h', '1d'] as const
+/** Grafik uchun: H1/H4/D1/W1. Telegram signallar faqat H1/H4/D1. */
+const ALLOWED_INTERVALS = ['1h', '4h', '1d', '1w'] as const
 type AllowedInterval = (typeof ALLOWED_INTERVALS)[number]
+const TELEGRAM_INTERVALS = new Set(['1h', '4h', '1d'])
 
 function intervalConfig(interval: string) {
+  if (interval === '1w') return '7d'
   if (interval === '1d') return '1d'
   if (interval === '4h') return '4h'
   return '1h'
@@ -21,14 +24,16 @@ async function fetchGate(symbol: string, interval: string): Promise<Candle[]> {
   const base = ALIASES[symbol] || symbol
   const pair = `${base}_USDT`
   const gateInterval = intervalConfig(interval)
-  const url = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${encodeURIComponent(pair)}&interval=${gateInterval}&limit=150`
+  const limit = interval === '1w' ? 100 : 150
+  const minCandles = interval === '1w' ? 40 : 60
+  const url = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${encodeURIComponent(pair)}&interval=${gateInterval}&limit=${limit}`
   const res = await fetch(url, {
     cache: 'no-store',
     headers: { Accept: 'application/json', 'User-Agent': 'Crypto-AI-Analyst/1.0' },
   })
   if (!res.ok) throw new Error(`Gate ${res.status}`)
   const data = await res.json()
-  if (!Array.isArray(data) || data.length < 60) throw new Error('Gate insufficient candles')
+  if (!Array.isArray(data) || data.length < minCandles) throw new Error('Gate insufficient candles')
 
   return data
     .map((k: string[]) => ({
@@ -48,7 +53,6 @@ async function fetchMarketData(symbol: string, interval: string) {
 
 /**
  * H1 signal uchun H4 filtr: H4 side H1 bilan bir xil bo'lishi shart.
- * H4 olinmasa yoki side mos kelmasa — signal yuborilmaydi.
  */
 async function passesHigherTimeframeFilter(
   symbol: string,
@@ -71,14 +75,14 @@ async function passesHigherTimeframeFilter(
 }
 
 /**
- * A variant: Telegram signal = Premium analyze() natijasi.
- * Side, Entry, TP, SL — hammasi bir xil manbadan.
- * H1 uchun qo'shimcha H4 side filtri qo'llaniladi.
+ * Telegram signal = Premium analyze() natijasi.
+ * W1 (haftalik) — faqat grafik, Telegramga yuborilmaydi.
  */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
+  // W1 va boshqa non-signal TF lar uchun Telegram yo'q
+  if (!TELEGRAM_INTERVALS.has(interval)) return
   if (!candles.length) return
 
-  // Joriy (ochiq) candle'ni chiqarib tashlaymiz — faqat yopilgan candle'lar
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
   if (closedCandles.length < 60) return
 
@@ -88,10 +92,8 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
 
   const previous = analyze(previousCandles, interval)
 
-  // Side o'zgarmagan bo'lsa — yangi signal yo'q
   if (current.side === previous.side) return
 
-  // H1 → H4 filtri: katta timeframe side mos kelishi shart
   const htfOk = await passesHigherTimeframeFilter(symbol, interval, current.side)
   if (!htfOk) return
 
@@ -116,7 +118,6 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     return
   }
 
-  // Bir xil signalni qayta yubormaslik uchun dedup kaliti
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${signalTime}:${current.side}`
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
   if (claimed == null) return
@@ -158,7 +159,8 @@ export async function GET(req: NextRequest) {
     const scannerSecret = process.env.CRON_SECRET
     const scannerHeader = req.headers.get('x-signal-scanner-secret')
     const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
-    if (isScannerRequest) {
+    // Scanner faqat H1/H4/D1 chaqiradi; W1 hech qachon Telegramga ketmaydi
+    if (isScannerRequest && TELEGRAM_INTERVALS.has(interval)) {
       try {
         await notifyTelegramForNewSignal(symbol, interval, candles)
       } catch (telegramError) {
