@@ -18,6 +18,8 @@ const TOP_COINS: { symbol: string; geckoId: string }[] = [
   { symbol: 'ATOM', geckoId: 'cosmos' },
 ]
 
+const MAX_NEWS = 10
+
 async function getPrices() {
   try {
     const ids = TOP_COINS.map(c => c.geckoId).join(',')
@@ -48,7 +50,10 @@ function fmt(p: number) {
 
 export default async function Home() {
   const prices = await getPrices()
-  const news = Array.isArray(newsData) ? newsData : []
+  const allNews = Array.isArray(newsData) ? newsData : []
+  const news = [...allNews]
+    .sort((a: any, b: any) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.slug || '').localeCompare(String(a.slug || '')))
+    .slice(0, MAX_NEWS)
 
   return (
     <>
