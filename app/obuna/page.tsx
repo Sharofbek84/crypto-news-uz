@@ -39,6 +39,54 @@ export default function ObunaPage() {
               </button>
             </div>
 
+            <div className="planCard">
+              <div className="planBadge" style={{ background: '#4aa8ff', color: '#0b0f14' }}>
+                $9/oy
+              </div>
+              <div className="planName">Signal Pro</div>
+              <div className="planPrice">
+                $9<span>/oy</span>
+              </div>
+              <ul>
+                <li>Telegram kanal orqali kunlik signallar</li>
+                <li>Kripto yangiliklari</li>
+                <li>Asosiy texnik tahlil</li>
+              </ul>
+              {status === 'loading' ? (
+                <button className="planBtn" disabled>
+                  ...
+                </button>
+              ) : session ? (
+                <Link
+                  href="/kabinet"
+                  className="planBtn"
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    background: '#4aa8ff',
+                    color: '#0b0f14',
+                  }}
+                >
+                  Kabinetda obuna bo‘lish
+                </Link>
+              ) : (
+                <Link
+                  href="/sign-up"
+                  className="planBtn"
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    background: '#4aa8ff',
+                    color: '#0b0f14',
+                  }}
+                >
+                  Avval ro‘yxatdan o‘ting
+                </Link>
+              )}
+            </div>
+
             <div className="planCard featured">
               <div className="planBadge">$19/oy</div>
               <div className="planName">Premium</div>
