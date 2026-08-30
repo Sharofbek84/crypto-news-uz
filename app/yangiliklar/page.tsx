@@ -17,8 +17,14 @@ type NewsItem = {
   date?: string
 }
 
+const MAX_NEWS = 10
+
 export default function YangiliklarPage() {
-  const news = (Array.isArray(newsData) ? newsData : []) as NewsItem[]
+  const all = (Array.isArray(newsData) ? newsData : []) as NewsItem[]
+  // Oxirgi 10 ta: sana bo‘yicha yangidan eski ga, keyin limit
+  const news = [...all]
+    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.slug).localeCompare(String(a.slug)))
+    .slice(0, MAX_NEWS)
 
   return (
     <>
