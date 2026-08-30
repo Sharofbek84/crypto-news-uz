@@ -24,7 +24,8 @@ async function fetchGate(symbol: string, interval: string): Promise<Candle[]> {
   const base = ALIASES[symbol] || symbol
   const pair = `${base}_USDT`
   const gateInterval = intervalConfig(interval)
-  const limit = interval === '1w' ? 100 : 150
+  // Barcha TF lar uchun bir xil sham soni — grafik zichligi teng bo'lsin
+  const limit = 150
   const minCandles = interval === '1w' ? 40 : 60
   const url = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${encodeURIComponent(pair)}&interval=${gateInterval}&limit=${limit}`
   const res = await fetch(url, {
