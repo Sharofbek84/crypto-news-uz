@@ -113,18 +113,12 @@ export default function SignalStatsPanel() {
     return null
   }
 
-  const recentCount = recent.length
-
   return (
     <div className="sigStats">
       <div className="sigStatsHead">
         <div>
           <div className="homeKicker">PREMIUM SIGNALLAR STATISTIKASI</div>
-          <h3>
-            {recentCount > 0
-              ? `Oxirgi ${recentCount} ta signal natijasi`
-              : 'Oxirgi signal natijalari'}
-          </h3>
+          <h3>Oxirgi 20 ta signal natijasi</h3>
           <p>Telegramga yuborilgan signallarning TP / SL bo‘yicha kuzatuvi</p>
         </div>
       </div>
@@ -168,7 +162,7 @@ export default function SignalStatsPanel() {
             </div>
           </div>
 
-          {recentCount === 0 ? (
+          {recent.length === 0 ? (
             <div className="sigStatsEmpty">Hali jadval uchun signal yo‘q.</div>
           ) : (
             <div className="sigTableWrap">
