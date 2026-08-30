@@ -76,16 +76,27 @@ function tfLookback(interval: string) {
   return 14
 }
 
-/** SL masofa: narxdan minimal uzoqlik, kirish zonasi bilan bo'shliq, swing buffer */
-function slParams(interval: string, last: number) {
-  const minPct =
+/**
+ * SL masofa parametrlari.
+ * wider=true (H1 + NEUTRAL): min SL va entry–SL bo'shlig'i kengaytiriladi.
+ */
+function slParams(interval: string, last: number, wider = false) {
+  let minPct =
     interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.012 : 0.018
-  const gapPct =
+  let gapPct =
     interval === '15m' ? 0.003 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.006 : 0.009
-  const bufPct =
+  let bufPct =
     interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.0035 : 0.005
   const maxPct =
     interval === '15m' ? 0.025 : interval === '1h' ? 0.04 : interval === '4h' ? 0.055 : 0.08
+
+  // Neytral H1: choppy bozor — SL kirishdan biroz uzoqroq
+  if (wider && interval === '1h') {
+    minPct *= 1.5 // 0.8% → 1.2%
+    gapPct *= 1.4 // entry–SL bo'shliq
+    bufPct *= 1.4
+  }
+
   return {
     minSl: last * minPct,
     entryGap: last * gapPct,
@@ -169,7 +180,7 @@ function buildTakeProfits(
   const r = Math.max(risk, last * 0.002)
   const mults = [1, 2, 3]
   const minGap = r * 0.45
-  const snapBand = r * 0.35 // struktura RR targetga shu masofada bo'lsa — snap
+  const snapBand = r * 0.35
 
   const rrTargets = mults.map((m) =>
     direction === 'long' ? last + r * m : last - r * m
@@ -184,10 +195,8 @@ function buildTakeProfits(
   for (let i = 0; i < 3; i++) {
     let tp = rrTargets[i]
 
-    // Yaqin struktura darajasiga snap
     for (const lvl of levels) {
       if (Math.abs(lvl - rrTargets[i]) <= snapBand) {
-        // Oldingi TP dan minGap saqlansin
         if (tps.length === 0 || Math.abs(lvl - tps[tps.length - 1]) >= minGap) {
           tp = lvl
           break
@@ -195,7 +204,6 @@ function buildTakeProfits(
       }
     }
 
-    // Min gap kafolati
     if (tps.length > 0) {
       if (direction === 'long') {
         tp = Math.max(tp, tps[tps.length - 1] + minGap)
@@ -203,7 +211,6 @@ function buildTakeProfits(
         tp = Math.min(tp, tps[tps.length - 1] - minGap)
       }
     } else {
-      // TP1 kamida 0.7R
       if (direction === 'long') tp = Math.max(tp, last + r * 0.7)
       else tp = Math.min(tp, last - r * 0.7)
     }
@@ -215,12 +222,12 @@ function buildTakeProfits(
 }
 
 /**
- * BUY: SL = oxirgi minimum (recent swing low / window low) TAGIDA
+ * BUY: SL = oxirgi minimum TAGIDA
  * Entry zone = current price at top, above SL
  */
-function longLevels(candles: Candle[], last: number, interval: string) {
+function longLevels(candles: Candle[], last: number, interval: string, widerSl = false) {
   const { window, tol, lb } = structureParams(interval, last)
-  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
+  const { minSl, entryGap, buf, maxSl } = slParams(interval, last, widerSl)
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
@@ -254,7 +261,6 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(riskRange * 0.3, last * 0.004)
   if (entryLow <= invalidation) entryLow = invalidation + entryGap
 
-  // Risk = SL masofasi, ATR pastki chegara sifatida
   const atrVal = atr(recent)
   const risk = Math.max(last - invalidation, atrVal * 0.8, last * 0.002)
   const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'long', resistances)
@@ -289,12 +295,12 @@ function longLevels(candles: Candle[], last: number, interval: string) {
 }
 
 /**
- * SELL: SL = oxirgi maksimum (recent swing high / window high) USTIDA
+ * SELL: SL = oxirgi maksimum USTIDA
  * Entry zone = current price at bottom, below SL
  */
-function shortLevels(candles: Candle[], last: number, interval: string) {
+function shortLevels(candles: Candle[], last: number, interval: string, widerSl = false) {
   const { window, tol, lb } = structureParams(interval, last)
-  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
+  const { minSl, entryGap, buf, maxSl } = slParams(interval, last, widerSl)
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
@@ -365,7 +371,12 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
   const side: 'BUY' | 'SELL' = trend === 'BEARISH' ? 'SELL' : 'BUY'
 
-  const sr = side === 'SELL' ? shortLevels(candles, last, interval) : longLevels(candles, last, interval)
+  // H1 + NEUTRAL: SL kirish zonasidan biroz uzoqroq
+  const widerSl = interval === '1h' && trend === 'NEUTRAL'
+  const sr =
+    side === 'SELL'
+      ? shortLevels(candles, last, interval, widerSl)
+      : longLevels(candles, last, interval, widerSl)
   const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
   const deepSupport = support.length
