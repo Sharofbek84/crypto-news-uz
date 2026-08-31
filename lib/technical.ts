@@ -403,6 +403,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let bearish: string
   let summary: string
 
+  const ema50Pos = last > e50 ? 'tepasida' : last < e50 ? 'ostida' : 'yonida'
+
   if (side === 'SELL') {
     bullish =
       `Narx ${fmt(invalidation)} resistance zonasini qayta test qilib, EMA20 ustiga chiqsa, ` +
@@ -413,19 +415,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'BEARISH') {
       summary =
-        `${tf} grafikda trend BEARISH. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx pastga tushishi mumkin. ` +
-        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
+        `${tf} grafikda trend BEARISH. Narx EMA50 ${ema50Pos}. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. EMA20 < EMA50, RSI ${r.toFixed(1)} < 50 — SELL signal. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx pastga tushishi mumkin. ` +
-        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
+        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, RSI ${r.toFixed(1)} < 50 — SELL. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. EMA20 > EMA50, lekin RSI ${r.toFixed(1)} < 50 — ehtiyotkorlik bilan SELL. ` +
+        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} < 50 — ehtiyotkorlik bilan SELL. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor.`
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     }
   } else {
     bullish =
@@ -437,19 +439,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'BULLISH') {
       summary =
-        `${tf} grafikda trend BULLISH. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx tepaga ko'tarilishi mumkin. ` +
-        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
+        `${tf} grafikda trend BULLISH. Narx EMA50 ${ema50Pos}. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. EMA20 > EMA50, RSI ${r.toFixed(1)} > 50 — BUY signal. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx tepaga ko'tarilishi mumkin. ` +
-        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
+        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, RSI ${r.toFixed(1)} > 50 — BUY. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. EMA20 < EMA50, lekin RSI ${r.toFixed(1)} > 50 — ehtiyotkorlik bilan BUY. ` +
+        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} > 50 — ehtiyotkorlik bilan BUY. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor.`
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     }
   }
 
