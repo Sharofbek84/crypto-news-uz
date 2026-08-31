@@ -17,6 +17,8 @@ export type TechnicalResult = {
   histogram: number
   trend: 'BULLISH' | 'BEARISH' | 'NEUTRAL'
   side: 'BUY' | 'SELL'
+  /** NEUTRAL: 'strong' | 'caution'; boshqa trendlarda null */
+  signalTone: 'strong' | 'caution' | null
   support: number[]
   resistance: number[]
   entryLow: number
@@ -476,6 +478,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     histogram: hist,
     trend,
     side,
+    signalTone: neutralTone,
     support,
     resistance,
     entryLow,
