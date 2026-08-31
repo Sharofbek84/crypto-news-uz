@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
-import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
+import { buildSignalId, getOpenSignalIds, saveTrackedSignal } from '@/lib/signal-tracker'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTC', ETH: 'ETH', LTC: 'LTC', SOL: 'SOL', BNB: 'BNB', NEAR: 'NEAR', GRAM: 'GRAM', SUI: 'SUI', APT: 'APT', ATOM: 'ATOM', XAUT: 'XAUT', XRP: 'XRP', XLM: 'XLM', TRX: 'TRX', HYPE: 'HYPE', BCH: 'BCH', ZEC: 'ZEC', LINK: 'LINK', AVAX: 'AVAX', ONDO: 'ONDO', WLD: 'WLD',
@@ -78,6 +78,7 @@ async function passesHigherTimeframeFilter(
 /**
  * Telegram signal = Premium analyze() natijasi.
  * W1 (haftalik) — faqat grafik, Telegramga yuborilmaydi.
+ * Bir coin uchun bir vaqtda faqat bitta signal (TF va side farqi yo'q).
  */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   // W1 va boshqa non-signal TF lar uchun Telegram yo'q
@@ -119,9 +120,26 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     return
   }
 
+  // 1) Ushbu coinda allaqachon ochiq signal bormi? (har qanday TF / side)
+  const openIds = await getOpenSignalIds(redis)
+  const hasOpenForCoin = openIds.some((id) => String(id).startsWith(`${symbol}:`))
+  if (hasOpenForCoin) return
+
+  // 2) Parallel scanner (H1+H4+D1 birga) uchun qisqa atomik lock
+  const coinLockKey = `goldenweb:telegram-coin:${symbol}`
+  const coinLocked = await redis.set(coinLockKey, `${interval}:${current.side}:${signalTime}`, {
+    nx: true,
+    ex: 60 * 5, // 5 daqiqa — faqat race; asosiy blok open signal
+  })
+  if (coinLocked == null) return
+
+  // 3) Xuddi shu candle/event qayta yuborilmasin
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${signalTime}:${current.side}`
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
-  if (claimed == null) return
+  if (claimed == null) {
+    await redis.del(coinLockKey)
+    return
+  }
 
   try {
     await sendTelegramSignal(signal)
@@ -141,6 +159,7 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     })
   } catch (error) {
     await redis.del(redisKey)
+    await redis.del(coinLockKey)
     throw error
   }
 }
