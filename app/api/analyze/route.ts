@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
-import { buildSignalId, getOpenSignalIds, saveTrackedSignal } from '@/lib/signal-tracker'
+import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTC', ETH: 'ETH', LTC: 'LTC', SOL: 'SOL', BNB: 'BNB', NEAR: 'NEAR', GRAM: 'GRAM', SUI: 'SUI', APT: 'APT', ATOM: 'ATOM', XAUT: 'XAUT', XRP: 'XRP', XLM: 'XLM', TRX: 'TRX', HYPE: 'HYPE', BCH: 'BCH', ZEC: 'ZEC', LINK: 'LINK', AVAX: 'AVAX', ONDO: 'ONDO', WLD: 'WLD',
@@ -12,6 +12,9 @@ const ALIASES: Record<string, string> = {
 const ALLOWED_INTERVALS = ['1h', '4h', '1d', '1w'] as const
 type AllowedInterval = (typeof ALLOWED_INTERVALS)[number]
 const TELEGRAM_INTERVALS = new Set(['1h', '4h', '1d'])
+
+/** Bir coin uchun keyingi Telegram signalgacha kutish (soat). */
+const COIN_TELEGRAM_COOLDOWN_SEC = 60 * 60 * 8 // 8 soat
 
 function intervalConfig(interval: string) {
   if (interval === '1w') return '7d'
@@ -77,11 +80,10 @@ async function passesHigherTimeframeFilter(
 
 /**
  * Telegram signal = Premium analyze() natijasi.
- * W1 (haftalik) — faqat grafik, Telegramga yuborilmaydi.
- * Bir coin uchun bir vaqtda faqat bitta signal (TF va side farqi yo'q).
+ * W1 — faqat grafik.
+ * Bir coin: TF/side farqi yo'q — 8 soat cooldown (parallel race: 5 daqiqa lock).
  */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
-  // W1 va boshqa non-signal TF lar uchun Telegram yo'q
   if (!TELEGRAM_INTERVALS.has(interval)) return
   if (!candles.length) return
 
@@ -94,6 +96,7 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
 
   const previous = analyze(previousCandles, interval)
 
+  // Faqat side o'zgarganda (BUY↔SELL) — spam bo'lmasin
   if (current.side === previous.side) return
 
   const htfOk = await passesHigherTimeframeFilter(symbol, interval, current.side)
@@ -120,24 +123,30 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     return
   }
 
-  // 1) Ushbu coinda allaqachon ochiq signal bormi? (har qanday TF / side)
-  const openIds = await getOpenSignalIds(redis)
-  const hasOpenForCoin = openIds.some((id) => String(id).startsWith(`${symbol}:`))
-  if (hasOpenForCoin) return
-
-  // 2) Parallel scanner (H1+H4+D1 birga) uchun qisqa atomik lock
+  // 1) Parallel H1+H4+D1 race — 5 daqiqa
   const coinLockKey = `goldenweb:telegram-coin:${symbol}`
   const coinLocked = await redis.set(coinLockKey, `${interval}:${current.side}:${signalTime}`, {
     nx: true,
-    ex: 60 * 5, // 5 daqiqa — faqat race; asosiy blok open signal
+    ex: 60 * 5,
   })
   if (coinLocked == null) return
+
+  // 2) Bir coin — 8 soat ichida faqat 1 ta Telegram (ochiq signal 10 kungacha bloklamasligi uchun)
+  const cooldownKey = `goldenweb:telegram-coin-cd:${symbol}`
+  const cooldownOk = await redis.set(cooldownKey, `${interval}:${current.side}`, {
+    nx: true,
+    ex: COIN_TELEGRAM_COOLDOWN_SEC,
+  })
+  if (cooldownOk == null) {
+    // lock qisqa muddatli; cooldown bor — chiqamiz
+    return
+  }
 
   // 3) Xuddi shu candle/event qayta yuborilmasin
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${signalTime}:${current.side}`
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
   if (claimed == null) {
-    await redis.del(coinLockKey)
+    await redis.del(cooldownKey)
     return
   }
 
@@ -159,6 +168,7 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
     })
   } catch (error) {
     await redis.del(redisKey)
+    await redis.del(cooldownKey)
     await redis.del(coinLockKey)
     throw error
   }
@@ -179,7 +189,6 @@ export async function GET(req: NextRequest) {
     const scannerSecret = process.env.CRON_SECRET
     const scannerHeader = req.headers.get('x-signal-scanner-secret')
     const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
-    // Scanner faqat H1/H4/D1 chaqiradi; W1 hech qachon Telegramga ketmaydi
     if (isScannerRequest && TELEGRAM_INTERVALS.has(interval)) {
       try {
         await notifyTelegramForNewSignal(symbol, interval, candles)
