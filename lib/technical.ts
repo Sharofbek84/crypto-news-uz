@@ -372,8 +372,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
 
-  // NEUTRAL signal sifati: narx–EMA20 masofasi
-  // yaqin/kesishish → kuchli; juda past → ehtiyotkor BUY; juda yuqori → ehtiyotkor SELL
+  // NEUTRAL: narx–EMA20 masofasi + (yaqin zonada) EMA20/EMA50 stack
   let side: 'BUY' | 'SELL'
   let neutralTone: 'strong' | 'caution' | null = null
   const atrNow = atr(candles)
@@ -384,7 +383,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else if (last < e20 - farDist) {
-    // Narx EMA20 dan ancha past — mean-reversion BUY, lekin ehtiyotkor
+    // Narx EMA20 dan ancha past — mean-reversion BUY, ehtiyotkor
     side = 'BUY'
     neutralTone = 'caution'
   } else if (last > e20 + farDist) {
@@ -392,9 +391,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     side = 'SELL'
     neutralTone = 'caution'
   } else {
-    // EMA20 atrofida / kesishish zonasi — kuchli signal
-    // Yo'nalish: narx EMA20 ustida → BUY, ostida → SELL
-    side = last >= e20 ? 'BUY' : 'SELL'
+    // EMA20 atrofida — kuchli signal; yo'nalish EMA20/EMA50 stackdan
+    side = e20 >= e50 ? 'BUY' : 'SELL'
     neutralTone = 'strong'
   }
 
@@ -433,7 +431,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA20 (${fmt(e20)}) atrofida — kuchli SELL signal. ` +
+        `${tf} grafikda trend NEUTRAL. Narx EMA20 (${fmt(e20)}) atrofida, EMA20 < EMA50 — kuchli SELL signal. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx pastga tushishi mumkin. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
     } else {
@@ -457,7 +455,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA20 (${fmt(e20)}) atrofida — kuchli BUY signal. ` +
+        `${tf} grafikda trend NEUTRAL. Narx EMA20 (${fmt(e20)}) atrofida, EMA20 > EMA50 — kuchli BUY signal. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx tepaga ko'tarilishi mumkin. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
     } else {
