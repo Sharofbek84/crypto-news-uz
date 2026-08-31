@@ -371,7 +371,11 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
-  const side: 'BUY' | 'SELL' = trend === 'BEARISH' ? 'SELL' : 'BUY'
+  // NEUTRAL: EMA20 EMA50 ostida → SELL, ustida → BUY (faqat BUY emas)
+  let side: 'BUY' | 'SELL'
+  if (trend === 'BEARISH') side = 'SELL'
+  else if (trend === 'BULLISH') side = 'BUY'
+  else side = e20 < e50 ? 'SELL' : 'BUY'
 
   // H1 + NEUTRAL: SL kirish zonasidan biroz uzoqroq
   const widerSl = interval === '1h' && trend === 'NEUTRAL'
