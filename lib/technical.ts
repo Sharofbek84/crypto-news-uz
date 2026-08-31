@@ -374,32 +374,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
 
-  // NEUTRAL: narx–EMA20 masofasi + (yaqin zonada) EMA20/EMA50 stack + RSI
+  // NEUTRAL: yo'nalish EMA20/EMA50 stack; kuchli = RSI tasdiqlashi
   let side: 'BUY' | 'SELL'
   let neutralTone: 'strong' | 'caution' | null = null
-  const atrNow = atr(candles)
-  const farDist = Math.max(atrNow * 1.15, last * 0.01) // ~1% yoki 1.15 ATR
 
   if (trend === 'BEARISH') {
     side = 'SELL'
   } else if (trend === 'BULLISH') {
     side = 'BUY'
-  } else if (last < e20 - farDist) {
-    // Narx EMA20 dan ancha past — mean-reversion BUY, ehtiyotkor
-    side = 'BUY'
-    neutralTone = 'caution'
-  } else if (last > e20 + farDist) {
-    // Narx EMA20 dan ancha yuqori — mean-reversion SELL, ehtiyotkor
-    side = 'SELL'
-    neutralTone = 'caution'
   } else {
-    // EMA20 atrofida — yo'nalish EMA20/EMA50 stackdan
-    // Kuchli: BUY faqat RSI >= 50, SELL faqat RSI < 50
     side = e20 >= e50 ? 'BUY' : 'SELL'
     if ((side === 'BUY' && r >= 50) || (side === 'SELL' && r < 50)) {
       neutralTone = 'strong'
     } else {
-      // Stack bor, lekin RSI tasdiqlamaydi — ehtiyotkor
       neutralTone = 'caution'
     }
   }
@@ -439,18 +426,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA20 (${fmt(e20)}) atrofida, EMA20 < EMA50, RSI ${r.toFixed(1)} < 50 — kuchli SELL signal. ` +
+        `${tf} grafikda trend NEUTRAL. EMA20 < EMA50, RSI ${r.toFixed(1)} < 50 — kuchli SELL signal. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx pastga tushishi mumkin. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, rebound ehtimoli oshadi.`
     } else {
       summary =
-        last > e20 + farDist
-          ? `${tf} grafikda trend NEUTRAL. Narx EMA20 dan ancha yuqorida — ehtiyotkorlik bilan SELL. ` +
-            `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, korreksiya ehtimoli bor. ` +
-            `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor.`
-          : `${tf} grafikda trend NEUTRAL. EMA stack SELL, lekin RSI ${r.toFixed(1)} (≥50) — ehtiyotkorlik bilan SELL. ` +
-            `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
-            `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor.`
+        `${tf} grafikda trend NEUTRAL. EMA20 < EMA50, lekin RSI ${r.toFixed(1)} (≥50) — ehtiyotkorlik bilan SELL. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor.`
     }
   } else {
     bullish =
@@ -467,18 +450,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA20 (${fmt(e20)}) atrofida, EMA20 > EMA50, RSI ${r.toFixed(1)} ≥ 50 — kuchli BUY signal. ` +
+        `${tf} grafikda trend NEUTRAL. EMA20 > EMA50, RSI ${r.toFixed(1)} ≥ 50 — kuchli BUY signal. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, narx tepaga ko'tarilishi mumkin. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, pasayish ehtimoli oshadi.`
     } else {
       summary =
-        last < e20 - farDist
-          ? `${tf} grafikda trend NEUTRAL. Narx EMA20 dan ancha pastda — ehtiyotkorlik bilan BUY. ` +
-            `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, rebound ehtimoli bor. ` +
-            `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor.`
-          : `${tf} grafikda trend NEUTRAL. EMA stack BUY, lekin RSI ${r.toFixed(1)} (<50) — ehtiyotkorlik bilan BUY. ` +
-            `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
-            `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor.`
+        `${tf} grafikda trend NEUTRAL. EMA20 > EMA50, lekin RSI ${r.toFixed(1)} (<50) — ehtiyotkorlik bilan BUY. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor.`
     }
   }
 
