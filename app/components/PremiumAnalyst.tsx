@@ -16,6 +16,7 @@ type Result = {
   histogram: number
   trend: string
   side?: string
+  signalTone?: 'strong' | 'caution' | null
   support: number[]
   resistance: number[]
   entryLow: number
@@ -516,7 +517,19 @@ export default function PremiumAnalyst() {
                 </div>
                 <div className="proRow">
                   <span>SIGNAL</span>
-                  <strong className={r.side === 'SELL' ? 'bad' : 'good'}>{r.side === 'SELL' ? 'SELL' : 'BUY'}</strong>
+                  <strong className={r.side === 'SELL' ? 'bad' : 'good'}>
+                    {r.signalTone === 'caution'
+                      ? r.side === 'SELL'
+                        ? 'Ehtiyotkor SELL'
+                        : 'Ehtiyotkor BUY'
+                      : r.signalTone === 'strong'
+                        ? r.side === 'SELL'
+                          ? 'Kuchli SELL'
+                          : 'Kuchli BUY'
+                        : r.side === 'SELL'
+                          ? 'SELL'
+                          : 'BUY'}
+                  </strong>
                 </div>
                 <div className="proRow">
                   <span>RSI (14)</span>
