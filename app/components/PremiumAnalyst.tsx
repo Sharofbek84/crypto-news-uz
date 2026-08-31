@@ -522,13 +522,9 @@ export default function PremiumAnalyst() {
                       ? r.side === 'SELL'
                         ? 'Ehtiyotkor SELL'
                         : 'Ehtiyotkor BUY'
-                      : r.signalTone === 'strong'
-                        ? r.side === 'SELL'
-                          ? 'Kuchli SELL'
-                          : 'Kuchli BUY'
-                        : r.side === 'SELL'
-                          ? 'SELL'
-                          : 'BUY'}
+                      : r.side === 'SELL'
+                        ? 'SELL'
+                        : 'BUY'}
                   </strong>
                 </div>
                 <div className="proRow">
