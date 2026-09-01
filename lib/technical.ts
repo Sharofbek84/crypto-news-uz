@@ -401,8 +401,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let bearish: string
   let summary: string
 
-  const ema50Pos = last > e50 ? 'tepasida' : last < e50 ? 'ostida' : 'yonida'
-
   if (side === 'SELL') {
     bullish =
       `Narx ${fmt(invalidation)} resistance zonasini qayta test qilib, EMA20 ustiga chiqsa, ` +
@@ -413,17 +411,17 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'BEARISH') {
       summary =
-        `${tf} grafikda trend BEARISH. Narx EMA50 ${ema50Pos}. ` +
+        `${tf} grafikda trend BEARISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, RSI ${r.toFixed(1)} < 50 — SELL. ` +
+        `${tf} grafikda trend NEUTRAL, biroq bearish momentum belgilari mavjud. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} ≥ 50 — ehtiyotkorlik bilan SELL. ` +
+        `${tf} grafikda trend NEUTRAL, biroq zaif bearish momentum belgilari mavjud. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     }
@@ -437,17 +435,17 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'BULLISH') {
       summary =
-        `${tf} grafikda trend BULLISH. Narx EMA50 ${ema50Pos}. ` +
+        `${tf} grafikda trend BULLISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, RSI ${r.toFixed(1)} ≥ 50 — BUY. ` +
+        `${tf} grafikda trend NEUTRAL, biroq bullish momentum belgilari mavjud. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} < 50 — ehtiyotkorlik bilan BUY. ` +
+        `${tf} grafikda trend NEUTRAL, biroq zaif bullish momentum belgilari mavjud. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     }
