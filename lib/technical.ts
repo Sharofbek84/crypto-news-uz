@@ -58,6 +58,94 @@ export function rsi(values: number[], period = 14) {
   return 100 - 100 / (1 + avgGain / avgLoss)
 }
 
+/** RSI series for pivot/divergence (same formula as rsi(), per-bar). */
+function rsiSeries(values: number[], period = 14): number[] {
+  const out: number[] = []
+  let avgGain = 0
+  let avgLoss = 0
+  for (let i = 0; i < values.length; i++) {
+    if (i === 0) {
+      out.push(50)
+      continue
+    }
+    const d = values[i] - values[i - 1]
+    const gain = Math.max(d, 0)
+    const loss = Math.max(-d, 0)
+    if (i < period) {
+      avgGain += gain
+      avgLoss += loss
+      out.push(50)
+    } else if (i === period) {
+      avgGain = (avgGain + gain) / period
+      avgLoss = (avgLoss + loss) / period
+      out.push(avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss))
+    } else {
+      avgGain = (avgGain * (period - 1) + gain) / period
+      avgLoss = (avgLoss * (period - 1) + loss) / period
+      out.push(avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss))
+    }
+  }
+  return out
+}
+
+type RsiDiv = 'bull' | 'bear' | null
+
+/**
+ * Regular divergence on last two swing highs/lows:
+ * - bear: price higher high, RSI lower high → Ehtiyotkor SELL
+ * - bull: price lower low, RSI higher low → Ehtiyotkor BUY
+ */
+function detectRegularRsiDivergence(candles: Candle[], left = 3, right = 3): RsiDiv {
+  if (candles.length < 30) return null
+  const closes = candles.map((c) => c.close)
+  const rs = rsiSeries(closes)
+  const highs: { i: number; price: number; rsi: number }[] = []
+  const lows: { i: number; price: number; rsi: number }[] = []
+
+  for (let i = left; i < candles.length - right; i++) {
+    let isHigh = true
+    let isLow = true
+    for (let j = 1; j <= left; j++) {
+      if (candles[i - j].high >= candles[i].high) isHigh = false
+      if (candles[i - j].low <= candles[i].low) isLow = false
+    }
+    for (let j = 1; j <= right; j++) {
+      if (candles[i + j].high > candles[i].high) isHigh = false
+      if (candles[i + j].low < candles[i].low) isLow = false
+    }
+    if (isHigh) highs.push({ i, price: candles[i].high, rsi: rs[i] })
+    if (isLow) lows.push({ i, price: candles[i].low, rsi: rs[i] })
+  }
+
+  const minGap = 5
+  let bear: { dist: number } | null = null
+  let bull: { dist: number } | null = null
+
+  if (highs.length >= 2) {
+    const a = highs[highs.length - 2]
+    const b = highs[highs.length - 1]
+    if (b.i - a.i >= minGap && b.price > a.price && b.rsi < a.rsi) {
+      bear = { dist: candles.length - 1 - b.i }
+    }
+  }
+  if (lows.length >= 2) {
+    const a = lows[lows.length - 2]
+    const b = lows[lows.length - 1]
+    if (b.i - a.i >= minGap && b.price < a.price && b.rsi > a.rsi) {
+      bull = { dist: candles.length - 1 - b.i }
+    }
+  }
+
+  // Faqat oxirgi 12 sham ichidagi divergensiya signalga ta'sir qilsin
+  const maxAge = 12
+  if (bear && bear.dist <= maxAge && bull && bull.dist <= maxAge) {
+    return bear.dist <= bull.dist ? 'bear' : 'bull'
+  }
+  if (bear && bear.dist <= maxAge) return 'bear'
+  if (bull && bull.dist <= maxAge) return 'bull'
+  return null
+}
+
 function fmt(n: number) {
   if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
   if (n >= 1) return n.toFixed(2)
@@ -382,6 +470,16 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     neutralTone = 'caution'
   }
 
+  // RSI regular divergence → Ehtiyotkor BUY/SELL (ustuvor)
+  const rsiDiv = detectRegularRsiDivergence(candles)
+  if (rsiDiv === 'bear') {
+    side = 'SELL'
+    neutralTone = 'caution'
+  } else if (rsiDiv === 'bull') {
+    side = 'BUY'
+    neutralTone = 'caution'
+  }
+
   const widerSl = interval === '1h' && trend === 'NEUTRAL'
   const sr =
     side === 'SELL'
@@ -449,6 +547,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     }
+  }
+
+  // Divergensiya bo'lsa — xulosani aniqroq yozamiz
+  if (rsiDiv === 'bear') {
+    summary =
+      `${tf} grafikda narx avvalgi maksimumni yangiladi, lekin RSI pasaymoqda (bearish divergence) — ehtiyotkorlik bilan SELL. ` +
+      `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+      `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
+  } else if (rsiDiv === 'bull') {
+    summary =
+      `${tf} grafikda narx avvalgi minimumni yangiladi, lekin RSI ko'tarilmoqda (bullish divergence) — ehtiyotkorlik bilan BUY. ` +
+      `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+      `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
   }
 
   return {
