@@ -81,6 +81,7 @@ async function passesHigherTimeframeFilter(
 /**
  * Telegram signal = Premium analyze() natijasi.
  * W1 — faqat grafik.
+ * H1 + NEUTRAL trend — yuborilmaydi.
  * Bir coin: TF/side farqi yo'q — 8 soat cooldown (parallel race: 5 daqiqa lock).
  */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
@@ -95,6 +96,9 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   if (previousCandles.length < 60) return
 
   const previous = analyze(previousCandles, interval)
+
+  // NEUTRAL trend + H1 → Telegramga yuborilmasin
+  if (interval === '1h' && current.trend === 'NEUTRAL') return
 
   // Faqat side o'zgarganda (BUY↔SELL) — spam bo'lmasin
   if (current.side === previous.side) return
@@ -131,14 +135,13 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   })
   if (coinLocked == null) return
 
-  // 2) Bir coin — 8 soat ichida faqat 1 ta Telegram (ochiq signal 10 kungacha bloklamasligi uchun)
+  // 2) Bir coin — 8 soat ichida faqat 1 ta Telegram
   const cooldownKey = `goldenweb:telegram-coin-cd:${symbol}`
   const cooldownOk = await redis.set(cooldownKey, `${interval}:${current.side}`, {
     nx: true,
     ex: COIN_TELEGRAM_COOLDOWN_SEC,
   })
   if (cooldownOk == null) {
-    // lock qisqa muddatli; cooldown bor — chiqamiz
     return
   }
 
