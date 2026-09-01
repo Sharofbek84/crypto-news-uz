@@ -356,10 +356,10 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
 
   // NEUTRAL:
-  //   EMA20 > EMA50 && RSI > 50 → BUY
-  //   EMA20 < EMA50 && RSI > 50 → Ehtiyotkor BUY
+  //   EMA20 ≥ EMA50 && RSI ≥ 50 → BUY
+  //   EMA20 ≥ EMA50 && RSI < 50 → Ehtiyotkor BUY
   //   EMA20 < EMA50 && RSI < 50 → SELL
-  //   EMA20 > EMA50 && RSI < 50 → Ehtiyotkor SELL
+  //   EMA20 < EMA50 && RSI ≥ 50 → Ehtiyotkor SELL
   let side: 'BUY' | 'SELL'
   let neutralTone: 'strong' | 'caution' | null = null
 
@@ -367,20 +367,18 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     side = 'SELL'
   } else if (trend === 'BULLISH') {
     side = 'BUY'
-  } else if (e20 > e50 && r > 50) {
+  } else if (e20 >= e50 && r >= 50) {
     side = 'BUY'
     neutralTone = 'strong'
+  } else if (e20 >= e50 && r < 50) {
+    side = 'BUY'
+    neutralTone = 'caution'
   } else if (e20 < e50 && r < 50) {
     side = 'SELL'
     neutralTone = 'strong'
-  } else if (r > 50) {
-    side = 'BUY'
-    neutralTone = 'caution'
-  } else if (r < 50) {
-    side = 'SELL'
-    neutralTone = 'caution'
   } else {
-    side = e20 >= e50 ? 'BUY' : 'SELL'
+    // EMA20 < EMA50 && RSI ≥ 50
+    side = 'SELL'
     neutralTone = 'caution'
   }
 
@@ -425,7 +423,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} < 50 — ehtiyotkorlik bilan SELL. ` +
+        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} ≥ 50 — ehtiyotkorlik bilan SELL. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     }
@@ -444,12 +442,12 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, RSI ${r.toFixed(1)} > 50 — BUY. ` +
+        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, RSI ${r.toFixed(1)} ≥ 50 — BUY. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} > 50 — ehtiyotkorlik bilan BUY. ` +
+        `${tf} grafikda trend NEUTRAL. Narx EMA50 ${ema50Pos}, lekin RSI ${r.toFixed(1)} < 50 — ehtiyotkorlik bilan BUY. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     }
