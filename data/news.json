@@ -1,5 +1,50 @@
 [
   {
+    "slug": "rossiya-kripto-rubl-1-sent",
+    "title": "Rossiya 1-sentabrdan qonuniy kripto savdosi va raqamli rublni ishga tushirdi",
+    "summary": "Sberbank birinchi yilda litsenziyalangan birjalarda $46 mlrd hajm kutmoqda. Chakana xaridor yiliga 300 000 rubl (~$3 700) bilan cheklangan.",
+    "body": "2026-yil 1-sentabrdan Rossiyada kriptovalyuta savdosi litsenziyalangan broker, birja va depozitariylar orqali rasman ochildi. Putin avgust boshida imzolagan qonun Markaziy bank nazoratini belgilaydi. Ichki tovar va xizmatlar uchun kripto to‘lovi taqiqlanganligicha qoladi.\n\nSberbank rais o‘rinbosari Anatoliy Popov TASS ga litsenziyalangan savdo hajmi birinchi yilda 3,5–4 trillion rubl ($40–46 mlrd), 2029-yilga 7,5 trillion rubl (~$87 mlrd) bo‘lishi mumkinligini aytdi. Bu mamlakatdagi taxminiy yillik kripto aylanmasining ~20% i.\n\nDastlabki ro‘yxatda Bitcoin, Ethereum va USDT. Malakasiz investor har bir vositachi orqali yiliga 300 000 rublgacha (~$3 700–3 800) xarid qiladi; malakali investorlar uchun chegara yuqori. Shu kundan 12 tizimli bank raqamli rubl to‘lovlarini ochishi shart.",
+    "url": "https://www.theblock.co/news/business/2026-08-31-russias-largest-bank-forecasts-46-billion-in-first-year-crypto-exchange-trading-under-new-rules-report-413082",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-01"
+  },
+  {
+    "slug": "vetnam-kripto-jarima-1-sent",
+    "title": "Vetnam 1-sentabrdan kripto ma’muriy jarimalarini kuchga kiritdi",
+    "summary": "Litsenziyasiz birja va reklama uchun tashkilotga 180–200 mln dong. Chakana offshor savdo jarimasi hali 6 oylik imtiyozda.",
+    "body": "Vetnam hukumati 284/2026/NĐ-CP farmoni 1-sentabrdan kuchga kirdi. Litsenziyasiz kripto xizmati yoki reklama uchun tashkilot 180–200 million dong, jismoniy shaxs shu summaning yarmigacha jarima olishi mumkin.\n\nIchki investorning litsenziyasiz (shu jumladan offshor) platformada savdo qilishi uchun 30–50 million dong jarima nazarda tutilgan. Lekin 05/2025/NQ-CP qaroriga ko‘ra bu band Moliya vazirligi birinchi birja litsenziyasini bergandan keyin 6 oy o‘tgach qo‘llanadi. Hozircha hech bir birja litsenziya olmagan.\n\nLitsenziya uchun 5 kompaniya dastlabki bahodan o‘tgan; keyingi talab — 4-daraja axborot xavfsizligi va kamida 10 trillion dong (~$383 mln) kapital. KYC buzilishi 50–70 million dong jarimaga tortiladi.",
+    "url": "https://blockchainreporter.net/vietnam-crypto-penalty-rules-take-effect-september-1/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-01"
+  },
+  {
+    "slug": "kalshi-santos-umrbod-1-sent",
+    "title": "Kalshi Jorj Santosni bashorat bozoridan umrbod chetlatdi",
+    "summary": "Platformaning birinchi lifetime ban. $71 356 jarima. CFTC avvalroq SOTU ishtiroki bozorida ~$18 ming foyda deb hisoblagan.",
+    "body": "Bashorat bozori Kalshi 31-avgustda sobiq Kongress a’zosi Jorj Santosni umrbod taqiqladi va $71 356 jarima yozdi. Bu kompaniya tarixidagi birinchi lifetime ban.\n\nMavzu — Trampning Kongressga murojaati (State of the Union) da Santos ishtirok etadimi, degan shartnoma. Kalshi uni natijaga ta’sir qila oladigan shaxs sifatida savdodan cheklangan deb topdi va chalg‘ituvchi ijtimoiy postlar orqali ehtimollikni siljitganini aytdi. Santos tekshiruvga to‘liq hamkorlik qilmagan.\n\nCFTC iyulda xuddi shu savdo uchun ~$17 800–18 000 foyda va $35 000 kelishuvni qayd etgan edi. Kalshi bir kunda boshqa siyosatchilarga ham qisqa muddatli taqiqlar berdi. Santos X da «umrbod taqiq uchun rahmat» deb yozdi.",
+    "url": "https://www.coindesk.com/policy/2026/08/31/kalshi-lays-down-first-lifetime-ban-for-ex-member-of-congress-george-santos",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-01"
+  },
+  {
+    "slug": "cme-coinbase-btc-derivativ-1-sent",
+    "title": "CME va Coinbase o‘rtasidagi BTC derivativ farqi majburiy yopilish xavfini oshirdi",
+    "summary": "CME dagi leverajli fondlarning sof shorti Coinbase dagi sof longdan ~272 barobar katta. Tahlilchilar keskin unwind ehtimolini ogohlantirmoqda.",
+    "body": "CryptoSlate 31-avgust tahliliga ko‘ra, CME Bitcoin fyucherslaridagi leverajli fondlarning sof qisqa pozitsiyasi Coinbase dagi sof uzun pozitsiyadan taxminan 272 barobar katta. Bu ikki maydon orasidagi derivativ «bo‘shliq» majburiy yopilish (forced unwind) xavfini oshiradi.\n\nAgar narx bir tomonga keskin ketsa, CME dagi yirik shortlar qo‘shimcha margin talabi va likvidatsiyalarni zanjirlab yuborishi mumkin. Shu bilan birga spot hajmlar uch yillik pastlikka yaqin qolmoqda — avgust rallysi asosan ETF va xazina xaridlari hisobiga ketgan.\n\nBitcoin avgustda 2017-yildan beri eng yaxshi oyini o‘tkazib, sentabr boshida $77,5–79 ming oralig‘ida savdo qildi. Fed raisi Kevin Warshning Jackson Hole dagi qattiq nutqi va 28-avgustdagi ~$202 mln BTC ETF chiqimi rallyni sekinlashtirgan.",
+    "url": "https://cryptoslate.com/massive-bitcoin-derivatives-gap-between-cme-and-coinbase-threatens-violent-position-shakeout/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-01"
+  },
+  {
+    "slug": "robinhood-chain-eth-tushum-1-sent",
+    "title": "Robinhood Chain kunlik tushumda Ethereumni ortda qoldirdi",
+    "summary": "30-avgustda 5,52 mln tranzaksiya va $2,66 mln tushum. Asosiy haydovchi — memecoin savdosi va 22 600 ta yangi token.",
+    "body": "CoinDesk: ikki oylik Robinhood Chain 30-avgustda rekord 5,52 million tranzaksiya qayta ishladi va $2,66 million kunlik tushum oldi — shu kunda Ethereumdan yuqori. Foydalanuvchilar 22 600 ta token ishga tushirgan; tushumning katta qismi memecoin savdo vositalaridan kelgan.\n\nTarmoq Robinhood ilovasidagi chakana oqimni onchain ga olib chiqishga qaratilgan. Qisqa muddatli hajm o‘sishi L2 va memecoin tsikllariga xos: token chiqarish osonlashganda komissiya tushumi keskin ko‘tariladi, keyin esa so‘nishi mumkin.\n\nBu Base va Solana dagi memecoin to‘lqinidan keyingi navbatdagi chakana zanjir signalidir. Institutsional oqim esa baribir BTC/ETH ETF va korporativ xazinalarda qolmoqda.",
+    "url": "https://www.coindesk.com/tech/2026/08/31/robinhood-chain-beats-ethereum-in-daily-revenue-as-memecoin-trading-takes-over",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-01"
+  },
+  {
     "slug": "strategy-4603-btc-1-sent",
     "title": "Strategy 2 oydan keyin yana sotib oldi: 4 603 BTC, $369,7 mln",
     "summary": "SEC 8-K: 24–30-avgust oralig‘ida 4 603 BTC, o‘rtacha $80 318. Jami zaxira 845 050 BTC. MSTR ATM dan $602,8 mln yig‘ilgan.",
