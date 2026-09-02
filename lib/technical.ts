@@ -190,14 +190,15 @@ function tfLookback(interval: string) {
 }
 
 function slParams(interval: string, last: number, wider = false) {
+  // H4: SL kirish zonasidan uzoqroq (min ~2%)
   let minPct =
-    interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.012 : interval === '1w' ? 0.025 : 0.018
+    interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.02 : interval === '1w' ? 0.025 : 0.018
   let gapPct =
-    interval === '15m' ? 0.003 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.006 : interval === '1w' ? 0.012 : 0.009
+    interval === '15m' ? 0.003 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.009 : interval === '1w' ? 0.012 : 0.009
   let bufPct =
-    interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.0035 : interval === '1w' ? 0.007 : 0.005
+    interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.006 : interval === '1w' ? 0.007 : 0.005
   const maxPct =
-    interval === '15m' ? 0.025 : interval === '1h' ? 0.04 : interval === '4h' ? 0.055 : interval === '1w' ? 0.12 : 0.08
+    interval === '15m' ? 0.025 : interval === '1h' ? 0.04 : interval === '4h' ? 0.07 : interval === '1w' ? 0.12 : 0.08
 
   if (wider && interval === '1h') {
     minPct *= 1.5
@@ -524,12 +525,12 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       : longLevels(candles, last, interval, widerSl)
   let { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
-  // RSI divergensiya: SL oxirgi swing low/high dan qo'yiladi
+  // RSI divergensiya: SL oxirgi swing low/high dan, H4 da min masofa saqlanadi
   if (rsiDiv) {
-    const { buf, entryGap } = slParams(interval, last, widerSl)
+    const { buf, entryGap, minSl } = slParams(interval, last, widerSl)
     if (rsiDiv.kind === 'bull') {
-      // BUY: SL = oxirgi minimum tagidan
       invalidation = rsiDiv.pivotPrice - buf
+      if (last - invalidation < minSl) invalidation = last - minSl
       entryHigh = last
       const riskRange = Math.max(last - invalidation, last * 0.004)
       entryLow = last - riskRange * 0.4
@@ -539,8 +540,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       const risk = Math.max(last - invalidation, last * 0.002)
       tp = buildTakeProfits(last, risk, 'long', resistance)
     } else {
-      // SELL: SL = oxirgi maksimum ustidan
       invalidation = rsiDiv.pivotPrice + buf
+      if (invalidation - last < minSl) invalidation = last + minSl
       entryLow = last
       const riskRange = Math.max(invalidation - last, last * 0.004)
       entryHigh = last + riskRange * 0.4
