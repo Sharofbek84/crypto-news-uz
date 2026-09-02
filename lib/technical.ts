@@ -189,22 +189,16 @@ function tfLookback(interval: string) {
   return 14
 }
 
-function slParams(interval: string, last: number, wider = false) {
-  // H4: SL avvalgi logika (min 1.2%), lekin entry–SL gap biroz kengroq
-  let minPct =
+function slParams(interval: string, last: number) {
+  // Barcha TF: oddiy SL o'lchami + entry–SL gap juda yaqin bo'lmasin
+  const minPct =
     interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.012 : interval === '1w' ? 0.025 : 0.018
-  let gapPct =
-    interval === '15m' ? 0.003 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.008 : interval === '1w' ? 0.012 : 0.009
-  let bufPct =
+  const gapPct =
+    interval === '15m' ? 0.004 : interval === '1h' ? 0.0055 : interval === '4h' ? 0.008 : interval === '1w' ? 0.014 : 0.01
+  const bufPct =
     interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.0035 : interval === '1w' ? 0.007 : 0.005
   const maxPct =
-    interval === '15m' ? 0.025 : interval === '1h' ? 0.04 : interval === '4h' ? 0.055 : interval === '1w' ? 0.12 : 0.08
-
-  if (wider && interval === '1h') {
-    minPct *= 1.5
-    gapPct *= 1.4
-    bufPct *= 1.4
-  }
+    interval === '15m' ? 0.02 : interval === '1h' ? 0.03 : interval === '4h' ? 0.055 : interval === '1w' ? 0.12 : 0.07
 
   return {
     minSl: last * minPct,
@@ -324,9 +318,9 @@ function buildTakeProfits(
   return [tps[0], tps[1], tps[2]]
 }
 
-function longLevels(candles: Candle[], last: number, interval: string, widerSl = false) {
+function longLevels(candles: Candle[], last: number, interval: string) {
   const { window, tol, lb } = structureParams(interval, last)
-  const { minSl, entryGap, buf, maxSl } = slParams(interval, last, widerSl)
+  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
@@ -393,9 +387,9 @@ function longLevels(candles: Candle[], last: number, interval: string, widerSl =
   }
 }
 
-function shortLevels(candles: Candle[], last: number, interval: string, widerSl = false) {
+function shortLevels(candles: Candle[], last: number, interval: string) {
   const { window, tol, lb } = structureParams(interval, last)
-  const { minSl, entryGap, buf, maxSl } = slParams(interval, last, widerSl)
+  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
   const recent = candles.slice(-Math.min(candles.length, window))
   const swings = findSwingPoints(recent, 2, 2)
 
@@ -518,16 +512,15 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     neutralTone = 'caution'
   }
 
-  const widerSl = interval === '1h' && trend === 'NEUTRAL'
   const sr =
     side === 'SELL'
-      ? shortLevels(candles, last, interval, widerSl)
-      : longLevels(candles, last, interval, widerSl)
+      ? shortLevels(candles, last, interval)
+      : longLevels(candles, last, interval)
   let { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
   // RSI divergensiya: SL oxirgi swing low/high dan, min masofa saqlanadi
   if (rsiDiv) {
-    const { buf, entryGap, minSl } = slParams(interval, last, widerSl)
+    const { buf, entryGap, minSl } = slParams(interval, last)
     if (rsiDiv.kind === 'bull') {
       invalidation = rsiDiv.pivotPrice - buf
       if (last - invalidation < minSl) invalidation = last - minSl
