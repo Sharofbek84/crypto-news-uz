@@ -87,7 +87,6 @@ function atr(candles: Candle[], period = 14): number {
 
 /** TF bo'yicha ATR koeffitsientlari — optimal SL/TP */
 function atrParams(interval: string, last: number, atrVal: number) {
-  // SL = atrSlMult * ATR, TP = risk * tpR (koeffitsientlar biroz kichraytirilgan)
   const atrSlMult =
     interval === '15m' ? 1.0 : interval === '1h' ? 1.2 : interval === '4h' ? 1.5 : interval === '1w' ? 2.1 : 1.7
   const tpR: [number, number, number] =
@@ -162,6 +161,66 @@ function structureWindow(interval: string) {
   return interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 60 : 48
 }
 
+/**
+ * NEUTRAL trend: support/resistance yaqinligi + oxirgi candle react.
+ * return: 'BUY' | 'SELL' | null (struktura aniq emas)
+ */
+function neutralStructureBias(
+  candles: Candle[],
+  last: number,
+  interval: string
+): { side: 'BUY' | 'SELL'; level: number } | null {
+  if (candles.length < 20) return null
+  const window = structureWindow(interval)
+  const recent = candles.slice(-Math.min(candles.length, window))
+  const atrVal = atr(recent, 14)
+  if (atrVal <= 0) return null
+
+  const tol = Math.max(atrVal * 0.35, last * 0.0015)
+  const nearBand = Math.max(atrVal * 1.1, last * 0.004)
+
+  const swings = findSwingPoints(recent, 2, 2)
+  const lows = swings.filter((s) => s.type === 'low').map((s) => s.price)
+  const highs = swings.filter((s) => s.type === 'high').map((s) => s.price)
+
+  const supports = clusterLevels(lows, tol).filter((p) => p < last).sort((a, b) => b - a)
+  const resistances = clusterLevels(highs, tol).filter((p) => p > last).sort((a, b) => a - b)
+
+  const nearestSup = supports[0]
+  const nearestRes = resistances[0]
+
+  const c = candles[candles.length - 1]
+  const prev = candles[candles.length - 2] ?? c
+  const bullReact =
+    c.close > c.open ||
+    (c.low < prev.low && c.close > prev.close) ||
+    c.close >= (c.high + c.low) / 2
+  const bearReact =
+    c.close < c.open ||
+    (c.high > prev.high && c.close < prev.close) ||
+    c.close <= (c.high + c.low) / 2
+
+  const distSup = nearestSup != null ? last - nearestSup : Infinity
+  const distRes = nearestRes != null ? nearestRes - last : Infinity
+
+  const nearSup = nearestSup != null && distSup <= nearBand
+  const nearRes = nearestRes != null && distRes <= nearBand
+
+  // Supportda react → BUY; resistanceda react → SELL
+  if (nearSup && bullReact && (!nearRes || distSup <= distRes)) {
+    return { side: 'BUY', level: nearestSup }
+  }
+  if (nearRes && bearReact && (!nearSup || distRes <= distSup)) {
+    return { side: 'SELL', level: nearestRes }
+  }
+
+  // Zona ichida, lekin react zaif — eng yaqin zonaga og'ish (juda ehtiyotkor)
+  if (nearSup && !nearRes) return { side: 'BUY', level: nearestSup }
+  if (nearRes && !nearSup) return { side: 'SELL', level: nearestRes }
+
+  return null
+}
+
 function buildAtrTakeProfits(
   last: number,
   risk: number,
@@ -184,7 +243,6 @@ function buildAtrTakeProfits(
   for (let i = 0; i < 3; i++) {
     let tp = rrTargets[i]
 
-    // Yaqin struktura darajasiga snap (ATR RR atrofida)
     for (const lvl of levels) {
       if (Math.abs(lvl - rrTargets[i]) <= snapBand) {
         if (tps.length === 0 || Math.abs(lvl - tps[tps.length - 1]) >= minGap) {
@@ -224,7 +282,6 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   const supports = clusterLevels(rawLows, tol).filter((p) => p < last).sort((a, b) => b - a)
   const resistances = clusterLevels(rawHighs, tol).filter((p) => p > last).sort((a, b) => a - b)
 
-  // ATR SL asosiy; agar yaqin struktura ATR diapazonda bo'lsa — uning tagiga snap
   let invalidation = last - slDist
   const structCandidates = swingLows
     .map((s) => s.price - buf)
@@ -334,30 +391,41 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   )
   const hist = macdLine - signal
 
-  // Barcha TF (shu jumladan H4): EMA20 + EMA50 stack asosiy
+  // Barcha TF: EMA20 + EMA50 stack
   const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
 
   let side: 'BUY' | 'SELL'
   let neutralTone: 'strong' | 'caution' | null = null
+  let structureBased = false
+  let structureLevel: number | null = null
 
   if (trend === 'BEARISH') {
     side = 'SELL'
   } else if (trend === 'BULLISH') {
     side = 'BUY'
-  } else if (e20 >= e50 && r >= 50) {
-    side = 'BUY'
-    neutralTone = 'strong'
-  } else if (e20 >= e50 && r < 50) {
-    side = 'BUY'
-    neutralTone = 'caution'
-  } else if (e20 < e50 && r < 50) {
-    side = 'SELL'
-    neutralTone = 'strong'
   } else {
-    side = 'SELL'
-    neutralTone = 'caution'
+    // NEUTRAL: avvalo struktura (S/R + react)
+    const bias = neutralStructureBias(candles, last, interval)
+    if (bias) {
+      side = bias.side
+      neutralTone = 'caution'
+      structureBased = true
+      structureLevel = bias.level
+    } else if (e20 >= e50 && r >= 50) {
+      side = 'BUY'
+      neutralTone = 'strong'
+    } else if (e20 >= e50 && r < 50) {
+      side = 'BUY'
+      neutralTone = 'caution'
+    } else if (e20 < e50 && r < 50) {
+      side = 'SELL'
+      neutralTone = 'strong'
+    } else {
+      side = 'SELL'
+      neutralTone = 'caution'
+    }
   }
 
   const sr =
@@ -391,6 +459,11 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `${tf} grafikda trend BEARISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
+    } else if (structureBased && structureLevel != null) {
+      summary =
+        `${tf} grafikda trend NEUTRAL. Narx resistance (~${fmt(structureLevel)}) zonasiga yaqin — struktura asosida ehtiyotkor SELL. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
       summary =
         `${tf} grafikda trend NEUTRAL, biroq bearish momentum belgilari mavjud. ` +
@@ -413,6 +486,11 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     if (trend === 'BULLISH') {
       summary =
         `${tf} grafikda trend BULLISH. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
+    } else if (structureBased && structureLevel != null) {
+      summary =
+        `${tf} grafikda trend NEUTRAL. Narx support (~${fmt(structureLevel)}) zonasiga yaqin — struktura asosida ehtiyotkor BUY. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
