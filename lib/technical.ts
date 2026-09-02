@@ -162,103 +162,8 @@ function structureWindow(interval: string) {
 }
 
 /**
- * Break + retest:
- * - Support yorildi (close pastga), keyin pastdan qayta test → SELL
- * - Resistance yorildi (close tepaga), keyin yuqoridan qayta test → BUY
- */
-function detectBreakRetest(
-  candles: Candle[],
-  last: number,
-  interval: string
-): { side: 'BUY' | 'SELL'; level: number } | null {
-  if (candles.length < 30) return null
-  const window = structureWindow(interval)
-  const recent = candles.slice(-Math.min(candles.length, window))
-  const atrVal = atr(recent, 14)
-  if (atrVal <= 0) return null
-
-  const n = recent.length
-  const tol = Math.max(atrVal * 0.35, last * 0.0015)
-  const breakPad = Math.max(atrVal * 0.12, last * 0.0008)
-  const retestBand = Math.max(atrVal * 0.9, last * 0.0035)
-  // Pivotlar oxirgi 8 bardan oldinroq bo'lsin
-  const pivotEnd = Math.max(10, n - 8)
-  const pivotSlice = recent.slice(0, pivotEnd)
-  const swings = findSwingPoints(pivotSlice, 2, 2)
-
-  const supportLevels = clusterLevels(
-    swings.filter((s) => s.type === 'low').map((s) => s.price),
-    tol
-  )
-  const resistanceLevels = clusterLevels(
-    swings.filter((s) => s.type === 'high').map((s) => s.price),
-    tol
-  )
-
-  type Hit = { side: 'BUY' | 'SELL'; level: number; age: number }
-  const hits: Hit[] = []
-
-  // Support break → endi resistance sifatida retest → SELL
-  for (const lvl of supportLevels) {
-    let breakIdx = -1
-    for (let i = 2; i < n - 1; i++) {
-      if (recent[i].close < lvl - breakPad) {
-        // Oldin daraja ustida yopilgan bo'lsin
-        const priorAbove = recent.slice(Math.max(0, i - 8), i).some((c) => c.close > lvl)
-        if (priorAbove) {
-          breakIdx = i
-          break
-        }
-      }
-    }
-    if (breakIdx < 0) continue
-    // Breakdan keyin pastda qolgan va hozir qayta test
-    const after = recent.slice(breakIdx + 1)
-    if (!after.length) continue
-    const stayedBelow = after.filter((c) => c.close < lvl + breakPad).length >= Math.ceil(after.length * 0.5)
-    if (!stayedBelow) continue
-    const dist = Math.abs(last - lvl)
-    if (dist > retestBand) continue
-    if (last > lvl + retestBand * 0.35) continue // hali pastdan/yaqin
-    hits.push({ side: 'SELL', level: lvl, age: n - 1 - breakIdx })
-  }
-
-  // Resistance break → endi support sifatida retest → BUY
-  for (const lvl of resistanceLevels) {
-    let breakIdx = -1
-    for (let i = 2; i < n - 1; i++) {
-      if (recent[i].close > lvl + breakPad) {
-        const priorBelow = recent.slice(Math.max(0, i - 8), i).some((c) => c.close < lvl)
-        if (priorBelow) {
-          breakIdx = i
-          break
-        }
-      }
-    }
-    if (breakIdx < 0) continue
-    const after = recent.slice(breakIdx + 1)
-    if (!after.length) continue
-    const stayedAbove = after.filter((c) => c.close > lvl - breakPad).length >= Math.ceil(after.length * 0.5)
-    if (!stayedAbove) continue
-    const dist = Math.abs(last - lvl)
-    if (dist > retestBand) continue
-    if (last < lvl - retestBand * 0.35) continue
-    hits.push({ side: 'BUY', level: lvl, age: n - 1 - breakIdx })
-  }
-
-  if (!hits.length) return null
-  // Eng yaqin retest + yangiroq break afzal
-  hits.sort((a, b) => {
-    const da = Math.abs(last - a.level)
-    const db = Math.abs(last - b.level)
-    if (Math.abs(da - db) > tol) return da - db
-    return a.age - b.age
-  })
-  return { side: hits[0].side, level: hits[0].level }
-}
-
-/**
  * NEUTRAL trend: support/resistance yaqinligi + oxirgi candle react.
+ * return: 'BUY' | 'SELL' | null (struktura aniq emas)
  */
 function neutralStructureBias(
   candles: Candle[],
@@ -484,6 +389,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   )
   const hist = macdLine - signal
 
+  // Barcha TF: EMA20 + EMA50 stack
   const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
   const trend = isBull ? 'BULLISH' : isBear ? 'BEARISH' : 'NEUTRAL'
@@ -492,7 +398,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let neutralTone: 'strong' | 'caution' | null = null
   let structureBased = false
   let structureLevel: number | null = null
-  let breakRetest = false
   let rsiBased = false
 
   if (trend === 'BEARISH') {
@@ -500,38 +405,29 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL tartibi: 1) break+retest  2) S/R zona  3) RSI
-    const br = detectBreakRetest(candles, last, interval)
-    if (br) {
-      side = br.side
-      neutralTone = 'strong'
+    // NEUTRAL: 1) struktura  2) zona o'rtasida → RSI
+    const bias = neutralStructureBias(candles, last, interval)
+    if (bias) {
+      side = bias.side
+      neutralTone = 'caution'
       structureBased = true
-      structureLevel = br.level
-      breakRetest = true
+      structureLevel = bias.level
     } else {
-      const bias = neutralStructureBias(candles, last, interval)
-      if (bias) {
-        side = bias.side
-        neutralTone = 'caution'
-        structureBased = true
-        structureLevel = bias.level
-      } else if (r >= 55) {
+      // RSI: ≥55 kuchliroq BUY, ≤45 kuchliroq SELL, 45–55 — 50 chizig'i
+      if (r >= 55) {
         side = 'BUY'
         neutralTone = 'strong'
-        rsiBased = true
       } else if (r <= 45) {
         side = 'SELL'
         neutralTone = 'strong'
-        rsiBased = true
       } else if (r >= 50) {
         side = 'BUY'
         neutralTone = 'caution'
-        rsiBased = true
       } else {
         side = 'SELL'
         neutralTone = 'caution'
-        rsiBased = true
       }
+      rsiBased = true
     }
   }
 
@@ -566,11 +462,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `${tf} grafikda trend BEARISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
-    } else if (breakRetest && structureLevel != null) {
-      summary =
-        `${tf} grafikda trend NEUTRAL. Support (~${fmt(structureLevel)}) yorilib, pastdan qayta test — break+retest SELL. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else if (structureBased && structureLevel != null) {
       summary =
         `${tf} grafikda trend NEUTRAL. Narx resistance (~${fmt(structureLevel)}) zonasiga yaqin — struktura asosida ehtiyotkor SELL. ` +
@@ -582,9 +473,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `${neutralTone === 'strong' ? 'SELL' : 'ehtiyotkor SELL'}. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
+    } else if (neutralTone === 'strong') {
+      summary =
+        `${tf} grafikda trend NEUTRAL, biroq bearish momentum belgilari mavjud. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. ` +
+        `${tf} grafikda trend NEUTRAL, biroq zaif bearish momentum belgilari mavjud. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     }
@@ -601,11 +497,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `${tf} grafikda trend BULLISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
-    } else if (breakRetest && structureLevel != null) {
-      summary =
-        `${tf} grafikda trend NEUTRAL. Resistance (~${fmt(structureLevel)}) yorilib, yuqoridan qayta test — break+retest BUY. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else if (structureBased && structureLevel != null) {
       summary =
         `${tf} grafikda trend NEUTRAL. Narx support (~${fmt(structureLevel)}) zonasiga yaqin — struktura asosida ehtiyotkor BUY. ` +
@@ -617,9 +508,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `${neutralTone === 'strong' ? 'BUY' : 'ehtiyotkor BUY'}. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
+    } else if (neutralTone === 'strong') {
+      summary =
+        `${tf} grafikda trend NEUTRAL, biroq bullish momentum belgilari mavjud. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
-        `${tf} grafikda trend NEUTRAL. ` +
+        `${tf} grafikda trend NEUTRAL, biroq zaif bullish momentum belgilari mavjud. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     }
