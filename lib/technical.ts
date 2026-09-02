@@ -72,37 +72,53 @@ function tfLabel(interval?: string) {
   return 'H1'
 }
 
-function tfLookback(interval: string) {
-  if (interval === '1w') return 26
-  if (interval === '1d') return 20
-  if (interval === '4h') return 16
-  if (interval === '15m') return 12
-  return 12
+function atr(candles: Candle[], period = 14): number {
+  if (candles.length < 2) return 0
+  const trs: number[] = []
+  for (let i = 1; i < candles.length; i++) {
+    const c = candles[i]
+    const p = candles[i - 1]
+    trs.push(Math.max(c.high - c.low, Math.abs(c.high - p.close), Math.abs(c.low - p.close)))
+  }
+  const slice = trs.slice(-period)
+  if (!slice.length) return 0
+  return slice.reduce((a, b) => a + b, 0) / slice.length
 }
 
-function slParams(interval: string, last: number) {
-  // H1: qisqa SL/TP — max ~1.6%
+/** TF bo'yicha ATR koeffitsientlari — optimal SL/TP */
+function atrParams(interval: string, last: number, atrVal: number) {
+  // SL = atrSlMult * ATR, TP = risk * tpR
+  const atrSlMult =
+    interval === '15m' ? 1.2 : interval === '1h' ? 1.5 : interval === '4h' ? 1.8 : interval === '1w' ? 2.5 : 2.0
+  const tpR: [number, number, number] =
+    interval === '15m' || interval === '1h'
+      ? [1.0, 1.8, 2.5]
+      : interval === '4h'
+        ? [1.2, 2.0, 3.0]
+        : [1.5, 2.5, 3.5]
+
   const minPct =
-    interval === '15m' ? 0.004 : interval === '1h' ? 0.006 : interval === '4h' ? 0.012 : interval === '1w' ? 0.025 : 0.018
-  const gapPct =
-    interval === '15m' ? 0.0035 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.008 : interval === '1w' ? 0.014 : 0.01
-  const bufPct =
-    interval === '15m' ? 0.0012 : interval === '1h' ? 0.0018 : interval === '4h' ? 0.0035 : interval === '1w' ? 0.007 : 0.005
+    interval === '15m' ? 0.003 : interval === '1h' ? 0.004 : interval === '4h' ? 0.008 : interval === '1w' ? 0.02 : 0.012
   const maxPct =
-    interval === '15m' ? 0.015 : interval === '1h' ? 0.016 : interval === '4h' ? 0.055 : interval === '1w' ? 0.12 : 0.07
+    interval === '15m' ? 0.018 : interval === '1h' ? 0.022 : interval === '4h' ? 0.045 : interval === '1w' ? 0.12 : 0.07
+  const gapPct =
+    interval === '15m' ? 0.0025 : interval === '1h' ? 0.0035 : interval === '4h' ? 0.006 : interval === '1w' ? 0.012 : 0.008
+  const bufPct =
+    interval === '15m' ? 0.0008 : interval === '1h' ? 0.0012 : interval === '4h' ? 0.002 : interval === '1w' ? 0.005 : 0.003
+
+  const minSl = last * minPct
+  const maxSl = last * maxPct
+  const raw = Math.max(atrVal * atrSlMult, last * 0.002)
+  const slDist = Math.min(maxSl, Math.max(minSl, raw))
 
   return {
-    minSl: last * minPct,
+    slDist,
+    tpR,
     entryGap: last * gapPct,
     buf: last * bufPct,
-    maxSl: last * maxPct,
+    minSl,
+    maxSl,
   }
-}
-
-function tpMults(interval: string): [number, number, number] {
-  if (interval === '1h' || interval === '15m') return [0.8, 1.4, 2.0]
-  if (interval === '4h') return [1, 1.8, 2.6]
-  return [1, 2, 3]
 }
 
 function findSwingPoints(candles: Candle[], left = 2, right = 2) {
@@ -142,32 +158,22 @@ function clusterLevels(prices: number[], tolerance: number) {
   return clusters
 }
 
-function structureParams(interval: string, last: number) {
-  // H1: yaqinroq swing (36 bar) — SL uzoq struktura pastiga tushmasin
-  const window =
-    interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 60 : 36
-  const tol =
-    last *
-    (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.008 : 0.005)
-  const lb = tfLookback(interval)
-  return { window, tol, lb }
+function structureWindow(interval: string) {
+  return interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 60 : 48
 }
 
-function buildTakeProfits(
+function buildAtrTakeProfits(
   last: number,
   risk: number,
   direction: 'long' | 'short',
-  structureLevels: number[],
-  interval: string
+  tpR: [number, number, number],
+  structureLevels: number[]
 ): [number, number, number] {
-  const r = Math.max(risk, last * 0.002)
-  const mults = tpMults(interval)
-  const minGap = r * 0.4
-  const snapBand = r * 0.3
+  const r = Math.max(risk, last * 0.0015)
+  const minGap = r * 0.35
+  const snapBand = r * 0.35
 
-  const rrTargets = mults.map((m) =>
-    direction === 'long' ? last + r * m : last - r * m
-  )
+  const rrTargets = tpR.map((m) => (direction === 'long' ? last + r * m : last - r * m))
 
   const levels =
     direction === 'long'
@@ -178,6 +184,7 @@ function buildTakeProfits(
   for (let i = 0; i < 3; i++) {
     let tp = rrTargets[i]
 
+    // Yaqin struktura darajasiga snap (ATR RR atrofida)
     for (const lvl of levels) {
       if (Math.abs(lvl - rrTargets[i]) <= snapBand) {
         if (tps.length === 0 || Math.abs(lvl - tps[tps.length - 1]) >= minGap) {
@@ -188,14 +195,8 @@ function buildTakeProfits(
     }
 
     if (tps.length > 0) {
-      if (direction === 'long') {
-        tp = Math.max(tp, tps[tps.length - 1] + minGap)
-      } else {
-        tp = Math.min(tp, tps[tps.length - 1] - minGap)
-      }
-    } else {
-      if (direction === 'long') tp = Math.max(tp, last + r * 0.6)
-      else tp = Math.min(tp, last - r * 0.6)
+      if (direction === 'long') tp = Math.max(tp, tps[tps.length - 1] + minGap)
+      else tp = Math.min(tp, tps[tps.length - 1] - minGap)
     }
 
     tps.push(tp)
@@ -205,65 +206,52 @@ function buildTakeProfits(
 }
 
 function longLevels(candles: Candle[], last: number, interval: string) {
-  const { window, tol, lb } = structureParams(interval, last)
-  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
+  const window = structureWindow(interval)
   const recent = candles.slice(-Math.min(candles.length, window))
-  const swings = findSwingPoints(recent, 2, 2)
+  const atrVal = atr(recent, 14)
+  const { slDist, tpR, entryGap, buf, minSl, maxSl } = atrParams(interval, last, atrVal)
 
+  const tol = last * (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.004)
+  const swings = findSwingPoints(recent, 2, 2)
   const swingLows = swings.filter((s) => s.type === 'low').sort((a, b) => b.index - a.index)
   const swingHighs = swings.filter((s) => s.type === 'high').sort((a, b) => b.index - a.index)
 
   const rawLows = swingLows.map((s) => s.price)
   const rawHighs = swingHighs.map((s) => s.price)
-  const windowLow = Math.min(...recent.slice(-lb).map((c) => c.low))
-  const windowHigh = Math.max(...recent.slice(-lb).map((c) => c.high))
-  if (!rawLows.length) rawLows.push(windowLow)
-  if (!rawHighs.length) rawHighs.push(windowHigh)
+  if (!rawLows.length) rawLows.push(last - slDist)
+  if (!rawHighs.length) rawHighs.push(last + slDist)
 
   const supports = clusterLevels(rawLows, tol).filter((p) => p < last).sort((a, b) => b - a)
   const resistances = clusterLevels(rawHighs, tol).filter((p) => p > last).sort((a, b) => a - b)
 
-  // Yaqin swing low afzal — uzoq tarixiy pastlarga tushmasin
-  const nearLows = swingLows.filter((s) => {
-    const dist = last - s.price
-    return dist >= minSl * 0.7 && dist <= maxSl * 1.05
-  })
-  const lastSwingMin = swingLows.find((s) => s.price < last)?.price
-  const structureLow = nearLows.length
-    ? Math.max(...nearLows.map((s) => s.price))
-    : Math.min(lastSwingMin ?? windowLow, windowLow, last - minSl)
-
-  let invalidation = structureLow - buf
+  // ATR SL asosiy; agar yaqin struktura ATR diapazonda bo'lsa — uning tagiga snap
+  let invalidation = last - slDist
+  const structCandidates = swingLows
+    .map((s) => s.price - buf)
+    .filter((p) => last - p >= minSl && last - p <= maxSl)
+  if (structCandidates.length) {
+    // ATR dan unchalik uzoq bo'lmagan eng yaqin (eng yuqori) struktura SL
+    const nearest = Math.max(...structCandidates)
+    const atrSl = last - slDist
+    // Struktura ATR SL dan biroz ichkarida yoki tashqarisida (±0.35 ATR) bo'lsa — snap
+    if (Math.abs(nearest - atrSl) <= atrVal * 0.45 || nearest < atrSl) {
+      invalidation = Math.min(nearest, atrSl)
+    }
+  }
   if (last - invalidation < minSl) invalidation = last - minSl
   if (last - invalidation > maxSl) invalidation = last - maxSl
 
   const entryHigh = last
-  const riskRange = Math.max(last - invalidation, last * 0.004)
-  let entryLow = last - riskRange * 0.35
+  const risk = Math.max(last - invalidation, last * 0.0015)
+  let entryLow = last - risk * 0.3
   if (entryLow - invalidation < entryGap) entryLow = invalidation + entryGap
-  if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(riskRange * 0.25, last * 0.003)
+  if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(risk * 0.2, last * 0.0025)
   if (entryLow <= invalidation) entryLow = invalidation + entryGap
 
-  // Risk faqat SL masofasiga bog'liq (ATR TP ni sun'iy kengaytirmasin)
-  const risk = Math.max(last - invalidation, last * 0.002)
-  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'long', resistances, interval)
+  const [tp1, tp2, tp3] = buildAtrTakeProfits(last, risk, 'long', tpR, resistances)
 
-  const fullWindowLow = Math.min(...recent.map((c) => c.low))
-  const deepLevel = supports.length
-    ? Math.min(supports[supports.length - 1], fullWindowLow)
-    : fullWindowLow
-  const supportArr: number[] = []
-  for (const s of supports) {
-    if (supportArr.length >= 2) break
-    if (!supportArr.length || Math.abs(supportArr[supportArr.length - 1] - s) / last > 0.0015) {
-      supportArr.push(s)
-    }
-  }
-  if (deepLevel < last && (!supportArr.length || deepLevel < Math.min(...supportArr) - last * 0.002)) {
-    supportArr.push(deepLevel)
-  }
-  if (!supportArr.length) supportArr.push(structureLow)
-
+  const supportArr = supports.slice(0, 3)
+  if (!supportArr.length) supportArr.push(invalidation)
   const resistanceArr = resistances.slice(0, 3)
   if (!resistanceArr.length) resistanceArr.push(tp1)
 
@@ -278,51 +266,51 @@ function longLevels(candles: Candle[], last: number, interval: string) {
 }
 
 function shortLevels(candles: Candle[], last: number, interval: string) {
-  const { window, tol, lb } = structureParams(interval, last)
-  const { minSl, entryGap, buf, maxSl } = slParams(interval, last)
+  const window = structureWindow(interval)
   const recent = candles.slice(-Math.min(candles.length, window))
-  const swings = findSwingPoints(recent, 2, 2)
+  const atrVal = atr(recent, 14)
+  const { slDist, tpR, entryGap, buf, minSl, maxSl } = atrParams(interval, last, atrVal)
 
+  const tol = last * (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : 0.004)
+  const swings = findSwingPoints(recent, 2, 2)
   const swingLows = swings.filter((s) => s.type === 'low').sort((a, b) => b.index - a.index)
   const swingHighs = swings.filter((s) => s.type === 'high').sort((a, b) => b.index - a.index)
 
   const rawLows = swingLows.map((s) => s.price)
   const rawHighs = swingHighs.map((s) => s.price)
-  const windowLow = Math.min(...recent.slice(-lb).map((c) => c.low))
-  const windowHigh = Math.max(...recent.slice(-lb).map((c) => c.high))
-  if (!rawLows.length) rawLows.push(windowLow)
-  if (!rawHighs.length) rawHighs.push(windowHigh)
+  if (!rawLows.length) rawLows.push(last - slDist)
+  if (!rawHighs.length) rawHighs.push(last + slDist)
 
   const supports = clusterLevels(rawLows, tol).filter((p) => p < last).sort((a, b) => b - a)
   const resistances = clusterLevels(rawHighs, tol).filter((p) => p > last).sort((a, b) => a - b)
 
-  const nearHighs = swingHighs.filter((s) => {
-    const dist = s.price - last
-    return dist >= minSl * 0.7 && dist <= maxSl * 1.05
-  })
-  const lastSwingMax = swingHighs.find((s) => s.price > last)?.price
-  const structureHigh = nearHighs.length
-    ? Math.min(...nearHighs.map((s) => s.price))
-    : Math.max(lastSwingMax ?? windowHigh, windowHigh, last + minSl)
-
-  let invalidation = structureHigh + buf
+  let invalidation = last + slDist
+  const structCandidates = swingHighs
+    .map((s) => s.price + buf)
+    .filter((p) => p - last >= minSl && p - last <= maxSl)
+  if (structCandidates.length) {
+    const nearest = Math.min(...structCandidates)
+    const atrSl = last + slDist
+    if (Math.abs(nearest - atrSl) <= atrVal * 0.45 || nearest > atrSl) {
+      invalidation = Math.max(nearest, atrSl)
+    }
+  }
   if (invalidation - last < minSl) invalidation = last + minSl
   if (invalidation - last > maxSl) invalidation = last + maxSl
 
   const entryLow = last
-  const riskRange = Math.max(invalidation - last, last * 0.004)
-  let entryHigh = last + riskRange * 0.35
+  const risk = Math.max(invalidation - last, last * 0.0015)
+  let entryHigh = last + risk * 0.3
   if (invalidation - entryHigh < entryGap) entryHigh = invalidation - entryGap
-  if (entryHigh <= entryLow) entryHigh = entryLow + Math.min(riskRange * 0.25, last * 0.003)
+  if (entryHigh <= entryLow) entryHigh = entryLow + Math.min(risk * 0.2, last * 0.0025)
   if (entryHigh >= invalidation) entryHigh = invalidation - entryGap
 
-  const risk = Math.max(invalidation - last, last * 0.002)
-  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'short', supports, interval)
+  const [tp1, tp2, tp3] = buildAtrTakeProfits(last, risk, 'short', tpR, supports)
 
   const supportArr = supports.slice(0, 3)
-  const resistanceArr = resistances.slice(0, 3)
   if (!supportArr.length) supportArr.push(tp1)
-  if (!resistanceArr.length) resistanceArr.push(structureHigh)
+  const resistanceArr = resistances.slice(0, 3)
+  if (!resistanceArr.length) resistanceArr.push(invalidation)
 
   return {
     support: supportArr,
@@ -367,7 +355,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else if (isH4) {
-    // H4 NEUTRAL: narx vs EMA20 + RSI
     if (last >= e20 && r >= 50) {
       side = 'BUY'
       neutralTone = 'strong'
