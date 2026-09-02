@@ -87,9 +87,9 @@ function atr(candles: Candle[], period = 14): number {
 
 /** TF bo'yicha ATR koeffitsientlari — optimal SL/TP */
 function atrParams(interval: string, last: number, atrVal: number) {
-  // SL = atrSlMult * ATR, TP = risk * tpR
+  // SL = atrSlMult * ATR, TP = risk * tpR (koeffitsientlar biroz kichraytirilgan)
   const atrSlMult =
-    interval === '15m' ? 1.2 : interval === '1h' ? 1.5 : interval === '4h' ? 1.8 : interval === '1w' ? 2.5 : 2.0
+    interval === '15m' ? 1.0 : interval === '1h' ? 1.2 : interval === '4h' ? 1.5 : interval === '1w' ? 2.1 : 1.7
   const tpR: [number, number, number] =
     interval === '15m' || interval === '1h'
       ? [1.0, 1.8, 2.5]
@@ -98,9 +98,9 @@ function atrParams(interval: string, last: number, atrVal: number) {
         : [1.5, 2.5, 3.5]
 
   const minPct =
-    interval === '15m' ? 0.003 : interval === '1h' ? 0.004 : interval === '4h' ? 0.008 : interval === '1w' ? 0.02 : 0.012
+    interval === '15m' ? 0.003 : interval === '1h' ? 0.004 : interval === '4h' ? 0.007 : interval === '1w' ? 0.018 : 0.01
   const maxPct =
-    interval === '15m' ? 0.018 : interval === '1h' ? 0.022 : interval === '4h' ? 0.045 : interval === '1w' ? 0.12 : 0.07
+    interval === '15m' ? 0.015 : interval === '1h' ? 0.018 : interval === '4h' ? 0.038 : interval === '1w' ? 0.1 : 0.06
   const gapPct =
     interval === '15m' ? 0.0025 : interval === '1h' ? 0.0035 : interval === '4h' ? 0.006 : interval === '1w' ? 0.012 : 0.008
   const bufPct =
@@ -230,10 +230,8 @@ function longLevels(candles: Candle[], last: number, interval: string) {
     .map((s) => s.price - buf)
     .filter((p) => last - p >= minSl && last - p <= maxSl)
   if (structCandidates.length) {
-    // ATR dan unchalik uzoq bo'lmagan eng yaqin (eng yuqori) struktura SL
     const nearest = Math.max(...structCandidates)
     const atrSl = last - slDist
-    // Struktura ATR SL dan biroz ichkarida yoki tashqarisida (±0.35 ATR) bo'lsa — snap
     if (Math.abs(nearest - atrSl) <= atrVal * 0.45 || nearest < atrSl) {
       invalidation = Math.min(nearest, atrSl)
     }
