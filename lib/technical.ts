@@ -77,19 +77,19 @@ function tfLookback(interval: string) {
   if (interval === '1d') return 20
   if (interval === '4h') return 16
   if (interval === '15m') return 12
-  return 14
+  return 12
 }
 
 function slParams(interval: string, last: number) {
-  // Barcha TF: oddiy SL o'lchami + entry–SL gap juda yaqin bo'lmasin
+  // H1: qisqa SL/TP — max ~1.6%
   const minPct =
-    interval === '15m' ? 0.005 : interval === '1h' ? 0.008 : interval === '4h' ? 0.012 : interval === '1w' ? 0.025 : 0.018
+    interval === '15m' ? 0.004 : interval === '1h' ? 0.006 : interval === '4h' ? 0.012 : interval === '1w' ? 0.025 : 0.018
   const gapPct =
-    interval === '15m' ? 0.004 : interval === '1h' ? 0.0055 : interval === '4h' ? 0.008 : interval === '1w' ? 0.014 : 0.01
+    interval === '15m' ? 0.0035 : interval === '1h' ? 0.0045 : interval === '4h' ? 0.008 : interval === '1w' ? 0.014 : 0.01
   const bufPct =
-    interval === '15m' ? 0.0015 : interval === '1h' ? 0.0025 : interval === '4h' ? 0.0035 : interval === '1w' ? 0.007 : 0.005
+    interval === '15m' ? 0.0012 : interval === '1h' ? 0.0018 : interval === '4h' ? 0.0035 : interval === '1w' ? 0.007 : 0.005
   const maxPct =
-    interval === '15m' ? 0.02 : interval === '1h' ? 0.03 : interval === '4h' ? 0.055 : interval === '1w' ? 0.12 : 0.07
+    interval === '15m' ? 0.015 : interval === '1h' ? 0.016 : interval === '4h' ? 0.055 : interval === '1w' ? 0.12 : 0.07
 
   return {
     minSl: last * minPct,
@@ -97,6 +97,12 @@ function slParams(interval: string, last: number) {
     buf: last * bufPct,
     maxSl: last * maxPct,
   }
+}
+
+function tpMults(interval: string): [number, number, number] {
+  if (interval === '1h' || interval === '15m') return [0.8, 1.4, 2.0]
+  if (interval === '4h') return [1, 1.8, 2.6]
+  return [1, 2, 3]
 }
 
 function findSwingPoints(candles: Candle[], left = 2, right = 2) {
@@ -137,8 +143,9 @@ function clusterLevels(prices: number[], tolerance: number) {
 }
 
 function structureParams(interval: string, last: number) {
+  // H1: yaqinroq swing (36 bar) — SL uzoq struktura pastiga tushmasin
   const window =
-    interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 80 : 60
+    interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : interval === '15m' ? 60 : 36
   const tol =
     last *
     (interval === '15m' ? 0.0015 : interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.008 : 0.005)
@@ -146,29 +153,17 @@ function structureParams(interval: string, last: number) {
   return { window, tol, lb }
 }
 
-function atr(candles: Candle[], period = 14): number {
-  if (candles.length < 2) return 0
-  const trs: number[] = []
-  for (let i = 1; i < candles.length; i++) {
-    const c = candles[i]
-    const p = candles[i - 1]
-    trs.push(Math.max(c.high - c.low, Math.abs(c.high - p.close), Math.abs(c.low - p.close)))
-  }
-  const slice = trs.slice(-period)
-  if (!slice.length) return 0
-  return slice.reduce((a, b) => a + b, 0) / slice.length
-}
-
 function buildTakeProfits(
   last: number,
   risk: number,
   direction: 'long' | 'short',
-  structureLevels: number[]
+  structureLevels: number[],
+  interval: string
 ): [number, number, number] {
   const r = Math.max(risk, last * 0.002)
-  const mults = [1, 2, 3]
-  const minGap = r * 0.45
-  const snapBand = r * 0.35
+  const mults = tpMults(interval)
+  const minGap = r * 0.4
+  const snapBand = r * 0.3
 
   const rrTargets = mults.map((m) =>
     direction === 'long' ? last + r * m : last - r * m
@@ -199,8 +194,8 @@ function buildTakeProfits(
         tp = Math.min(tp, tps[tps.length - 1] - minGap)
       }
     } else {
-      if (direction === 'long') tp = Math.max(tp, last + r * 0.7)
-      else tp = Math.min(tp, last - r * 0.7)
+      if (direction === 'long') tp = Math.max(tp, last + r * 0.6)
+      else tp = Math.min(tp, last - r * 0.6)
     }
 
     tps.push(tp)
@@ -228,10 +223,14 @@ function longLevels(candles: Candle[], last: number, interval: string) {
   const supports = clusterLevels(rawLows, tol).filter((p) => p < last).sort((a, b) => b - a)
   const resistances = clusterLevels(rawHighs, tol).filter((p) => p > last).sort((a, b) => a - b)
 
-  const farLows = swingLows.filter((s) => last - s.price >= minSl * 0.7)
+  // Yaqin swing low afzal — uzoq tarixiy pastlarga tushmasin
+  const nearLows = swingLows.filter((s) => {
+    const dist = last - s.price
+    return dist >= minSl * 0.7 && dist <= maxSl * 1.05
+  })
   const lastSwingMin = swingLows.find((s) => s.price < last)?.price
-  const structureLow = farLows.length
-    ? Math.max(...farLows.map((s) => s.price))
+  const structureLow = nearLows.length
+    ? Math.max(...nearLows.map((s) => s.price))
     : Math.min(lastSwingMin ?? windowLow, windowLow, last - minSl)
 
   let invalidation = structureLow - buf
@@ -240,14 +239,14 @@ function longLevels(candles: Candle[], last: number, interval: string) {
 
   const entryHigh = last
   const riskRange = Math.max(last - invalidation, last * 0.004)
-  let entryLow = last - riskRange * 0.4
+  let entryLow = last - riskRange * 0.35
   if (entryLow - invalidation < entryGap) entryLow = invalidation + entryGap
-  if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(riskRange * 0.3, last * 0.004)
+  if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(riskRange * 0.25, last * 0.003)
   if (entryLow <= invalidation) entryLow = invalidation + entryGap
 
-  const atrVal = atr(recent)
-  const risk = Math.max(last - invalidation, atrVal * 0.8, last * 0.002)
-  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'long', resistances)
+  // Risk faqat SL masofasiga bog'liq (ATR TP ni sun'iy kengaytirmasin)
+  const risk = Math.max(last - invalidation, last * 0.002)
+  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'long', resistances, interval)
 
   const fullWindowLow = Math.min(...recent.map((c) => c.low))
   const deepLevel = supports.length
@@ -297,10 +296,13 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
   const supports = clusterLevels(rawLows, tol).filter((p) => p < last).sort((a, b) => b - a)
   const resistances = clusterLevels(rawHighs, tol).filter((p) => p > last).sort((a, b) => a - b)
 
-  const farHighs = swingHighs.filter((s) => s.price - last >= minSl * 0.7)
+  const nearHighs = swingHighs.filter((s) => {
+    const dist = s.price - last
+    return dist >= minSl * 0.7 && dist <= maxSl * 1.05
+  })
   const lastSwingMax = swingHighs.find((s) => s.price > last)?.price
-  const structureHigh = farHighs.length
-    ? Math.min(...farHighs.map((s) => s.price))
+  const structureHigh = nearHighs.length
+    ? Math.min(...nearHighs.map((s) => s.price))
     : Math.max(lastSwingMax ?? windowHigh, windowHigh, last + minSl)
 
   let invalidation = structureHigh + buf
@@ -309,14 +311,13 @@ function shortLevels(candles: Candle[], last: number, interval: string) {
 
   const entryLow = last
   const riskRange = Math.max(invalidation - last, last * 0.004)
-  let entryHigh = last + riskRange * 0.4
+  let entryHigh = last + riskRange * 0.35
   if (invalidation - entryHigh < entryGap) entryHigh = invalidation - entryGap
-  if (entryHigh <= entryLow) entryHigh = entryLow + Math.min(riskRange * 0.3, last * 0.004)
+  if (entryHigh <= entryLow) entryHigh = entryLow + Math.min(riskRange * 0.25, last * 0.003)
   if (entryHigh >= invalidation) entryHigh = invalidation - entryGap
 
-  const atrVal = atr(recent)
-  const risk = Math.max(invalidation - last, atrVal * 0.8, last * 0.002)
-  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'short', supports)
+  const risk = Math.max(invalidation - last, last * 0.002)
+  const [tp1, tp2, tp3] = buildTakeProfits(last, risk, 'short', supports, interval)
 
   const supportArr = supports.slice(0, 3)
   const resistanceArr = resistances.slice(0, 3)
