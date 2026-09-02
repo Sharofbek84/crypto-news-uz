@@ -1,46 +1,55 @@
 [
   {
+    "slug": "btc-etf-217mln-eth-11kun-2-sent",
+    "title": "Bitcoin ETF’lari $217 mln bilan qaytdi, ether fondlari 11 kunlik seriyani uzatmadi",
+    "summary": "Dushanba kuni AQSh spot BTC ETF’lari $216,7–217 mln sof kirim oldi. ETH ETF’lari $87,7–88 mln bilan 11-sessiyani yozdi; IBIT kunlik oqimning ~95% ini oldi.",
+    "body": "SoSoValue: 1-sentabr (dushanba) AQSh spot Bitcoin ETF’lari taxminan $216,7–217 million dollar sof kirim qayd etdi. Bu juma kuni $201,8–202 mln chiqimdan keyingi qaytish. Juma chiqimi 19-avgustdan davom etgan 9 kunlik kirim seriyasini ($3 mlrddan oshiq) uzgan edi.\n\nFarside: BlackRock IBIT $205,9 mln (~95%) oldi. Fidelity FBTC $6,9 mln, Bitwise BITB $4,3 mln. VanEck HODL $13,4 mln chiqim yozgan yagona fond bo‘ldi. BTC ETF sof aktivlari avgust oxirida $100 mlrd chizig‘ini qisqa kesib, keyin $100 mlrd ostiga qaytdi; 2024-yil yanvardan beri kumulativ sof kirim ~$55 mlrd. 2026 yili bo‘yicha esa hali ~$2,5 mlrd sof chiqim saqlanmoqda.\n\nEther ETF’lari $87,7–88 mln bilan 11-ketma-ket ijobiy kunni yozdi; seriya $1,6 mlrd. Bu 2025-yil iyulida tugagan 20 kunlik seriyadan keyingi eng uzun. ETHA $59,9 mln, Grayscale Ethereum Mini $13,5 mln, Fidelity $9,3 mln. XRP va Solana fondlari ham 10-sessiyani ijobiy yakunladi (XRP ~$5,64 mln).\n\nNarx: BTC $77,1–78,7 ming, ETH ~$2 400 atrofida. Institutsional oqim qaytgan, lekin yapon 10 yillik obligatsiyasi 3% va neft o‘sishi xavf-aktivlarga bosim bergan.",
+    "url": "https://www.coindesk.com/business/2026/09/01/live-updates-bitcoin-etfs-resume-buying-as-ether-funds-stretch-streak-to-11-days",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-02"
+  },
+  {
+    "slug": "singapur-mas-steyblkoin-2-sent",
+    "title": "Singapur steyblkoinga 100% zaxira va foiz taqiqini taklif qildi",
+    "summary": "MAS Payment Services Act o‘zgartirishlarini maslahatlashuvga qo‘ydi. Konsultatsiya 16-oktabrgacha. Chet el steyblkoinlarini tan olish ham ko‘rib chiqilmoqda.",
+    "body": "Singapur pul-kredit boshqarmasi (MAS) 1-sentabrda Payment Services Act 2019 ga o‘zgartirishlar bo‘yicha konsultatsiya e’lon qildi. Maqsad — 2023-yilda yakunlangan yagona valyutali steyblkoin (MAS-SCS) rejimini qonunga kiritish.\n\nLitsenziyalangan emitent doimiy ravishda muomaladagi tokenlarning kamida 100% qiymatida zaxira ushlashi shart. Zaxira emitentning o‘z mablag‘idan ajratilgan ishonch hisobida, faqat litsenziyalangan moliya muassasalarida saqlanadi va kunlik mark-to-market qilinadi. Par qiymatida qaytarib olish muddati — belgilangan ish kunlari ichida (taklifda 5 ish kuni tilga olingan).\n\nEmitentlarga ushlovchiga foiz yoki ushlashga bog‘liq boshqa naf to‘lash taqiqlanadi. MAS buni AQSh GENIUS Act va Yevropa MiCA amaliyoti bilan mos deb izohladi. Qo‘shimcha: stress-test, tiklash va tartibli yopilish rejalari, noqonuniy tokenlarni kuzatish/muzlatish/yoqish imkoniyati.\n\nYangi yo‘nalish: cheklangan sonli chet el steyblkoinlarini qiyosiy rejim ostida tan olish va Singapur–chet el qo‘shma emissiyasiga MAS yorlig‘ini berish. Fikr-mulohaza 16-oktabrgacha. Joriy etish sanasi belgilanmagan.",
+    "url": "https://www.coindesk.com/policy/2026/09/01/singapore-proposes-100-reserves-and-a-ban-on-yields-for-stablecoin-issuers",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-02"
+  },
+  {
+    "slug": "citi-goldman-21-bank-steyblkoin-2-sent",
+    "title": "Citi, Goldman va 19 ta firma dollar steyblkoini uchun kompaniya ochadi",
+    "summary": "21 ta bank va aktiv-menejer 2026-yil ikkinchi yarmida kompaniya tuzadi. Token 2027-yil birinchi yarmida, GENIUS va MiCA ga mos.",
+    "body": "1-sentabrda 21 ta moliyaviy muassasa dollar steyblkoini chiqarish uchun yangi kompaniya tuzishga kelishganini e’lon qildi. Kompaniya nomi va blokcheyn hali tanlanmagan. Tuzilish 2026-yil ikkinchi yarmida, yopilish shartlariga qarab; mahsulot 2027-yil birinchi yarmida chiqishi mo‘ljallangan.\n\nShimoliy Amerika: Citi, Goldman Sachs, Bank of America, Wells Fargo, Capital One, PNC, Scotiabank, TD Bank Group, Fidelity va WisdomTree. Yevropa: Deutsche Bank, UBS, Santander, BBVA, Commerzbank, Crédit Agricole, Lloyds, Rabobank. Shuningdek MUFG Bank, Sirius International Holding va Standard Bank. Maslahatchilar: BCG va Brunswick.\n\nAvval dollar, keyin boshqa G7 valyutalari; yevro ustuvor. Guruh GENIUS Act va MiCA ga mos ishlashni maqsad qilgan. Tashabbus 2025-yil oktabrida 10 ta bank bilan boshlangan, hozir soni ikki baravar oshgan.\n\nRaqobat: 37 ta muassasa Qivalis orqali shu yil yevro steyblkoini rejalashtirgan. CoinDesk xabariga ko‘ra, e’lon kuni Circle aksiyasi kripto-aksiyalarning aksariyatidan ortda qolgan.",
+    "url": "https://www.coindesk.com/business/2026/09/01/citi-goldman-other-global-banks-and-asset-managers-team-up-on-stablecoin-venture",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-02"
+  },
+  {
+    "slug": "sec-transfer-agent-blokcheyn-2-sent",
+    "title": "SEC transfer-agent qoidalarini blokcheyn davri uchun yangilamoqchi",
+    "summary": "S7-2026-30: 1970-yillardagi qoidalar elektron hisob va tokenizatsiyaga moslashtiriladi. Rais Atkins DLT ni ochiq tilga oldi.",
+    "body": "AQSh Qimmatli qog‘ozlar va birja komissiyasi (SEC) 1-sentabrda ro‘yxatdan o‘tgan transfer-agentlar uchun qoidalarni modernizatsiya qilishni taklif qildi (reliz 34-106246, fayl S7-2026-30). Amaldagi qoidalar 1970-yillar oxiri — 1980-yillar boshidan jiddiy yangilanmagan.\n\nRais Paul Atkins: taklif elektron kommunikatsiya va blokcheyn texnologiyasini qimmatli qog‘oz chiqarish va ulush o‘tkazishda inobatga olishga qaratilgan. 421 sahifalik matnda tokenizatsiya, tarqalgan reestr yaxlitligi, smart-kontrakt xavflari va avtomatlashtirish nazorati alohida qayd etilgan.\n\nKomissar Hester Peirce qog‘oz sertifikatlar o‘rniga onchain ulushlar kelayotganini yozdi va identifikator sifatida email hamda raqamli hamyon manzillarini yig‘ish mumkinligini savol qilib qo‘ydi. Taklifda mikrokap firibgarligiga qarshi siyosat va cheklovchi legendani noto‘g‘ri olib tashlashni taqiqlash ham bor.\n\nIzohlar Federal Register da e’lon qilingandan keyin 60 kun. Bu tokenizatsiya infratuzilmasi uchun yuridik asosni yangilash urinishi — CLARITY Act ovozi hali 15-sentabrga qolgan fonida.",
+    "url": "https://www.sec.gov/newsroom/press-releases/2026-81-sec-proposes-modernize-rules-registered-transfer-agents",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-02"
+  },
+  {
+    "slug": "btc-78ming-neft-rektember-2-sent",
+    "title": "Bitcoin $78 ming atrofida: ETF kirimi bor, makro bosim ham",
+    "summary": "Avgust +24% dan keyin sentabr «Rektember» mavsumiyati, obligatsiya savdosi va neft o‘sishi rallyni sekinlashtirdi.",
+    "body": "Bitcoin sentabrning 1–2 kunlarida $77–78,7 ming oralig‘ida savdo qildi. 28-avgustdagi ~$81 400 cho‘qqidan keyin tuzatish ketdi. Avgust o‘sishi manbalarga qarab ~25% — 2017-yildan beri eng kuchli avgust.\n\nDushanba ETF kirimi ($217 mln BTC, $88 mln ETH) institutsional talab saqlanayotganini ko‘rsatdi. Shu bilan birga Yaponiya 10 yillik obligatsiyasi 3% chizig‘iga yaqinlashdi, global bond sell-off chuqurlashdi. CoinDesk «Rektember»ni — sentabrning tarixan zaif oyi va foiz oshirish xavfini — alohida qayd etdi.\n\nGeosiyosiy fon: Eron atrofidagi yangi zarbalar neftni uch oylik yuqoriga ko‘tardi. Xavf-aktivlar shu kombinatsiyada sekinlashdi: ETH ~$2 400, XRP ~$1,33–1,35. Altcoin tomonda Arbitrum Robinhood Chain kunlik komissiyasi $2 mln dan oshishi fonida ~30% ko‘tarilgani qayd etildi.\n\nXulosa: avgust oqimi ETF va korporativ xazinalarda qolgan; sentabr boshida oqim qaytdi, lekin narx hali $81 ming cho‘qqisini qayta sinamagan.",
+    "url": "https://www.coindesk.com/markets/2026/09/01/bitcoin-enters-rektember-as-rate-hike-risk-combines-with-seasonality-to-threaten-rally",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-02"
+  },
+  {
     "slug": "rossiya-kripto-rubl-1-sent",
     "title": "Rossiya 1-sentabrdan qonuniy kripto savdosi va raqamli rublni ishga tushirdi",
     "summary": "Sberbank birinchi yilda litsenziyalangan birjalarda $46 mlrd hajm kutmoqda. Chakana xaridor yiliga 300 000 rubl (~$3 700) bilan cheklangan.",
     "body": "2026-yil 1-sentabrdan Rossiyada kriptovalyuta savdosi litsenziyalangan broker, birja va depozitariylar orqali rasman ochildi. Putin avgust boshida imzolagan qonun Markaziy bank nazoratini belgilaydi. Ichki tovar va xizmatlar uchun kripto to‘lovi taqiqlanganligicha qoladi.\n\nSberbank rais o‘rinbosari Anatoliy Popov TASS ga litsenziyalangan savdo hajmi birinchi yilda 3,5–4 trillion rubl ($40–46 mlrd), 2029-yilga 7,5 trillion rubl (~$87 mlrd) bo‘lishi mumkinligini aytdi. Bu mamlakatdagi taxminiy yillik kripto aylanmasining ~20% i.\n\nDastlabki ro‘yxatda Bitcoin, Ethereum va USDT. Malakasiz investor har bir vositachi orqali yiliga 300 000 rublgacha (~$3 700–3 800) xarid qiladi; malakali investorlar uchun chegara yuqori. Shu kundan 12 tizimli bank raqamli rubl to‘lovlarini ochishi shart.",
     "url": "https://www.theblock.co/news/business/2026-08-31-russias-largest-bank-forecasts-46-billion-in-first-year-crypto-exchange-trading-under-new-rules-report-413082",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-09-01"
-  },
-  {
-    "slug": "vetnam-kripto-jarima-1-sent",
-    "title": "Vetnam 1-sentabrdan kripto ma’muriy jarimalarini kuchga kiritdi",
-    "summary": "Litsenziyasiz birja va reklama uchun tashkilotga 180–200 mln dong. Chakana offshor savdo jarimasi hali 6 oylik imtiyozda.",
-    "body": "Vetnam hukumati 284/2026/NĐ-CP farmoni 1-sentabrdan kuchga kirdi. Litsenziyasiz kripto xizmati yoki reklama uchun tashkilot 180–200 million dong, jismoniy shaxs shu summaning yarmigacha jarima olishi mumkin.\n\nIchki investorning litsenziyasiz (shu jumladan offshor) platformada savdo qilishi uchun 30–50 million dong jarima nazarda tutilgan. Lekin 05/2025/NQ-CP qaroriga ko‘ra bu band Moliya vazirligi birinchi birja litsenziyasini bergandan keyin 6 oy o‘tgach qo‘llanadi. Hozircha hech bir birja litsenziya olmagan.\n\nLitsenziya uchun 5 kompaniya dastlabki bahodan o‘tgan; keyingi talab — 4-daraja axborot xavfsizligi va kamida 10 trillion dong (~$383 mln) kapital. KYC buzilishi 50–70 million dong jarimaga tortiladi.",
-    "url": "https://blockchainreporter.net/vietnam-crypto-penalty-rules-take-effect-september-1/",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-09-01"
-  },
-  {
-    "slug": "kalshi-santos-umrbod-1-sent",
-    "title": "Kalshi Jorj Santosni bashorat bozoridan umrbod chetlatdi",
-    "summary": "Platformaning birinchi lifetime ban. $71 356 jarima. CFTC avvalroq SOTU ishtiroki bozorida ~$18 ming foyda deb hisoblagan.",
-    "body": "Bashorat bozori Kalshi 31-avgustda sobiq Kongress a’zosi Jorj Santosni umrbod taqiqladi va $71 356 jarima yozdi. Bu kompaniya tarixidagi birinchi lifetime ban.\n\nMavzu — Trampning Kongressga murojaati (State of the Union) da Santos ishtirok etadimi, degan shartnoma. Kalshi uni natijaga ta’sir qila oladigan shaxs sifatida savdodan cheklangan deb topdi va chalg‘ituvchi ijtimoiy postlar orqali ehtimollikni siljitganini aytdi. Santos tekshiruvga to‘liq hamkorlik qilmagan.\n\nCFTC iyulda xuddi shu savdo uchun ~$17 800–18 000 foyda va $35 000 kelishuvni qayd etgan edi. Kalshi bir kunda boshqa siyosatchilarga ham qisqa muddatli taqiqlar berdi. Santos X da «umrbod taqiq uchun rahmat» deb yozdi.",
-    "url": "https://www.coindesk.com/policy/2026/08/31/kalshi-lays-down-first-lifetime-ban-for-ex-member-of-congress-george-santos",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-09-01"
-  },
-  {
-    "slug": "cme-coinbase-btc-derivativ-1-sent",
-    "title": "CME va Coinbase o‘rtasidagi BTC derivativ farqi majburiy yopilish xavfini oshirdi",
-    "summary": "CME dagi leverajli fondlarning sof shorti Coinbase dagi sof longdan ~272 barobar katta. Tahlilchilar keskin unwind ehtimolini ogohlantirmoqda.",
-    "body": "CryptoSlate 31-avgust tahliliga ko‘ra, CME Bitcoin fyucherslaridagi leverajli fondlarning sof qisqa pozitsiyasi Coinbase dagi sof uzun pozitsiyadan taxminan 272 barobar katta. Bu ikki maydon orasidagi derivativ «bo‘shliq» majburiy yopilish (forced unwind) xavfini oshiradi.\n\nAgar narx bir tomonga keskin ketsa, CME dagi yirik shortlar qo‘shimcha margin talabi va likvidatsiyalarni zanjirlab yuborishi mumkin. Shu bilan birga spot hajmlar uch yillik pastlikka yaqin qolmoqda — avgust rallysi asosan ETF va xazina xaridlari hisobiga ketgan.\n\nBitcoin avgustda 2017-yildan beri eng yaxshi oyini o‘tkazib, sentabr boshida $77,5–79 ming oralig‘ida savdo qildi. Fed raisi Kevin Warshning Jackson Hole dagi qattiq nutqi va 28-avgustdagi ~$202 mln BTC ETF chiqimi rallyni sekinlashtirgan.",
-    "url": "https://cryptoslate.com/massive-bitcoin-derivatives-gap-between-cme-and-coinbase-threatens-violent-position-shakeout/",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-09-01"
-  },
-  {
-    "slug": "robinhood-chain-eth-tushum-1-sent",
-    "title": "Robinhood Chain kunlik tushumda Ethereumni ortda qoldirdi",
-    "summary": "30-avgustda 5,52 mln tranzaksiya va $2,66 mln tushum. Asosiy haydovchi — memecoin savdosi va 22 600 ta yangi token.",
-    "body": "CoinDesk: ikki oylik Robinhood Chain 30-avgustda rekord 5,52 million tranzaksiya qayta ishladi va $2,66 million kunlik tushum oldi — shu kunda Ethereumdan yuqori. Foydalanuvchilar 22 600 ta token ishga tushirgan; tushumning katta qismi memecoin savdo vositalaridan kelgan.\n\nTarmoq Robinhood ilovasidagi chakana oqimni onchain ga olib chiqishga qaratilgan. Qisqa muddatli hajm o‘sishi L2 va memecoin tsikllariga xos: token chiqarish osonlashganda komissiya tushumi keskin ko‘tariladi, keyin esa so‘nishi mumkin.\n\nBu Base va Solana dagi memecoin to‘lqinidan keyingi navbatdagi chakana zanjir signalidir. Institutsional oqim esa baribir BTC/ETH ETF va korporativ xazinalarda qolmoqda.",
-    "url": "https://www.coindesk.com/tech/2026/08/31/robinhood-chain-beats-ethereum-in-daily-revenue-as-memecoin-trading-takes-over",
     "source": "GOLDENWEB.UZ",
     "date": "2026-09-01"
   },
@@ -54,13 +63,13 @@
     "date": "2026-09-01"
   },
   {
-    "slug": "strive-1800-btc-5-orin-1-sent",
-    "title": "Strive 1 800 BTC oldi — ochiq kompaniyalar orasida 5-o‘rin",
-    "summary": "24–28-avgustda $143 mln evaziga, o‘rtacha $79 431. Zaxira 23 156 BTC. TD Cowen ASST nishonini $28 dan $32 ga ko‘tardi.",
-    "body": "Strive Inc. (Nasdaq: ASST) 31-avgustdagi 8-K da 24–28-avgust haftasida 1 800 BTC ni $143 mln ga, o‘rtacha $79 431 (komissiya bilan) sotib olganini yozdi. Jami 23 156 BTC — Bitcoin Treasuries reytingida Bullish (22 000 BTC) ni ortda qoldirib, ochiq savdodagi korporativ ushlovchilar orasida 5-o‘rin.\n\nMoliyalashtirish ikki ATM orqali: 803 099 dona SATA imtiyozli aksiya (~$80,3 mln, $100 nominal) va 3 579 147 dona Class A oddiy aksiya (~$74,3 mln, o‘rtacha ~$20,75). Jami tushum ~$154,6 mln; $11,6 mln naqdga qoldi.\n\nOldinda: Strategy 845 050, Twenty One Capital 43 514, Metaplanet 43 000, MARA 35 577 BTC. TD Cowen ASST uchun Buy reytingini saqlab, nishonni $28 dan $32 ga oshirdi va III chorak xaridi prognozini 1 500 dan ~4 300 BTC ga ko‘tardi.",
-    "url": "https://www.theblock.co/news/business/2026-08-31-strive-fifth-largest-public-bitcoin-treasury-1800-btc-buy-td-cowen-lifts-asst-price-target-413112",
+    "slug": "clarity-act-sentabr-31-avg",
+    "title": "CLARITY Act ovozi sentabrga qoldi: cloture 15-sentabr",
+    "summary": "Senat avgust ta’tiliga qonunni ovozga qo‘ymay chiqdi. Thune cloture jarayonini 15-sentabrga qo‘ydi; 60 ovoz kerak.",
+    "body": "AQSh Senati avgustning besh haftalik ta’tiliga Digital Asset Market CLARITY Act bo‘yicha to‘liq qavat ovozisiz chiqdi. Majority Leader John Thune 15-sentabrda debatni cheklash (cloture) ovozini belgiladi. Cloture uchun 60 ovoz kerak.\n\nQonun Palatadan 2025-yil iyulida 294–134 bilan o‘tgan. Senat Banking qo‘mitasi 15–9. Asosiy to‘siq — etika bandi va noqonuniy moliya himoyasi. Demokratlar, jumladan Kirsten Gillibrand, yuqori mansabdorlarning kripto biznesiga bog‘liqligini cheklashni talab qilgan.\n\nSenat 14-sentabrda qaytadi va saylov tanaffusigacha ~14 ish kuni qoladi. Reuters tahlilida muvaffaqiyatsiz cloture qonunni 2026-yil uchun amalda yopishi mumkinligi aytilgan. Bozor uchun bu XRP, SOL va boshqa altcoinlarning tovar/qimmatli qog‘oz tasnifi noaniqligini saqlaydi.",
+    "url": "https://www.usnews.com/news/politics/articles/2026-08-10/analysis-crypto-bill-faces-long-odds-after-senate-punts-vote-to-september",
     "source": "GOLDENWEB.UZ",
-    "date": "2026-09-01"
+    "date": "2026-08-31"
   },
   {
     "slug": "bitmine-eth-49-foiz-1-sent",
@@ -79,59 +88,5 @@
     "url": "https://www.theblock.co/news/markets/2026-08-28-bitwise-fund-is-first-solana-etf-to-hit-1-billion-aum-413035",
     "source": "GOLDENWEB.UZ",
     "date": "2026-09-01"
-  },
-  {
-    "slug": "btc-78ming-sentabr-1-sent",
-    "title": "Sentabr boshi: Bitcoin $78 ming atrofida, avgust +24–30%",
-    "summary": "28-avgustdagi $81 ming cho‘qqi va $202 mln ETF chiqimidan keyin BTC $77,5–79 mingda. Avgust 2017-yildan beri eng kuchli.",
-    "body": "Bitcoin sentabrning birinchi kunida $78 000 atrofida savdo qildi (crypto.news spot ~$78 874; dam olish kunlari $77,3–79,3 ming). 28-avgustda $81 179–81 455 cho‘qqi, so‘ng Fed raisi Kevin Warshning Jackson Hole nutqi (PCE 3,7%) va spot BTC ETF’laridan $201,8–201,9 mln sof chiqim tuzatish keltirdi.\n\nAvgust rallysi $62–64 mingdan $81 minggacha: manbalarga qarab +24% dan +30% gacha — 2017-yildagi ~65% dan keyingi eng yaxshi avgust. Oy davomida AQSh spot BTC ETF‘lari ~$3,3 mlrd sof kirim qilgan; 9 kunlik seriya $3,04 mlrd.\n\nChiqim ARKB ($114,9 mln), BITB ($49,7 mln) va IBIT ($33,4 mln) hisobiga. Shu kuni ETH ETF $102,1 mln, XRP ETF $26,2 mln kirim oldi. Geopolitik fon: neft $90 dan oshishi xavf-aktivlarga qo‘shimcha bosim bergan.",
-    "url": "https://decrypt.co/376897/bitcoin-etfs-snap-streak-ethereum-funds-extend",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-09-01"
-  },
-  {
-    "slug": "cronos-tectonic-75mln-31-avg",
-    "title": "Cronos to‘xtatildi: Tectonic hujumi ~$75 mln",
-    "summary": "Crypto.com bog‘liq Cronos tarmog‘i Tectonic kredit protokoli exploitidan keyin blok ishlab chiqarishni to‘xtatdi. ~$6 mln Ethereumga o‘tgan.",
-    "body": "Cronos Network yakshanba kuni X da exploit aniqlanganini va tarmoq to‘xtatilganini yozdi. Zarar onchain tadqiqotchi Weilin Li hisobida taxminan $74–75 mln. Hujumchi Tectonicning nozik TONIC tokenini ~20 daqiqada 100 barobar shishirib, garov sifatida boshqa aktivlarni qarzga olgan — 2022-yilgi Mango Markets sxemasiga o‘xshash.\n\nTo‘xtashdan oldin ~$6 mln Ethereumga ko‘prik qilingan; ~$60 mln Cronosda qolgan. Tectonic TVL ~$121,6 mln edi — Cronos DeFi ning ~46%. Crypto.com birjasi va ilovasi ta’sirlanmaganini aytdi.\n\nValidatorlar rollback, hujumchini qora ro‘yxat yoki aralashmasdan qayta ishga tushirish orasida tanlov qiladi. Tectonic depozitorlarga hozircha yaqinlashmaslikni ogohlantirdi.",
-    "url": "https://www.theblock.co/news/defi/2026-08-30-crypto-com-linked-cronos-network-halts-after-tectonic-exploit-estimated-at-75-million-413069",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-31"
-  },
-  {
-    "slug": "sberbank-kripto-garov-31-avg",
-    "title": "Sberbank BTC, ETH va USDT ni kredit garovi qilmoqchi",
-    "summary": "Rossiyaning eng yirik banki 1-sentabrdagi yangi kripto qonuni ostida Bitcoin, keyin ETH va USDT ni garov sifatida qabul qilishni rejalashtirgan.",
-    "body": "Sberbank boshqaruvi rais o‘rinbosari Anatoliy Popov TASS ga 28-avgustda Bitcoin bilan birga Ethereum va Tether USDT ni ham kredit garovi sifatida qabul qilishni mo‘ljallaganini aytdi. ETH va USDT faqat Rossiya Markaziy banki ularni ommaviy muomalaga ruxsat bergandan keyin qo‘shiladi.\n\nFederal qonun 282-FZ 2026-yil 1-sentabrda kuchga kiradi. Banklar, brokerlar va kriptobirjalar Markaziy bank nazorati ostida ishlaydi. Malakasiz investorlar har bir vositachi orqali yiliga 300 000 rublgacha xarid qilishi mumkin.\n\nSberbank 2025-yil dekabrida Intelion Data bilan Bitcoin garovli kredit pilotini o‘tkazgan. Mahsulot va xizmatlar uchun kripto to‘lovlari Rossiyada taqiqlanganligicha qoladi. Aniq start sanasi va shartlar e’lon qilinmagan.",
-    "url": "https://crypto.news/sberbank-plans-btc-eth-and-usdt-backed-loans/",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-31"
-  },
-  {
-    "slug": "clarity-act-sentabr-31-avg",
-    "title": "CLARITY Act ovozi sentabrga qoldi: cloture 15-sentabr",
-    "summary": "Senat avgust ta’tiliga qonunni ovozga qo‘ymay chiqdi. Thune cloture jarayonini 15-sentabrga qo‘ydi; 60 ovoz kerak.",
-    "body": "AQSh Senati avgustning besh haftalik ta’tiliga Digital Asset Market CLARITY Act bo‘yicha to‘liq qavat ovozisiz chiqdi. Majority Leader John Thune 15-sentabrda debatni cheklash (cloture) ovozini belgiladi. Cloture uchun 60 ovoz kerak.\n\nQonun Palatadan 2025-yil iyulida 294–134 bilan o‘tgan. Senat Banking qo‘mitasi 15–9. Asosiy to‘siq — etika bandi va noqonuniy moliya himoyasi. Demokratlar, jumladan Kirsten Gillibrand, yuqori mansabdorlarning kripto biznesiga bog‘liqligini cheklashni talab qilgan.\n\nSenat 14-sentabrda qaytadi va saylov tanaffusigacha ~14 ish kuni qoladi. Reuters tahlilida muvaffaqiyatsiz cloture qonunni 2026-yil uchun amalda yopishi mumkinligi aytilgan. Bozor uchun bu XRP, SOL va boshqa altcoinlarning tovar/qimmatli qog‘oz tasnifi noaniqligini saqlaydi.",
-    "url": "https://www.usnews.com/news/politics/articles/2026-08-10/analysis-crypto-bill-faces-long-odds-after-senate-punts-vote-to-september",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-31"
-  },
-  {
-    "slug": "evernorth-xrp-nasdaq-31-avg",
-    "title": "Evernorth XRP xazinasi SEC S-4 dan o‘tdi: ovoz 30-sentabr",
-    "summary": "SEC 27-avgustda Evernorth Form S-4 ni kuchga kiritdi. Armada II aksiyadorlari 30-sentabrda ovoz beradi, listing tickeri XRPN.",
-    "body": "Evernorth Holdings Inc. AQSh SEC tomonidan Form S-4 registratsiyasi 27-avgustda effective deb e’lon qilindi. Kompaniya Armada Acquisition Corp. II (Nasdaq: XRPN) bilan birlashadi. Qayd sanasi 20-avgust, maxsus yig‘ilish 30-sentabr.\n\nBitim yalpi tushumni $1 mlrddan oshirish mo‘ljallangan. SBI Group $200 mln majburiyat bergan. Ripple Evernorthga sarmoya kiritgan va 126 mln+ XRP (ayrim hisobotlarda 126,8 mln) xazinaga qo‘shgan; Arrington Capital 211,3 mln XRP. Boshqa ishtirokchilar: Pantera Capital, Kraken, GSR.\n\nIshga tushishda zaxira kamida 473 mln XRP. CEO Asheesh Birla (sobiq Ripple) xazinani XRPL da kredit, likvidlik va yield orqali faol boshqarishni maqsad qilgan. Yopilish kech Q3 yoki erta Q4 2026.",
-    "url": "https://www.coindesk.com/markets/2026/08/28/an-xrp-treasury-company-backed-by-ripple-is-a-shareholder-vote-away-from-nasdaq",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-31"
-  },
-  {
-    "slug": "btc-etf-202mln-chiqim-30-avg",
-    "title": "Bitcoin ETF’lari 9 kunlik kirimni uzdi: $202 mln chiqim",
-    "summary": "28-avgustda AQSh spot BTC ETF’laridan $201,8–201,9 mln sof chiqim chiqdi. Oldingi to‘qqiz sessiyada $3 mlrddan oshiq kirim bo‘lgan edi.",
-    "body": "SoSoValue va Farside ma’lumotlariga ko‘ra, 28-avgust juma kuni AQSh spot Bitcoin ETF’lari $201,8–201,9 million dollar sof chiqim qayd etdi. Bu 17-avgustdan beri davom etgan to‘qqiz savdo kunlik kirim seriyasini to‘xtatdi; seriya davomida fondlarga $3,04 mlrd yaqin mablag‘ kirgan edi.\n\nChiqimning asosiy qismi ARK 21Shares ARKB ($114,9 mln), Bitwise BITB ($49,7 mln) va BlackRock IBIT ($33,4 mln) hisobiga to‘g‘ri keldi. VanEck HODL $13,2 mln yo‘qotdi. Morgan Stanley MSBT esa $9,3 mln kirim bilan yagona ijobiy fond bo‘ldi.\n\nShu kuni Bitcoin taxminan 3,2% pasayib $77,696 atrofida yopildi. Avgust oyi baribir ijobiy: oy bo‘yicha sof kirim taxminan $3,3 mlrd, haftalik kirim 28-avgust holatiga $924,5 mln. Jami sof aktivlar payshanba kuni $100 mlrd ostidan o‘tganidan keyin $97,6 mlrd atrofiga qaytdi.",
-    "url": "https://cointelegraph.com/markets/bitcoin-etf-end-9-day-inflow-streak-btc-below-78k",
-    "source": "GOLDENWEB.UZ",
-    "date": "2026-08-30"
   }
 ]
