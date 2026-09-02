@@ -58,115 +58,6 @@ export function rsi(values: number[], period = 14) {
   return 100 - 100 / (1 + avgGain / avgLoss)
 }
 
-/** RSI series for pivot/divergence (same formula as rsi(), per-bar). */
-function rsiSeries(values: number[], period = 14): number[] {
-  const out: number[] = []
-  let avgGain = 0
-  let avgLoss = 0
-  for (let i = 0; i < values.length; i++) {
-    if (i === 0) {
-      out.push(50)
-      continue
-    }
-    const d = values[i] - values[i - 1]
-    const gain = Math.max(d, 0)
-    const loss = Math.max(-d, 0)
-    if (i < period) {
-      avgGain += gain
-      avgLoss += loss
-      out.push(50)
-    } else if (i === period) {
-      avgGain = (avgGain + gain) / period
-      avgLoss = (avgLoss + loss) / period
-      out.push(avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss))
-    } else {
-      avgGain = (avgGain * (period - 1) + gain) / period
-      avgLoss = (avgLoss * (period - 1) + loss) / period
-      out.push(avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss))
-    }
-  }
-  return out
-}
-
-type RsiDivResult = { kind: 'bull' | 'bear'; pivotPrice: number } | null
-
-/**
- * Regular divergence on last two swing highs/lows:
- * - bear: price HH, RSI LH + after high a red candle closed → Ehtiyotkor SELL
- * - bull: price LL, RSI HL + after low a green candle closed → Ehtiyotkor BUY
- * pivotPrice: bull → oxirgi swing low, bear → oxirgi swing high (SL uchun)
- */
-function hasConfirmCandle(candles: Candle[], afterIndex: number, kind: 'red' | 'green'): boolean {
-  for (let i = afterIndex + 1; i < candles.length; i++) {
-    const c = candles[i]
-    if (kind === 'red' && c.close < c.open) return true
-    if (kind === 'green' && c.close > c.open) return true
-  }
-  return false
-}
-
-function detectRegularRsiDivergence(candles: Candle[], left = 3, right = 3): RsiDivResult {
-  if (candles.length < 30) return null
-  const closes = candles.map((c) => c.close)
-  const rs = rsiSeries(closes)
-  const highs: { i: number; price: number; rsi: number }[] = []
-  const lows: { i: number; price: number; rsi: number }[] = []
-
-  for (let i = left; i < candles.length - right; i++) {
-    let isHigh = true
-    let isLow = true
-    for (let j = 1; j <= left; j++) {
-      if (candles[i - j].high >= candles[i].high) isHigh = false
-      if (candles[i - j].low <= candles[i].low) isLow = false
-    }
-    for (let j = 1; j <= right; j++) {
-      if (candles[i + j].high > candles[i].high) isHigh = false
-      if (candles[i + j].low < candles[i].low) isLow = false
-    }
-    if (isHigh) highs.push({ i, price: candles[i].high, rsi: rs[i] })
-    if (isLow) lows.push({ i, price: candles[i].low, rsi: rs[i] })
-  }
-
-  const minGap = 5
-  let bear: { dist: number; pivotPrice: number } | null = null
-  let bull: { dist: number; pivotPrice: number } | null = null
-
-  if (highs.length >= 2) {
-    const a = highs[highs.length - 2]
-    const b = highs[highs.length - 1]
-    if (
-      b.i - a.i >= minGap &&
-      b.price > a.price &&
-      b.rsi < a.rsi &&
-      hasConfirmCandle(candles, b.i, 'red')
-    ) {
-      bear = { dist: candles.length - 1 - b.i, pivotPrice: b.price }
-    }
-  }
-  if (lows.length >= 2) {
-    const a = lows[lows.length - 2]
-    const b = lows[lows.length - 1]
-    if (
-      b.i - a.i >= minGap &&
-      b.price < a.price &&
-      b.rsi > a.rsi &&
-      hasConfirmCandle(candles, b.i, 'green')
-    ) {
-      bull = { dist: candles.length - 1 - b.i, pivotPrice: b.price }
-    }
-  }
-
-  const maxAge = 12
-  if (bear && bear.dist <= maxAge && bull && bull.dist <= maxAge) {
-    return bear.dist <= bull.dist
-      ? { kind: 'bear', pivotPrice: bear.pivotPrice }
-      : { kind: 'bull', pivotPrice: bull.pivotPrice }
-  }
-  if (bear && bear.dist <= maxAge) return { kind: 'bear', pivotPrice: bear.pivotPrice }
-  if (bull && bull.dist <= maxAge) return { kind: 'bull', pivotPrice: bull.pivotPrice }
-  return null
-}
-
 function fmt(n: number) {
   if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 0 })
   if (n >= 1) return n.toFixed(2)
@@ -503,48 +394,11 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     neutralTone = 'caution'
   }
 
-  const rsiDiv = detectRegularRsiDivergence(candles)
-  if (rsiDiv?.kind === 'bear') {
-    side = 'SELL'
-    neutralTone = 'caution'
-  } else if (rsiDiv?.kind === 'bull') {
-    side = 'BUY'
-    neutralTone = 'caution'
-  }
-
   const sr =
     side === 'SELL'
       ? shortLevels(candles, last, interval)
       : longLevels(candles, last, interval)
-  let { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
-
-  // RSI divergensiya: SL oxirgi swing low/high dan, min masofa saqlanadi
-  if (rsiDiv) {
-    const { buf, entryGap, minSl } = slParams(interval, last)
-    if (rsiDiv.kind === 'bull') {
-      invalidation = rsiDiv.pivotPrice - buf
-      if (last - invalidation < minSl) invalidation = last - minSl
-      entryHigh = last
-      const riskRange = Math.max(last - invalidation, last * 0.004)
-      entryLow = last - riskRange * 0.4
-      if (entryLow - invalidation < entryGap) entryLow = invalidation + entryGap
-      if (entryLow >= entryHigh) entryLow = entryHigh - Math.min(riskRange * 0.3, last * 0.004)
-      if (entryLow <= invalidation) entryLow = invalidation + entryGap
-      const risk = Math.max(last - invalidation, last * 0.002)
-      tp = buildTakeProfits(last, risk, 'long', resistance)
-    } else {
-      invalidation = rsiDiv.pivotPrice + buf
-      if (invalidation - last < minSl) invalidation = last + minSl
-      entryLow = last
-      const riskRange = Math.max(invalidation - last, last * 0.004)
-      entryHigh = last + riskRange * 0.4
-      if (invalidation - entryHigh < entryGap) entryHigh = invalidation - entryGap
-      if (entryHigh <= entryLow) entryHigh = entryLow + Math.min(riskRange * 0.3, last * 0.004)
-      if (entryHigh >= invalidation) entryHigh = invalidation - entryGap
-      const risk = Math.max(invalidation - last, last * 0.002)
-      tp = buildTakeProfits(last, risk, 'short', support)
-    }
-  }
+  const { support, resistance, invalidation, entryLow, entryHigh, tp } = sr
 
   const deepSupport = support.length
     ? Math.min(...support)
@@ -606,20 +460,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     }
-  }
-
-  if (rsiDiv?.kind === 'bear') {
-    summary =
-      `${tf} grafikda narx avvalgi maksimumni yangiladi, lekin RSI pasaymoqda (bearish divergence) — ehtiyotkorlik bilan SELL. ` +
-      `SL oxirgi maksimum (${fmt(rsiDiv.pivotPrice)}) ustidan. ` +
-      `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
-      `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
-  } else if (rsiDiv?.kind === 'bull') {
-    summary =
-      `${tf} grafikda narx avvalgi minimumni yangiladi, lekin RSI ko'tarilmoqda (bullish divergence) — ehtiyotkorlik bilan BUY. ` +
-      `SL oxirgi minimum (${fmt(rsiDiv.pivotPrice)}) tagidan. ` +
-      `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
-      `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
   }
 
   return {

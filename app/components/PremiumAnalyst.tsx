@@ -28,13 +28,6 @@ type Result = {
   summary: string
 }
 
-type Pivot = { i: number; price: number; rsi: number }
-type DivLine = {
-  kind: 'bull-div' | 'bear-div' | 'bull-hid' | 'bear-hid'
-  a: Pivot
-  b: Pivot
-}
-
 const coins = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
 const intervals = [
   ['1h', 'H1'],
@@ -94,64 +87,6 @@ function emaSeries(c: Candle[], p: number) {
   })
 }
 
-function findPivots(candles: Candle[], rs: number[], left = 3, right = 3) {
-  const highs: Pivot[] = []
-  const lows: Pivot[] = []
-  for (let i = left; i < candles.length - right; i++) {
-    let isHigh = true
-    let isLow = true
-    for (let j = 1; j <= left; j++) {
-      if (candles[i - j].high >= candles[i].high) isHigh = false
-      if (candles[i - j].low <= candles[i].low) isLow = false
-    }
-    for (let j = 1; j <= right; j++) {
-      if (candles[i + j].high > candles[i].high) isHigh = false
-      if (candles[i + j].low < candles[i].low) isLow = false
-    }
-    if (isHigh) highs.push({ i, price: candles[i].high, rsi: rs[i] })
-    if (isLow) lows.push({ i, price: candles[i].low, rsi: rs[i] })
-  }
-  return { highs, lows }
-}
-
-function detectRsiDivergences(candles: Candle[], rs: number[]): DivLine[] {
-  if (candles.length < 30) return []
-  const { highs, lows } = findPivots(candles, rs, 3, 3)
-  const out: DivLine[] = []
-  const minGap = 5
-
-  if (lows.length >= 2) {
-    const a = lows[lows.length - 2]
-    const b = lows[lows.length - 1]
-    if (b.i - a.i >= minGap) {
-      if (b.price < a.price && b.rsi > a.rsi) out.push({ kind: 'bull-div', a, b })
-      else if (b.price > a.price && b.rsi < a.rsi) out.push({ kind: 'bull-hid', a, b })
-    }
-  }
-
-  if (highs.length >= 2) {
-    const a = highs[highs.length - 2]
-    const b = highs[highs.length - 1]
-    if (b.i - a.i >= minGap) {
-      if (b.price > a.price && b.rsi < a.rsi) out.push({ kind: 'bear-div', a, b })
-      else if (b.price < a.price && b.rsi > a.rsi) out.push({ kind: 'bear-hid', a, b })
-    }
-  }
-
-  return out
-}
-
-function divLabel(kind: DivLine['kind']) {
-  if (kind === 'bull-div') return 'Bull Div'
-  if (kind === 'bear-div') return 'Bear Div'
-  if (kind === 'bull-hid') return 'Bull Hid'
-  return 'Bear Hid'
-}
-
-function divColor(kind: DivLine['kind']) {
-  return kind.startsWith('bull') ? '#20d67a' : '#ff5360'
-}
-
 function CleanChart({
   candles,
   result,
@@ -202,7 +137,6 @@ function CleanChart({
   const labelX = plotRight + 10
   const tf = tfLong(interval)
   const isSell = result.side === 'SELL'
-  const divergences = detectRsiDivergences(candles, rs)
 
   const rightBox = (yy: number, text: string, bg: string, w = 100) => (
     <g>
@@ -299,26 +233,6 @@ function CleanChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
-          {divergences.map((d, idx) => {
-            const color = divColor(d.kind)
-            return (
-              <g key={'px-' + idx}>
-                <line
-                  x1={x(d.a.i)}
-                  y1={y(d.a.price)}
-                  x2={x(d.b.i)}
-                  y2={y(d.b.price)}
-                  stroke={color}
-                  strokeWidth="2"
-                  strokeDasharray="6 4"
-                  opacity="0.9"
-                />
-                <circle cx={x(d.a.i)} cy={y(d.a.price)} r="4" fill={color} />
-                <circle cx={x(d.b.i)} cy={y(d.b.price)} r="4" fill={color} />
-              </g>
-            )
-          })}
-
           <rect
             x={zoneLeft}
             y={Math.min(y(result.entryHigh), y(result.entryLow))}
@@ -364,32 +278,8 @@ function CleanChart({
 
           <text x={L} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
             RSI 14  {result.rsi.toFixed(2)}
-            {divergences.length > 0 && (
-              <tspan fill={divColor(divergences[0].kind)} fontSize="12" fontWeight="700">
-                {'  ·  '}{divergences.map((d) => divLabel(d.kind)).join(' · ')}
-              </tspan>
-            )}
           </text>
           <polyline points={rs.map((v, i) => `${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2" />
-
-          {divergences.map((d, idx) => {
-            const color = divColor(d.kind)
-            return (
-              <g key={'rsi-' + idx}>
-                <line
-                  x1={x(d.a.i)}
-                  y1={ry(d.a.rsi)}
-                  x2={x(d.b.i)}
-                  y2={ry(d.b.rsi)}
-                  stroke={color}
-                  strokeWidth="2.2"
-                  opacity="0.95"
-                />
-                <circle cx={x(d.a.i)} cy={ry(d.a.rsi)} r="4.5" fill={color} stroke="#0e1320" strokeWidth="1" />
-                <circle cx={x(d.b.i)} cy={ry(d.b.rsi)} r="4.5" fill={color} stroke="#0e1320" strokeWidth="1" />
-              </g>
-            )
-          })}
 
           <rect x={labelX} y={ry(result.rsi) - 12} width="70" height="24" rx="4" fill="#5b4a9a" />
           <text x={labelX + 35} y={ry(result.rsi) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="700">
