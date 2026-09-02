@@ -206,7 +206,6 @@ function neutralStructureBias(
   const nearSup = nearestSup != null && distSup <= nearBand
   const nearRes = nearestRes != null && distRes <= nearBand
 
-  // Supportda react → BUY; resistanceda react → SELL
   if (nearSup && bullReact && (!nearRes || distSup <= distRes)) {
     return { side: 'BUY', level: nearestSup }
   }
@@ -214,7 +213,6 @@ function neutralStructureBias(
     return { side: 'SELL', level: nearestRes }
   }
 
-  // Zona ichida, lekin react zaif — eng yaqin zonaga og'ish (juda ehtiyotkor)
   if (nearSup && !nearRes) return { side: 'BUY', level: nearestSup }
   if (nearRes && !nearSup) return { side: 'SELL', level: nearestRes }
 
@@ -400,31 +398,36 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let neutralTone: 'strong' | 'caution' | null = null
   let structureBased = false
   let structureLevel: number | null = null
+  let rsiBased = false
 
   if (trend === 'BEARISH') {
     side = 'SELL'
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL: avvalo struktura (S/R + react)
+    // NEUTRAL: 1) struktura  2) zona o'rtasida → RSI
     const bias = neutralStructureBias(candles, last, interval)
     if (bias) {
       side = bias.side
       neutralTone = 'caution'
       structureBased = true
       structureLevel = bias.level
-    } else if (e20 >= e50 && r >= 50) {
-      side = 'BUY'
-      neutralTone = 'strong'
-    } else if (e20 >= e50 && r < 50) {
-      side = 'BUY'
-      neutralTone = 'caution'
-    } else if (e20 < e50 && r < 50) {
-      side = 'SELL'
-      neutralTone = 'strong'
     } else {
-      side = 'SELL'
-      neutralTone = 'caution'
+      // RSI: ≥55 kuchliroq BUY, ≤45 kuchliroq SELL, 45–55 — 50 chizig'i
+      if (r >= 55) {
+        side = 'BUY'
+        neutralTone = 'strong'
+      } else if (r <= 45) {
+        side = 'SELL'
+        neutralTone = 'strong'
+      } else if (r >= 50) {
+        side = 'BUY'
+        neutralTone = 'caution'
+      } else {
+        side = 'SELL'
+        neutralTone = 'caution'
+      }
+      rsiBased = true
     }
   }
 
@@ -464,6 +467,12 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `${tf} grafikda trend NEUTRAL. Narx resistance (~${fmt(structureLevel)}) zonasiga yaqin — struktura asosida ehtiyotkor SELL. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
+    } else if (rsiBased) {
+      summary =
+        `${tf} grafikda trend NEUTRAL, zona o'rtasida — RSI (${r.toFixed(1)}) asosida ` +
+        `${neutralTone === 'strong' ? 'SELL' : 'ehtiyotkor SELL'}. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
       summary =
         `${tf} grafikda trend NEUTRAL, biroq bearish momentum belgilari mavjud. ` +
@@ -491,6 +500,12 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     } else if (structureBased && structureLevel != null) {
       summary =
         `${tf} grafikda trend NEUTRAL. Narx support (~${fmt(structureLevel)}) zonasiga yaqin — struktura asosida ehtiyotkor BUY. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
+    } else if (rsiBased) {
+      summary =
+        `${tf} grafikda trend NEUTRAL, zona o'rtasida — RSI (${r.toFixed(1)}) asosida ` +
+        `${neutralTone === 'strong' ? 'BUY' : 'ehtiyotkor BUY'}. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else if (neutralTone === 'strong') {
