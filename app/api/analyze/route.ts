@@ -14,7 +14,7 @@ type AllowedInterval = (typeof ALLOWED_INTERVALS)[number]
 const TELEGRAM_INTERVALS = new Set(['1h', '4h', '1d'])
 
 /** Bir coin uchun keyingi Telegram signalgacha kutish (soat). */
-const COIN_TELEGRAM_COOLDOWN_SEC = 60 * 60 * 8 // 8 soat
+const COIN_TELEGRAM_COOLDOWN_SEC = 60 * 60 * 4 // 4 soat
 
 function intervalConfig(interval: string) {
   if (interval === '1w') return '7d'
@@ -82,7 +82,7 @@ async function passesHigherTimeframeFilter(
  * Telegram signal = Premium analyze() natijasi.
  * W1 — faqat grafik.
  * H1 + NEUTRAL trend — yuborilmaydi.
- * Bir coin: TF/side farqi yo'q — 8 soat cooldown (parallel race: 5 daqiqa lock).
+ * Bir coin: TF/side farqi yo'q — 4 soat cooldown (parallel race: 5 daqiqa lock).
  */
 async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
   if (!TELEGRAM_INTERVALS.has(interval)) return
@@ -135,7 +135,7 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   })
   if (coinLocked == null) return
 
-  // 2) Bir coin — 8 soat ichida faqat 1 ta Telegram
+  // 2) Bir coin — 4 soat ichida faqat 1 ta Telegram
   const cooldownKey = `goldenweb:telegram-coin-cd:${symbol}`
   const cooldownOk = await redis.set(cooldownKey, `${interval}:${current.side}`, {
     nx: true,
