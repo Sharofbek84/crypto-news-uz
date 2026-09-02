@@ -442,10 +442,10 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
   if (side === 'SELL') {
     bullish =
-      `Narx ${fmt(invalidation)} resistance zonasini qayta test qilib, EMA20/EMA50 ustiga chiqsa, ` +
+      `Narx ${fmt(invalidation)} resistance zonasini qayta test qilib, EMA20 ustiga chiqsa, ` +
       `qisqa muddatli rebound ehtimoli oshadi va SELL signal bekor bo'lishi mumkin.`
     bearish =
-      `Narx EMA20/EMA50 ostida qolsa va momentum salbiy bo'lsa, ` +
+      `Narx EMA20 ostida qolsa va momentum salbiy bo'lsa, ` +
       `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga pasayish ssenariysi kuchayadi.`
 
     if (trend === 'BEARISH') {
@@ -466,10 +466,10 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     }
   } else {
     bullish =
-      `Narx EMA20/EMA50 ustida va momentum ijobiy bo'lsa, ` +
+      `Narx EMA20 ustida va momentum ijobiy bo'lsa, ` +
       `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} gacha rebound/breakout ssenariysi kuzatiladi.`
     bearish =
-      `Narx EMA20/EMA50 ostida qolish va momentum susayishi ` +
+      `Narx EMA20 ostida qolish va momentum susayishi ` +
       `${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
 
     if (trend === 'BULLISH') {
