@@ -94,9 +94,19 @@ export async function getTrackedSignal(
 
 type CandleHL = { time: number; high: number; low: number; close: number }
 
+function tpStatus(level: 1 | 2 | 3): 'tp1' | 'tp2' | 'tp3' {
+  return level === 3 ? 'tp3' : level === 2 ? 'tp2' : 'tp1'
+}
+
+function tpPrice(signal: TrackedSignal, level: 1 | 2 | 3): number {
+  return level === 3 ? signal.tp3 : level === 2 ? signal.tp2 : signal.tp1
+}
+
 /**
- * Candles chronologically after signalTime.
- * First touch wins: SL vs TPs (TP1 before TP2 before TP3 if same candle both hit, higher priority to SL if both extremes touch).
+ * SignalTime dan keyingi shamchalar bo'yicha natija.
+ * Progressiv TP: avval TP1, keyin TP2, keyin TP3 — eng yuqori yetgan TP saqlanadi.
+ * SL faqat hech qanday TP tegmasdan oldin (yoki birinchi TP bilan bir xil shamchada) hisoblanadi.
+ * TP dan keyin SL tegsa — oldingi eng yuqori TP g'alaba deb qoladi.
  */
 export function evaluateOutcome(
   signal: TrackedSignal,
@@ -107,6 +117,10 @@ export function evaluateOutcome(
 
   const now = Date.now()
   if (now - signal.signalTime > MAX_AGE_MS) {
+    // Muddati o'tgan: agar TP allaqachon bo'lsa — TP qoladi, aks holda expired
+    if (signal.status === 'tp1' || signal.status === 'tp2' || signal.status === 'tp3') {
+      return null
+    }
     return {
       status: 'expired',
       outcomePrice: after[after.length - 1].close,
@@ -114,56 +128,88 @@ export function evaluateOutcome(
     }
   }
 
+  let bestTp: 0 | 1 | 2 | 3 =
+    signal.status === 'tp3' ? 3 : signal.status === 'tp2' ? 2 : signal.status === 'tp1' ? 1 : 0
+  let bestTpTime = signal.outcomeAt ? Date.parse(signal.outcomeAt) : 0
+
   for (const c of after) {
     if (signal.side === 'BUY') {
       const hitSl = c.low <= signal.sl
       const hitTp1 = c.high >= signal.tp1
       const hitTp2 = c.high >= signal.tp2
       const hitTp3 = c.high >= signal.tp3
+      const tpThis: 0 | 1 | 2 | 3 = hitTp3 ? 3 : hitTp2 ? 2 : hitTp1 ? 1 : 0
 
-      // Same candle: agar SL va TP birga tegsa — SL ustun (konservativ)
-      if (hitSl && (hitTp1 || hitTp2 || hitTp3)) {
-        return { status: 'sl', outcomePrice: signal.sl, outcomeAt: new Date(c.time).toISOString() }
-      }
       if (hitSl) {
-        return { status: 'sl', outcomePrice: signal.sl, outcomeAt: new Date(c.time).toISOString() }
+        // TP dan oldin (yoki bir xil shamchada TP+SL) — SL
+        if (bestTp === 0) {
+          return { status: 'sl', outcomePrice: signal.sl, outcomeAt: new Date(c.time).toISOString() }
+        }
+        // Allaqachon TP olgan — SL ni e'tiborsiz, eng yuqori TP yakuniy
+        return {
+          status: tpStatus(bestTp),
+          outcomePrice: tpPrice(signal, bestTp),
+          outcomeAt: bestTpTime ? new Date(bestTpTime).toISOString() : new Date(c.time).toISOString(),
+        }
       }
-      if (hitTp3) {
-        return { status: 'tp3', outcomePrice: signal.tp3, outcomeAt: new Date(c.time).toISOString() }
-      }
-      if (hitTp2) {
-        return { status: 'tp2', outcomePrice: signal.tp2, outcomeAt: new Date(c.time).toISOString() }
-      }
-      if (hitTp1) {
-        return { status: 'tp1', outcomePrice: signal.tp1, outcomeAt: new Date(c.time).toISOString() }
+
+      if (tpThis > bestTp) {
+        bestTp = tpThis
+        bestTpTime = c.time
       }
     } else {
       const hitSl = c.high >= signal.sl
       const hitTp1 = c.low <= signal.tp1
       const hitTp2 = c.low <= signal.tp2
       const hitTp3 = c.low <= signal.tp3
+      const tpThis: 0 | 1 | 2 | 3 = hitTp3 ? 3 : hitTp2 ? 2 : hitTp1 ? 1 : 0
 
-      if (hitSl && (hitTp1 || hitTp2 || hitTp3)) {
-        return { status: 'sl', outcomePrice: signal.sl, outcomeAt: new Date(c.time).toISOString() }
-      }
       if (hitSl) {
-        return { status: 'sl', outcomePrice: signal.sl, outcomeAt: new Date(c.time).toISOString() }
+        if (bestTp === 0) {
+          return { status: 'sl', outcomePrice: signal.sl, outcomeAt: new Date(c.time).toISOString() }
+        }
+        return {
+          status: tpStatus(bestTp),
+          outcomePrice: tpPrice(signal, bestTp),
+          outcomeAt: bestTpTime ? new Date(bestTpTime).toISOString() : new Date(c.time).toISOString(),
+        }
       }
-      if (hitTp3) {
-        return { status: 'tp3', outcomePrice: signal.tp3, outcomeAt: new Date(c.time).toISOString() }
+
+      if (tpThis > bestTp) {
+        bestTp = tpThis
+        bestTpTime = c.time
       }
-      if (hitTp2) {
-        return { status: 'tp2', outcomePrice: signal.tp2, outcomeAt: new Date(c.time).toISOString() }
-      }
-      if (hitTp1) {
-        return { status: 'tp1', outcomePrice: signal.tp1, outcomeAt: new Date(c.time).toISOString() }
-      }
+    }
+  }
+
+  // TP3 — yakuniy yopilish
+  if (bestTp === 3) {
+    return {
+      status: 'tp3',
+      outcomePrice: signal.tp3,
+      outcomeAt: bestTpTime ? new Date(bestTpTime).toISOString() : new Date().toISOString(),
+    }
+  }
+
+  // TP1/TP2 — oraliq holat (keyinroq TP3 yoki SL kuzatiladi)
+  if (bestTp === 1 || bestTp === 2) {
+    // Allaqachon shu statusda bo'lsa — o'zgarish yo'q
+    if (signal.status === tpStatus(bestTp)) return null
+    return {
+      status: tpStatus(bestTp),
+      outcomePrice: tpPrice(signal, bestTp),
+      outcomeAt: bestTpTime ? new Date(bestTpTime).toISOString() : new Date().toISOString(),
     }
   }
 
   return null
 }
 
+/**
+ * Statusni yangilash.
+ * TP1/TP2 — hali kuzatiladi (OPEN_SET da qoladi).
+ * TP3 / SL / expired — to'liq yopiladi.
+ */
 export async function closeTrackedSignal(
   redis: Redis,
   signal: TrackedSignal,
@@ -178,13 +224,17 @@ export async function closeTrackedSignal(
     outcomeAt,
   }
   await redis.set(signalKey(signal.id), JSON.stringify(updated), { ex: 60 * 60 * 24 * 60 })
-  if (status !== 'open') {
+
+  const stillTracking = status === 'open' || status === 'tp1' || status === 'tp2'
+  if (stillTracking) {
+    await redis.sadd(OPEN_SET, signal.id)
+  } else {
     await redis.srem(OPEN_SET, signal.id)
   }
   return updated
 }
 
-/** Tracker uchun: ochiq + noto'g'ri expired (hali muddati ichida) signallar */
+/** Tracker uchun: ochiq + TP1/TP2 (progressiv) + noto'g'ri expired */
 export async function getTrackableSignals(): Promise<TrackedSignal[]> {
   const redis = getRedis()
   if (!redis) return []
@@ -194,10 +244,16 @@ export async function getTrackableSignals(): Promise<TrackedSignal[]> {
   for (const id of ids) {
     const s = await getTrackedSignal(redis, String(id))
     if (!s) continue
-    if (s.status === 'open') {
-      out.push(s)
+
+    // Ochiq yoki hali TP3/SL ga yetmagan progressiv TP
+    if (s.status === 'open' || s.status === 'tp1' || s.status === 'tp2') {
+      if (now - s.signalTime <= MAX_AGE_MS) {
+        out.push(s)
+        await redis.sadd(OPEN_SET, s.id)
+      }
       continue
     }
+
     // Noto'g'ri expired: hali MAX_AGE ichida va TP/SL tegmagan
     if (s.status === 'expired' && now - s.signalTime <= MAX_AGE_MS) {
       const reopened: TrackedSignal = {
