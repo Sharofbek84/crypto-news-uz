@@ -55,7 +55,8 @@ export async function GET(request: NextRequest) {
 
   for (const signal of trackable) {
     try {
-      if (signal.status !== 'open') continue
+      // open + progressiv tp1/tp2 kuzatiladi
+      if (signal.status !== 'open' && signal.status !== 'tp1' && signal.status !== 'tp2') continue
 
       const cacheKey = `${signal.symbol}:${signal.interval}`
       let candles = candleCache.get(cacheKey)
