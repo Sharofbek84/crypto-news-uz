@@ -198,7 +198,7 @@ function structureWindow(interval: string) {
 }
 
 /**
- * RSI divergensiya: grafik + NEUTRAL signal.
+ * RSI divergensiya: grafik + NEUTRAL signal (RSI tasdiq bilan).
  * Pivotlar oxirgi ~60 shamchadan qidiriladi.
  * Ikki pivot oralig'i 5–40 shamcha.
  * Bullish: narx pastroq low, RSI yuqoriroq low.
@@ -474,12 +474,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL: 1) RSI divergensiya  2) RSI > 50 → BUY, aks holda SELL
-    // Asosiy xulosa matni o'zgarmaydi (faqat side/entry/TP/SL yo'nalishi)
-    if (divergence?.type === 'bullish') {
+    // NEUTRAL + divergensiya: RSI tasdiqlash filtri
+    // bullish div + RSI > 50 → BUY (ehtiyotkor)
+    // bearish div + RSI < 50 → SELL (ehtiyotkor)
+    // tasdiq yo'q → oddiy RSI fallback
+    if (divergence?.type === 'bullish' && r > 50) {
       side = 'BUY'
       neutralTone = 'caution'
-    } else if (divergence?.type === 'bearish') {
+    } else if (divergence?.type === 'bearish' && r < 50) {
       side = 'SELL'
       neutralTone = 'caution'
     } else if (r > 50) {
