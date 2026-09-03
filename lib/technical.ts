@@ -201,6 +201,7 @@ function structureWindow(interval: string) {
  * RSI divergensiya: oxirgi 10–20 shamcha oralig'ida.
  * Bullish: narx pastroq low, RSI yuqoriroq low.
  * Bearish: narx yuqoriroq high, RSI pastroq high.
+ * Hozircha faqat grafik uchun; signalga ta'sir qilmaydi.
  */
 function detectRsiDivergence(candles: Candle[], lookbackMin = 10, lookbackMax = 20): Divergence | null {
   if (candles.length < lookbackMax + 8) return null
@@ -466,14 +467,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL: 1) RSI divergensiya  2) RSI > 50 → BUY, aks holda SELL
-    if (divergence?.type === 'bullish') {
-      side = 'BUY'
-      neutralTone = 'caution'
-    } else if (divergence?.type === 'bearish') {
-      side = 'SELL'
-      neutralTone = 'caution'
-    } else if (r > 50) {
+    // NEUTRAL: hozircha divergensiya signalga ta'sir qilmaydi (faqat grafik uchun)
+    // RSI > 50 → BUY, aks holda SELL
+    if (r > 50) {
       side = 'BUY'
       neutralTone = 'caution'
     } else {
