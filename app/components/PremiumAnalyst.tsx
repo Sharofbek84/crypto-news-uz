@@ -6,6 +6,15 @@ import CryptoAnalystAI from './CryptoAnalystAI'
 import SignalStatsPanel from './SignalStatsPanel'
 
 type Candle = { time: number; open: number; high: number; low: number; close: number; volume: number }
+type Divergence = {
+  type: 'bullish' | 'bearish'
+  i1: number
+  i2: number
+  price1: number
+  price2: number
+  rsi1: number
+  rsi2: number
+}
 type Result = {
   ema10: number
   ema20: number
@@ -26,6 +35,7 @@ type Result = {
   bullish: string
   bearish: string
   summary: string
+  divergence?: Divergence | null
 }
 
 const coins = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
@@ -137,6 +147,7 @@ function CleanChart({
   const labelX = plotRight + 10
   const tf = tfLong(interval)
   const isSell = result.side === 'SELL'
+  const div = result.divergence
 
   const rightBox = (yy: number, text: string, bg: string, w = 100) => (
     <g>
@@ -232,6 +243,54 @@ function CleanChart({
           <polyline points={poly(e10)} fill="none" stroke="#ff9f0a" strokeWidth="1.9" />
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
+
+          {/* RSI divergensiya chiziqlari — faqat chiziq, yozuv yo'q */}
+          {div && div.i1 >= 0 && div.i2 < candles.length && (
+            <g opacity="0.95">
+              <line
+                x1={x(div.i1)}
+                y1={y(div.price1)}
+                x2={x(div.i2)}
+                y2={y(div.price2)}
+                stroke={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+                strokeWidth="2.2"
+                strokeDasharray="6 4"
+              />
+              <circle
+                cx={x(div.i1)}
+                cy={y(div.price1)}
+                r="4"
+                fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+              />
+              <circle
+                cx={x(div.i2)}
+                cy={y(div.price2)}
+                r="4"
+                fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+              />
+              <line
+                x1={x(div.i1)}
+                y1={ry(div.rsi1)}
+                x2={x(div.i2)}
+                y2={ry(div.rsi2)}
+                stroke={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+                strokeWidth="2.2"
+                strokeDasharray="6 4"
+              />
+              <circle
+                cx={x(div.i1)}
+                cy={ry(div.rsi1)}
+                r="3.5"
+                fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+              />
+              <circle
+                cx={x(div.i2)}
+                cy={ry(div.rsi2)}
+                r="3.5"
+                fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+              />
+            </g>
+          )}
 
           <rect
             x={zoneLeft}
