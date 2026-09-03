@@ -198,19 +198,25 @@ function structureWindow(interval: string) {
 }
 
 /**
- * RSI divergensiya: oxirgi 10–20 shamcha oralig'ida.
+ * RSI divergensiya (faqat grafik; signalga ta'sir qilmaydi).
+ * Pivotlar oxirgi ~60 shamchadan qidiriladi.
+ * Ikki pivot oralig'i 5–40 shamcha.
  * Bullish: narx pastroq low, RSI yuqoriroq low.
  * Bearish: narx yuqoriroq high, RSI pastroq high.
- * Hozircha faqat grafik uchun; signalga ta'sir qilmaydi.
  */
-function detectRsiDivergence(candles: Candle[], lookbackMin = 10, lookbackMax = 20): Divergence | null {
-  if (candles.length < lookbackMax + 8) return null
+function detectRsiDivergence(
+  candles: Candle[],
+  lookbackMin = 5,
+  lookbackMax = 40,
+  searchBars = 60
+): Divergence | null {
+  if (candles.length < lookbackMin + 10) return null
 
   const closes = candles.map((c) => c.close)
   const rs = rsiSeries(closes)
   const left = 2
   const right = 2
-  const start = Math.max(left, candles.length - lookbackMax - right - 2)
+  const start = Math.max(left, candles.length - searchBars)
 
   type Pivot = { i: number; price: number; rsi: number }
   const lows: Pivot[] = []
@@ -234,6 +240,7 @@ function detectRsiDivergence(candles: Candle[], lookbackMin = 10, lookbackMax = 
 
   // Eng yaqin (oxirgi) juftlikni qidiramiz
   let best: Divergence | null = null
+  const rsiEps = 0.5
 
   for (let a = 0; a < lows.length; a++) {
     for (let b = a + 1; b < lows.length; b++) {
@@ -241,8 +248,8 @@ function detectRsiDivergence(candles: Candle[], lookbackMin = 10, lookbackMax = 
       const p2 = lows[b]
       const dist = p2.i - p1.i
       if (dist < lookbackMin || dist > lookbackMax) continue
-      if (p2.price < p1.price && p2.rsi > p1.rsi + 1) {
-        if (!best || p2.i > best.i2) {
+      if (p2.price < p1.price && p2.rsi > p1.rsi + rsiEps) {
+        if (!best || p2.i > best.i2 || (p2.i === best.i2 && dist < best.i2 - best.i1)) {
           best = {
             type: 'bullish',
             i1: p1.i,
@@ -263,8 +270,8 @@ function detectRsiDivergence(candles: Candle[], lookbackMin = 10, lookbackMax = 
       const p2 = highs[b]
       const dist = p2.i - p1.i
       if (dist < lookbackMin || dist > lookbackMax) continue
-      if (p2.price > p1.price && p2.rsi < p1.rsi - 1) {
-        if (!best || p2.i > best.i2) {
+      if (p2.price > p1.price && p2.rsi < p1.rsi - rsiEps) {
+        if (!best || p2.i > best.i2 || (p2.i === best.i2 && dist < best.i2 - best.i1)) {
           best = {
             type: 'bearish',
             i1: p1.i,
@@ -452,7 +459,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   )
   const hist = macdLine - signal
 
-  const divergence = detectRsiDivergence(candles, 10, 20)
+  const divergence = detectRsiDivergence(candles)
 
   // Barcha TF: EMA20 + EMA50 stack
   const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
