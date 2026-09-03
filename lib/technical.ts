@@ -402,18 +402,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL: 1) struktura  2) zona o'rtasida → RSI
-    const bias = neutralStructureBias(candles, last, interval)
-    if (bias) {
-      side = bias.side
-      neutralTone = 'caution'
-    } else if (r >= 55) {
-      side = 'BUY'
-      neutralTone = 'strong'
-    } else if (r <= 45) {
-      side = 'SELL'
-      neutralTone = 'strong'
-    } else if (r >= 50) {
+    // NEUTRAL: RSI > 50 → ehtiyotkor BUY, RSI < 50 → ehtiyotkor SELL
+    if (r > 50) {
       side = 'BUY'
       neutralTone = 'caution'
     } else {
