@@ -443,11 +443,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
         `${tf} grafikda trend BEARISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
-    } else if (neutralTone === 'strong') {
-      summary =
-        `${tf} grafikda trend NEUTRAL, biroq bearish momentum belgilari mavjud. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else {
       summary =
         `${tf} grafikda trend NEUTRAL, biroq zaif bearish momentum belgilari mavjud. ` +
@@ -465,11 +460,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     if (trend === 'BULLISH') {
       summary =
         `${tf} grafikda trend BULLISH. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
-    } else if (neutralTone === 'strong') {
-      summary =
-        `${tf} grafikda trend NEUTRAL, biroq bullish momentum belgilari mavjud. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
         `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else {
