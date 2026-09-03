@@ -7,6 +7,16 @@ export type Candle = {
   volume: number
 }
 
+export type Divergence = {
+  type: 'bullish' | 'bearish'
+  i1: number
+  i2: number
+  price1: number
+  price2: number
+  rsi1: number
+  rsi2: number
+}
+
 export type TechnicalResult = {
   ema10: number
   ema20: number
@@ -28,6 +38,7 @@ export type TechnicalResult = {
   bullish: string
   bearish: string
   summary: string
+  divergence: Divergence | null
 }
 
 export function ema(values: number[], period: number) {
@@ -56,6 +67,31 @@ export function rsi(values: number[], period = 14) {
   }
   if (avgLoss === 0) return 100
   return 100 - 100 / (1 + avgGain / avgLoss)
+}
+
+function rsiSeries(values: number[], period = 14): number[] {
+  const out: number[] = []
+  let g = 0
+  let l = 0
+  for (let i = 0; i < values.length; i++) {
+    if (i === 0) {
+      out.push(50)
+      continue
+    }
+    const d = values[i] - values[i - 1]
+    const gg = Math.max(d, 0)
+    const ll = Math.max(-d, 0)
+    if (i <= period) {
+      g += gg
+      l += ll
+      out.push(i === period ? (l === 0 ? 100 : 100 - 100 / (1 + g / l)) : 50)
+    } else {
+      g = (g * (period - 1) + gg) / period
+      l = (l * (period - 1) + ll) / period
+      out.push(l === 0 ? 100 : 100 - 100 / (1 + g / l))
+    }
+  }
+  return out
 }
 
 function fmt(n: number) {
@@ -162,61 +198,87 @@ function structureWindow(interval: string) {
 }
 
 /**
- * NEUTRAL trend: support/resistance yaqinligi + oxirgi candle react.
- * return: 'BUY' | 'SELL' | null (struktura aniq emas)
+ * RSI divergensiya: oxirgi 10–20 shamcha oralig'ida.
+ * Bullish: narx pastroq low, RSI yuqoriroq low.
+ * Bearish: narx yuqoriroq high, RSI pastroq high.
  */
-function neutralStructureBias(
-  candles: Candle[],
-  last: number,
-  interval: string
-): { side: 'BUY' | 'SELL'; level: number } | null {
-  if (candles.length < 20) return null
-  const window = structureWindow(interval)
-  const recent = candles.slice(-Math.min(candles.length, window))
-  const atrVal = atr(recent, 14)
-  if (atrVal <= 0) return null
+function detectRsiDivergence(candles: Candle[], lookbackMin = 10, lookbackMax = 20): Divergence | null {
+  if (candles.length < lookbackMax + 8) return null
 
-  const tol = Math.max(atrVal * 0.35, last * 0.0015)
-  const nearBand = Math.max(atrVal * 1.1, last * 0.004)
+  const closes = candles.map((c) => c.close)
+  const rs = rsiSeries(closes)
+  const left = 2
+  const right = 2
+  const start = Math.max(left, candles.length - lookbackMax - right - 2)
 
-  const swings = findSwingPoints(recent, 2, 2)
-  const lows = swings.filter((s) => s.type === 'low').map((s) => s.price)
-  const highs = swings.filter((s) => s.type === 'high').map((s) => s.price)
+  type Pivot = { i: number; price: number; rsi: number }
+  const lows: Pivot[] = []
+  const highs: Pivot[] = []
 
-  const supports = clusterLevels(lows, tol).filter((p) => p < last).sort((a, b) => b - a)
-  const resistances = clusterLevels(highs, tol).filter((p) => p > last).sort((a, b) => a - b)
-
-  const nearestSup = supports[0]
-  const nearestRes = resistances[0]
-
-  const c = candles[candles.length - 1]
-  const prev = candles[candles.length - 2] ?? c
-  const bullReact =
-    c.close > c.open ||
-    (c.low < prev.low && c.close > prev.close) ||
-    c.close >= (c.high + c.low) / 2
-  const bearReact =
-    c.close < c.open ||
-    (c.high > prev.high && c.close < prev.close) ||
-    c.close <= (c.high + c.low) / 2
-
-  const distSup = nearestSup != null ? last - nearestSup : Infinity
-  const distRes = nearestRes != null ? nearestRes - last : Infinity
-
-  const nearSup = nearestSup != null && distSup <= nearBand
-  const nearRes = nearestRes != null && distRes <= nearBand
-
-  if (nearSup && bullReact && (!nearRes || distSup <= distRes)) {
-    return { side: 'BUY', level: nearestSup }
-  }
-  if (nearRes && bearReact && (!nearSup || distRes <= distSup)) {
-    return { side: 'SELL', level: nearestRes }
+  for (let i = start; i < candles.length - right; i++) {
+    const c = candles[i]
+    let isLow = true
+    let isHigh = true
+    for (let j = 1; j <= left; j++) {
+      if (candles[i - j].low <= c.low) isLow = false
+      if (candles[i - j].high >= c.high) isHigh = false
+    }
+    for (let j = 1; j <= right; j++) {
+      if (candles[i + j].low <= c.low) isLow = false
+      if (candles[i + j].high >= c.high) isHigh = false
+    }
+    if (isLow) lows.push({ i, price: c.low, rsi: rs[i] })
+    if (isHigh) highs.push({ i, price: c.high, rsi: rs[i] })
   }
 
-  if (nearSup && !nearRes) return { side: 'BUY', level: nearestSup }
-  if (nearRes && !nearSup) return { side: 'SELL', level: nearestRes }
+  // Eng yaqin (oxirgi) juftlikni qidiramiz
+  let best: Divergence | null = null
 
-  return null
+  for (let a = 0; a < lows.length; a++) {
+    for (let b = a + 1; b < lows.length; b++) {
+      const p1 = lows[a]
+      const p2 = lows[b]
+      const dist = p2.i - p1.i
+      if (dist < lookbackMin || dist > lookbackMax) continue
+      if (p2.price < p1.price && p2.rsi > p1.rsi + 1) {
+        if (!best || p2.i > best.i2) {
+          best = {
+            type: 'bullish',
+            i1: p1.i,
+            i2: p2.i,
+            price1: p1.price,
+            price2: p2.price,
+            rsi1: p1.rsi,
+            rsi2: p2.rsi,
+          }
+        }
+      }
+    }
+  }
+
+  for (let a = 0; a < highs.length; a++) {
+    for (let b = a + 1; b < highs.length; b++) {
+      const p1 = highs[a]
+      const p2 = highs[b]
+      const dist = p2.i - p1.i
+      if (dist < lookbackMin || dist > lookbackMax) continue
+      if (p2.price > p1.price && p2.rsi < p1.rsi - 1) {
+        if (!best || p2.i > best.i2) {
+          best = {
+            type: 'bearish',
+            i1: p1.i,
+            i2: p2.i,
+            price1: p1.price,
+            price2: p2.price,
+            rsi1: p1.rsi,
+            rsi2: p2.rsi,
+          }
+        }
+      }
+    }
+  }
+
+  return best
 }
 
 function buildAtrTakeProfits(
@@ -389,6 +451,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   )
   const hist = macdLine - signal
 
+  const divergence = detectRsiDivergence(candles, 10, 20)
+
   // Barcha TF: EMA20 + EMA50 stack
   const isBull = last > e20 && e20 > e50 && r >= 50 && hist >= 0
   const isBear = last < e20 && e20 < e50 && r < 50 && hist < 0
@@ -402,8 +466,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL: RSI > 50 → ehtiyotkor BUY, RSI < 50 → ehtiyotkor SELL
-    if (r > 50) {
+    // NEUTRAL: 1) RSI divergensiya  2) RSI > 50 → BUY, aks holda SELL
+    if (divergence?.type === 'bullish') {
+      side = 'BUY'
+      neutralTone = 'caution'
+    } else if (divergence?.type === 'bearish') {
+      side = 'SELL'
+      neutralTone = 'caution'
+    } else if (r > 50) {
       side = 'BUY'
       neutralTone = 'caution'
     } else {
@@ -490,5 +560,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     bullish,
     bearish,
     summary,
+    divergence,
   }
 }
