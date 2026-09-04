@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
+import SiteFooter from '../components/SiteFooter'
 
 type MeResponse = {
   user: {
@@ -285,9 +286,7 @@ export default function KabinetPage() {
         <KabinetContent />
       </Suspense>
 
-      <footer className="footer">
-        GOLDENWEB.UZ • Shaxsiy kabinet • {new Date().getFullYear()}
-      </footer>
+      <SiteFooter />
     </>
   )
 }
