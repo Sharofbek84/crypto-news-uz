@@ -23,11 +23,15 @@ function intervalConfig(interval: string) {
   return '1h'
 }
 
+/** Upstash SET NX: 'OK' | true = muvaffaqiyat */
+function redisSetOk(result: unknown): boolean {
+  return result === 'OK' || result === true
+}
+
 async function fetchGate(symbol: string, interval: string): Promise<Candle[]> {
   const base = ALIASES[symbol] || symbol
   const pair = `${base}_USDT`
   const gateInterval = intervalConfig(interval)
-  // Barcha TF lar uchun bir xil sham soni — grafik zichligi teng bo'lsin
   const limit = 150
   const minCandles = interval === '1w' ? 40 : 60
   const url = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${encodeURIComponent(pair)}&interval=${gateInterval}&limit=${limit}`
@@ -79,32 +83,36 @@ async function passesHigherTimeframeFilter(
 }
 
 /**
- * Telegram signal = Premium analyze() natijasi.
- * W1 — faqat grafik.
- * H1 + NEUTRAL trend — yuborilmaydi.
- * Bir coin: TF/side farqi yo'q — 4 soat cooldown (parallel race: 5 daqiqa lock).
+ * Telegram + tracker.
+ * Avval Redis trackerga yoziladi, keyin Telegram — jadval hech qachon bo'sh qolmasin.
  */
-async function notifyTelegramForNewSignal(symbol: string, interval: string, candles: Candle[]) {
-  if (!TELEGRAM_INTERVALS.has(interval)) return
-  if (!candles.length) return
+async function notifyTelegramForNewSignal(
+  symbol: string,
+  interval: string,
+  candles: Candle[]
+): Promise<{ tracked: boolean; telegram: boolean; reason?: string }> {
+  if (!TELEGRAM_INTERVALS.has(interval)) return { tracked: false, telegram: false, reason: 'interval' }
+  if (!candles.length) return { tracked: false, telegram: false, reason: 'no-candles' }
 
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
-  if (closedCandles.length < 60) return
+  if (closedCandles.length < 60) return { tracked: false, telegram: false, reason: 'few-candles' }
 
   const current = analyze(closedCandles, interval)
   const previousCandles = closedCandles.slice(0, -1)
-  if (previousCandles.length < 60) return
+  if (previousCandles.length < 60) return { tracked: false, telegram: false, reason: 'few-prev' }
 
   const previous = analyze(previousCandles, interval)
 
-  // NEUTRAL trend + H1 → Telegramga yuborilmasin
-  if (interval === '1h' && current.trend === 'NEUTRAL') return
+  if (interval === '1h' && current.trend === 'NEUTRAL') {
+    return { tracked: false, telegram: false, reason: 'h1-neutral' }
+  }
 
-  // Faqat side o'zgarganda (BUY↔SELL) — spam bo'lmasin
-  if (current.side === previous.side) return
+  if (current.side === previous.side) {
+    return { tracked: false, telegram: false, reason: 'same-side' }
+  }
 
   const htfOk = await passesHigherTimeframeFilter(symbol, interval, current.side)
-  if (!htfOk) return
+  if (!htfOk) return { tracked: false, telegram: false, reason: 'htf-filter' }
 
   const signalTime = closedCandles[closedCandles.length - 1].time
   const timeframe = (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1'
@@ -124,39 +132,40 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
   const redis = getRedis()
   if (!redis) {
     console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured')
-    return
+    return { tracked: false, telegram: false, reason: 'no-redis' }
   }
 
-  // 1) Parallel H1+H4+D1 race — 5 daqiqa
   const coinLockKey = `goldenweb:telegram-coin:${symbol}`
   const coinLocked = await redis.set(coinLockKey, `${interval}:${current.side}:${signalTime}`, {
     nx: true,
     ex: 60 * 5,
   })
-  if (coinLocked == null) return
+  if (!redisSetOk(coinLocked)) {
+    return { tracked: false, telegram: false, reason: 'coin-lock' }
+  }
 
-  // 2) Bir coin — 4 soat ichida faqat 1 ta Telegram
   const cooldownKey = `goldenweb:telegram-coin-cd:${symbol}`
   const cooldownOk = await redis.set(cooldownKey, `${interval}:${current.side}`, {
     nx: true,
     ex: COIN_TELEGRAM_COOLDOWN_SEC,
   })
-  if (cooldownOk == null) {
-    return
+  if (!redisSetOk(cooldownOk)) {
+    return { tracked: false, telegram: false, reason: 'cooldown' }
   }
 
-  // 3) Xuddi shu candle/event qayta yuborilmasin
   const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${signalTime}:${current.side}`
   const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
-  if (claimed == null) {
+  if (!redisSetOk(claimed)) {
     await redis.del(cooldownKey)
-    return
+    return { tracked: false, telegram: false, reason: 'dup-event' }
   }
 
+  const signalId = buildSignalId(symbol, interval, signalTime, current.side)
+
   try {
-    await sendTelegramSignal(signal)
+    // 1) Avval statistikaga yoz — Telegram xatosi jadvalni buzmasin
     await saveTrackedSignal({
-      id: buildSignalId(symbol, interval, signalTime, current.side),
+      id: signalId,
       symbol,
       interval,
       timeframe,
@@ -169,10 +178,15 @@ async function notifyTelegramForNewSignal(symbol: string, interval: string, cand
       sl: current.invalidation,
       signalTime,
     })
+
+    // 2) Keyin Telegram
+    await sendTelegramSignal(signal)
+    return { tracked: true, telegram: true }
   } catch (error) {
     await redis.del(redisKey)
     await redis.del(cooldownKey)
     await redis.del(coinLockKey)
+    console.error(`Signal notify failed ${symbol}/${interval}:`, error)
     throw error
   }
 }
@@ -192,19 +206,24 @@ export async function GET(req: NextRequest) {
     const scannerSecret = process.env.CRON_SECRET
     const scannerHeader = req.headers.get('x-signal-scanner-secret')
     const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
+
+    let signalNotify: { tracked: boolean; telegram: boolean; reason?: string } | null = null
     if (isScannerRequest && TELEGRAM_INTERVALS.has(interval)) {
       try {
-        await notifyTelegramForNewSignal(symbol, interval, candles)
+        signalNotify = await notifyTelegramForNewSignal(symbol, interval, candles)
       } catch (telegramError) {
         console.error('Telegram signal notification failed:', telegramError)
+        signalNotify = { tracked: false, telegram: false, reason: 'error' }
       }
     }
+
     return NextResponse.json({
       symbol,
       interval,
       provider,
       candles,
       result,
+      signalNotify,
       generatedAt: new Date().toISOString(),
     })
   } catch (e: any) {
