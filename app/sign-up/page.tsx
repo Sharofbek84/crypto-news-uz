@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import SiteFooter from '../components/SiteFooter'
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -123,7 +124,7 @@ export default function SignUpPage() {
         </p>
       </main>
 
-      <footer className="footer">GOLDENWEB.UZ • {new Date().getFullYear()}</footer>
+      <SiteFooter />
     </>
   )
 }
