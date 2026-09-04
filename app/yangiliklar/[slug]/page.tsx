@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import SiteHeader from '../../components/SiteHeader'
@@ -8,17 +9,39 @@ export function generateStaticParams() {
   return getAllFreshNews().map((item) => ({ slug: item.slug }))
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
+export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const item = getNewsBySlug(params.slug)
-  if (!item) return { title: 'Yangilik topilmadi | GOLDENWEB.UZ' }
+  if (!item) {
+    return {
+      title: 'Yangilik topilmadi',
+      robots: { index: false, follow: true },
+    }
+  }
+
+  const title = item.title
+  const description = item.summary || item.title
+  const url = `/yangiliklar/${item.slug}`
+
   return {
-    title: `${item.title} | GOLDENWEB.UZ`,
-    description: item.summary || item.title,
-    openGraph: item.image
-      ? {
-          images: [{ url: item.image }],
-        }
-      : undefined,
+    title,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: `${title} | GOLDENWEB.UZ`,
+      description,
+      url,
+      type: 'article',
+      publishedTime: item.date || undefined,
+      images: item.image ? [{ url: item.image }] : undefined,
+    },
+    twitter: {
+      card: item.image ? 'summary_large_image' : 'summary',
+      title: `${title} | GOLDENWEB.UZ`,
+      description,
+      images: item.image ? [item.image] : undefined,
+    },
   }
 }
 

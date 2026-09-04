@@ -1,11 +1,23 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 import { getNewsPage } from '@/lib/news'
 
-export const metadata = {
-  title: 'So‘nggi Yangiliklar | GOLDENWEB.UZ',
-  description: 'Kriptovalyuta bozori haqida o‘zbek tilidagi so‘nggi yangiliklar va tahlillar.',
+export const metadata: Metadata = {
+  title: 'So‘nggi Yangiliklar',
+  description:
+    'Kriptovalyuta bozori, ETF, tartibga solish va texnologiya haqida o‘zbek tilidagi so‘nggi yangiliklar va tahlillar.',
+  alternates: {
+    canonical: '/yangiliklar',
+  },
+  openGraph: {
+    title: 'So‘nggi Yangiliklar | GOLDENWEB.UZ',
+    description:
+      'Kriptovalyuta bozori haqida o‘zbek tilidagi so‘nggi yangiliklar va tahlillar.',
+    url: '/yangiliklar',
+    type: 'website',
+  },
 }
 
 export default function YangiliklarPage({
