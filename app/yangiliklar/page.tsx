@@ -13,7 +13,7 @@ export default function YangiliklarPage({
   searchParams?: { page?: string }
 }) {
   const raw = Number(searchParams?.page || '1')
-  const { items: news, page, totalPages, total } = getNewsPage(raw)
+  const { items: news, page, totalPages } = getNewsPage(raw)
 
   return (
     <>
@@ -23,17 +23,7 @@ export default function YangiliklarPage({
         <div className="newsPageHead">
           <div className="subscribeKicker">📰 YANGILIKLAR</div>
           <h1>So‘nggi Yangiliklar</h1>
-          <p>
-            Kriptovalyuta bozori, ETF, tartibga solish va texnologiya haqida o‘zbek tilidagi qisqa xabarlar.
-            {total > 0 ? (
-              <>
-                {' '}
-                <span style={{ color: '#8492a2' }}>
-                  (oxirgi 10 kun · {total} ta)
-                </span>
-              </>
-            ) : null}
-          </p>
+          <p>Kriptovalyuta bozori, ETF, tartibga solish va texnologiya haqida o‘zbek tilidagi qisqa xabarlar.</p>
         </div>
 
         <div className="newsList">
