@@ -23,7 +23,20 @@ async function scanOne(baseUrl: string, symbol: string, interval: string, secret
     throw new Error(`${symbol}/${interval}: ${response.status} ${body.slice(0, 180)}`)
   }
 
-  return { symbol, interval, ok: true }
+  const data = await response.json()
+  const notify = data?.signalNotify as
+    | { tracked?: boolean; telegram?: boolean; reason?: string }
+    | null
+    | undefined
+
+  return {
+    symbol,
+    interval,
+    ok: true,
+    telegram: Boolean(notify?.telegram),
+    tracked: Boolean(notify?.tracked),
+    reason: notify?.reason || (notify ? 'none' : 'no-notify'),
+  }
 }
 
 async function runTracker(baseUrl: string, secret: string) {
@@ -58,8 +71,18 @@ export async function GET(request: NextRequest) {
 
   const baseUrl = new URL(request.url).origin
   const jobs = COINS.flatMap((symbol) => INTERVALS.map((interval) => ({ symbol, interval })))
-  const completed: Array<{ symbol: string; interval: string; ok: boolean }> = []
+  const completed: Array<{
+    symbol: string
+    interval: string
+    ok: boolean
+    telegram: boolean
+    tracked: boolean
+    reason: string
+  }> = []
   const errors: string[] = []
+  const reasonCounts: Record<string, number> = {}
+  let telegramSent = 0
+  let trackedCount = 0
 
   for (let i = 0; i < jobs.length; i += CONCURRENCY) {
     const batch = jobs.slice(i, i + CONCURRENCY)
@@ -68,13 +91,19 @@ export async function GET(request: NextRequest) {
     )
 
     results.forEach((result, index) => {
-      if (result.status === 'fulfilled') completed.push(result.value)
-      else
+      if (result.status === 'fulfilled') {
+        const v = result.value
+        completed.push(v)
+        reasonCounts[v.reason] = (reasonCounts[v.reason] || 0) + 1
+        if (v.telegram) telegramSent++
+        if (v.tracked) trackedCount++
+      } else {
         errors.push(
           result.reason instanceof Error
             ? result.reason.message
             : `${batch[index].symbol}/${batch[index].interval}: unknown error`
         )
+      }
     })
   }
 
@@ -89,6 +118,10 @@ export async function GET(request: NextRequest) {
     ok: errors.length === 0,
     scanned: jobs.length,
     completed: completed.length,
+    telegramSent,
+    trackedCount,
+    reasonCounts,
+    sentSignals: completed.filter((c) => c.telegram),
     tracker,
     errors,
     generatedAt: new Date().toISOString(),

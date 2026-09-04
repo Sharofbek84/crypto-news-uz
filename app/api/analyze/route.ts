@@ -23,9 +23,13 @@ function intervalConfig(interval: string) {
   return '1h'
 }
 
-/** Upstash SET NX: 'OK' | true = muvaffaqiyat */
+/**
+ * Upstash SET NX natijasi.
+ * Muvaffaqiyat: 'OK' | true | boshqa truthy (null/false emas).
+ * Faqat null/undefined/false — rad etiladi.
+ */
 function redisSetOk(result: unknown): boolean {
-  return result === 'OK' || result === true
+  return result !== null && result !== undefined && result !== false
 }
 
 async function fetchGate(symbol: string, interval: string): Promise<Candle[]> {
@@ -84,7 +88,7 @@ async function passesHigherTimeframeFilter(
 
 /**
  * Telegram + tracker.
- * Avval Redis trackerga yoziladi, keyin Telegram — jadval hech qachon bo'sh qolmasin.
+ * Avval Redis trackerga yoziladi, keyin Telegram.
  */
 async function notifyTelegramForNewSignal(
   symbol: string,
@@ -103,10 +107,12 @@ async function notifyTelegramForNewSignal(
 
   const previous = analyze(previousCandles, interval)
 
+  // H1 + NEUTRAL trend — Telegramga yuborilmaydi
   if (interval === '1h' && current.trend === 'NEUTRAL') {
     return { tracked: false, telegram: false, reason: 'h1-neutral' }
   }
 
+  // Faqat side o'zgarganda (BUY↔SELL)
   if (current.side === previous.side) {
     return { tracked: false, telegram: false, reason: 'same-side' }
   }
@@ -163,7 +169,6 @@ async function notifyTelegramForNewSignal(
   const signalId = buildSignalId(symbol, interval, signalTime, current.side)
 
   try {
-    // 1) Avval statistikaga yoz — Telegram xatosi jadvalni buzmasin
     await saveTrackedSignal({
       id: signalId,
       symbol,
@@ -179,7 +184,6 @@ async function notifyTelegramForNewSignal(
       signalTime,
     })
 
-    // 2) Keyin Telegram
     await sendTelegramSignal(signal)
     return { tracked: true, telegram: true }
   } catch (error) {
@@ -211,9 +215,13 @@ export async function GET(req: NextRequest) {
     if (isScannerRequest && TELEGRAM_INTERVALS.has(interval)) {
       try {
         signalNotify = await notifyTelegramForNewSignal(symbol, interval, candles)
-      } catch (telegramError) {
+      } catch (telegramError: any) {
         console.error('Telegram signal notification failed:', telegramError)
-        signalNotify = { tracked: false, telegram: false, reason: 'error' }
+        signalNotify = {
+          tracked: false,
+          telegram: false,
+          reason: `error:${telegramError?.message || 'unknown'}`.slice(0, 120),
+        }
       }
     }
 
