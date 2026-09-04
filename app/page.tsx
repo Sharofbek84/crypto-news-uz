@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import HomeAnalyst from './components/HomeAnalyst'
 import SiteHeader from './components/SiteHeader'
+import SiteFooter from './components/SiteFooter'
 import { getRecentNews } from '@/lib/news'
 
 /** Tartib: BTC, ETH, LTC, SOL, BNB, NEAR, GRAM, SUI, APT, ATOM */
@@ -125,9 +126,7 @@ export default async function Home() {
         </div>
       </main>
 
-      <footer className="footer">
-        GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
-      </footer>
+      <SiteFooter />
     </>
   )
 }

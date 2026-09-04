@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import SiteHeader from '../../components/SiteHeader'
+import SiteFooter from '../../components/SiteFooter'
 import { getAllFreshNews, getNewsBySlug } from '@/lib/news'
 
 export function generateStaticParams() {
@@ -75,9 +76,7 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
         </article>
       </main>
 
-      <footer className="footer">
-        GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
-      </footer>
+      <SiteFooter />
     </>
   )
 }

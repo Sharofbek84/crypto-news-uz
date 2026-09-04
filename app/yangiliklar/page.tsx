@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import SiteHeader from '../components/SiteHeader'
+import SiteFooter from '../components/SiteFooter'
 import { getNewsPage } from '@/lib/news'
 
 export const metadata = {
@@ -98,9 +99,7 @@ export default function YangiliklarPage({
         ) : null}
       </main>
 
-      <footer className="footer">
-        GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
-      </footer>
+      <SiteFooter />
     </>
   )
 }
