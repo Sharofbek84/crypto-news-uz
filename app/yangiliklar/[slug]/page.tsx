@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import SiteHeader from '../../components/SiteHeader'
-import { getNewsBySlug, getRecentNews } from '@/lib/news'
+import { getAllFreshNews, getNewsBySlug } from '@/lib/news'
 
 export function generateStaticParams() {
-  return getRecentNews().map((item) => ({ slug: item.slug }))
+  return getAllFreshNews().map((item) => ({ slug: item.slug }))
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
