@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
+import SiteFooter from '../components/SiteFooter'
 
 type AdminUser = {
   id: string
@@ -181,9 +182,7 @@ export default function AdminPage() {
         </p>
       </main>
 
-      <footer className="footer">
-        GOLDENWEB.UZ • Admin • {new Date().getFullYear()}
-      </footer>
+      <SiteFooter />
     </>
   )
 }
