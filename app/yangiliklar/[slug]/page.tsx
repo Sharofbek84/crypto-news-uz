@@ -40,21 +40,20 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
           <h1>{item.title}</h1>
           {item.summary ? <p className="articleLead">{item.summary}</p> : null}
 
-          {item.image ? (
-            <div className="articleCover">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.image}
-                alt=""
-                className="articleCoverImage"
-                loading="eager"
-                decoding="async"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          ) : null}
-
           <div className="articleBody">
+            {item.image ? (
+              <div className="articleCover">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.image}
+                  alt=""
+                  className="articleCoverImage"
+                  loading="eager"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            ) : null}
             {paragraphs.map((p, i) => (
               <p key={i}>{p}</p>
             ))}

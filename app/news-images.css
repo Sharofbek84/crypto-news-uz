@@ -35,12 +35,15 @@
   display:block;
 }
 
-/* Ichki sahifa: ~8×6 cm */
+/* Ichki sahifa: rasm chapda (~8×6 cm), matn yonidan oqib tagiga tushadi */
+.articleBody{
+  overflow:visible;
+}
 .articleCover{
   float:left;
   width:8cm;
   height:6cm;
-  margin:4px 18px 16px 0;
+  margin:4px 18px 12px 0;
   border-radius:10px;
   overflow:hidden;
   border:1px solid #202c3a;
@@ -52,8 +55,10 @@
   object-fit:cover;
   display:block;
 }
-.articleBody{
-  overflow:auto;
+.articleBody::after{
+  content:"";
+  display:table;
+  clear:both;
 }
 
 @media(max-width:600px){
