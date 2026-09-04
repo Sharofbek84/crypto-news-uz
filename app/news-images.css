@@ -1,6 +1,6 @@
 /* Yangiliklar — kichik rasmlar */
 
-/* Ro'yxat: matn chapda, rasm o'ngda (~3×4 cm) */
+/* Ro'yxat: rasm chapda (~4×3 cm), matn o'ngda */
 .newsCard{
   display:flex;
   flex-direction:row;
@@ -19,8 +19,9 @@
 .newsCardImageLink{
   display:block;
   flex-shrink:0;
-  width:3cm;
-  height:4cm;
+  order:-1;
+  width:4cm;
+  height:3cm;
   border-radius:8px;
   overflow:hidden;
   border:1px solid #243041;
@@ -34,12 +35,12 @@
   display:block;
 }
 
-/* Ichki sahifa: ~6×8 cm */
+/* Ichki sahifa: ~8×6 cm */
 .articleCover{
-  float:right;
-  width:6cm;
-  height:8cm;
-  margin:4px 0 16px 18px;
+  float:left;
+  width:8cm;
+  height:6cm;
+  margin:4px 18px 16px 0;
   border-radius:10px;
   overflow:hidden;
   border:1px solid #202c3a;
@@ -57,18 +58,18 @@
 
 @media(max-width:600px){
   .newsCard{
-    flex-direction:row;
     gap:10px;
     padding:12px 14px;
   }
   .newsCardImageLink{
-    width:2.4cm;
-    height:3.2cm;
+    width:3.2cm;
+    height:2.4cm;
   }
   .articleCover{
     float:none;
-    width:6cm;
-    height:8cm;
+    width:8cm;
+    max-width:100%;
+    height:6cm;
     margin:0 auto 18px;
   }
 }

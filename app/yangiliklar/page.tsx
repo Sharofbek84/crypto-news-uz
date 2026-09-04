@@ -27,19 +27,6 @@ export default function YangiliklarPage() {
           ) : (
             news.map((item) => (
               <article key={item.slug} className="newsCard">
-                <div className="newsCardBody">
-                  <div className="newsCardMeta">
-                    <span>{item.source || 'GOLDENWEB.UZ'}</span>
-                    {item.date ? <span>• {item.date}</span> : null}
-                  </div>
-                  <h2>
-                    <Link href={`/yangiliklar/${item.slug}`}>{item.title}</Link>
-                  </h2>
-                  {item.summary ? <p className="newsCardSummary">{item.summary}</p> : null}
-                  <Link href={`/yangiliklar/${item.slug}`} className="newsReadMore">
-                    Batafsil o‘qish →
-                  </Link>
-                </div>
                 {item.image ? (
                   <Link href={`/yangiliklar/${item.slug}`} className="newsCardImageLink" tabIndex={-1}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,6 +40,19 @@ export default function YangiliklarPage() {
                     />
                   </Link>
                 ) : null}
+                <div className="newsCardBody">
+                  <div className="newsCardMeta">
+                    <span>{item.source || 'GOLDENWEB.UZ'}</span>
+                    {item.date ? <span>• {item.date}</span> : null}
+                  </div>
+                  <h2>
+                    <Link href={`/yangiliklar/${item.slug}`}>{item.title}</Link>
+                  </h2>
+                  {item.summary ? <p className="newsCardSummary">{item.summary}</p> : null}
+                  <Link href={`/yangiliklar/${item.slug}`} className="newsReadMore">
+                    Batafsil o‘qish →
+                  </Link>
+                </div>
               </article>
             ))
           )}
