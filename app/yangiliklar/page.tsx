@@ -1,14 +1,19 @@
 import Link from 'next/link'
 import SiteHeader from '../components/SiteHeader'
-import { getRecentNews } from '@/lib/news'
+import { getNewsPage } from '@/lib/news'
 
 export const metadata = {
   title: 'So‘nggi Yangiliklar | GOLDENWEB.UZ',
   description: 'Kriptovalyuta bozori haqida o‘zbek tilidagi so‘nggi yangiliklar va tahlillar.',
 }
 
-export default function YangiliklarPage() {
-  const news = getRecentNews()
+export default function YangiliklarPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string }
+}) {
+  const raw = Number(searchParams?.page || '1')
+  const { items: news, page, totalPages, total } = getNewsPage(raw)
 
   return (
     <>
@@ -18,7 +23,17 @@ export default function YangiliklarPage() {
         <div className="newsPageHead">
           <div className="subscribeKicker">📰 YANGILIKLAR</div>
           <h1>So‘nggi Yangiliklar</h1>
-          <p>Kriptovalyuta bozori, ETF, tartibga solish va texnologiya haqida o‘zbek tilidagi qisqa xabarlar.</p>
+          <p>
+            Kriptovalyuta bozori, ETF, tartibga solish va texnologiya haqida o‘zbek tilidagi qisqa xabarlar.
+            {total > 0 ? (
+              <>
+                {' '}
+                <span style={{ color: '#8492a2' }}>
+                  (oxirgi 10 kun · {total} ta)
+                </span>
+              </>
+            ) : null}
+          </p>
         </div>
 
         <div className="newsList">
@@ -57,6 +72,40 @@ export default function YangiliklarPage() {
             ))
           )}
         </div>
+
+        {totalPages > 1 ? (
+          <nav className="newsPagination" aria-label="Yangiliklar sahifalari">
+            {page > 1 ? (
+              <Link
+                href={page - 1 === 1 ? '/yangiliklar' : `/yangiliklar?page=${page - 1}`}
+                className="newsPageBtn"
+              >
+                ←
+              </Link>
+            ) : (
+              <span className="newsPageBtn disabled">←</span>
+            )}
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <Link
+                key={n}
+                href={n === 1 ? '/yangiliklar' : `/yangiliklar?page=${n}`}
+                className={'newsPageBtn' + (n === page ? ' active' : '')}
+                aria-current={n === page ? 'page' : undefined}
+              >
+                {n}
+              </Link>
+            ))}
+
+            {page < totalPages ? (
+              <Link href={`/yangiliklar?page=${page + 1}`} className="newsPageBtn">
+                →
+              </Link>
+            ) : (
+              <span className="newsPageBtn disabled">→</span>
+            )}
+          </nav>
+        ) : null}
       </main>
 
       <footer className="footer">

@@ -12,15 +12,17 @@ export type NewsItem = {
   image?: string
 }
 
-/** Sahifada ko‘rsatiladigan maksimal yangilik soni */
-export const MAX_NEWS = 10
+/** Har bir arxiv sahifasida nechta yangilik */
+export const NEWS_PER_PAGE = 10
+
+/** Bosh sahifada ko‘rsatiladigan yangilik soni */
+export const HOME_NEWS_COUNT = 10
 
 /** Shu kundan eski yangiliklar chiqarib tashlanadi */
 export const NEWS_MAX_AGE_DAYS = 10
 
 function parseNewsDate(date?: string): number | null {
   if (!date) return null
-  // YYYY-MM-DD yoki ISO
   const t = Date.parse(date.length === 10 ? `${date}T12:00:00Z` : date)
   return Number.isFinite(t) ? t : null
 }
@@ -31,36 +33,59 @@ function startOfTodayUtc(): number {
 }
 
 /**
- * 10 kundan eski yangiliklarni olib tashlaydi,
- * sanaga qarab tartiblaydi va oxirgi MAX_NEWS tasini qaytaradi.
- * Yangi yangilik qo‘shganda ham shu filtr ishlaydi (o‘qish vaqtida).
+ * 10 kundan eski yangiliklarni olib tashlaydi va sanaga qarab tartiblaydi.
+ * Sahifalash uchun limit qo‘llanmaydi.
  */
-export function trimNews(items: NewsItem[], nowMs = Date.now()): NewsItem[] {
+export function trimNews(items: NewsItem[]): NewsItem[] {
   const cutoff = startOfTodayUtc() - NEWS_MAX_AGE_DAYS * 24 * 60 * 60 * 1000
 
   const fresh = items.filter((item) => {
     const ts = parseNewsDate(item.date)
-    // Sanasi yo‘q yoki noto‘g‘ri — xavfsiz tomonda saqlab qolamiz, lekin limit ichida
     if (ts == null) return true
     return ts >= cutoff
   })
 
-  return [...fresh]
-    .sort(
-      (a, b) =>
-        String(b.date || '').localeCompare(String(a.date || '')) ||
-        String(b.slug || '').localeCompare(String(a.slug || ''))
-    )
-    .slice(0, MAX_NEWS)
+  return [...fresh].sort(
+    (a, b) =>
+      String(b.date || '').localeCompare(String(a.date || '')) ||
+      String(b.slug || '').localeCompare(String(a.slug || ''))
+  )
 }
 
-/** data/news.json dan o‘qib, avtomatik trim qilingan ro‘yxat */
-export function getRecentNews(): NewsItem[] {
+/** 10 kun ichidagi barcha yangiliklar (tartiblangan) */
+export function getAllFreshNews(): NewsItem[] {
   const all = (Array.isArray(newsData) ? newsData : []) as NewsItem[]
   return trimNews(all)
 }
 
-/** Bitta yangilikni slug bo‘yicha topish (faqat trim ichidagilar) */
+/** Bosh sahifa uchun oxirgi N ta */
+export function getRecentNews(limit = HOME_NEWS_COUNT): NewsItem[] {
+  return getAllFreshNews().slice(0, limit)
+}
+
+export type NewsPageResult = {
+  items: NewsItem[]
+  page: number
+  totalPages: number
+  total: number
+}
+
+/** Arxiv sahifasi: 1-dan boshlanadi, har sahifada NEWS_PER_PAGE ta */
+export function getNewsPage(page: number): NewsPageResult {
+  const all = getAllFreshNews()
+  const total = all.length
+  const totalPages = Math.max(1, Math.ceil(total / NEWS_PER_PAGE))
+  const safePage = Number.isFinite(page) ? Math.min(Math.max(1, Math.floor(page)), totalPages) : 1
+  const start = (safePage - 1) * NEWS_PER_PAGE
+  return {
+    items: all.slice(start, start + NEWS_PER_PAGE),
+    page: safePage,
+    totalPages,
+    total,
+  }
+}
+
+/** Bitta yangilikni slug bo‘yicha topish (10 kun ichidagilar) */
 export function getNewsBySlug(slug: string): NewsItem | undefined {
-  return getRecentNews().find((n) => n.slug === slug)
+  return getAllFreshNews().find((n) => n.slug === slug)
 }
