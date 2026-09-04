@@ -8,6 +8,8 @@ export type NewsItem = {
   url?: string
   source?: string
   date?: string
+  /** Tashqi rasm URL (ixtiyoriy). Faqat /yangiliklar sahifalarida ko'rsatiladi. */
+  image?: string
 }
 
 /** Sahifada ko‘rsatiladigan maksimal yangilik soni */

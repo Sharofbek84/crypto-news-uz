@@ -13,6 +13,11 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   return {
     title: `${item.title} | GOLDENWEB.UZ`,
     description: item.summary || item.title,
+    openGraph: item.image
+      ? {
+          images: [{ url: item.image }],
+        }
+      : undefined,
   }
 }
 
@@ -34,6 +39,20 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
           </div>
           <h1>{item.title}</h1>
           {item.summary ? <p className="articleLead">{item.summary}</p> : null}
+
+          {item.image ? (
+            <div className="articleCover">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.image}
+                alt=""
+                className="articleCoverImage"
+                loading="eager"
+                decoding="async"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          ) : null}
 
           <div className="articleBody">
             {paragraphs.map((p, i) => (
