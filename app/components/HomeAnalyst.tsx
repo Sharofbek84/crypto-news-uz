@@ -243,7 +243,7 @@ export default function HomeAnalyst(){
         </div>
       </div>
 
-      <p className="homeDisclaimer">Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz tahlil qiling.</p>
+      <p className="homeDisclaimer">Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat yuqotishga tayyor bo'lgan pulingiz bilan kiring.</p>
     </>
     )}
   </section>
