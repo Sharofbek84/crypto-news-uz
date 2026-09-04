@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { FormEvent, Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import SiteFooter from '../components/SiteFooter'
 
 function SignInForm() {
   const router = useRouter()
@@ -94,7 +95,7 @@ export default function SignInPage() {
         </p>
       </main>
 
-      <footer className="footer">GOLDENWEB.UZ • {new Date().getFullYear()}</footer>
+      <SiteFooter />
     </>
   )
 }
