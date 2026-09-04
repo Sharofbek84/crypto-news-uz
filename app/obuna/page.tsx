@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import SiteHeader from '../components/SiteHeader'
+import SiteFooter from '../components/SiteFooter'
 
 const SIGNAL_PRO_URL =
   'https://t.me/tribute/app?startapp=ep_zdhegwwYthRyGnRV7ergnHtnqG9PWBxBD1bs2XG9gt7PYKPG3ao'
@@ -142,9 +143,7 @@ export default function ObunaPage() {
         </section>
       </main>
 
-      <footer className="footer">
-        GOLDENWEB.UZ • AI texnik tahlil va kripto yangiliklari • {new Date().getFullYear()}
-      </footer>
+      <SiteFooter />
     </>
   )
 }
