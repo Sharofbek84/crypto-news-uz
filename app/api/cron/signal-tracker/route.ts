@@ -9,7 +9,9 @@ import {
 async function fetchGateCandles(symbol: string, interval: string) {
   const pair = `${symbol}_USDT`
   const gateInterval = interval === '1d' ? '1d' : interval === '4h' ? '4h' : '1h'
-  const url = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${encodeURIComponent(pair)}&interval=${gateInterval}&limit=200`
+  // H1: 10 kun ≈ 240 soat — limit yetarli bo'lsin (TP/SL o'tkazib yuborilmasin)
+  const limit = interval === '1h' ? 300 : interval === '4h' ? 200 : 120
+  const url = `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${encodeURIComponent(pair)}&interval=${gateInterval}&limit=${limit}`
   const res = await fetch(url, {
     cache: 'no-store',
     headers: { Accept: 'application/json', 'User-Agent': 'GoldenWeb-Signal-Tracker/1.0' },
@@ -50,12 +52,10 @@ export async function GET(request: NextRequest) {
   const errors: string[] = []
   const stillOpen: string[] = []
 
-  // Cache candles per symbol+interval
   const candleCache = new Map<string, Array<{ time: number; high: number; low: number; close: number }>>()
 
   for (const signal of trackable) {
     try {
-      // open + progressiv tp1/tp2 kuzatiladi
       if (signal.status !== 'open' && signal.status !== 'tp1' && signal.status !== 'tp2') continue
 
       const cacheKey = `${signal.symbol}:${signal.interval}`

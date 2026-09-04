@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 
 type TrackedSignal = {
@@ -79,34 +79,35 @@ export default function SignalStatsPanel() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const load = useCallback(async (silent = false) => {
+    if (!silent) {
+      setLoading(true)
+      setError('')
+    }
+    try {
+      const r = await fetch('/api/signal-stats/public', { cache: 'no-store' })
+      const j = await r.json()
+      if (!r.ok) throw new Error(j.error || 'Statistika yuklanmadi')
+      setStats(j.stats || null)
+      setRecent(Array.isArray(j.recent) ? j.recent : [])
+    } catch (e: any) {
+      if (!silent) setError(e.message || 'Xato')
+    } finally {
+      if (!silent) setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (status === 'loading') return
     if (!isAdmin) {
       setLoading(false)
       return
     }
-    let cancelled = false
-    async function load() {
-      setLoading(true)
-      setError('')
-      try {
-        const r = await fetch('/api/signal-stats/public', { cache: 'no-store' })
-        const j = await r.json()
-        if (!r.ok) throw new Error(j.error || 'Statistika yuklanmadi')
-        if (cancelled) return
-        setStats(j.stats || null)
-        setRecent(Array.isArray(j.recent) ? j.recent : [])
-      } catch (e: any) {
-        if (!cancelled) setError(e.message || 'Xato')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [status, isAdmin])
+    load(false)
+    // Har 60 soniyada yangilab tursin — sahifa ochiq tursa ham "to'xtab qolgan" ko'rinmasin
+    const id = setInterval(() => load(true), 60_000)
+    return () => clearInterval(id)
+  }, [status, isAdmin, load])
 
   // Faqat admin ko'radi
   if (status === 'loading' || !isAdmin) {

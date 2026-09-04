@@ -105,7 +105,7 @@ function tpPrice(signal: TrackedSignal, level: 1 | 2 | 3): number {
 /**
  * SignalTime dan keyingi shamchalar bo'yicha natija.
  * Progressiv TP: avval TP1, keyin TP2, keyin TP3 — eng yuqori yetgan TP saqlanadi.
- * SL faqat hech qanday TP tegmasdan oldin (yoki birinchi TP bilan bir xil shamchada) hisoblanadi.
+ * SL faqat hech qanday TP tegmasdan oldin hisoblanadi.
  * TP dan keyin SL tegsa — oldingi eng yuqori TP g'alaba deb qoladi.
  */
 export function evaluateOutcome(
@@ -117,9 +117,19 @@ export function evaluateOutcome(
 
   const now = Date.now()
   if (now - signal.signalTime > MAX_AGE_MS) {
-    // Muddati o'tgan: agar TP allaqachon bo'lsa — TP qoladi, aks holda expired
+    // Muddati o'tgan: TP1/TP2/TP3 bo'lsa — shu TP bilan yakunla; aks holda expired
     if (signal.status === 'tp1' || signal.status === 'tp2' || signal.status === 'tp3') {
-      return null
+      return {
+        status: signal.status,
+        outcomePrice:
+          signal.outcomePrice ??
+          (signal.status === 'tp3'
+            ? signal.tp3
+            : signal.status === 'tp2'
+              ? signal.tp2
+              : signal.tp1),
+        outcomeAt: signal.outcomeAt || new Date().toISOString(),
+      }
     }
     return {
       status: 'expired',
@@ -141,11 +151,9 @@ export function evaluateOutcome(
       const tpThis: 0 | 1 | 2 | 3 = hitTp3 ? 3 : hitTp2 ? 2 : hitTp1 ? 1 : 0
 
       if (hitSl) {
-        // TP dan oldin (yoki bir xil shamchada TP+SL) — SL
         if (bestTp === 0) {
           return { status: 'sl', outcomePrice: signal.sl, outcomeAt: new Date(c.time).toISOString() }
         }
-        // Allaqachon TP olgan — SL ni e'tiborsiz, eng yuqori TP yakuniy
         return {
           status: tpStatus(bestTp),
           outcomePrice: tpPrice(signal, bestTp),
@@ -182,7 +190,6 @@ export function evaluateOutcome(
     }
   }
 
-  // TP3 — yakuniy yopilish
   if (bestTp === 3) {
     return {
       status: 'tp3',
@@ -191,9 +198,7 @@ export function evaluateOutcome(
     }
   }
 
-  // TP1/TP2 — oraliq holat (keyinroq TP3 yoki SL kuzatiladi)
   if (bestTp === 1 || bestTp === 2) {
-    // Allaqachon shu statusda bo'lsa — o'zgarish yo'q
     if (signal.status === tpStatus(bestTp)) return null
     return {
       status: tpStatus(bestTp),
@@ -209,6 +214,7 @@ export function evaluateOutcome(
  * Statusni yangilash.
  * TP1/TP2 — hali kuzatiladi (OPEN_SET da qoladi).
  * TP3 / SL / expired — to'liq yopiladi.
+ * Muddati o'tgan TP1/TP2 ham yakuniy (OPEN_SET dan chiqadi).
  */
 export async function closeTrackedSignal(
   redis: Redis,
@@ -225,7 +231,9 @@ export async function closeTrackedSignal(
   }
   await redis.set(signalKey(signal.id), JSON.stringify(updated), { ex: 60 * 60 * 24 * 60 })
 
-  const stillTracking = status === 'open' || status === 'tp1' || status === 'tp2'
+  const age = Date.now() - signal.signalTime
+  const stillTracking =
+    (status === 'open' || status === 'tp1' || status === 'tp2') && age <= MAX_AGE_MS
   if (stillTracking) {
     await redis.sadd(OPEN_SET, signal.id)
   } else {
@@ -245,11 +253,14 @@ export async function getTrackableSignals(): Promise<TrackedSignal[]> {
     const s = await getTrackedSignal(redis, String(id))
     if (!s) continue
 
-    // Ochiq yoki hali TP3/SL ga yetmagan progressiv TP
+    // Ochiq yoki hali TP3/SL ga yetmagan progressiv TP — muddati ichida
     if (s.status === 'open' || s.status === 'tp1' || s.status === 'tp2') {
       if (now - s.signalTime <= MAX_AGE_MS) {
         out.push(s)
         await redis.sadd(OPEN_SET, s.id)
+      } else {
+        // Muddati o'tgan — trackerga beramiz (evaluateOutcome yakunlaydi)
+        out.push(s)
       }
       continue
     }
@@ -327,6 +338,15 @@ export async function computeStats(): Promise<SignalStats | null> {
       stats.wins++
       stats.byTimeframe[tf].wins++
       stats.bySymbol[s.symbol].wins++
+      // TP1/TP2 hali kuzatilayotgan bo'lsa — ochiq ham deb hisoblanadi (progressiv)
+      if (
+        (s.status === 'tp1' || s.status === 'tp2') &&
+        Date.now() - s.signalTime <= MAX_AGE_MS
+      ) {
+        stats.open++
+        stats.byTimeframe[tf].open++
+        stats.bySymbol[s.symbol].open++
+      }
     }
   }
 
