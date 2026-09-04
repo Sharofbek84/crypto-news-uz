@@ -27,19 +27,6 @@ export default function YangiliklarPage() {
           ) : (
             news.map((item) => (
               <article key={item.slug} className="newsCard">
-                {item.image ? (
-                  <Link href={`/yangiliklar/${item.slug}`} className="newsCardImageLink" tabIndex={-1}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.image}
-                      alt=""
-                      className="newsCardImage"
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                    />
-                  </Link>
-                ) : null}
                 <div className="newsCardBody">
                   <div className="newsCardMeta">
                     <span>{item.source || 'GOLDENWEB.UZ'}</span>
@@ -53,6 +40,19 @@ export default function YangiliklarPage() {
                     Batafsil o‘qish →
                   </Link>
                 </div>
+                {item.image ? (
+                  <Link href={`/yangiliklar/${item.slug}`} className="newsCardImageLink" tabIndex={-1}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.image}
+                      alt=""
+                      className="newsCardImage"
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                    />
+                  </Link>
+                ) : null}
               </article>
             ))
           )}
