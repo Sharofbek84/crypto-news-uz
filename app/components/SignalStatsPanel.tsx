@@ -104,8 +104,8 @@ export default function SignalStatsPanel() {
       return
     }
     load(false)
-    // Har 60 soniyada yangilab tursin — sahifa ochiq tursa ham "to'xtab qolgan" ko'rinmasin
-    const id = setInterval(() => load(true), 60_000)
+    // Cron har soatda ishlaydi — panel ham soatiga bir yangilanadi
+    const id = setInterval(() => load(true), 3_600_000)
     return () => clearInterval(id)
   }, [status, isAdmin, load])
 
