@@ -544,7 +544,7 @@ export default function PremiumAnalyst() {
                 )}
               </div>
             </div>
-            <CryptoAnalystAI coin={coin} interval={interval} result={r} />
+            <CryptoAnalystAI coin={coin} interval={interval} analysis={r} />
           </>
         )
       )}
