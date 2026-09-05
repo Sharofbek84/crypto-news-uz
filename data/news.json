@@ -1,1 +1,102 @@
-FULL_NEWS_JSON_FROM_ARTIFACTS
+[
+  {
+    "slug": "nfp-162k-btc-80ming-5-sent",
+    "title": "Avgust NFP 162 ming: BTC $80 ming ostiga tushdi, stavka oshirish ehtimoli qaytdi",
+    "summary": "AQSh avgustda 162 ming ish o‘rni qo‘shdi (kutilgan ~56 ming). Ishsizlik 4,1%. BTC $81 300 dan ~$78 600 gacha tushib, keyin $79 500 atrofida tiklandi.",
+    "body": "4-sentabr (juma) AQSh Mehnat statistikasi byurosi avgust nonfarm payrolls ni +162 000 deb e’lon qildi — iqtisodchilar konsensusi ~53–56 ming edi. Iyul avval −23 000 deb berilgan, endi +21 000 ga qayta ko‘rib chiqildi; ikki oylik tuzatish +55 000. Ishsizlik 4,1% da qoldi.\n\nBitcoin hisobot oldidan ~$81 340 da edi va bir 5 daqiqalik shamda $79 661 gacha tushdi; ba’zi manbalarda past $78 649–$78 600. Keyin $79 500–$79 800 atrofida barqarorlashdi. Sentabr 15–16 FOMC da 25 bp oshirish ehtimoli ~49–52% dan ~58–65% gacha ko‘tarildi.\n\nBu Waller «stavkani ushlab turish» signalidan keyingi rallyni qisqa muddatda teskarisiga aylantirdi. Keyingi katalizator — inflyatsiya raqamlari va Fed yig‘ilishi.\n\nManba: Bloomberg, Cointelegraph, BLS, CME FedWatch.",
+    "url": "https://cointelegraph.com/markets/surprise-labor-market-print-sends-bitcoin-back-below-80k",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "long-likvidatsiya-278mln-5-sent",
+    "title": "NFP dan keyin 4 soatda ~$278 mln long likvidatsiya qilindi",
+    "summary": "CoinGlass: juma hisobotidan keyin to‘rt soatda ~$278 mln leveredj yopilgan, shundan ~86% long. Avvalgi rally short squeeze edi.",
+    "body": "4-sentabr bandlik hisobotidan so‘ng kripto derivativlarida keskin long yopilish kuzatildi. CoinMarketCap/CoinGlass: taxminan to‘rt soatda $278 million likvidatsiya, ~86 foizi uzun pozitsiyalar.\n\nOldingi sessiyada BTC $80–82 mingni kesganda asosiy bosim short yopilish ($116–128 mln atrofida) edi. Endi yo‘nalish almashdi: yangi xaridor emas, leveredjli longlar siqildi.\n\nCryptoQuant avvalroq rallyni «yangi spot talab emas, short covering» deb baholagan edi. $83 000 ba’zi tahlilchilarda bull market ostonasi sifatida qolmoqda. Bu savdo chaqirig‘i emas — leveredj xavfi haqida fakt.\n\nManba: CoinGlass, CoinMarketCap, CryptoQuant.",
+    "url": "https://coinmarketcap.com/academy/article/bitcoin-falls-below-80k-hot-jobs-report-fed-hike-bets",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://images.unsplash.com/photo-1642790551116-18e150f248e5?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "slug": "imf-salvador-chivo-xususiy-5-sent",
+    "title": "FMI: El Salvador BTC o‘sishi xususiy hadya; Chivo nazorati operatorga o‘tdi",
+    "summary": "Birinchi ko‘rikdan keyingi zaxira o‘sishi davlat puli emas. Chivo Wallet ko‘pchilik ulushi noma’lum xususiy operatorga o‘tkazilgan.",
+    "body": "Xalqaro Valyuta Fondi El Salvadorning 40 oylik Extended Fund Facility dasturi 2- va 3-ko‘riklari bo‘yicha xodimlar darajasidagi kelishuvni e’lon qildi. FMI: birinchi ko‘rikdan keyin qo‘shilgan bitcoin xususiy hadyalardan kelgan, davlat mablag‘i ishlatilmagan.\n\nHukumat Chivo kripto hamyonida ko‘pchilik mulk va operatsion nazoratni noma’lum xususiy operatorga o‘tkazgan; davlat ozchilik ulush va foydalanuvchi aktivlari kustodiyasini saqlab qolgan. El País: 7 763 BTC dan ortiq (~$632 mln) ko‘chgani haqida yozadi; operator nomi ochilmagan.\n\nYanvarda bitcoin qonuniy to‘lov vositasi maqomi olib tashlangan edi. Bu dastur sharti ijrosi haqidagi rasmiy bayonot, investitsiya maslahati emas.\n\nManba: IMF, CoinDesk, El País.",
+    "url": "https://www.coindesk.com/business/2026/09/04/imf-confirms-el-salvador-s-bitcoin-growth-was-funded-by-private-donations-not-public-money",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://images.unsplash.com/photo-1526304640301-7eaab2a00290?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "slug": "janubiy-koreya-token-qimmatli-qogoz-2027-5-sent",
+    "title": "Janubiy Koreya to‘liq tokenlashtirilgan qimmatli qog‘oz bozorini 2027-yil fevralga rejalashtirdi",
+    "summary": "Seul 2027-yil fevralida to‘liq tokenlashtirilgan qimmatli qog‘oz bozorini ishga tushirishni maqsad qilgan. Kripto-kapital bozori integratsiyasi kengayadi.",
+    "body": "4-sentabr xabarlariga ko‘ra, Janubiy Koreya 2027-yil fevralida to‘liq tokenlashtirilgan qimmatli qog‘ozlar bozorini ishga tushirishni maqsad qilmoqda. Bu mahalliy kapital bozori va blokcheyn infratuzilmasini birlashtirish yo‘lidagi navbatdagi qadam.\n\nReja emitentlar, brokerlar va investorlar uchun tokenlashtirilgan aksiyalar va boshqa qog‘ozlarni tartibga solingan muhitda savdo qilish imkonini beradi. Aniq litsenziya va texnik standartlar keyingi qoidalarda ochiladi.\n\nBu Osiyodagi tokenlashtirish poygasining bir qismi: Singapur steyblkoin qonunchiligini, BAA esa institutsional spot savdoni kengaytirmoqda. Sana maqsad — qonuniy kuchga kirish hali tasdiqlanmagan.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/markets/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "slug": "openreserve-occ-bank-ok-5-sent",
+    "title": "AQSh bank nazoratchisi OpenReserve blokcheyn-bankiga dastlabki rozilik berdi",
+    "summary": "On-chain bank OpenReserve federal darajada ishlash uchun dastlabki OK oldi. Kompaniya yaqinda a16z crypto yetakchiligida $25 mln seed yig‘gan.",
+    "body": "4-sentabrda AQSh bank nazorati idorasi (OCC) blokcheyn-bank OpenReserve ga dastlabki faoliyat roziligini bergani xabar qilindi. Bu an’anaviy bank litsenziyasi bilan on-chain hisob-kitobni birlashtirishga urinayotgan yangi toifa.\n\nKuCoin kunlik hisobotiga ko‘ra, OpenReserve a16z crypto yetakchiligida $25 million seed raund yopgan. Mahsulot steyblkoin hisob-kitobi va institutsional on-chain dollar oqimlariga qaratilgan.\n\nDastlabki OK to‘liq litsenziya emas: kapital, AML va rezerv talablari oldinda. Shu hafta Diameter Pay $10 mln Series A, Cari $32,5 mln banklar ishtirokida yig‘gan.\n\nManba: CoinDesk, KuCoin Daily Report.",
+    "url": "https://www.coindesk.com/business/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "slug": "btc-eth-etf-872mln-5-sent",
+    "title": "AQSh spot BTC va ETH ETF lari bir kunda $872 mln jalb qildi",
+    "summary": "SoSoValue: 3-sentabr Bitcoin ETF +$730,8–730,9 mln (2026-yilning uchinchi yirik kuni), Ethereum ETF +$141,4 mln. IBIT ~$454 mln.",
+    "body": "3-sentabr (payshanba) AQSh spot Bitcoin ETF lari $730,8–730,9 million sof kirim yozdi — 14-yanvardagi $843,6 mln dan keyingi eng katta kun. Ethereum ETF lari $141,4 mln kirim. CryptoSlate: jami $872,2 mln. BlackRock IBIT ~$454 mln.\n\nManba: SoSoValue, CryptoSlate, The Block.",
+    "url": "https://cryptoslate.com/wall-street-just-poured-nearly-900-million-into-bitcoin-and-ethereum-etfs/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "clarity-sheriffs-neytral-5-sent",
+    "title": "AQSh sheriflari assotsiatsiyasi CLARITY Act bo‘yicha qarshilikni olib tashladi",
+    "summary": "National Sheriffs’ Association pozitsiyasini «qarshi»dan «neytral»ga o‘tkazdi. Senatda cloture ovozi 15-sentabr, 14:15 ET.",
+    "body": "National Sheriffs’ Association CLARITY Act (H.R. 3633) bo‘yicha muxolifatini bekor qildi. Pozitsiya qo‘llab-quvvatlash emas — neytral. Cloture ovozi 15-sentabr.\n\nManba: CoinDesk, POLITICO.",
+    "url": "https://www.coindesk.com/policy/2026/09/04/u-s-sheriff-s-association-shifts-opposition-stance-to-clarity-act-to-neutral",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80"
+  },
+  {
+    "slug": "zec-1000-grayscale-etf-5-sent",
+    "title": "Zcash $1 000 ni kesib o‘tdi: shortlar $34,5 mln, ZCSH ETF fonida",
+    "summary": "ZEC ~$1 020 gacha chiqdi, 24 soatda ~20%. Grayscale spot Zcash ETF (ZCSH) 25-avgustda NYSE Arca da ochilgan.",
+    "body": "4-sentabrda ZEC $1 000 ni kesib ~$1 023 gacha chiqdi. 24 soatlik hajm ~$1,2 mlrd. Likvidatsiya ~$36,6 mln, shundan $34,5 mln short. Shielded supply 4,86 mln ZEC.\n\nManba: CoinDesk, CoinGecko, ZecStats.",
+    "url": "https://www.coindesk.com/markets/2026/09/04/zcash-jumps-20-to-landmark-usd1-000-level-as-short-sellers-lose-usd34-million",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://assets.coingecko.com/coins/images/486/large/circle-zcash-color.png"
+  },
+  {
+    "slug": "hargreaves-lansdown-9-etn-5-sent",
+    "title": "Hargreaves Lansdown 2 mln mijozga 9 ta BTC va ETH ETN ochdi",
+    "summary": "Britaniyaning eng yirik chakana platformasi 3-sentabrdan BlackRock, WisdomTree, 21Shares, Invesco, CoinShares va Bitwise ETN larini listing qildi.",
+    "body": "Hargreaves Lansdown (~2 mln investor) Advanced Investing orqali to‘qqizta bitcoin va ether ETN ni taklif qila boshladi. Yillik to‘lov 0–0,35%. FCA 2025-yil oktabrida chakana kripto ETP taqiqini olib tashlagan edi.\n\nManba: CoinDesk, Financial Times.",
+    "url": "https://www.coindesk.com/business/2026/09/04/from-warning-to-listing-uk-s-largest-wealth-platform-opens-access-to-crypto-etns",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+  },
+  {
+    "slug": "waller-fed-btc-82ming-5-sent",
+    "title": "Waller stavkani ushlab turishga ochiq: BTC $82 ming, bozor $2,73–2,81 trln",
+    "summary": "Fed gubernatori sentabr 15–16 yig‘ilishida stavkani 3,50–3,75% da qoldirishga moyil, agar inflyatsiya sovisa.",
+    "body": "3-sentabr Reuters NEXT tadbirida Christopher Waller avgust inflyatsiyasi sovisa stavkani ushlab turishni qo‘llab-quvvatlashini aytdi. BTC $82 016–$82 240 gacha chiqqan, keyin NFP dan so‘ng $80 ming ostiga qaytgan.\n\nManba: Reuters, CoinDesk.",
+    "url": "https://www.reuters.com/business/feds-waller-open-leaving-rates-unchanged-september-meeting-if-inflation-cools-2026-09-03/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-05",
+    "image": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80"
+  }
+]
