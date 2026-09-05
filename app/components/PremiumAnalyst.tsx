@@ -268,6 +268,22 @@ function CleanChart({
               />
               <circle cx={x(div.i1)} cy={ry(div.rsi1)} r="3.5" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
               <circle cx={x(div.i2)} cy={ry(div.rsi2)} r="3.5" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
+              {result.signalTone === 'caution' &&
+                (div.type === 'bullish' ? (
+                  <polygon
+                    points={`${x(div.i2)},${y(div.price2) + 18} ${x(div.i2) - 9},${y(div.price2) + 34} ${x(div.i2) + 9},${y(div.price2) + 34}`}
+                    fill="#20d67a"
+                    stroke="#0b1a12"
+                    strokeWidth="1"
+                  />
+                ) : (
+                  <polygon
+                    points={`${x(div.i2)},${y(div.price2) - 18} ${x(div.i2) - 9},${y(div.price2) - 34} ${x(div.i2) + 9},${y(div.price2) - 34}`}
+                    fill="#ff4d5a"
+                    stroke="#1a0b0d"
+                    strokeWidth="1"
+                  />
+                ))}
             </g>
           )}
 
@@ -499,43 +515,36 @@ export default function PremiumAnalyst() {
                   </div>
                 </div>
               </div>
-              <div className="proCard bullCard">
-                <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
-                <p>{r.bullish}</p>
-                <div className="levelPath greenPath">
-                  {r.side === 'SELL' ? (
-                    <>
-                      {money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}
-                    </>
-                  ) : (
-                    <>
-                      {money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
-                    </>
-                  )}
+              <div className="proCard">
+                <h3>SENARIYLAR</h3>
+                <div className="scenario good">
+                  <b>Bullish</b>
+                  <p>{r.bullish}</p>
                 </div>
-              </div>
-              <div className="proCard bearCard">
-                <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
-                <p>{r.bearish}</p>
-                <div className="levelPath redPath">
-                  {r.side === 'SELL' ? (
-                    <>
-                      {money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}
-                    </>
-                  ) : (
-                    <>
-                      {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
-                    </>
-                  )}
+                <div className="scenario bad">
+                  <b>Bearish</b>
+                  <p>{r.bearish}</p>
                 </div>
+                {r.side === 'SELL' ? (
+                  <>
+                    <div className="scenario bad">
+                      <b>Pasayish yo‘li</b>
+                      <p>{bearPath.map(money$).join(' → ')}</p>
+                    </div>
+                    <div className="scenario good">
+                      <b>O‘sish xavfi</b>
+                      <p>{bullSellPath.map(money$).join(' → ')}</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="scenario bad">
+                    <b>Pasayish yo‘li</b>
+                    <p>{bearPath.map(money$).join(' → ')}</p>
+                  </div>
+                )}
               </div>
             </div>
-            <p className="homeDisclaimer">
-              Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz
-              tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat
-              yuqotishga tayyor bo'lgan pulingiz bilan kiring.
-            </p>
-            <CryptoAnalystAI analysis={r} coin={coin} interval={interval} />
+            <CryptoAnalystAI coin={coin} interval={interval} result={r} />
           </>
         )
       )}
