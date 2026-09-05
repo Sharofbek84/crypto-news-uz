@@ -127,10 +127,10 @@ function atrParams(interval: string, last: number, atrVal: number) {
     interval === '15m' ? 1.0 : interval === '1h' ? 1.2 : interval === '4h' ? 1.5 : interval === '1w' ? 2.1 : 1.7
   const tpR: [number, number, number] =
     interval === '15m' || interval === '1h'
-      ? [1.0, 1.8, 2.5]
+      ? [1.0, 1.5, 2.0]
       : interval === '4h'
-        ? [1.2, 2.0, 3.0]
-        : [1.5, 2.5, 3.5]
+        ? [1.2, 1.7, 2.2]
+        : [1.5, 2.1, 2.7]
 
   const minPct =
     interval === '15m' ? 0.003 : interval === '1h' ? 0.004 : interval === '4h' ? 0.007 : interval === '1w' ? 0.018 : 0.01
@@ -323,8 +323,9 @@ function buildAtrTakeProfits(
   structureLevels: number[]
 ): [number, number, number] {
   const r = Math.max(risk, last * 0.0015)
-  const minGap = r * 0.35
-  const snapBand = r * 0.35
+  const minGap = r * 0.3
+  const maxGap = r * 0.65
+  const snapBand = r * 0.3
 
   const rrTargets = tpR.map((m) => (direction === 'long' ? last + r * m : last - r * m))
 
@@ -347,8 +348,13 @@ function buildAtrTakeProfits(
     }
 
     if (tps.length > 0) {
-      if (direction === 'long') tp = Math.max(tp, tps[tps.length - 1] + minGap)
-      else tp = Math.min(tp, tps[tps.length - 1] - minGap)
+      if (direction === 'long') {
+        tp = Math.max(tp, tps[tps.length - 1] + minGap)
+        tp = Math.min(tp, tps[tps.length - 1] + maxGap)
+      } else {
+        tp = Math.min(tp, tps[tps.length - 1] - minGap)
+        tp = Math.max(tp, tps[tps.length - 1] - maxGap)
+      }
     }
 
     tps.push(tp)
@@ -499,7 +505,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL: divergensiya yoki RSI + oxirgi swing strukturasi
     const swing = lastSwingLevels(candles)
     if (divergence?.type === 'bullish' && r > 50) {
       side = 'BUY'
