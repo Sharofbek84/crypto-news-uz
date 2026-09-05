@@ -76,7 +76,7 @@ export default function YangiliklarPage({
           )}
         </div>
 
-        {totalPages > 1 ? (
+        {news.length > 0 ? (
           <nav className="newsPagination" aria-label="Yangiliklar sahifalari">
             {page > 1 ? (
               <Link
