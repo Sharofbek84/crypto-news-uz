@@ -500,10 +500,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     side = 'BUY'
   } else {
     const swing = lastSwingLevels(candles)
-    if (divergence?.type === 'bullish' && r > 50) {
+    // Divergensiya ham swing strukturasi bilan tasdiqlanadi
+    if (
+      divergence?.type === 'bullish' &&
+      r > 50 &&
+      (!swing || last >= swing.low)
+    ) {
       side = 'BUY'
       neutralTone = 'caution'
-    } else if (divergence?.type === 'bearish' && r < 50) {
+    } else if (
+      divergence?.type === 'bearish' &&
+      r < 50 &&
+      (!swing || last <= swing.high)
+    ) {
       side = 'SELL'
       neutralTone = 'caution'
     } else if (swing && r > 50 && last >= swing.low) {
