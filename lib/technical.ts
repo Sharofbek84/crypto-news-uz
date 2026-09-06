@@ -200,7 +200,7 @@ function structureWindow(interval: string) {
 /**
  * RSI divergensiya: grafik + NEUTRAL signal (RSI tasdiq bilan).
  * Pivotlar oxirgi ~60 shamchadan qidiriladi.
- * Faqat oxirgi 2 ta swing low (bullish) yoki high (bearish).
+ * i2 = eng so'nggi swing low/high; i1 = u bilan div beradigan oldingi pivot.
  * Ikki pivot oralig'i 5–40 shamcha.
  * Bullish: narx pastroq low, RSI yuqoriroq low.
  * Bearish: narx yuqoriroq high, RSI pastroq high.
@@ -239,43 +239,58 @@ function detectRsiDivergence(
     if (isHigh) highs.push({ i, price: c.high, rsi: rs[i] })
   }
 
-  // Faqat oxirgi ikkita swing low/high — chiziq eng so'nggi ekstremumlarda
+  // i2 har doim eng so'nggi pivot; i1 — u bilan divergensiya beradigan oldingi pivot
   const rsiEps = 0.5
   let best: Divergence | null = null
 
   if (lows.length >= 2) {
-    const p1 = lows[lows.length - 2]
     const p2 = lows[lows.length - 1]
-    const dist = p2.i - p1.i
-    if (dist >= lookbackMin && dist <= lookbackMax && p2.price < p1.price && p2.rsi > p1.rsi + rsiEps) {
-      best = {
-        type: 'bullish',
-        i1: p1.i,
-        i2: p2.i,
-        price1: p1.price,
-        price2: p2.price,
-        rsi1: p1.rsi,
-        rsi2: p2.rsi,
+    for (let a = 0; a < lows.length - 1; a++) {
+      const p1 = lows[a]
+      const dist = p2.i - p1.i
+      if (dist < lookbackMin || dist > lookbackMax) continue
+      if (p2.price < p1.price && p2.rsi > p1.rsi + rsiEps) {
+        // Eng yaqin (eng so'nggi) p1 ni afzal ko'ramiz
+        if (!best || best.type !== 'bullish' || p1.i > best.i1) {
+          best = {
+            type: 'bullish',
+            i1: p1.i,
+            i2: p2.i,
+            price1: p1.price,
+            price2: p2.price,
+            rsi1: p1.rsi,
+            rsi2: p2.rsi,
+          }
+        }
       }
     }
   }
 
   if (highs.length >= 2) {
-    const p1 = highs[highs.length - 2]
     const p2 = highs[highs.length - 1]
-    const dist = p2.i - p1.i
-    if (dist >= lookbackMin && dist <= lookbackMax && p2.price > p1.price && p2.rsi < p1.rsi - rsiEps) {
-      const bear: Divergence = {
-        type: 'bearish',
-        i1: p1.i,
-        i2: p2.i,
-        price1: p1.price,
-        price2: p2.price,
-        rsi1: p1.rsi,
-        rsi2: p2.rsi,
+    for (let a = 0; a < highs.length - 1; a++) {
+      const p1 = highs[a]
+      const dist = p2.i - p1.i
+      if (dist < lookbackMin || dist > lookbackMax) continue
+      if (p2.price > p1.price && p2.rsi < p1.rsi - rsiEps) {
+        const bear: Divergence = {
+          type: 'bearish',
+          i1: p1.i,
+          i2: p2.i,
+          price1: p1.price,
+          price2: p2.price,
+          rsi1: p1.rsi,
+          rsi2: p2.rsi,
+        }
+        // Eng so'nggi i2 ustun; bir xil i2 da eng yaqin p1
+        if (
+          !best ||
+          bear.i2 > best.i2 ||
+          (bear.i2 === best.i2 && bear.i1 > best.i1)
+        ) {
+          best = bear
+        }
       }
-      // Ikkalasi ham bo'lsa — eng so'nggi pivot ustun
-      if (!best || bear.i2 >= best.i2) best = bear
     }
   }
 
