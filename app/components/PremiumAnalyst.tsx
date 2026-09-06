@@ -493,10 +493,28 @@ export default function PremiumAnalyst() {
                   <strong>
                     {money$(r.entryLow)} – {money$(r.entryHigh)}
                   </strong>
-                  <span>
-                    Stop / Invalidation: narx {money$(r.invalidation)} dan{' '}
+                </div>
+                <div className="proBox red">
+                  <b>STOP LOSS (SL)</b>
+                  <strong>{money$(r.invalidation)}</strong>
+                  <small>
                     {r.side === 'SELL' ? 'yuqorisida' : 'pastida'} {tf} candle yopilsa
-                  </span>
+                  </small>
+                </div>
+                <div className="proBox tp">
+                  <b>TAKE PROFIT (TP)</b>
+                  <div className="tpLine">
+                    <span>TP1</span>
+                    <strong>{money$(r.tp[0])}</strong>
+                  </div>
+                  <div className="tpLine">
+                    <span>TP2</span>
+                    <strong>{money$(r.tp[1])}</strong>
+                  </div>
+                  <div className="tpLine">
+                    <span>TP3</span>
+                    <strong>{money$(r.tp[2])}</strong>
+                  </div>
                 </div>
               </div>
               <div className="proCard bullCard">
