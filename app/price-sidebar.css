@@ -61,6 +61,9 @@
 
 @media(max-width:1000px){
   .homeLayout{grid-template-columns:1fr}
+  /* Asosiy kontent yuqorida, chap ustun pastida */
+  .homeMain{order:1}
+  .priceSidebar{order:2;margin-top:12px}
   .priceSidebarList{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
   .subscribeAside{width:100%;max-width:none}
   .subscribeAside .planGrid{grid-template-columns:repeat(3,1fr)}
