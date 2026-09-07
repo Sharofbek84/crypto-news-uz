@@ -91,7 +91,6 @@ export default async function PremiumPage() {
       <main className="container homeWide" style={{ paddingTop: 28, paddingBottom: 48 }}>
         <div className="homeLayout">
           <aside className="priceSidebar">
-            <h2 className="priceSidebarTitle">Premium · 16 juftlik</h2>
             {prices.length === 0 ? (
               <p className="priceSidebarEmpty">Narxlar vaqtincha yuklanmadi.</p>
             ) : (

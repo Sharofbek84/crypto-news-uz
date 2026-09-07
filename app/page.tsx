@@ -66,7 +66,6 @@ export default async function Home() {
       <main className="container homeWide">
         <div className="homeLayout">
           <aside className="priceSidebar">
-            <h2 className="priceSidebarTitle">Top Kriptovalyutalar</h2>
             {prices.length === 0 ? (
               <p className="priceSidebarEmpty">Narxlar vaqtincha yuklanmadi.</p>
             ) : (
