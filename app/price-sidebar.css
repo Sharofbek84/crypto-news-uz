@@ -1,7 +1,7 @@
 /* Umumiy sahifa kengligi — header, main, footer bir xil */
 .container{max-width:1280px}
 
-/* Home / Premium: chap ustun — oddiy qator, sticky yo‘q */
+/* Home / Premium / Yangiliklar: chap ustun */
 .homeWide{max-width:1280px}
 .homeLayout{display:grid;grid-template-columns:220px 1fr;gap:18px;align-items:start;margin-top:8px}
 .priceSidebar{background:transparent;border:none;padding:0;max-height:none;overflow:visible;position:static}
@@ -38,7 +38,33 @@
 .homeMain{min-width:0}
 .homeMain .homeAnalyst{max-width:none;margin-top:0}
 
+/* Yangiliklar: obuna chap ustunda, 220px dan kengaymasin */
+.subscribeAside{width:220px;max-width:220px}
+.subscribeAside .subscribeSection{
+  margin:0;
+  padding:14px 10px;
+  border-radius:12px;
+}
+.subscribeAside .subscribeHead{margin-bottom:12px;text-align:left}
+.subscribeAside .subscribeHead h2{font-size:1.05rem;margin-bottom:4px}
+.subscribeAside .subscribeHead p{font-size:.78rem;max-width:none}
+.subscribeAside .subscribeKicker{font-size:.7rem;margin-bottom:4px}
+.subscribeAside .planGrid{grid-template-columns:1fr;gap:10px;margin-top:0}
+.subscribeAside .planCard{padding:12px 10px}
+.subscribeAside .planName{font-size:.82rem}
+.subscribeAside .planPrice{font-size:1.25rem;margin-bottom:8px}
+.subscribeAside .planCard ul{margin-bottom:10px}
+.subscribeAside .planCard li{font-size:.75rem;padding:4px 0}
+.subscribeAside .planBtn{font-size:.78rem;padding:9px 10px}
+.subscribeAside .planBadge{font-size:.65rem;top:-8px;right:8px;padding:2px 7px}
+.subscribeAside .subscribeNote{margin-top:10px;font-size:.7rem;text-align:left}
+
 @media(max-width:1000px){
   .homeLayout{grid-template-columns:1fr}
   .priceSidebarList{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+  .subscribeAside{width:100%;max-width:none}
+  .subscribeAside .planGrid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:700px){
+  .subscribeAside .planGrid{grid-template-columns:1fr}
 }
