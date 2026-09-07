@@ -1,4 +1,5 @@
-import newsData from '../data/news.json'
+import fs from 'fs'
+import path from 'path'
 
 export type NewsItem = {
   slug: string
@@ -20,6 +21,37 @@ export const HOME_NEWS_COUNT = 10
 
 /** Shu kundan eski yangiliklar chiqarib tashlanadi */
 export const NEWS_MAX_AGE_DAYS = 10
+
+const NEWS_DIR = path.join(process.cwd(), 'data', 'news')
+
+/**
+ * data/news/ papkasidagi barcha YYYY-MM-DD.json fayllarni o‘qiydi.
+ * Har kun alohida fayl — yangi kun qo‘shilganda eski arxiv o‘zgarmaydi.
+ */
+function loadAllNewsFromDisk(): NewsItem[] {
+  try {
+    if (!fs.existsSync(NEWS_DIR)) return []
+    const files = fs
+      .readdirSync(NEWS_DIR)
+      .filter((f) => f.endsWith('.json') && /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+      .sort()
+      .reverse()
+
+    const items: NewsItem[] = []
+    for (const file of files) {
+      try {
+        const raw = fs.readFileSync(path.join(NEWS_DIR, file), 'utf8')
+        const data = JSON.parse(raw)
+        if (Array.isArray(data)) items.push(...(data as NewsItem[]))
+      } catch {
+        // bitta buzilgan kun fayli butun arxivni to‘xtatmasin
+      }
+    }
+    return items
+  } catch {
+    return []
+  }
+}
 
 function parseNewsDate(date?: string): number | null {
   if (!date) return null
@@ -54,8 +86,7 @@ export function trimNews(items: NewsItem[]): NewsItem[] {
 
 /** 10 kun ichidagi barcha yangiliklar (tartiblangan) */
 export function getAllFreshNews(): NewsItem[] {
-  const all = (Array.isArray(newsData) ? newsData : []) as NewsItem[]
-  return trimNews(all)
+  return trimNews(loadAllNewsFromDisk())
 }
 
 /** Bosh sahifa uchun oxirgi N ta */
