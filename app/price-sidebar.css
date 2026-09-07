@@ -1,3 +1,6 @@
+/* Umumiy sahifa kengligi — header, main, footer bir xil */
+.container{max-width:1280px}
+
 /* Home / Premium: chap ustun — oddiy qator, sticky yo‘q */
 .homeWide{max-width:1280px}
 .homeLayout{display:grid;grid-template-columns:220px 1fr;gap:18px;align-items:start;margin-top:8px}
