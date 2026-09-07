@@ -64,7 +64,7 @@ export default async function Home() {
     <>
       <SiteHeader />
 
-      <main className="container homeWide">
+      <main className="container homeWide" style={{ paddingTop: 28, paddingBottom: 48 }}>
         <div className="homeLayout">
           <aside className="priceSidebar">
             {prices.length === 0 ? (
