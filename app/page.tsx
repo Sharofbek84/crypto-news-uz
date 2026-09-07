@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import HomeAnalyst from './components/HomeAnalyst'
 import SiteHeader from './components/SiteHeader'
 import SiteFooter from './components/SiteFooter'
+import SubscribeSection from './components/SubscribeSection'
 import { getRecentNews } from '@/lib/news'
 
 /** Tartib: BTC, ETH, LTC, SOL, BNB, NEAR, GRAM, SUI, APT, ATOM */
@@ -105,6 +106,8 @@ export default async function Home() {
                 <HomeAnalyst />
               </Suspense>
             </div>
+
+            <SubscribeSection />
 
             <div className="sectionRow">
               <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
