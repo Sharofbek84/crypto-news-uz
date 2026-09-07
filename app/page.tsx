@@ -19,9 +19,9 @@ const TOP_COINS: { symbol: string; geckoId: string }[] = [
   { symbol: 'ATOM', geckoId: 'cosmos' },
 ]
 
-async function getPrices() {
+async function getPrices(coins: { symbol: string; geckoId: string }[]) {
   try {
-    const ids = TOP_COINS.map((c) => c.geckoId).join(',')
+    const ids = coins.map((c) => c.geckoId).join(',')
     const res = await fetch(
       `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc`,
       { next: { revalidate: 60 }, headers: { Accept: 'application/json' } }
@@ -30,7 +30,7 @@ async function getPrices() {
     const data = await res.json()
     if (!Array.isArray(data)) return []
     const byId = new Map(data.map((c: any) => [c.id, c]))
-    return TOP_COINS.map(({ symbol, geckoId }) => {
+    return coins.map(({ symbol, geckoId }) => {
       const c = byId.get(geckoId)
       if (!c)
         return {
@@ -56,73 +56,79 @@ function fmt(p: number) {
 }
 
 export default async function Home() {
-  const prices = await getPrices()
+  const prices = await getPrices(TOP_COINS)
   const news = getRecentNews()
 
   return (
     <>
       <SiteHeader />
 
-      <main className="container">
-        <div id="tahlil">
-          <Suspense fallback={<div className="homeLoading">Grafik va tahlil yuklanmoqda...</div>}>
-            <HomeAnalyst />
-          </Suspense>
-        </div>
-
-        <h2 className="section">Top Kriptovalyutalar</h2>
-        {prices.length === 0 ? (
-          <p style={{ color: '#848e9c', marginBottom: 24 }}>Narxlar vaqtincha yuklanmadi. Keyinroq yangilang.</p>
-        ) : (
-          <div className="prices">
-            {prices.map((c: any) => (
-              <Link
-                key={c.symbol}
-                href={`/?symbol=${c.symbol}#tahlil`}
-                className="card cardLink"
-                title={`${c.symbol} texnik tahlilini ochish`}
-              >
-                {c.image ? (
-                  <img src={c.image} alt={c.name} width={32} height={32} />
-                ) : (
-                  <div className="coinPlaceholder">{c.symbol.slice(0, 2)}</div>
-                )}
-                <div>
-                  <h3>{c.name || c.symbol}</h3>
-                  <div className="sym">{c.symbol}</div>
-                </div>
-                <div className="right">
-                  <div className="price">{fmt(c.current_price)}</div>
-                  <div className={(c.price_change_percentage_24h ?? 0) >= 0 ? 'up' : 'down'}>
-                    {(c.price_change_percentage_24h ?? 0) >= 0 ? '+' : ''}
-                    {Number(c.price_change_percentage_24h ?? 0).toFixed(2)}%
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        <div className="sectionRow">
-          <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
-            So‘nggi Yangiliklar
-          </h2>
-          <Link href="/yangiliklar" className="sectionMore">
-            Barchasi →
-          </Link>
-        </div>
-        <div className="news">
-          {news.map((item) => (
-            <article key={item.slug || item.title} className="item">
-              <h3>
-                <Link href={item.slug ? `/yangiliklar/${item.slug}` : '/yangiliklar'}>{item.title}</Link>
-              </h3>
-              <div className="meta">
-                {item.source || 'GOLDENWEB.UZ'}
-                {item.date ? ` • ${item.date}` : ''}
+      <main className="container homeWide">
+        <div className="homeLayout">
+          <aside className="priceSidebar">
+            <h2 className="priceSidebarTitle">Top Kriptovalyutalar</h2>
+            {prices.length === 0 ? (
+              <p className="priceSidebarEmpty">Narxlar vaqtincha yuklanmadi.</p>
+            ) : (
+              <div className="priceSidebarList">
+                {prices.map((c: any) => (
+                  <Link
+                    key={c.symbol}
+                    href={`/?symbol=${c.symbol}#tahlil`}
+                    className="priceRow"
+                    title={`${c.symbol} texnik tahlilini ochish`}
+                  >
+                    {c.image ? (
+                      <img src={c.image} alt={c.name} width={28} height={28} />
+                    ) : (
+                      <div className="coinPlaceholder sm">{c.symbol.slice(0, 2)}</div>
+                    )}
+                    <div className="priceRowMain">
+                      <span className="priceRowSym">{c.symbol}</span>
+                      <span className="priceRowName">{c.name}</span>
+                    </div>
+                    <div className="priceRowRight">
+                      <span className="priceRowPrice">{fmt(c.current_price)}</span>
+                      <span className={(c.price_change_percentage_24h ?? 0) >= 0 ? 'up' : 'down'}>
+                        {(c.price_change_percentage_24h ?? 0) >= 0 ? '+' : ''}
+                        {Number(c.price_change_percentage_24h ?? 0).toFixed(2)}%
+                      </span>
+                    </div>
+                  </Link>
+                ))}
               </div>
-            </article>
-          ))}
+            )}
+          </aside>
+
+          <div className="homeMain">
+            <div id="tahlil">
+              <Suspense fallback={<div className="homeLoading">Grafik va tahlil yuklanmoqda...</div>}>
+                <HomeAnalyst />
+              </Suspense>
+            </div>
+
+            <div className="sectionRow">
+              <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
+                So‘nggi Yangiliklar
+              </h2>
+              <Link href="/yangiliklar" className="sectionMore">
+                Barchasi →
+              </Link>
+            </div>
+            <div className="news">
+              {news.map((item) => (
+                <article key={item.slug || item.title} className="item">
+                  <h3>
+                    <Link href={item.slug ? `/yangiliklar/${item.slug}` : '/yangiliklar'}>{item.title}</Link>
+                  </h3>
+                  <div className="meta">
+                    {item.source || 'GOLDENWEB.UZ'}
+                    {item.date ? ` • ${item.date}` : ''}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
 
