@@ -250,9 +250,18 @@ function KabinetContent() {
             >
               Telegram Tribute orqali to‘lash
             </a>
-            <p style={{ color: '#848e9c', fontSize: 12, margin: 0 }}>
-              To‘lovdan keyin Premium sayt hisobingizda yoqilishi uchun Telegramda yozing yoki
-              admin tasdiqlaydi. Email: {me?.user.email || session.user.email}
+            <p style={{ color: '#848e9c', fontSize: 12, margin: 0, lineHeight: 1.55 }}>
+              To‘lovdan keyin saytdagi hisobingizda Premium yoqilishi uchun Telegram orqali sayt
+              administratoriga xabar bering. Xabarda Email manzilingiz va to‘lov o‘tganligini
+              tasdiqlovchi chekni yoki skrenshotni yuboring. Sayt administratori Telegram manzili:{' '}
+              <a
+                href="https://t.me/Goldenweb777"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: '#f0b90b', fontWeight: 600 }}
+              >
+                @Goldenweb777
+              </a>
             </p>
           </div>
         )}
