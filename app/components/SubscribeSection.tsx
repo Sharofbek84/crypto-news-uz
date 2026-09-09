@@ -138,10 +138,7 @@ export default function SubscribeSection() {
 
       <div className="subscribeNote">
         To‘lov Telegram Tribute orqali. To‘lovdan keyin sayt hisobingizda Premium yoqilishi uchun
-        Telegramda yozing va admin tasdiqlaydi.{' '}
-        <Link href="/obuna" style={{ color: '#f0b90b', fontWeight: 600 }}>
-          Batafsil →
-        </Link>
+        Telegramda yozing va admin tasdiqlaydi.
       </div>
     </section>
   )
