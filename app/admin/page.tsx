@@ -26,6 +26,12 @@ type Stats = {
   cancelled: number
 }
 
+const ACTIVATE_OPTIONS = [
+  { label: '1 oy', days: 30 },
+  { label: '6 oy', days: 180 },
+  { label: '12 oy', days: 365 },
+] as const
+
 function formatDate(iso: string | null) {
   if (!iso) return '—'
   const d = new Date(iso)
@@ -42,6 +48,8 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
+  const [busyEmail, setBusyEmail] = useState<string | null>(null)
 
   const isAdmin = Boolean((session?.user as { isAdmin?: boolean } | undefined)?.isAdmin)
 
@@ -78,12 +86,46 @@ export default function AdminPage() {
     }
   }, [status, isAdmin, router, load])
 
+  async function activateUser(email: string, days: number) {
+    if (!confirm(`${email} uchun Premium ${days} kunga yoqilsinmi?`)) return
+    setBusyEmail(email)
+    setMessage('')
+    setError('')
+    try {
+      const res = await fetch('/api/admin/users/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, days }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Aktivlashtirishda xato')
+        return
+      }
+      setMessage(data.message || 'Premium yoqildi')
+      await load()
+    } catch {
+      setError('Tarmoq xatosi')
+    } finally {
+      setBusyEmail(null)
+    }
+  }
+
   return (
     <>
       <SiteHeader />
 
       <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 12,
+            flexWrap: 'wrap',
+            marginBottom: 20,
+          }}
+        >
           <div>
             <h1 style={{ fontSize: 26, marginBottom: 4 }}>Administrator kabineti</h1>
             <p style={{ color: '#848e9c', fontSize: 14, margin: 0 }}>
@@ -102,6 +144,7 @@ export default function AdminPage() {
         </div>
 
         {error && <p style={{ color: '#f6465d', marginBottom: 16 }}>{error}</p>}
+        {message && <p style={{ color: '#0ecb81', marginBottom: 16 }}>{message}</p>}
 
         {stats && (
           <div
@@ -144,6 +187,7 @@ export default function AdminPage() {
                   <th style={{ padding: '8px 6px' }}>Holat</th>
                   <th style={{ padding: '8px 6px' }}>Tugash</th>
                   <th style={{ padding: '8px 6px' }}>Ro‘yxat</th>
+                  <th style={{ padding: '8px 6px' }}>Aktivlashtirish</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,7 +196,14 @@ export default function AdminPage() {
                     <td style={{ padding: '10px 6px' }}>
                       {u.name}
                       {u.isAdmin ? (
-                        <span style={{ marginLeft: 6, color: '#f0b90b', fontSize: 11, fontWeight: 700 }}>
+                        <span
+                          style={{
+                            marginLeft: 6,
+                            color: '#f0b90b',
+                            fontSize: 11,
+                            fontWeight: 700,
+                          }}
+                        >
                           ADMIN
                         </span>
                       ) : null}
@@ -168,6 +219,45 @@ export default function AdminPage() {
                       {formatDate(u.subscriptionEndsAt)}
                     </td>
                     <td style={{ padding: '10px 6px', color: '#9aa7b8' }}>{formatDate(u.createdAt)}</td>
+                    <td style={{ padding: '10px 6px' }}>
+                      {!u.premium ? (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <span style={{ color: '#848e9c', fontSize: 12, whiteSpace: 'nowrap' }}>
+                            Aktivlashtirish:
+                          </span>
+                          {ACTIVATE_OPTIONS.map((opt) => (
+                            <button
+                              key={opt.days}
+                              type="button"
+                              disabled={busyEmail === u.email || loading}
+                              onClick={() => activateUser(u.email, opt.days)}
+                              style={{
+                                padding: '4px 10px',
+                                fontSize: 12,
+                                fontWeight: 700,
+                                borderRadius: 8,
+                                border: '1px solid rgba(240,185,11,0.45)',
+                                background: 'rgba(240,185,11,0.12)',
+                                color: '#f0b90b',
+                                cursor: busyEmail === u.email ? 'wait' : 'pointer',
+                                opacity: busyEmail === u.email ? 0.6 : 1,
+                              }}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <span style={{ color: '#0ecb81', fontSize: 12 }}>Faol</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
