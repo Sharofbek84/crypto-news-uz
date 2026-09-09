@@ -111,6 +111,31 @@ export default function AdminPage() {
     }
   }
 
+  async function cancelUser(email: string) {
+    if (!confirm(`${email} uchun Premium bekor qilinsinmi?`)) return
+    setBusyEmail(email)
+    setMessage('')
+    setError('')
+    try {
+      const res = await fetch('/api/admin/users/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Bekor qilishda xato')
+        return
+      }
+      setMessage(data.message || 'Premium bekor qilindi')
+      await load()
+    } catch {
+      setError('Tarmoq xatosi')
+    } finally {
+      setBusyEmail(null)
+    }
+  }
+
   return (
     <>
       <SiteHeader />
@@ -255,7 +280,34 @@ export default function AdminPage() {
                           ))}
                         </div>
                       ) : (
-                        <span style={{ color: '#0ecb81', fontSize: 12 }}>Faol</span>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            gap: 8,
+                          }}
+                        >
+                          <span style={{ color: '#0ecb81', fontSize: 12 }}>Faol</span>
+                          <button
+                            type="button"
+                            disabled={busyEmail === u.email || loading}
+                            onClick={() => cancelUser(u.email)}
+                            style={{
+                              padding: '4px 10px',
+                              fontSize: 12,
+                              fontWeight: 700,
+                              borderRadius: 8,
+                              border: '1px solid rgba(246,70,93,0.45)',
+                              background: 'rgba(246,70,93,0.12)',
+                              color: '#f6465d',
+                              cursor: busyEmail === u.email ? 'wait' : 'pointer',
+                              opacity: busyEmail === u.email ? 0.6 : 1,
+                            }}
+                          >
+                            Bekor qilish
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>

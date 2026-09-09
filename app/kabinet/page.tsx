@@ -38,15 +38,13 @@ function formatDateDDMMYYYY(iso: string): string {
 }
 
 function KabinetContent() {
-  const { data: session, status, update } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const needPremium = searchParams.get('need') === 'premium'
 
   const [me, setMe] = useState<MeResponse | null>(null)
   const [loading, setLoading] = useState(true)
-  const [actionLoading, setActionLoading] = useState(false)
-  const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
   const loadMe = useCallback(async () => {
@@ -73,28 +71,6 @@ function KabinetContent() {
     }
     if (status === 'authenticated') loadMe()
   }, [status, router, loadMe])
-
-  async function cancel() {
-    if (!confirm('Premium obunani bekor qilmoqchimisiz?')) return
-    setActionLoading(true)
-    setMessage('')
-    setError('')
-    try {
-      const res = await fetch('/api/subscription/cancel', { method: 'POST' })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error || 'Xato')
-        return
-      }
-      setMessage(data.message || 'Obuna bekor qilindi')
-      await update()
-      await loadMe()
-    } catch {
-      setError('So‘rov bajarilmadi')
-    } finally {
-      setActionLoading(false)
-    }
-  }
 
   if (status === 'loading' || loading) {
     return <p style={{ color: '#848e9c', padding: 24 }}>Yuklanmoqda...</p>
@@ -130,9 +106,6 @@ function KabinetContent() {
         </div>
       )}
 
-      {message && (
-        <div style={{ color: '#0ecb81', marginBottom: 16, fontSize: 14 }}>{message}</div>
-      )}
       {error && <div style={{ color: '#f6465d', marginBottom: 16, fontSize: 14 }}>{error}</div>}
 
       <section
@@ -214,24 +187,13 @@ function KabinetContent() {
         </ul>
 
         {premium ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Link
-              href="/premium"
-              className="planBtn"
-              style={{ textDecoration: 'none', textAlign: 'center' }}
-            >
-              Premium tahlilga o‘tish
-            </Link>
-            <button
-              type="button"
-              className="planBtn muted"
-              disabled={actionLoading}
-              onClick={cancel}
-              style={{ cursor: 'pointer' }}
-            >
-              {actionLoading ? '...' : 'Obunani bekor qilish'}
-            </button>
-          </div>
+          <Link
+            href="/premium"
+            className="planBtn"
+            style={{ display: 'inline-block', textDecoration: 'none', textAlign: 'center' }}
+          >
+            Premium tahlilga o‘tish
+          </Link>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <a
