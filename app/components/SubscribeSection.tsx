@@ -139,7 +139,16 @@ export default function SubscribeSection() {
       <div className="subscribeNote">
         To‘lov Telegram Tribute orqali. To‘lovdan keyin siz VIP qo‘llab-quvvatlash guruhiga a’zo
         bo‘lasiz. U yerda Email manzilingiz va to‘lov chekini yozib qoldiring. Premium obuna 24
-        soat ichida sayt administratori tomonidan aktivlashtiriladi.
+        soat ichida sayt administratori tomonidan aktivlashtiriladi. Qo‘shimcha savollaringiz
+        bo‘lsa, sayt administratori Telegram manziliga yozing:{' '}
+        <a
+          href="https://t.me/Goldenweb777"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#f0b90b', fontWeight: 600 }}
+        >
+          @Goldenweb777
+        </a>
       </div>
     </section>
   )
