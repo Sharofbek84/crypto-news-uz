@@ -1,1 +1,102 @@
-PLACEHOLDER
+[
+  {
+    "slug": "btc-78800-fed-60-9-sent",
+    "title": "Bitcoin $78 800 atrofida: Fed stavka oshirish ehtimoli ~60% va CPI oldidan bosim",
+    "summary": "Bitcoin $80 000 ostida qolmoqda, narx $78 800 atrofida. Kuchli avgust NFP va Treasury daromadliligi 16-sentabr FOMCda 25 bp oshirish ehtimolini 60% ga yaqin ushlab turibdi.",
+    "body": "CoinDesk maʼlumotiga koʻra, Bitcoin seshanba kuni $78 800 atrofida savdo qildi va $80 000 psixologik chizigʻini ikki haftadan beri yopiq holda ushlab turolmadi. 24 soatlik pasayish 0,7–1% oraligʻida, token oʻtgan haftadagi $82 320 choʻqqisidan taxminan 4% past. Ethereum $2 480–$2 495, XRP $1,39, Solana $103 atrofida tuzatildi.\n\nMakro fon ogʻir. Kutilganidan kuchli avgust ish oʻrinlari hisoboti va oshgan Treasury daromadliligi bozor bahosidagi Fed stavka oshirish ehtimolini 58–60% atrofida ushlab turibdi. 11–12 sentabr inflatsiya hisobotlari va 16-sentabr FOMC qarori oldidan $77 000 qoʻllab-quvvatlash zonasi xavf ostida qolishi mumkin.\n\nAltkoinlar ichida Zcash ~5% tushib $1 125 atrofida qoldi, lekin haftalik +33% hali yetakchi. Hyperliquid HYPE 3% dan koʻproq, Solana 2% dan koʻproq yoʻqotdi. BNB va Dogecoin nisbatan barqaror, kunlik pasayish foizning kichik qismi.\n\nParadoks shundaki, spot Bitcoin ETF oqimlari oʻtgan hafta ~$987 million plusda. Institutsional talab bor, lekin narx hozircha Fed yoʻlini savdo qilmoqda. Keyingi sathlar: yuqorida $81 800, pastda $78 000 va $77 000.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/markets/2026/09/08/bitcoin-slips-under-usd79-000-zcash-leads-losses-as-fed-hike-odds-hold-near-60",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "btc-etf-1mlrd-breakeven-9-sent",
+    "title": "Bitcoin ETF-lari 2026-yilni nolga chiqarish uchun hali ~$1 milliard yetishmayapti",
+    "summary": "Haftalik $986,9 mln kirimga qaramay, spot Bitcoin ETF-lari yil boshidan hali taxminan $1 mlrd minusda. AUM $101 mlrd atrofida, IBIT yetakchi.",
+    "body": "SoSoValue va CoinDesk tahliliga koʻra, 4-sentabrda yakunlangan savdo haftasida AQSh spot Bitcoin ETF-lari $986,9 million sof kirim yozgan. Bu ketma-ket uchinchi ijobiy hafta. Kategoriya aktivlari ~$101 milliard, 2024-yil yanvardan beri kumulativ kirim ~$55–56 milliard.\n\nShunga qaramay 2026-yil kesimida fondlar hali taxminan $1 milliard yetishmovchilikda: yil boshidagi chiqimlar avgust-sentabr seriyasini toʻliq yopmagan. BlackRock IBIT oqimda yetakchi, baʼzi raqobatchilar barqarorroq, lekin umumiy AUM hali yil boshidagi choʻqqidan past.\n\nNarx $78 800 atrofida turgan bir paytda ETF kirimi institutsional talabning barqarorligini koʻrsatadi. Agar FOMC yumshoqroq signal bersa, yilni plusga chiqarish uchun yana $1 mlrd atrofida sof kirim yetarli boʻlishi mumkin.\n\nManba: CoinDesk / SoSoValue.",
+    "url": "https://www.coindesk.com/markets/2026/09/08/bitcoin-etfs",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "eth-kvant-2029-9-sent",
+    "title": "Ethereum Foundation kvantga chidamlilikni 2029-yil dekabriga majburiy maqsad qildi",
+    "summary": "EF Protocol L1 ni 2029-yil oxirigacha kvant hujumlariga chidamli qilishni north star deb belgiladi. Hegota forki oʻzi PQ emas, lekin keyingi forklar jadvalini ushlab turadi.",
+    "body": "CoinDesk xabariga koʻra, Ethereum Foundation Protocol klasteri 7–8 sentabrda eʼlon qilingan ustuvorliklarida dekabr 2029 ni L1 uchun kvantga chidamlilik muddati qilib belgiladi. Maqsad execution layer va consensus ni post-quantum sxemalarga tayyorlash.\n\n2027-yilgi Hegota yangilanishi oʻzi post-quantum fork emas. Foundation uni \"PQ forklari oʻz vaqtida ketadimi-yoʻqligini belgilovchi fork\" deb atagan. Keyin rejalashtirilgan yangilanishlar kriptografik migratsiya yoʻlini aniqlashi kutiladi.\n\nBu eʼlon validatorlar, wallet ishlab chiquvchilar va L2 jamoalariga erta signal. Migratsiya murakkab: yangi imzo sxemalari, gas va client muvofiqlik xavflari bor. Shu bilan birga 2029 muddati aniq roadmap beradi.\n\nQisqa muddatda ETH narxiga bevosita taʼsir cheklangan, lekin uzoq muddatli xavfsizlik narrativi mustahkamlanadi.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/tech/2026/09/08/ethereum-makes-quantum-resistance-a-top-priority-with-a-2029-deadline",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+  },
+  {
+    "slug": "circle-tazapay-400mln-9-sent",
+    "title": "Circle Tazapay ni ~$400 millionga sotib olishga kelishdi",
+    "summary": "USDC emitenti Circle Osiyo-Tinch okeani toʻlov infratuzilmasi Tazapay ni taxminan $400 mln evaziga sotib oladi. Stablecoin global tarqatish kuchayadi.",
+    "body": "CoinDesk maʼlumotiga koʻra, Circle Tazapay ni taxminan $400 millionga sotib olish boʻyicha kelishuvga erishgan. Tazapay Osiyo va boshqa bozorlarda cross-border toʻlov va merchant infratuzilmasini rivojlantirgan.\n\nBitim Circle uchun USDC ni real iqtisodiyotga chuqurroq kiritish strategiyasining davomi. Bank va fintech kanallariga qoʻshimcha ravishda regional toʻlov tarmogʻi USDC likvidligi va hisob-kitob tezligini oshirishi mumkin.\n\nRegulator va antitrust tekshiruvlari hali yakunlanmagan boʻlishi mumkin. Yopilish muddati va integratsiya rejalari keyingi choraklarda aniqlanadi.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/business/2026/09/08/circle-tazapay",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/6319/large/usdc.png"
+  },
+  {
+    "slug": "visa-steyblkoin-20mlrd-9-sent",
+    "title": "Visa steyblkoin hisob-kitoblari yiliga $20 milliardga yaqinlashmoqda",
+    "summary": "Visa stablecoin settlement hajmi yillik surʼatda $20 mlrd atrofida. Banklar va fintechlar on-chain hisob-kitobni kengaytirmoqda.",
+    "body": "CoinDesk hisobotiga koʻra, Visa tarmogʻida stablecoin orqali hisob-kitob hajmi yillik $20 milliardga yaqinlashgan. Bu Visa ning anʼanaviy kart oqimidan tashqari on-chain settlement yoʻnalishini koʻrsatadi.\n\nBank partnerlari USDC va boshqa steyblkoinlar orqali chegaraoldi toʻlovlarni tezlashmoqda. Xarajat va T+N kechikishlari kamayadi. Shu bilan birga AML/KYC talablari saqlanib qoladi.\n\nKatta banklar uchun bu hali kichik ulush, lekin tendentsiya aniq: kart brendlari blockchain settlement ni sinab koʻrmoqda. Keyingi bosqich — koʻproq valyuta juftliklari va kechayu kunduz likvidlik.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/business/2026/09/08/visa-stablecoin",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/6319/large/usdc.png"
+  },
+  {
+    "slug": "cronos-rollback-111mln-9-sent",
+    "title": "Cronos tarmogʻi $111 mln xavfsizlik hodisasidan keyin rollback qildi",
+    "summary": "Cronos zanjirida taxminan $111 millionlik xavfsizlik hodisasi yuz berdi. Jamoa zararli tranzaksiyalarni orqaga qaytarish uchun rollback amalga oshirdi.",
+    "body": "CoinDesk xabariga koʻra, Cronos ekotizimida taxminan $111 million miqyosidagi xavfsizlik hodisasi qayd etilgan. Validatorlar va asosiy jamoa zararli oqimlarni cheklash uchun zanjirni qisman rollback qilishga qaror qilgan.\n\nRollback har doim bahsli: foydalanuvchi ishonchi, markazlashuv savollari va boshqa dApp holati muhokama qilinadi. Shu bilan birga yirik zarar oldini olish baʼzi L1/L2 larda tanlangan yondashuv boʻlib qolmoqda.\n\nCRO va bogʻliq tokenlar qisqa muddatda oʻzgaruvchan. Keyingi kunlarda post-mortem va kompensatsiya rejalari eʼlon qilinishi kutiladi.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/tech/2026/09/08/cronos-rollback",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/7310/large/cro_token_logo.png"
+  },
+  {
+    "slug": "bitmine-30k-eth-9-sent",
+    "title": "BitMine qoʻshimcha 30 000 ETH sotib oldi",
+    "summary": "BitMine treasury strategiyasi doirasida yana ~30 000 ETH qoʻshdi. Korporativ ETH jamgʻarmalari oshmoqda.",
+    "body": "CoinDesk maʼlumotiga koʻra, BitMine oʻz balansiga taxminan 30 000 ETH qoʻshgan. Bu qadam kompaniyaning Ethereum ni uzoq muddatli rezerv sifatida koʻrishini tasdiqlaydi.\n\nKorporativ xazinada BTC dan keyin ETH ham koʻpaymoqda. Stavka oshirish xavfi ostida ham baʼzi firmalar dipda yigʻishni davom ettirmoqda.\n\nBozor uchun bu qisqa muddatli sotib olish bosimi, lekin umumiy likvidlikka nisbatan ulush kichik. Kuzatuv: keyingi 13F va treasury hisobotlari.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/business/2026/09/08/bitmine-eth",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+  },
+  {
+    "slug": "strive-1375-btc-9-sent",
+    "title": "Strive Assets yana 1 375 BTC qoʻshdi",
+    "summary": "Strive Assets treasury ga qoʻshimcha 1 375 BTC kiritdi. Institutsional BTC yigʻish davom etmoqda.",
+    "body": "CoinDesk xabariga koʻra, Strive Assets oʻz xazinasiga yana 1 375 BTC qoʻshgan. Bu harakat spot ETF oqimlari bilan parallel ravishda institutsional talabning turli kanallarini koʻrsatadi.\n\nNarx $79 000 ostida boʻlsa-da, baʼzi korporativ xaridlar davom etmoqda. Ular FOMC oldidan qisqa shovqinga emas, balanska uzoq muddatli BTC ulushiga eʼtibor qaratmoqda.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/business/2026/09/08/strive-bitcoin",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "bnb-defi-selloff-9-sent",
+    "title": "Bitcoin $78 800 ga tushganda BNB va DeFi tokenlari selloffga qarshi turdi",
+    "summary": "BTC pasayganda BNB ~$754 va baʼzi DeFi tokenlari plusda qoldi. BNB Chain likvidligi qisqa muddatli himoya berdi.",
+    "body": "CoinDesk bozor sharhida Bitcoin $78 800 atrofida boʻlgan bir paytda BNB va bir qator DeFi tokenlari selloffdan ajralib chiqqani qayd etilgan. CoinDesk 20 +0,2%, memecoin indeksi +0,41%. BNB UTC yarimidan +2% bilan $754 atrofida. BNB Chain tokenlari PancakeSwap ~6,4%, Syrup ~4,9% oshgan. Aerodrome AERO top-100 ichida +17% bilan yetakchi.\n\nBu rotatsiya Bitcoinning makro-sezgirligi va baʼzi L1/DeFi ekotizimlarining ichki katalizatorlari ajralib qolayotganini koʻrsatadi. BNB Chain likvidligi va DEX hajmi qisqa muddatda alt-sektor uchun himoya yostiq boʻlishi mumkin.\n\nShunday boʻlsa-da, FOMC oldidan yuqori beta tokenlarda long toʻplanishi xavfli. Agar BTC $77 000 ni yoʻqotsa, kechgi rotatsiya ham yuvilishi mumkin.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/markets/2026/09/08/bitcoin-slips-to-usd78-800-as-bnb-and-defi-tokens-buck-the-selloff",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png"
+  },
+  {
+    "slug": "robinhood-cryptocom-prediction-9-sent",
+    "title": "Robinhood Crypto.com prediction marketlarini qoʻshdi va Crypto.com hamda OG da ulush oldi",
+    "summary": "WSJ orqali CoinDesk: Robinhood Crypto.com ning ha/yoʻq prediction shartnomalarini platformaga kiritdi va ikki kompaniyada ozchilik ulushiga ega boʻldi.",
+    "body": "CoinDesk 8-sentabr live yangilanishida Wall Street Journal maʼlumotiga tayanib, Robinhood Crypto.com prediction marketlarini oʻz platformasiga qoʻshganini va Crypto.com hamda prediction-market platformasi OG da ozchilik ulush olganini yozdi.\n\nBu qadam 2026-yilda prediction marketlarning broker ilovalariga kirib kelishini tezlashtiradi. Foydalanuvchilar endi klassik aksiya va kripto savdosidan tashqari ha/yoʻq kontraktlarini ham bir ilovada koʻrishi mumkin.\n\nStrategik jihatdan Robinhood trafik va order flow ni, Crypto.com esa retail tarqatish kanalini oladi. Bunday cross-holdinglar prediction market likvidligini oshirishi mumkin.\n\nManba: CoinDesk.",
+    "url": "https://www.coindesk.com/tech/2026/09/08/live-updates",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-09",
+    "image": "https://assets.coingecko.com/coins/images/7310/large/cro_token_logo.png"
+  }
+]
