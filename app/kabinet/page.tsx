@@ -20,6 +20,9 @@ type MeResponse = {
   premium: boolean
 }
 
+const PREMIUM_TRIBUTE_URL =
+  'https://t.me/tribute/app?startapp=ep_zdhfmWSUyUDZH3LV5B9D4CnZY4fhgXeDN1G0nKe1hEUpPfGU5k9'
+
 const PRICE_TIERS = [
   { label: '$19 / oyiga', note: '1 oy' },
   { label: '$100 / 6 oyga', note: '6 oy' },
@@ -70,27 +73,6 @@ function KabinetContent() {
     }
     if (status === 'authenticated') loadMe()
   }, [status, router, loadMe])
-
-  async function activate() {
-    setActionLoading(true)
-    setMessage('')
-    setError('')
-    try {
-      const res = await fetch('/api/subscription/activate', { method: 'POST' })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error || 'Xato')
-        return
-      }
-      setMessage(data.message || 'Premium faollashtirildi')
-      await update()
-      await loadMe()
-    } catch {
-      setError('So‘rov bajarilmadi')
-    } finally {
-      setActionLoading(false)
-    }
-  }
 
   async function cancel() {
     if (!confirm('Premium obunani bekor qilmoqchimisiz?')) return
@@ -144,7 +126,7 @@ function KabinetContent() {
             fontSize: 14,
           }}
         >
-          Premium sahifaga kirish uchun avval obunani faollashtiring.
+          Premium sahifaga kirish uchun avval Telegram Tribute orqali to‘lang.
         </div>
       )}
 
@@ -252,17 +234,25 @@ function KabinetContent() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <button
-              type="button"
+            <a
+              href={PREMIUM_TRIBUTE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="planBtn"
-              disabled={actionLoading}
-              onClick={activate}
-              style={{ cursor: 'pointer', maxWidth: 300 }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                textDecoration: 'none',
+                maxWidth: 320,
+              }}
             >
-              {actionLoading ? 'Faollashtirilmoqda...' : 'Premium ni faollashtirish (demo 30 kun)'}
-            </button>
+              Telegram Tribute orqali to‘lash
+            </a>
             <p style={{ color: '#848e9c', fontSize: 12, margin: 0 }}>
-              Hozircha demo rejim. To‘lov (Payme / Click yoki boshqa) keyin ulanadi.
+              To‘lovdan keyin Premium sayt hisobingizda yoqilishi uchun Telegramda yozing yoki
+              admin tasdiqlaydi. Email: {me?.user.email || session.user.email}
             </p>
           </div>
         )}

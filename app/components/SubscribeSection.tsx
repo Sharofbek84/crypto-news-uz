@@ -6,6 +6,9 @@ import { useSession } from 'next-auth/react'
 const SIGNAL_PRO_URL =
   'https://t.me/tribute/app?startapp=ep_zdhegwwYthRyGnRV7ergnHtnqG9PWBxBD1bs2XG9gt7PYKPG3ao'
 
+const PREMIUM_TRIBUTE_URL =
+  'https://t.me/tribute/app?startapp=ep_zdhfmWSUyUDZH3LV5B9D4CnZY4fhgXeDN1G0nKe1hEUpPfGU5k9'
+
 function TelegramIcon() {
   return (
     <svg
@@ -31,7 +34,7 @@ export default function SubscribeSection() {
         <div className="subscribeKicker">💎 PREMIUM</div>
         <h2>Obuna bo‘lish</h2>
         <p>
-          Ro‘yxatdan o‘ting, shaxsiy kabinetda obunani boshqaring va Premium imkoniyatlarga
+          Ro‘yxatdan o‘ting, Telegram Tribute orqali to‘lang va Premium imkoniyatlarga
           kiring.
         </p>
       </div>
@@ -111,28 +114,31 @@ export default function SubscribeSection() {
             >
               Premium ga o‘tish
             </Link>
-          ) : session ? (
-            <Link
-              href="/kabinet"
-              className="planBtn"
-              style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}
-            >
-              Kabinetda obuna bo‘lish
-            </Link>
           ) : (
-            <Link
-              href="/sign-up"
+            <a
+              href={PREMIUM_TRIBUTE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="planBtn"
-              style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                textAlign: 'center',
+                textDecoration: 'none',
+              }}
             >
-              Avval ro‘yxatdan o‘ting
-            </Link>
+              <TelegramIcon />
+              Telegram orqali to‘lash
+            </a>
           )}
         </div>
       </div>
 
       <div className="subscribeNote">
-        Obunani shaxsiy kabinetdan boshqarasiz. To‘lov (Payme / Click) keyin ulanadi.{' '}
+        To‘lov Telegram Tribute orqali. To‘lovdan keyin sayt hisobingizda Premium yoqilishi uchun
+        Telegramda yozing yoki admin tasdiqlaydi.{' '}
         <Link href="/obuna" style={{ color: '#f0b90b', fontWeight: 600 }}>
           Batafsil →
         </Link>
