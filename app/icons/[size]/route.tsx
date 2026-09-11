@@ -10,11 +10,11 @@ export async function GET(
   const n = parseInt(String(raw.size || '192'), 10)
   const size = Number.isFinite(n) ? Math.min(512, Math.max(48, n)) : 192
 
-  // Yumaloq kvadrat (burchaklar silliq), ichida ingichka aylana + qalin G
   const plate = Math.round(size * 0.92)
   const radius = Math.round(size * 0.22)
   const outer = Math.round(size * 0.72)
   const inner = Math.round(size * 0.62)
+  const stroke = Math.max(3, Math.round(size * 0.032))
 
   return new ImageResponse(
     (
@@ -59,16 +59,42 @@ export async function GET(
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#f0b90b',
-                fontSize: Math.round(size * 0.46),
-                fontWeight: 900,
-                fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
-                lineHeight: 1,
-                letterSpacing: Math.round(size * -0.04),
-                WebkitTextStroke: `${Math.max(2, Math.round(size * 0.022))}px #f0b90b`,
+                position: 'relative',
               }}
             >
-              G
+              {/* Ikki qatlam: tag stroke + ustki G — yanada qalin ko‘rinish */}
+              <div
+                style={{
+                  position: 'absolute',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#f0b90b',
+                  fontSize: Math.round(size * 0.52),
+                  fontWeight: 900,
+                  fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
+                  lineHeight: 1,
+                  letterSpacing: Math.round(size * -0.05),
+                  WebkitTextStroke: `${stroke}px #f0b90b`,
+                }}
+              >
+                G
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#f0b90b',
+                  fontSize: Math.round(size * 0.52),
+                  fontWeight: 900,
+                  fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
+                  lineHeight: 1,
+                  letterSpacing: Math.round(size * -0.05),
+                }}
+              >
+                G
+              </div>
             </div>
           </div>
         </div>
