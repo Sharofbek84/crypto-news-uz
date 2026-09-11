@@ -10,7 +10,7 @@ export async function GET(
   const n = parseInt(String(raw.size || '192'), 10)
   const size = Number.isFinite(n) ? Math.min(512, Math.max(48, n)) : 192
 
-  // Aylana ingichka, G qalin
+  // Aylana ingichka, G yana biroz qalinroq
   const outer = Math.round(size * 0.78)
   const inner = Math.round(size * 0.68)
 
@@ -47,12 +47,12 @@ export async function GET(
               alignItems: 'center',
               justifyContent: 'center',
               color: '#f0b90b',
-              fontSize: Math.round(size * 0.48),
+              fontSize: Math.round(size * 0.5),
               fontWeight: 900,
               fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
               lineHeight: 1,
-              letterSpacing: Math.round(size * -0.03),
-              WebkitTextStroke: `${Math.max(1, Math.round(size * 0.014))}px #f0b90b`,
+              letterSpacing: Math.round(size * -0.04),
+              WebkitTextStroke: `${Math.max(2, Math.round(size * 0.022))}px #f0b90b`,
             }}
           >
             G
