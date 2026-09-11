@@ -12,9 +12,11 @@ export async function GET(
 
   const plate = Math.round(size * 0.92)
   const radius = Math.round(size * 0.22)
-  const outer = Math.round(size * 0.72)
-  const inner = Math.round(size * 0.62)
+  // Aylana sal kattaroq
+  const outer = Math.round(size * 0.8)
+  const inner = Math.round(size * 0.7)
   const stroke = Math.max(3, Math.round(size * 0.032))
+  const fontSize = Math.round(size * 0.5)
 
   return new ImageResponse(
     (
@@ -59,38 +61,25 @@ export async function GET(
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative',
               }}
             >
-              {/* Ikki qatlam: tag stroke + ustki G — yanada qalin ko‘rinish */}
               <div
                 style={{
-                  position: 'absolute',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  width: '100%',
+                  height: '100%',
                   color: '#f0b90b',
-                  fontSize: Math.round(size * 0.52),
+                  fontSize,
                   fontWeight: 900,
                   fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
                   lineHeight: 1,
+                  textAlign: 'center',
+                  // Vertikal markazlash (font baseline uchun)
+                  paddingBottom: Math.round(size * 0.02),
                   letterSpacing: Math.round(size * -0.05),
                   WebkitTextStroke: `${stroke}px #f0b90b`,
-                }}
-              >
-                G
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#f0b90b',
-                  fontSize: Math.round(size * 0.52),
-                  fontWeight: 900,
-                  fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
-                  lineHeight: 1,
-                  letterSpacing: Math.round(size * -0.05),
                 }}
               >
                 G
