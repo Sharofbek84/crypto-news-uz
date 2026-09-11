@@ -16,8 +16,8 @@ export async function GET(
   const inner = Math.round(size * 0.66)
   const stroke = Math.max(3, Math.round(size * 0.032))
   const fontSize = Math.round(size * 0.48)
-  // Shrifts baseline tufayli G biroz pastga tushadi — biroz yuqoriga ko‘taramiz
-  const opticalNudge = Math.round(size * -0.03)
+  // Pastroqqa biroz siljitish (oldingi yuqoriga siljish bekor)
+  const opticalNudge = Math.round(size * 0.02)
 
   return new ImageResponse(
     (
