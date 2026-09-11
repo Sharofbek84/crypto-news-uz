@@ -10,9 +10,9 @@ export async function GET(
   const n = parseInt(String(raw.size || '192'), 10)
   const size = Number.isFinite(n) ? Math.min(512, Math.max(48, n)) : 192
 
-  // Halqa biroz qalinroq; G kattaroq va qalin
-  const outer = Math.round(size * 0.88)
-  const inner = Math.round(size * 0.72)
+  // Umumiy aylana kichikroq, halqa qalinroq
+  const outer = Math.round(size * 0.78)
+  const inner = Math.round(size * 0.58)
 
   return new ImageResponse(
     (
@@ -47,7 +47,7 @@ export async function GET(
               alignItems: 'center',
               justifyContent: 'center',
               color: '#f0b90b',
-              fontSize: Math.round(size * 0.48),
+              fontSize: Math.round(size * 0.42),
               fontWeight: 900,
               fontFamily: 'system-ui, Arial Black, sans-serif',
               lineHeight: 1,
