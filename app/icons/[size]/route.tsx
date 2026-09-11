@@ -10,6 +10,10 @@ export async function GET(
   const n = parseInt(String(raw.size || '192'), 10)
   const size = Number.isFinite(n) ? Math.min(512, Math.max(48, n)) : 192
 
+  // Tashqi aylana katta, ichki deyarli bir xil → ingichka halqa
+  const outer = Math.round(size * 0.9)
+  const inner = Math.round(size * 0.82)
+
   return new ImageResponse(
     (
       <div
@@ -20,13 +24,12 @@ export async function GET(
           alignItems: 'center',
           justifyContent: 'center',
           background: '#0b0f14',
-          position: 'relative',
         }}
       >
         <div
           style={{
-            width: Math.round(size * 0.76),
-            height: Math.round(size * 0.76),
+            width: outer,
+            height: outer,
             borderRadius: '50%',
             background: '#f0b90b',
             display: 'flex',
@@ -36,17 +39,18 @@ export async function GET(
         >
           <div
             style={{
-              width: Math.round(size * 0.52),
-              height: Math.round(size * 0.52),
+              width: inner,
+              height: inner,
               borderRadius: '50%',
               background: '#0b0f14',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#f0b90b',
-              fontSize: Math.round(size * 0.32),
-              fontWeight: 800,
-              fontFamily: 'system-ui, sans-serif',
+              fontSize: Math.round(size * 0.52),
+              fontWeight: 900,
+              fontFamily: 'system-ui, Arial Black, sans-serif',
+              lineHeight: 1,
             }}
           >
             G
