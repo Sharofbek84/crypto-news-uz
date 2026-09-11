@@ -12,11 +12,12 @@ export async function GET(
 
   const plate = Math.round(size * 0.92)
   const radius = Math.round(size * 0.22)
-  // Aylana biroz kichikroq va ingichkaroq
   const outer = Math.round(size * 0.74)
   const inner = Math.round(size * 0.66)
   const stroke = Math.max(3, Math.round(size * 0.032))
   const fontSize = Math.round(size * 0.48)
+  // Shrifts baseline tufayli G biroz pastga tushadi — biroz yuqoriga ko‘taramiz
+  const opticalNudge = Math.round(size * -0.03)
 
   return new ImageResponse(
     (
@@ -61,23 +62,28 @@ export async function GET(
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                position: 'relative',
               }}
             >
               <div
                 style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '100%',
-                  height: '100%',
                   color: '#f0b90b',
                   fontSize,
                   fontWeight: 900,
                   fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
                   lineHeight: 1,
-                  textAlign: 'center',
-                  paddingBottom: Math.round(size * 0.02),
-                  letterSpacing: Math.round(size * -0.05),
+                  margin: 0,
+                  padding: 0,
+                  transform: `translateY(${opticalNudge}px)`,
+                  letterSpacing: 0,
                   WebkitTextStroke: `${stroke}px #f0b90b`,
                 }}
               >
