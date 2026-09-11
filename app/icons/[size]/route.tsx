@@ -10,9 +10,9 @@ export async function GET(
   const n = parseInt(String(raw.size || '192'), 10)
   const size = Number.isFinite(n) ? Math.min(512, Math.max(48, n)) : 192
 
-  // Umumiy aylana kichikroq, halqa qalinroq
+  // Aylana o‘lchami saqlanadi, halqa biroz ingichka; G qalinroq
   const outer = Math.round(size * 0.78)
-  const inner = Math.round(size * 0.58)
+  const inner = Math.round(size * 0.64)
 
   return new ImageResponse(
     (
@@ -47,11 +47,12 @@ export async function GET(
               alignItems: 'center',
               justifyContent: 'center',
               color: '#f0b90b',
-              fontSize: Math.round(size * 0.42),
+              fontSize: Math.round(size * 0.46),
               fontWeight: 900,
-              fontFamily: 'system-ui, Arial Black, sans-serif',
+              fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
               lineHeight: 1,
-              letterSpacing: Math.round(size * -0.02),
+              letterSpacing: Math.round(size * -0.03),
+              WebkitTextStroke: `${Math.max(1, Math.round(size * 0.012))}px #f0b90b`,
             }}
           >
             G
