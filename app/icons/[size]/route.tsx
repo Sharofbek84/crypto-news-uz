@@ -16,8 +16,6 @@ export async function GET(
   const inner = Math.round(size * 0.66)
   const stroke = Math.max(3, Math.round(size * 0.032))
   const fontSize = Math.round(size * 0.48)
-  // Pastroqqa biroz siljitish (oldingi yuqoriga siljish bekor)
-  const opticalNudge = Math.round(size * 0.02)
 
   return new ImageResponse(
     (
@@ -62,16 +60,10 @@ export async function GET(
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative',
               }}
             >
               <div
                 style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -79,10 +71,10 @@ export async function GET(
                   fontSize,
                   fontWeight: 900,
                   fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
-                  lineHeight: 1,
+                  lineHeight: `${fontSize}px`,
+                  height: fontSize,
                   margin: 0,
                   padding: 0,
-                  transform: `translateY(${opticalNudge}px)`,
                   letterSpacing: 0,
                   WebkitTextStroke: `${stroke}px #f0b90b`,
                 }}
