@@ -12,11 +12,11 @@ export async function GET(
 
   const plate = Math.round(size * 0.92)
   const radius = Math.round(size * 0.22)
-  // Aylana sal kattaroq
-  const outer = Math.round(size * 0.8)
-  const inner = Math.round(size * 0.7)
+  // Aylana biroz kichikroq va ingichkaroq
+  const outer = Math.round(size * 0.74)
+  const inner = Math.round(size * 0.66)
   const stroke = Math.max(3, Math.round(size * 0.032))
-  const fontSize = Math.round(size * 0.5)
+  const fontSize = Math.round(size * 0.48)
 
   return new ImageResponse(
     (
@@ -76,7 +76,6 @@ export async function GET(
                   fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
                   lineHeight: 1,
                   textAlign: 'center',
-                  // Vertikal markazlash (font baseline uchun)
                   paddingBottom: Math.round(size * 0.02),
                   letterSpacing: Math.round(size * -0.05),
                   WebkitTextStroke: `${stroke}px #f0b90b`,
