@@ -11,18 +11,25 @@ export default function SignUpPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
+
+    if (password !== passwordConfirm) {
+      setError('Parollar mos kelmadi.')
+      return
+    }
+
     setLoading(true)
 
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, passwordConfirm }),
     })
     const data = await res.json()
 
@@ -103,6 +110,19 @@ export default function SignUpPage() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              style={inputStyle}
+              placeholder="••••••••"
+              autoComplete="new-password"
+            />
+          </label>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#9aa7b8' }}>
+            Parolni tasdiqlang
+            <input
+              type="password"
+              required
+              minLength={6}
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
               style={inputStyle}
               placeholder="••••••••"
               autoComplete="new-password"

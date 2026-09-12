@@ -6,7 +6,12 @@ export async function POST(req: Request) {
     const body = await req.json()
     const email = String(body.email || '')
     const password = String(body.password || '')
+    const passwordConfirm = String(body.passwordConfirm || '')
     const name = body.name ? String(body.name) : undefined
+
+    if (password !== passwordConfirm) {
+      return NextResponse.json({ error: 'Parollar mos kelmadi.' }, { status: 400 })
+    }
 
     const result = await createUser({ email, password, name })
     if (!result.ok) {

@@ -49,7 +49,12 @@ function SignInForm() {
         />
       </label>
       <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#9aa7b8' }}>
-        Parol
+        <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          Parol
+          <Link href="/forgot-password" style={{ color: '#f0b90b', fontWeight: 600, fontSize: 12 }}>
+            Parolni unutdingizmi?
+          </Link>
+        </span>
         <input
           type="password"
           required

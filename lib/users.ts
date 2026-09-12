@@ -96,12 +96,25 @@ export async function createUser(params: {
   return { ok: true, user: publicUser }
 }
 
+export async function updatePassword(
+  email: string,
+  newPassword: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!newPassword || newPassword.length < 6) {
+    return { ok: false, error: 'Parol kamida 6 ta belgidan iborat bo‘lsin.' }
+  }
+  const user = await findUserByEmail(email)
+  if (!user) return { ok: false, error: 'Foydalanuvchi topilmadi.' }
+  user.passwordHash = await bcrypt.hash(newPassword, 10)
+  await saveUser(user)
+  return { ok: true }
+}
+
 export async function verifyPassword(email: string, password: string): Promise<AppUser | null> {
   const user = await findUserByEmail(email)
   if (!user) return null
   const match = await bcrypt.compare(password, user.passwordHash)
   if (!match) return null
-  // Eski foydalanuvchilarni admin ro‘yxatiga qo‘shish
   const redis = getRedis()
   if (redis) await redis.sadd(USERS_INDEX, user.email.toLowerCase())
   return user
