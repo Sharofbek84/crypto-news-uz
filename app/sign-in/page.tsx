@@ -30,25 +30,35 @@ function SignInForm() {
       setError('Email yoki parol noto‘g‘ri.')
       return
     }
+    // Muvaffaqiyatli navigatsiya — brauzer parol saqlashni taklif qilishi uchun muhim
     router.push(callbackUrl)
     router.refresh()
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#9aa7b8' }}>
+    <form
+      method="post"
+      action="/sign-in"
+      onSubmit={onSubmit}
+      autoComplete="on"
+      style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+    >
+      <label htmlFor="login-email" style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#9aa7b8' }}>
         Email
         <input
+          id="login-email"
+          name="email"
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={inputStyle}
           placeholder="email@example.com"
-          autoComplete="email"
+          autoComplete="username"
+          inputMode="email"
         />
       </label>
-      <label style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#9aa7b8' }}>
+      <label htmlFor="login-password" style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, color: '#9aa7b8' }}>
         <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           Parol
           <Link href="/forgot-password" style={{ color: '#f0b90b', fontWeight: 600, fontSize: 12 }}>
@@ -56,6 +66,8 @@ function SignInForm() {
           </Link>
         </span>
         <input
+          id="login-password"
+          name="password"
           type="password"
           required
           minLength={6}
