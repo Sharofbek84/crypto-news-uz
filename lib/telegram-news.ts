@@ -9,10 +9,10 @@ type NewsItem = {
 
 function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
 }
 
 export async function sendTelegramNews(items: NewsItem[]): Promise<void> {
@@ -28,7 +28,8 @@ export async function sendTelegramNews(items: NewsItem[]): Promise<void> {
     ].filter(Boolean).join('\n')
   })
 
-  const footer = 'Yangiliklarning to\'liq matni bilan GOLDENWEB.UZ ning Yangiliklar sahifasida tanishing.\nhttps://goldenweb.vercel.app/yangiliklar'
+  const footer =
+    "Yangiliklarning to'liq matni bilan GOLDENWEB.UZ ning Yangiliklar sahifasida tanishing.\nhttps://goldenweb.uz/yangiliklar"
   let message = `<b>📰 SO‘NGGI YANGILIKLAR</b>\n\n${sections.join('\n\n')}\n\n${footer}`
 
   if (message.length > 4096) {
