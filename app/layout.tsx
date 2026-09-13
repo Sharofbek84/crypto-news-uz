@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   },
   description: DEFAULT_DESCRIPTION,
   applicationName: SITE_NAME,
+  verification: {
+    google: 'UFMpa6Vma7uPgtJtAaAiNL7vBuHYsFdelLUWk5cubVQ',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
