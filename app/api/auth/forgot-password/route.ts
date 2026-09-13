@@ -3,6 +3,20 @@ import { sendEmail } from '@/lib/email'
 import { createPasswordResetToken } from '@/lib/password-reset'
 import { findUserByEmail } from '@/lib/users'
 
+function siteBase(req: Request): string {
+  const env = process.env.NEXTAUTH_URL?.replace(/\/$/, '')
+  if (env && !env.includes('vercel.app')) return env
+  try {
+    const url = new URL(req.url)
+    if (url.hostname && url.hostname !== 'localhost') {
+      return `${url.protocol}//${url.host}`
+    }
+  } catch {
+    /* ignore */
+  }
+  return env || 'https://goldenweb.uz'
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -18,7 +32,7 @@ export async function POST(req: Request) {
     const generic = {
       ok: true,
       message:
-        'Agar bu email ro‘yxatdan o‘tgan bo‘lsa, parol tiklash havolasi yuborildi. Pochtani tekshiring.',
+        'Agar bu email ro‘yxatdan o‘tgan bo‘lsa, parol tiklash havolasi yuborildi. Spam papkasini ham tekshiring.',
     }
 
     const user = await findUserByEmail(email)
@@ -31,8 +45,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Server sozlanmagan (Redis).' }, { status: 500 })
     }
 
-    const base = process.env.NEXTAUTH_URL || 'https://goldenweb.uz'
-    const link = `${base.replace(/\/$/, '')}/reset-password?token=${token}`
+    const link = `${siteBase(req)}/reset-password?token=${token}`
 
     const sent = await sendEmail({
       to: email,

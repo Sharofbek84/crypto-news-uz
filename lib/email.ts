@@ -10,7 +10,8 @@ export async function sendEmail(params: {
   if (!apiKey) {
     return {
       ok: false,
-      error: 'Email xizmati sozlanmagan (RESEND_API_KEY). Admin bilan bog‘laning.',
+      error:
+        'Email xizmati sozlanmagan. Vercelga RESEND_API_KEY qo‘shing (resend.com).',
     }
   }
 
@@ -36,7 +37,20 @@ export async function sendEmail(params: {
     if (!res.ok) {
       const body = await res.text()
       console.error('[email]', res.status, body)
-      return { ok: false, error: 'Email yuborilmadi. Keyinroq urinib ko‘ring.' }
+
+      // Resend cheklovlari: test rejimida faqat o‘z emailingizga yuborish mumkin
+      if (body.includes('only send testing emails to your own') || body.includes('verify a domain')) {
+        return {
+          ok: false,
+          error:
+            'Resend test rejimi: faqat Resend akkauntingizdagi emailga yuboradi. goldenweb.uz domenini Resendda tasdiqlang yoki EMAIL_FROM ni sozlang.',
+        }
+      }
+
+      return {
+        ok: false,
+        error: 'Email yuborilmadi. RESEND_API_KEY va EMAIL_FROM ni tekshiring.',
+      }
     }
 
     return { ok: true }
