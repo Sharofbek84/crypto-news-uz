@@ -1,10 +1,6 @@
-import type { Candle } from './technical-helpers-a'
+import type { Candle, EmaRejectSignal } from './technical-helpers-a'
 
-export type EmaRejectSignal = {
-  type: 'BUY' | 'SELL'
-  index: number
-  price: number
-}
+export type { EmaRejectSignal }
 
 function emaSeries(values: number[], period: number): number[] {
   if (!values.length) return []
@@ -38,7 +34,6 @@ export function detectEmaRejectSignals(candles: Candle[]): EmaRejectSignal[] {
     const ema50 = e50[i]
     const prevEma20 = e20[i - 1]
 
-    // SELL: pastdan yuqoriga kesib o'tish + tagida yopilish + EMA20 EMA50 ostida
     if (
       ema20 < ema50 &&
       prev.close <= prevEma20 &&
@@ -49,7 +44,6 @@ export function detectEmaRejectSignals(candles: Candle[]): EmaRejectSignal[] {
       continue
     }
 
-    // BUY: yuqoridan pastga kesib o'tish + tepasida yopilish + EMA20 EMA50 ustida
     if (
       ema20 > ema50 &&
       prev.close >= prevEma20 &&
