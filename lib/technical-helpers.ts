@@ -1,5 +1,4 @@
-export type { Candle, Divergence, TechnicalResult, StructureSignal } from './technical-helpers-a'
-export type { EmaRejectSignal } from './ema-reject'
+export type { Candle, Divergence, TechnicalResult, StructureSignal, EmaRejectSignal } from './technical-helpers-a'
 export {
   ema,
   rsi,
