@@ -36,6 +36,14 @@ type Result = {
   bearish: string
   summary: string
   divergence?: Divergence | null
+  structureSignal?: {
+    type: 'BUY' | 'SELL'
+    level: number
+    swingIndex: number
+    breakIndex: number
+    retestIndex: number
+    context: 'uptrend-break' | 'downtrend-break'
+  } | null
 }
 
 const coins = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
@@ -121,10 +129,11 @@ function CleanChart({
   const RB = 740
   const plotRight = W - R
   const candleRight = L + (plotRight - L) * 0.93
+  const structLevel = result.structureSignal?.level
   const min =
-    Math.min(...candles.map((c) => c.low), result.entryLow, ...result.tp, result.invalidation) * 0.997
+    Math.min(...candles.map((c) => c.low), result.entryLow, ...result.tp, result.invalidation, ...(structLevel != null ? [structLevel] : [])) * 0.997
   const max =
-    Math.max(...candles.map((c) => c.high), result.entryHigh, ...result.tp, result.invalidation) * 1.003
+    Math.max(...candles.map((c) => c.high), result.entryHigh, ...result.tp, result.invalidation, ...(structLevel != null ? [structLevel] : [])) * 1.003
   const x = (i: number) => L + (i * (candleRight - L)) / Math.max(1, candles.length - 1)
   const y = (v: number) => MB - ((v - min) / (max - min)) * (MB - T)
   const ry = (v: number) => RB - (Math.max(0, Math.min(100, v)) / 100) * (RB - RT)
@@ -244,6 +253,55 @@ function CleanChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
+          {result.structureSignal &&
+            result.structureSignal.swingIndex >= 0 &&
+            result.structureSignal.retestIndex < candles.length && (
+              <g opacity="0.95">
+                <line
+                  x1={x(result.structureSignal.swingIndex)}
+                  x2={x(Math.max(result.structureSignal.retestIndex, result.structureSignal.breakIndex))}
+                  y1={y(result.structureSignal.level)}
+                  y2={y(result.structureSignal.level)}
+                  stroke={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
+                  strokeWidth="2"
+                  strokeDasharray="5 4"
+                />
+                <circle
+                  cx={x(result.structureSignal.swingIndex)}
+                  cy={y(result.structureSignal.level)}
+                  r="4.5"
+                  fill="#f0b90b"
+                  stroke="#0b1018"
+                  strokeWidth="1.2"
+                />
+                <circle
+                  cx={x(result.structureSignal.breakIndex)}
+                  cy={y(result.structureSignal.level)}
+                  r="5.5"
+                  fill="none"
+                  stroke={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
+                  strokeWidth="2.2"
+                />
+                <circle
+                  cx={x(result.structureSignal.retestIndex)}
+                  cy={y(result.structureSignal.level)}
+                  r="5.5"
+                  fill={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
+                  stroke="#0b1018"
+                  strokeWidth="1"
+                />
+                <text
+                  x={x(result.structureSignal.retestIndex) + 10}
+                  y={y(result.structureSignal.level) - 12}
+                  fill={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
+                  fontSize="12"
+                  fontWeight="800"
+                >
+                  {result.structureSignal.type === 'SELL' ? 'Break+Retest SELL' : 'Break+Retest BUY'}
+                </text>
+              </g>
+            )}
+
           {div && div.i1 >= 0 && div.i2 < candles.length && (
             <g opacity="0.95">
               <line
@@ -301,7 +359,7 @@ function CleanChart({
             rx="3"
           />
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2" />
-          <rect x={labelX} y={y(latest) - 13} width="100" height="26" rx="4" fill={isSell ? '#c52f3a' : '#1a9e55'} />
+          <rect x={labelX} y={y(latest) - 13} width="100" height={26} rx="4" fill={isSell ? '#c52f3a' : '#1a9e55'} />
           <text x={labelX + 50} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
             {money(latest)}
           </text>
@@ -468,9 +526,13 @@ export default function PremiumAnalyst() {
                       ? r.side === 'SELL'
                         ? 'Ehtiyotkor SELL'
                         : 'Ehtiyotkor BUY'
-                      : r.side === 'SELL'
-                        ? 'SELL'
-                        : 'BUY'}
+                      : r.signalTone === 'strong' && r.structureSignal
+                        ? r.side === 'SELL'
+                          ? 'SELL · Break+Retest'
+                          : 'BUY · Break+Retest'
+                        : r.side === 'SELL'
+                          ? 'SELL'
+                          : 'BUY'}
                   </strong>
                 </div>
                 <div className="proRow">
@@ -487,77 +549,10 @@ export default function PremiumAnalyst() {
                 </div>
                 <p className="proSummary">{r.summary}</p>
               </div>
-              <div className="proCard">
-                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
-                  <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
-                  <strong>
-                    {money$(r.entryLow)} – {money$(r.entryHigh)}
-                  </strong>
-                </div>
-                <div className="proBox red">
-                  <b>STOP LOSS (SL)</b>
-                  <strong>{money$(r.invalidation)}</strong>
-                  <small>
-                    {r.side === 'SELL' ? 'yuqorisida' : 'pastida'} {tf} candle yopilsa
-                  </small>
-                </div>
-                <div className="proBox tp">
-                  <b>TAKE PROFIT (TP)</b>
-                  <div className="tpLine">
-                    <span>TP1</span>
-                    <strong>{money$(r.tp[0])}</strong>
-                  </div>
-                  <div className="tpLine">
-                    <span>TP2</span>
-                    <strong>{money$(r.tp[1])}</strong>
-                  </div>
-                  <div className="tpLine">
-                    <span>TP3</span>
-                    <strong>{money$(r.tp[2])}</strong>
-                  </div>
-                </div>
-              </div>
-              <div className="proCard bullCard">
-                <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
-                <p>{r.bullish}</p>
-                <div className="levelPath greenPath">
-                  {r.side === 'SELL' ? (
-                    <>
-                      {money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}
-                    </>
-                  ) : (
-                    <>
-                      {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="proCard bearCard">
-                <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
-                <p>{r.bearish}</p>
-                <div className="levelPath redPath">
-                  {r.side === 'SELL' ? (
-                    <>
-                      {money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}
-                    </>
-                  ) : (
-                    <>
-                      {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
-                    </>
-                  )}
-                </div>
-              </div>
             </div>
-            <p className="homeDisclaimer">
-              Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz
-              tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat
-              yuqotishga tayyor bo'lgan pulingiz bilan kiring.
-            </p>
-            <CryptoAnalystAI analysis={r} coin={coin} interval={interval} />
           </>
         )
       )}
-      <SignalStatsPanel />
     </section>
   )
 }
