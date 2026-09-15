@@ -13,4 +13,3 @@ export {
   shortLevels,
 } from './technical-helpers-b'
 export { detectStructureBreakRetest } from './structure-break'
-export type { StructureSignal as StructureBreakSignal } from './structure-break'
