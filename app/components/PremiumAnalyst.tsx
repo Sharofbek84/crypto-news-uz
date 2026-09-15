@@ -359,7 +359,7 @@ function CleanChart({
             rx="3"
           />
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2" />
-          <rect x={labelX} y={y(latest) - 13} width="100" height={26} rx="4" fill={isSell ? '#c52f3a' : '#1a9e55'} />
+          <rect x={labelX} y={y(latest) - 13} width="100" height="26" rx="4" fill={isSell ? '#c52f3a' : '#1a9e55'} />
           <text x={labelX + 50} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
             {money(latest)}
           </text>
@@ -549,10 +549,50 @@ export default function PremiumAnalyst() {
                 </div>
                 <p className="proSummary">{r.summary}</p>
               </div>
+              <div className="proCard">
+                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
+                  <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
+                  <strong>
+                    {money$(r.entryLow)} – {money$(r.entryHigh)}
+                  </strong>
+                </div>
+                <div className="proBox red">
+                  <b>STOP LOSS (SL)</b>
+                  <strong>{money$(r.invalidation)}</strong>
+                  <small>
+                    {r.side === 'SELL' ? 'yuqorisida' : 'pastida'} {tf} candle yopilsa
+                  </small>
+                </div>
+                <div className="proBox tp">
+                  <b>TAKE PROFIT (TP)</b>
+                  <div className="tpLine">
+                    <span>TP1</span>
+                    <strong>{money$(r.tp[0])}</strong>
+                  </div>
+                  <div className="tpLine">
+                    <span>TP2</span>
+                    <strong>{money$(r.tp[1])}</strong>
+                  </div>
+                  <div className="tpLine">
+                    <span>TP3</span>
+                    <strong>{money$(r.tp[2])}</strong>
+                  </div>
+                </div>
+              </div>
+              <div className="proCard bullCard">
+                <h3>BULLISH SSENARIY</h3>
+                <p>{r.bullish}</p>
+              </div>
+              <div className="proCard bearCard">
+                <h3>BEARISH SSENARIY</h3>
+                <p>{r.bearish}</p>
+              </div>
             </div>
+            <CryptoAnalystAI analysis={r} coin={coin} interval={interval} />
           </>
         )
       )}
+      <SignalStatsPanel />
     </section>
   )
 }
