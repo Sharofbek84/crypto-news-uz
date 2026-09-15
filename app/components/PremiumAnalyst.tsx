@@ -290,15 +290,6 @@ function CleanChart({
                   stroke="#0b1018"
                   strokeWidth="1"
                 />
-                <text
-                  x={x(result.structureSignal.retestIndex) + 10}
-                  y={y(result.structureSignal.level) - 12}
-                  fill={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
-                  fontSize="12"
-                  fontWeight="800"
-                >
-                  {result.structureSignal.type === 'SELL' ? 'Break+Retest SELL' : 'Break+Retest BUY'}
-                </text>
               </g>
             )}
 
@@ -526,13 +517,9 @@ export default function PremiumAnalyst() {
                       ? r.side === 'SELL'
                         ? 'Ehtiyotkor SELL'
                         : 'Ehtiyotkor BUY'
-                      : r.signalTone === 'strong' && r.structureSignal
-                        ? r.side === 'SELL'
-                          ? 'SELL · Break+Retest'
-                          : 'BUY · Break+Retest'
-                        : r.side === 'SELL'
-                          ? 'SELL'
-                          : 'BUY'}
+                      : r.side === 'SELL'
+                        ? 'SELL'
+                        : 'BUY'}
                   </strong>
                 </div>
                 <div className="proRow">
