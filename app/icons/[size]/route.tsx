@@ -11,7 +11,7 @@ function decodeBase64Png(b64: string): Uint8Array {
 
 const PNG_BYTES = decodeBase64Png(LOGO_PNG_BASE64)
 
-/** Brand logo (globe + G) — uploaded PNG for favicon / PWA */
+/** Brand logo (globe + G) — serves the uploaded PNG for all requested sizes */
 export async function GET(
   _request: Request,
   context: { params: Promise<{ size: string }> | { size: string } }
@@ -20,7 +20,7 @@ export async function GET(
   return new Response(PNG_BYTES, {
     headers: {
       'Content-Type': 'image/png',
-      'Cache-Control': 'public, max-age=604800, immutable',
+      'Cache-Control': 'public, max-age=3600, must-revalidate',
     },
   })
 }
