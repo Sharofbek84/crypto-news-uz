@@ -1,23 +1,12 @@
-import type { Candle } from './technical-helpers-a'
+import type { Candle, StructureSignal } from './technical-helpers-a'
 import { findSwingPoints } from './technical-helpers-a'
 
-export type StructureSignal = {
-  type: 'BUY' | 'SELL'
-  /** Broken swing level price */
-  level: number
-  swingIndex: number
-  breakIndex: number
-  retestIndex: number
-  /** EMA trend context: uptrend sell / downtrend buy */
-  context: 'uptrend-break' | 'downtrend-break'
-}
+export type { StructureSignal }
 
 /**
  * Trend structure break + retest:
  * - O'suvchi trend: oxirgi swing low pastga yoriladi → keyin shu darajaga qaytish = SELL
  * - Tushuvchi trend: oxirgi swing high yuqoriga yoriladi → keyin shu darajaga qaytish = BUY
- *
- * Faqat oxirgi ~80 shamchada qidiriladi; retest oxirgi 12 yopilgan shamchada bo'lishi shart.
  */
 export function detectStructureBreakRetest(
   candles: Candle[],
