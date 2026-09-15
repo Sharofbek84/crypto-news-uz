@@ -3,36 +3,31 @@ const SOCIAL = [
     name: 'Gmail',
     href: 'mailto:goldenweb.uz@gmail.com',
     label: 'Gmail',
-    color: '#EA4335',
   },
   {
     name: 'YouTube',
     href: 'https://www.youtube.com/@Goldenweb777',
     label: 'YouTube',
-    color: '#FF0000',
   },
   {
     name: 'X',
     href: 'https://www.x.com/Sharofbek84',
     label: 'X',
-    color: '#eaecef',
   },
   {
     name: 'Instagram',
     href: 'https://www.instagram.com/goldenweb.uz',
     label: 'Instagram',
-    color: '#E4405F',
   },
   {
     name: 'Telegram',
     href: 'https://t.me/goldenweb_uz',
     label: 'Telegram',
-    color: '#2AABEE',
   },
 ] as const
 
 function Icon({ name }: { name: (typeof SOCIAL)[number]['name'] }) {
-  const s = 18
+  const s = 17
   if (name === 'Gmail') {
     return (
       <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -62,7 +57,6 @@ function Icon({ name }: { name: (typeof SOCIAL)[number]['name'] }) {
       </svg>
     )
   }
-  // Telegram
   return (
     <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
@@ -72,17 +66,49 @@ function Icon({ name }: { name: (typeof SOCIAL)[number]['name'] }) {
 
 export default function SiteFooter() {
   return (
-    <footer className="footer" style={{ paddingTop: 28, paddingBottom: 28 }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
+    <footer className="footer siteFooter">
+      <style>{`
+        .siteFooter {
+          text-align: center;
+          padding: 28px 16px 32px;
+          color: #8b949e;
+          font-size: 0.8rem;
+          border-top: 1px solid #202938;
+        }
+        .siteFooterSocial {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-bottom: 18px;
+        }
+        .siteFooterSocial a {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
+          border: 1px solid #2b3139;
+          background: #0d1117;
+          color: #9aa7b8;
+          text-decoration: none;
+          transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+        }
+        .siteFooterSocial a:hover {
+          border-color: rgba(240, 185, 11, 0.55);
+          color: #f0b90b;
+          background: rgba(240, 185, 11, 0.08);
+          transform: translateY(-1px);
+        }
+        .siteFooterCopy {
+          color: #8b949e;
+          line-height: 1.5;
+        }
+      `}</style>
+
+      <div className="siteFooterSocial">
         {SOCIAL.map((item) => (
           <a
             key={item.name}
@@ -91,25 +117,15 @@ export default function SiteFooter() {
             rel={item.name === 'Gmail' ? undefined : 'noopener noreferrer'}
             aria-label={item.label}
             title={item.label}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 40,
-              height: 40,
-              borderRadius: 10,
-              border: '1px solid #2b3139',
-              background: '#1e2329',
-              color: item.color,
-              textDecoration: 'none',
-              transition: 'border-color .15s, transform .15s, background .15s',
-            }}
           >
             <Icon name={item.name} />
           </a>
         ))}
       </div>
-      <div>GOLDENWEB.UZ © 2026 • Real vaqtda kripto bozor tahlili va kripto yangiliklari</div>
+
+      <div className="siteFooterCopy">
+        GOLDENWEB.UZ © 2026 • Real vaqtda kripto bozor tahlili va kripto yangiliklari
+      </div>
     </footer>
   )
 }
