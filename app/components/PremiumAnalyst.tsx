@@ -44,6 +44,7 @@ type Result = {
     retestIndex: number
     context: 'uptrend-break' | 'downtrend-break'
   } | null
+  emaRejectSignals?: { type: 'BUY' | 'SELL'; index: number; price: number }[]
 }
 
 const coins = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
@@ -157,6 +158,9 @@ function CleanChart({
   const tf = tfLong(interval)
   const isSell = result.side === 'SELL'
   const div = result.divergence
+  const emaMarks = (result.emaRejectSignals || []).filter(
+    (s) => s.index >= Math.max(0, candles.length - 60) && s.index < candles.length
+  )
 
   const rightBox = (yy: number, text: string, bg: string, w = 100) => (
     <g>
@@ -293,6 +297,31 @@ function CleanChart({
               </g>
             )}
 
+          {emaMarks.map((s) => {
+            const cx = x(s.index)
+            const cy = y(s.price)
+            if (s.type === 'BUY') {
+              return (
+                <polygon
+                  key={`ema-buy-${s.index}`}
+                  points={`${cx},${cy + 6} ${cx - 8},${cy + 20} ${cx + 8},${cy + 20}`}
+                  fill="#20d67a"
+                  stroke="#0b1a12"
+                  strokeWidth="1"
+                />
+              )
+            }
+            return (
+              <polygon
+                key={`ema-sell-${s.index}`}
+                points={`${cx},${cy - 6} ${cx - 8},${cy - 20} ${cx + 8},${cy - 20}`}
+                fill="#ff4d5a"
+                stroke="#1a0b0d"
+                strokeWidth="1"
+              />
+            )
+          })}
+
           {div && div.i1 >= 0 && div.i2 < candles.length && (
             <g opacity="0.95">
               <line
@@ -317,24 +346,6 @@ function CleanChart({
               />
               <circle cx={x(div.i1)} cy={ry(div.rsi1)} r="3.5" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
               <circle cx={x(div.i2)} cy={ry(div.rsi2)} r="3.5" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
-              {result.signalTone === 'caution' &&
-                ((div.type === 'bullish' && result.side === 'BUY') ||
-                  (div.type === 'bearish' && result.side === 'SELL')) &&
-                (div.type === 'bullish' ? (
-                  <polygon
-                    points={`${x(div.i2)},${y(div.price2) + 18} ${x(div.i2) - 9},${y(div.price2) + 34} ${x(div.i2) + 9},${y(div.price2) + 34}`}
-                    fill="#20d67a"
-                    stroke="#0b1a12"
-                    strokeWidth="1"
-                  />
-                ) : (
-                  <polygon
-                    points={`${x(div.i2)},${y(div.price2) - 18} ${x(div.i2) - 9},${y(div.price2) - 34} ${x(div.i2) + 9},${y(div.price2) - 34}`}
-                    fill="#ff4d5a"
-                    stroke="#1a0b0d"
-                    strokeWidth="1"
-                  />
-                ))}
             </g>
           )}
 
