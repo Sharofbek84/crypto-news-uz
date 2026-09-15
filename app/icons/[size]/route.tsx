@@ -1,94 +1,26 @@
-import { ImageResponse } from 'next/og'
+import { LOGO_PNG_BASE64 } from '@/lib/brand-logo'
 
 export const runtime = 'edge'
 
+function decodeBase64Png(b64: string): Uint8Array {
+  const binary = atob(b64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
+}
+
+const PNG_BYTES = decodeBase64Png(LOGO_PNG_BASE64)
+
+/** Brand logo (globe + G) — uploaded PNG for favicon / PWA */
 export async function GET(
   _request: Request,
   context: { params: Promise<{ size: string }> | { size: string } }
 ) {
-  const raw = await Promise.resolve(context.params)
-  const n = parseInt(String(raw.size || '192'), 10)
-  const size = Number.isFinite(n) ? Math.min(512, Math.max(48, n)) : 192
-
-  const plate = Math.round(size * 0.92)
-  const radius = Math.round(size * 0.22)
-  const outer = Math.round(size * 0.74)
-  const inner = Math.round(size * 0.66)
-  const stroke = Math.max(3, Math.round(size * 0.032))
-  const fontSize = Math.round(size * 0.48)
-
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'transparent',
-        }}
-      >
-        <div
-          style={{
-            width: plate,
-            height: plate,
-            borderRadius: radius,
-            background: '#0b0f14',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div
-            style={{
-              width: outer,
-              height: outer,
-              borderRadius: '50%',
-              background: '#f0b90b',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <div
-              style={{
-                width: inner,
-                height: inner,
-                borderRadius: '50%',
-                background: '#0b0f14',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#f0b90b',
-                  fontSize,
-                  fontWeight: 900,
-                  fontFamily: 'Arial Black, Impact, system-ui, sans-serif',
-                  lineHeight: `${fontSize}px`,
-                  height: fontSize,
-                  margin: 0,
-                  padding: 0,
-                  letterSpacing: 0,
-                  WebkitTextStroke: `${stroke}px #f0b90b`,
-                }}
-              >
-                G
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    {
-      width: size,
-      height: size,
-    }
-  )
+  await Promise.resolve(context.params)
+  return new Response(PNG_BYTES, {
+    headers: {
+      'Content-Type': 'image/png',
+      'Cache-Control': 'public, max-age=604800, immutable',
+    },
+  })
 }
