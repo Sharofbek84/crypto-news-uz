@@ -13,6 +13,8 @@ export async function GET(
 
   const ring = size * 0.88
   const border = Math.max(2, Math.round(size * 0.055))
+  const inner = size * 0.72
+  const innerBorder = Math.max(1, Math.round(size * 0.018))
   const fontSize = Math.round(size * 0.54)
 
   return new ImageResponse(
@@ -27,7 +29,7 @@ export async function GET(
           background: 'transparent',
         }}
       >
-        {/* Golden ring — G is absolutely centered inside */}
+        {/* Outer golden ring */}
         <div
           style={{
             width: ring,
@@ -42,6 +44,20 @@ export async function GET(
             justifyContent: 'center',
           }}
         >
+          {/* Inner thinner ring for depth */}
+          <div
+            style={{
+              width: inner,
+              height: inner,
+              borderRadius: '50%',
+              border: `${innerBorder}px solid rgba(232, 197, 71, 0.5)`,
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          />
+          {/* G — geometric center of the circle */}
           <div
             style={{
               position: 'absolute',
