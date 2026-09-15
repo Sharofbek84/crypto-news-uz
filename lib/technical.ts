@@ -10,9 +10,10 @@ import {
   shortLevels,
   tfLabel,
   fmt,
+  detectStructureBreakRetest,
 } from './technical-helpers'
 
-export type { Candle, Divergence, TechnicalResult }
+export type { Candle, Divergence, TechnicalResult, StructureSignal } from './technical-helpers'
 export { ema, rsi }
 
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
@@ -44,14 +45,12 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     side = 'BUY'
   } else {
     const swing = lastSwingLevels(candles)
-    // H4 / D1 / W1: RSI signallariga EMA50 filtri — neutralda yolg'on signallarni kamaytiradi
     const useEma50Filter = interval === '4h' || interval === '1d' || interval === '1w'
     const aboveEma50 = last >= e50
     const belowEma50 = last <= e50
     const rsiBuyOk = r > 50 && (!useEma50Filter || aboveEma50)
     const rsiSellOk = r < 50 && (!useEma50Filter || belowEma50)
 
-    // Divergensiya ham swing strukturasi bilan tasdiqlanadi (+ H4+ da EMA50)
     if (
       divergence?.type === 'bullish' &&
       rsiBuyOk &&
@@ -85,13 +84,19 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       side = 'SELL'
       neutralTone = 'caution'
     } else if (useEma50Filter) {
-      // RSI va EMA50 zid: H4+ da EMA50 tomonini olamiz
       side = aboveEma50 ? 'BUY' : 'SELL'
       neutralTone = 'caution'
     } else {
       side = 'SELL'
       neutralTone = 'caution'
     }
+  }
+
+  // Premium: trend structure break + retest (oxirgi 6 shamchada retest)
+  const structureSignal = detectStructureBreakRetest(candles, trend)
+  if (structureSignal && structureSignal.retestIndex >= candles.length - 6) {
+    side = structureSignal.type
+    neutralTone = 'strong'
   }
 
   const sr =
@@ -120,7 +125,11 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA50 ostida qolsa va momentum salbiy bo'lsa, ` +
       `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga pasayish ssenariysi kuchayadi.`
 
-    if (trend === 'BEARISH') {
+    if (structureSignal?.type === 'SELL') {
+      summary =
+        `${tf}: o'suvchi strukturada oxirgi minimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — SELL. ` +
+        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
+    } else if (trend === 'BEARISH') {
       summary =
         `${tf} grafikda trend BEARISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
@@ -139,7 +148,11 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA50 ostida qolish va momentum susayishi ` +
       `${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
 
-    if (trend === 'BULLISH') {
+    if (structureSignal?.type === 'BUY') {
+      summary =
+        `${tf}: tushuvchi strukturada oxirgi maksimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — BUY. ` +
+        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
+    } else if (trend === 'BULLISH') {
       summary =
         `${tf} grafikda trend BULLISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
@@ -173,5 +186,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     bearish,
     summary,
     divergence,
+    structureSignal,
   }
 }
