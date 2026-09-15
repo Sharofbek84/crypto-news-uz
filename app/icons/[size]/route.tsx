@@ -29,12 +29,12 @@ export async function GET(
             width: size * 0.88,
             height: size * 0.88,
             borderRadius: '50%',
-            border: `${Math.max(2, Math.round(size * 0.055))}px solid #c9a951`,
+            border: `${Math.max(2, Math.round(size * 0.055))}px solid #e8c547`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             background: 'rgba(11, 15, 20, 0.92)',
-            boxShadow: `0 0 ${Math.round(size * 0.06)}px rgba(201, 169, 81, 0.35)`,
+            boxShadow: `0 0 ${Math.round(size * 0.08)}px rgba(232, 197, 71, 0.45)`,
           }}
         >
           {/* Inner thinner ring for depth */}
@@ -43,7 +43,7 @@ export async function GET(
               width: size * 0.72,
               height: size * 0.72,
               borderRadius: '50%',
-              border: `${Math.max(1, Math.round(size * 0.018))}px solid rgba(201, 169, 81, 0.45)`,
+              border: `${Math.max(1, Math.round(size * 0.018))}px solid rgba(232, 197, 71, 0.5)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -51,9 +51,9 @@ export async function GET(
           >
             <span
               style={{
-                fontSize: Math.round(size * 0.42),
+                fontSize: Math.round(size * 0.54),
                 fontWeight: 800,
-                color: '#c9a951',
+                color: '#f0d060',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 lineHeight: 1,
                 letterSpacing: '-0.02em',
