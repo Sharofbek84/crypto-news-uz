@@ -567,14 +567,41 @@ export default function PremiumAnalyst() {
                 </div>
               </div>
               <div className="proCard bullCard">
-                <h3>BULLISH SSENARIY</h3>
+                <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
                 <p>{r.bullish}</p>
+                <div className="levelPath greenPath">
+                  {r.side === 'SELL' ? (
+                    <>
+                      {money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}
+                    </>
+                  ) : (
+                    <>
+                      {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
+                    </>
+                  )}
+                </div>
               </div>
               <div className="proCard bearCard">
-                <h3>BEARISH SSENARIY</h3>
+                <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
                 <p>{r.bearish}</p>
+                <div className="levelPath redPath">
+                  {r.side === 'SELL' ? (
+                    <>
+                      {money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}
+                    </>
+                  ) : (
+                    <>
+                      {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
+            <p className="homeDisclaimer">
+              Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz
+              tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat
+              yuqotishga tayyor bo'lgan pulingiz bilan kiring.
+            </p>
             <CryptoAnalystAI analysis={r} coin={coin} interval={interval} />
           </>
         )
