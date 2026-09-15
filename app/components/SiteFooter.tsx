@@ -75,13 +75,17 @@ export default function SiteFooter() {
           font-size: 0.8rem;
           border-top: 1px solid #202938;
         }
+        .siteFooterCopy {
+          color: #8b949e;
+          line-height: 1.5;
+          margin-bottom: 16px;
+        }
         .siteFooterSocial {
           display: flex;
           justify-content: center;
           align-items: center;
           flex-wrap: wrap;
           gap: 10px;
-          margin-bottom: 18px;
         }
         .siteFooterSocial a {
           display: inline-flex;
@@ -102,11 +106,11 @@ export default function SiteFooter() {
           background: rgba(240, 185, 11, 0.08);
           transform: translateY(-1px);
         }
-        .siteFooterCopy {
-          color: #8b949e;
-          line-height: 1.5;
-        }
       `}</style>
+
+      <div className="siteFooterCopy">
+        GOLDENWEB.UZ © 2026 • Real vaqtda kripto bozor tahlili va kripto yangiliklari
+      </div>
 
       <div className="siteFooterSocial">
         {SOCIAL.map((item) => (
@@ -121,10 +125,6 @@ export default function SiteFooter() {
             <Icon name={item.name} />
           </a>
         ))}
-      </div>
-
-      <div className="siteFooterCopy">
-        GOLDENWEB.UZ © 2026 • Real vaqtda kripto bozor tahlili va kripto yangiliklari
       </div>
     </footer>
   )
