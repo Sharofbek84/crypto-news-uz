@@ -11,9 +11,10 @@ import {
   tfLabel,
   fmt,
   detectStructureBreakRetest,
+  detectEmaRejectSignals,
 } from './technical-helpers'
 
-export type { Candle, Divergence, TechnicalResult, StructureSignal } from './technical-helpers'
+export type { Candle, Divergence, TechnicalResult, StructureSignal, EmaRejectSignal } from './technical-helpers'
 export { ema, rsi }
 
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
@@ -98,6 +99,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     side = structureSignal.type
     neutralTone = 'strong'
   }
+
+  // EMA20 rejection — faqat grafik uchburchaklari, side/summary o'zgarmaydi
+  const emaRejectSignals = detectEmaRejectSignals(candles)
 
   const sr =
     side === 'SELL'
@@ -187,5 +191,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     summary,
     divergence,
     structureSignal,
+    emaRejectSignals,
   }
 }
