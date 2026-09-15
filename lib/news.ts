@@ -19,8 +19,14 @@ export const NEWS_PER_PAGE = 10
 /** Bosh sahifada ko‘rsatiladigan yangilik soni */
 export const HOME_NEWS_COUNT = 10
 
-/** Shu kundan eski yangiliklar chiqarib tashlanadi */
-export const NEWS_MAX_AGE_DAYS = 10
+/**
+ * Saytda saqlanadigan / ko‘rsatiladigan maksimal yangilik soni.
+ * 10 sahifa × 10 = 100. Undan eskiroqlari avtomatik chiqarib tashlanadi.
+ */
+export const NEWS_MAX_TOTAL = 100
+
+/** Shu kundan eski yangiliklar ham chiqarib tashlanadi (qo‘shimcha filtr) */
+export const NEWS_MAX_AGE_DAYS = 30
 
 const NEWS_DIR = path.join(process.cwd(), 'data', 'news')
 
@@ -65,8 +71,11 @@ function startOfTodayUtc(): number {
 }
 
 /**
- * 10 kundan eski yangiliklarni olib tashlaydi va sanaga qarab tartiblaydi.
- * Sahifalash uchun limit qo‘llanmaydi.
+ * 1) Juda eski (NEWS_MAX_AGE_DAYS) yangiliklarni olib tashlaydi
+ * 2) Sanaga qarab tartiblaydi (eng yangi birinchi)
+ * 3) Faqat oxirgi NEWS_MAX_TOTAL (100) ta qoldiradi
+ *
+ * Natija: maksimal 10 sahifa × 10 yangilik.
  */
 export function trimNews(items: NewsItem[]): NewsItem[] {
   const cutoff = startOfTodayUtc() - NEWS_MAX_AGE_DAYS * 24 * 60 * 60 * 1000
@@ -77,14 +86,16 @@ export function trimNews(items: NewsItem[]): NewsItem[] {
     return ts >= cutoff
   })
 
-  return [...fresh].sort(
+  const sorted = [...fresh].sort(
     (a, b) =>
       String(b.date || '').localeCompare(String(a.date || '')) ||
       String(b.slug || '').localeCompare(String(a.slug || ''))
   )
+
+  return sorted.slice(0, NEWS_MAX_TOTAL)
 }
 
-/** 10 kun ichidagi barcha yangiliklar (tartiblangan) */
+/** Eng yangi 100 ta yangilik (tartiblangan) */
 export function getAllFreshNews(): NewsItem[] {
   return trimNews(loadAllNewsFromDisk())
 }
@@ -101,7 +112,7 @@ export type NewsPageResult = {
   total: number
 }
 
-/** Arxiv sahifasi: 1-dan boshlanadi, har sahifada NEWS_PER_PAGE ta */
+/** Arxiv sahifasi: 1-dan boshlanadi, har sahifada NEWS_PER_PAGE ta, jami max 10 sahifa */
 export function getNewsPage(page: number): NewsPageResult {
   const all = getAllFreshNews()
   const total = all.length
@@ -116,7 +127,7 @@ export function getNewsPage(page: number): NewsPageResult {
   }
 }
 
-/** Bitta yangilikni slug bo‘yicha topish (10 kun ichidagilar) */
+/** Bitta yangilikni slug bo‘yicha topish (100 ta ichidagilar) */
 export function getNewsBySlug(slug: string): NewsItem | undefined {
   return getAllFreshNews().find((n) => n.slug === slug)
 }
