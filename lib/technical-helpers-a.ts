@@ -17,6 +17,15 @@ export type Divergence = {
   rsi2: number
 }
 
+export type StructureSignal = {
+  type: 'BUY' | 'SELL'
+  level: number
+  swingIndex: number
+  breakIndex: number
+  retestIndex: number
+  context: 'uptrend-break' | 'downtrend-break'
+}
+
 export type TechnicalResult = {
   ema10: number
   ema20: number
@@ -39,6 +48,8 @@ export type TechnicalResult = {
   bearish: string
   summary: string
   divergence: Divergence | null
+  /** Premium: trend structure break + retest */
+  structureSignal: StructureSignal | null
 }
 
 export function ema(values: number[], period: number) {
