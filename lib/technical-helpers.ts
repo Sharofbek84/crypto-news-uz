@@ -1,4 +1,5 @@
 export type { Candle, Divergence, TechnicalResult, StructureSignal } from './technical-helpers-a'
+export type { EmaRejectSignal } from './ema-reject'
 export {
   ema,
   rsi,
@@ -13,3 +14,4 @@ export {
   shortLevels,
 } from './technical-helpers-b'
 export { detectStructureBreakRetest } from './structure-break'
+export { detectEmaRejectSignals } from './ema-reject'
