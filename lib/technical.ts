@@ -92,9 +92,14 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     }
   }
 
-  // Premium: trend structure break + retest (oxirgi 6 shamchada retest)
-  const structureSignal = detectStructureBreakRetest(candles, trend)
-  if (structureSignal && structureSignal.retestIndex >= candles.length - 6) {
+  // Break+Retest — faqat NEUTRAL trendda side ni o'zgartiradi
+  const structureSignal =
+    trend === 'NEUTRAL' ? detectStructureBreakRetest(candles, trend) : null
+  if (
+    trend === 'NEUTRAL' &&
+    structureSignal &&
+    structureSignal.retestIndex >= candles.length - 6
+  ) {
     side = structureSignal.type
     neutralTone = 'strong'
   }
@@ -125,9 +130,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA50 ostida qolsa va momentum salbiy bo'lsa, ` +
       `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga pasayish ssenariysi kuchayadi.`
 
-    if (structureSignal?.type === 'SELL') {
+    if (trend === 'NEUTRAL' && structureSignal?.type === 'SELL') {
       summary =
-        `${tf}: o'suvchi strukturada oxirgi minimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — SELL. ` +
+        `${tf}: neytral trendda oxirgi minimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — SELL. ` +
         `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
     } else if (trend === 'BEARISH') {
       summary =
@@ -148,9 +153,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA50 ostida qolish va momentum susayishi ` +
       `${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
 
-    if (structureSignal?.type === 'BUY') {
+    if (trend === 'NEUTRAL' && structureSignal?.type === 'BUY') {
       summary =
-        `${tf}: tushuvchi strukturada oxirgi maksimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — BUY. ` +
+        `${tf}: neytral trendda oxirgi maksimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — BUY. ` +
         `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
     } else if (trend === 'BULLISH') {
       summary =
