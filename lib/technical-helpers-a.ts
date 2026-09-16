@@ -26,6 +26,13 @@ export type StructureSignal = {
   context: 'uptrend-break' | 'downtrend-break'
 }
 
+export type EmaPullbackSignal = {
+  type: 'BUY' | 'SELL'
+  index: number
+  price: number
+  ema20: number
+}
+
 export type TechnicalResult = {
   ema10: number
   ema20: number
@@ -48,8 +55,10 @@ export type TechnicalResult = {
   bearish: string
   summary: string
   divergence: Divergence | null
-  /** Premium: trend structure break + retest */
+  /** Premium: trend structure break + retest (faqat NEUTRAL) */
   structureSignal: StructureSignal | null
+  /** Premium: EMA20 pullback (trend ichida) */
+  emaPullback: EmaPullbackSignal | null
 }
 
 export function ema(values: number[], period: number) {
