@@ -105,7 +105,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     neutralTone = 'strong'
   }
 
-  // EMA pullback — faqat trend ichida, yo'nalishga mos
+  // EMA pullback — grafik uchburchak + side (xulosa o'zgarmaydi)
   const emaPullback = detectEmaPullback(candles)
   if (emaPullback && emaPullback.index >= candles.length - 6) {
     if (trend === 'BULLISH' && emaPullback.type === 'BUY') {
@@ -113,7 +113,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     } else if (trend === 'BEARISH' && emaPullback.type === 'SELL') {
       side = 'SELL'
     } else if (trend === 'NEUTRAL') {
-      // Neytralda ham EMA20/50 struktura bo'yicha pullback ishlashi mumkin
       if (e20 > e50 && emaPullback.type === 'BUY') {
         side = 'BUY'
         neutralTone = 'strong'
@@ -156,10 +155,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       summary =
         `${tf}: neytral trendda oxirgi minimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — SELL. ` +
         `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
-    } else if (pullbackRecent?.type === 'SELL') {
-      summary =
-        `${tf}: EMA20 < EMA50, narx EMA20 ga qaytib pastga sakradi — SELL. ` +
-        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
     } else if (trend === 'BEARISH') {
       summary =
         `${tf} grafikda trend BEARISH. ` +
@@ -182,10 +177,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     if (trend === 'NEUTRAL' && structureSignal?.type === 'BUY') {
       summary =
         `${tf}: neytral trendda oxirgi maksimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — BUY. ` +
-        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
-    } else if (pullbackRecent?.type === 'BUY') {
-      summary =
-        `${tf}: EMA20 > EMA50, narx EMA20 ga qaytib yuqoriga sakradi — BUY. ` +
         `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
     } else if (trend === 'BULLISH') {
       summary =
