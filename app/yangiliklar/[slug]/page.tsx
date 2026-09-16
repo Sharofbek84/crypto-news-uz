@@ -50,6 +50,12 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
   const item = getNewsBySlug(params.slug)
   if (!item) notFound()
 
+  const all = getAllFreshNews()
+  const idx = all.findIndex((n) => n.slug === item.slug)
+  // Ro'yxat eng yangidan: keyingi = biroz eskiroq (idx + 1); oxirgisida birinchiga qaytadi
+  const nextItem =
+    idx >= 0 && all.length > 1 ? all[(idx + 1) % all.length] : null
+
   const paragraphs = (item.body || item.summary || '').split('\n\n').filter(Boolean)
 
   return (
@@ -101,7 +107,11 @@ export default function YangilikDetailPage({ params }: { params: { slug: string 
 
               <div className="articleNav">
                 <Link href="/yangiliklar">← Barcha yangiliklar</Link>
-                <Link href="/">Bosh sahifa</Link>
+                {nextItem ? (
+                  <Link href={`/yangiliklar/${nextItem.slug}`}>Keyingi yangilik →</Link>
+                ) : (
+                  <Link href="/yangiliklar">Keyingi yangilik →</Link>
+                )}
               </div>
             </article>
           </div>
