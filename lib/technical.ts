@@ -11,9 +11,10 @@ import {
   tfLabel,
   fmt,
   detectStructureBreakRetest,
+  detectEmaPullback,
 } from './technical-helpers'
 
-export type { Candle, Divergence, TechnicalResult, StructureSignal } from './technical-helpers'
+export type { Candle, Divergence, TechnicalResult, StructureSignal, EmaPullbackSignal } from './technical-helpers'
 export { ema, rsi }
 
 export function analyze(candles: Candle[], interval: string = '1h'): TechnicalResult {
@@ -92,7 +93,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     }
   }
 
-  // Break+Retest — faqat NEUTRAL trendda side ni o'zgartiradi
+  // Break+Retest — faqat NEUTRAL
   const structureSignal =
     trend === 'NEUTRAL' ? detectStructureBreakRetest(candles, trend) : null
   if (
@@ -102,6 +103,25 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   ) {
     side = structureSignal.type
     neutralTone = 'strong'
+  }
+
+  // EMA pullback — faqat trend ichida, yo'nalishga mos
+  const emaPullback = detectEmaPullback(candles)
+  if (emaPullback && emaPullback.index >= candles.length - 6) {
+    if (trend === 'BULLISH' && emaPullback.type === 'BUY') {
+      side = 'BUY'
+    } else if (trend === 'BEARISH' && emaPullback.type === 'SELL') {
+      side = 'SELL'
+    } else if (trend === 'NEUTRAL') {
+      // Neytralda ham EMA20/50 struktura bo'yicha pullback ishlashi mumkin
+      if (e20 > e50 && emaPullback.type === 'BUY') {
+        side = 'BUY'
+        neutralTone = 'strong'
+      } else if (e20 < e50 && emaPullback.type === 'SELL') {
+        side = 'SELL'
+        neutralTone = 'strong'
+      }
+    }
   }
 
   const sr =
@@ -117,6 +137,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       : Math.min(invalidation, last * 0.97)
 
   const tf = tfLabel(interval)
+  const pullbackRecent =
+    emaPullback && emaPullback.index >= candles.length - 6 ? emaPullback : null
 
   let bullish: string
   let bearish: string
@@ -133,6 +155,10 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     if (trend === 'NEUTRAL' && structureSignal?.type === 'SELL') {
       summary =
         `${tf}: neytral trendda oxirgi minimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — SELL. ` +
+        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
+    } else if (pullbackRecent?.type === 'SELL') {
+      summary =
+        `${tf}: EMA20 < EMA50, narx EMA20 ga qaytib pastga sakradi — SELL. ` +
         `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
     } else if (trend === 'BEARISH') {
       summary =
@@ -156,6 +182,10 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     if (trend === 'NEUTRAL' && structureSignal?.type === 'BUY') {
       summary =
         `${tf}: neytral trendda oxirgi maksimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — BUY. ` +
+        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
+    } else if (pullbackRecent?.type === 'BUY') {
+      summary =
+        `${tf}: EMA20 > EMA50, narx EMA20 ga qaytib yuqoriga sakradi — BUY. ` +
         `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
     } else if (trend === 'BULLISH') {
       summary =
@@ -192,5 +222,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     summary,
     divergence,
     structureSignal,
+    emaPullback: pullbackRecent,
   }
 }
