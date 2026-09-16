@@ -153,8 +153,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'NEUTRAL' && structureSignal?.type === 'SELL') {
       summary =
-        `${tf}: neytral trendda oxirgi minimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — SELL. ` +
-        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
+        `${tf}: neytral trendda oxirgi minimum yorildi va qayta test qilindi. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
     } else if (trend === 'BEARISH') {
       summary =
         `${tf} grafikda trend BEARISH. ` +
@@ -176,8 +177,9 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
 
     if (trend === 'NEUTRAL' && structureSignal?.type === 'BUY') {
       summary =
-        `${tf}: neytral trendda oxirgi maksimum (${fmt(structureSignal.level)}) yorildi va qayta test qilindi — BUY. ` +
-        `Kirish ${fmt(entryLow)}–${fmt(entryHigh)}. SL: ${fmt(invalidation)}.`
+        `${tf}: neytral trendda oxirgi maksimum yorildi va qayta test qilindi. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
     } else if (trend === 'BULLISH') {
       summary =
         `${tf} grafikda trend BULLISH. ` +
