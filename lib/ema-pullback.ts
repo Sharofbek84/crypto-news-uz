@@ -24,23 +24,29 @@ function emaSeries(values: number[], period: number): number[] {
  * Trend ichida EMA20 pullback:
  * - EMA20 > EMA50 → faqat BUY (narx EMA20 ga tushib, wick + close yuqorida)
  * - EMA20 < EMA50 → faqat SELL (narx EMA20 ga chiqib, wick + close pastida)
- * Faqat oxirgi lookback shamchalar ichida eng yaqin signal.
+ * Birinchi signaldan keyin kamida 5 shamcha ichida takrorlanmaydi.
+ * Qaytaradi: eng so'nggi (cooldown bilan) signal.
  */
 export function detectEmaPullback(
   candles: Candle[],
-  opts?: { lookback?: number; tolPct?: number }
+  opts?: { lookback?: number; tolPct?: number; cooldown?: number }
 ): EmaPullbackSignal | null {
   if (candles.length < 55) return null
 
-  const lookback = opts?.lookback ?? 8
+  const lookback = opts?.lookback ?? 40
   const tolPct = opts?.tolPct ?? 0.003
+  const cooldown = opts?.cooldown ?? 5
   const closes = candles.map((c) => c.close)
   const e20s = emaSeries(closes, 20)
   const e50s = emaSeries(closes, 50)
 
   const from = Math.max(50, candles.length - lookback)
+  const found: EmaPullbackSignal[] = []
+  let lastSignalIndex = -999
 
-  for (let i = candles.length - 1; i >= from; i--) {
+  for (let i = from; i < candles.length; i++) {
+    if (i - lastSignalIndex < cooldown) continue
+
     const c = candles[i]
     const e20 = e20s[i]
     const e50 = e50s[i]
@@ -57,13 +63,14 @@ export function detectEmaPullback(
       const closedAbove = c.close > e20
       const lowerWick = Math.min(c.open, c.close) - c.low
       const bounced = lowerWick >= body * 0.25 || lowerWick >= range * 0.2
-      // Oldingi 2–4 shamcha asosan EMA20 ustida bo'lishi (pullback, continuous break emas)
       let wasAbove = 0
       for (let j = Math.max(from, i - 4); j < i; j++) {
         if (candles[j].close > e20s[j] - tol) wasAbove++
       }
       if (touched && closedAbove && bounced && wasAbove >= 1) {
-        return { type: 'BUY', index: i, price: c.close, ema20: e20 }
+        found.push({ type: 'BUY', index: i, price: c.close, ema20: e20 })
+        lastSignalIndex = i
+        continue
       }
     }
 
@@ -78,10 +85,11 @@ export function detectEmaPullback(
         if (candles[j].close < e20s[j] + tol) wasBelow++
       }
       if (touched && closedBelow && bounced && wasBelow >= 1) {
-        return { type: 'SELL', index: i, price: c.close, ema20: e20 }
+        found.push({ type: 'SELL', index: i, price: c.close, ema20: e20 })
+        lastSignalIndex = i
       }
     }
   }
 
-  return null
+  return found.length ? found[found.length - 1] : null
 }
