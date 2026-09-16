@@ -46,11 +46,13 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     side = 'BUY'
   } else {
     const swing = lastSwingLevels(candles)
-    const useEma50Filter = interval === '4h' || interval === '1d' || interval === '1w'
-    const aboveEma50 = last >= e50
-    const belowEma50 = last <= e50
-    const rsiBuyOk = r > 50 && (!useEma50Filter || aboveEma50)
-    const rsiSellOk = r < 50 && (!useEma50Filter || belowEma50)
+    // H4+ : RSI signallarni narx emas, EMA20/EMA50 struktura bilan filtrlash
+    // EMA20 > EMA50 → SELL taqiqlanadi; EMA20 < EMA50 → BUY taqiqlanadi
+    const useEmaStructureFilter = interval === '4h' || interval === '1d' || interval === '1w'
+    const emaBullStack = e20 > e50
+    const emaBearStack = e20 < e50
+    const rsiBuyOk = r > 50 && (!useEmaStructureFilter || emaBullStack)
+    const rsiSellOk = r < 50 && (!useEmaStructureFilter || emaBearStack)
 
     if (
       divergence?.type === 'bullish' &&
@@ -72,10 +74,10 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     } else if (swing && rsiSellOk && last <= swing.high) {
       side = 'SELL'
       neutralTone = 'caution'
-    } else if (swing && last < swing.low) {
+    } else if (swing && last < swing.low && (!useEmaStructureFilter || emaBearStack)) {
       side = 'SELL'
       neutralTone = 'caution'
-    } else if (swing && last > swing.high) {
+    } else if (swing && last > swing.high && (!useEmaStructureFilter || emaBullStack)) {
       side = 'BUY'
       neutralTone = 'caution'
     } else if (rsiBuyOk) {
@@ -84,8 +86,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     } else if (rsiSellOk) {
       side = 'SELL'
       neutralTone = 'caution'
-    } else if (useEma50Filter) {
-      side = aboveEma50 ? 'BUY' : 'SELL'
+    } else if (useEmaStructureFilter) {
+      side = emaBullStack ? 'BUY' : 'SELL'
       neutralTone = 'caution'
     } else {
       side = 'SELL'
