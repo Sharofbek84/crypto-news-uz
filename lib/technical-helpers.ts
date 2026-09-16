@@ -1,4 +1,4 @@
-export type { Candle, Divergence, TechnicalResult, StructureSignal } from './technical-helpers-a'
+export type { Candle, Divergence, TechnicalResult, StructureSignal, EmaPullbackSignal } from './technical-helpers-a'
 export {
   ema,
   rsi,
@@ -13,3 +13,4 @@ export {
   shortLevels,
 } from './technical-helpers-b'
 export { detectStructureBreakRetest } from './structure-break'
+export { detectEmaPullback } from './ema-pullback'
