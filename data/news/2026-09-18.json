@@ -1,1 +1,112 @@
-PLACEHOLDER
+[
+  {
+    "slug": "btc-fed-oshirish-keyin-76621-18-sent",
+    "title": "Bitcoin Fed oshirishi orqali $76 621 ga kotarildi: yana bitta qadam kutilmoqda",
+    "summary": "FOMC 25 punktga stavka oshirganidan keyin BTC 24 soatda 0,88 foiz oshib, $76 621 ga yetdi. Dot plot 2026 va 2027 oxiriga 4,1 foiz medianani korsatadi.",
+    "body": "CoinDesk Markets Today malumotiga kora, Bitcoin payshanba kuni $76 621 gacha kotarildi. Bu 24 soatda 0,88 foiz, UTC yarimidan 0,60 foiz oshish. Federal Reserve federal funds stavkasini 3,75-4,00 foizga chiqarganiga qaramay, treiderlar qoshimcha qatiylashtirish sikli emas, balki cheklangan yol xaritasiga e'tibor qaratdi.\n\nFOMC ovozi bir ovozdan boldi. Rais Kevin Warsh inflyatsiya uzoq vaqt yuqori qolganini aytdi. Lekin komitetning nuqtali grafigi 2026 va 2027 yil oxiriga medianani 4,1 foizda ushlab turadi. Bu yana faqat bitta 25 punktlik qadamni anglatadi. Dollar indeksi 0,17 foiz pasaydi, Nasdaq 100 fyucherslari 1,04 foiz, S&P 500 fyucherslari 0,81 foiz oshdi.\n\nEther $2 444 atrofida 1,1 foiz, Solana $100,57 atrofida 2 foiz qo'shdi. CoinDesk 100 ning 94 tasi yashil. Kichik kapitalli CoinDesk 80 indeksi 4,7 foiz, bitcoin ogirlikdagi CoinDesk 5 esa 1,2 foiz oshdi. Spekulyativ qatlam tiklanmoqda.\n\nETF oqimlari hali orqaga qaytmadi. AQSh spot bitcoin ETF-lari chorshanba kuni $295,98 million chiqardi, oldingi kuni $450,33 million. 8-sentabrdan beri jami $1 milliarddan oshiq chiqim. Sof aktivlar $95,19 milliard. BTC sentabr choqqasi $82 284 dan 6,9 foiz past.\n\nFyuchers ochiq qiziqishi $59,7 milliarddan $64,4 milliardga chiqdi. Kunlik hajm $112,6 milliard, likuidatsiya $214,3 million. Bitcoin OI $26,6 milliard, ether OI $16,7 milliard. Long/short nisbati 1,13 va sakkiz kundan beri musbat. Manba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/17/crypto-rallies-through-the-fed-s-first-rate-increase-since-2023",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "zec-23-foiz-paradigm-rekord-18-sent",
+    "title": "Zcash 23 foiz oshib rekord $1 369: Paradigm ZEC ushlashini ochdi",
+    "summary": "Paradigm hammuassisi Matt Huang firma ZEC egaligini e'lon qilgach, token rekordga chiqdi. Ochiq qiziqish 37,84 foiz oshdi, funding manfiy qoldi.",
+    "body": "CoinDesk yozishicha, maxfiylik tokeni Zcash (ZEC) 24 soatda 23 foiz oshib, taxminan $1 369 ga yetdi. Bu barcha davrlar rekordi. Bozor kapitallashuvi $23,2 milliard. Paradigm hammuassisi Matt Huang X da firmaning ZEC ushlashini ochib, uni Bitcoinning maxfiy jufti deb atadi va dasturchilarni moliyalashtirishni davom ettirishini aytdi.\n\nShu hafta boshqaruv ovozi blok vaqtini 75 soniyadan 25 soniyaga tushirishni maqulladi. Bitcoin-uslubidagi halving jadvali saqlanadi. Yangi ZEC chiqarish surati o'zgarmasligi uchun subsidiya moslashtiriladi.\n\nDerivativlar bosimi kuchli. ZEC fyuchers ochiq qiziqishi 24 soatda 37,84 foiz oshib, $2,2 milliardga yetdi. $28,9 million likuidatsiya boldi. Funding -0,0253 foiz: shortlar longlarga to'lamoqda, narx esa yangi choqqaga chiqmoqda. Treiderlar oy davomida bu rallyga qarshi savdo qilgan va siqilgan.\n\nRaqib Monero (XMR) 0,97 foiz pasayib $494,14 da qoldi. ZEC endi XMR dan taxminan ikki barobar qimmat. Bu ikki maxfiylik tokeni orasidagi farq institutsional hikoya va ETF kutilmalariga ham bog'liq.\n\nO'rta kapitallarda NEAR 16 foiz oshib $2,82 ga yetdi. Venice Token 14 foiz tiklandi. Pump.fun CoinDesk 80 da 7,9 foiz bilan yetakchilik qildi. Altcoin Season indikatori 32/100 dan 39/100 ga chiqdi. Manba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/17/zcash-jumps-23-as-bitcoin-and-major-tokens-rise-despite-fed-s-first-hike-since-2023",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/486/large/circle-zcash-logo.png"
+  },
+  {
+    "slug": "btc-eth-etf-chiqim-sol-xrp-kirim-18-sent",
+    "title": "BTC va ETH ETF-lari $520 million chiqardi, SOL va XRP kirim oldi",
+    "summary": "16-sentabrda Bitcoin ETF-lari $295,98 million, Ethereum ETF-lari $224,11 million chiqardi. XRP $3,50 million, Solana $837 ming sof kirim yozdi.",
+    "body": "SoSoValue va CryptoBriefing malumotiga kora, 16-sentabr sessiyasida spot Bitcoin va Ethereum ETF-lari birgalikda taxminan $520 million chiqardi. Bitcoin fondlari $295,98 million yo'qotdi. Bu sentabrning ikkinchi eng katta chiqimi. BlackRock IBIT yolg'iz $144,11 million qaytardi.\n\nEthereum ETF-lari $224,11 million chiqardi — oy ichidagi eng katta sessiya. BlackRock ulushi $110,03 million atrofida. Shunga qaramay, ETH fondlarining kumulativ kirimi $13,15 milliard, sof aktivlari $15,16 milliard, bu tarmoq kapitallashuvining 5,15 foizi.\n\nXRP ETF-lari $3,50 million, Solana ETF-lari taxminan $836 930 sof kirim oldi. Kichik aktivlar yirik fondlardan chiqqan kapitalning bir qismini qabul qildi. XRP kumulativ kirimi $1,72 milliard, aktivlari $1,40 milliard. Solana kumulativ kirimi $1,37 milliard, aktivlari $1,38 milliard.\n\nBitcoin fondlarining kumulativ kirimi $54,57 milliard, jami aktivlari $95,19 milliard — butun BTC bozorining taxminan 6,22 foizi. Narx $76 000 atrofida ushlandi, lekin institutsional oqim hali tiklanmadi. Bu spot savdo va ETF rebalansining ajralishini ko'rsatadi.\n\nBenzinga qo'shimcha qilishicha, ba'zi hisob-kitoblarda chorshanba kuni BTC ETF-lariga $517 million kirim ham qayd etilgan, lekin asosiy SoSoValue lenti 16-sentabrni chiqim kuni sifatida beradi. Treiderlar ketma-ket sessiyalarni kuzatishi kerak. Manba: SoSoValue / CryptoBriefing.",
+    "manba": "CryptoBriefing",
+    "url": "https://cryptobriefing.com/solana-xrp-etf-inflows-btc-eth-outflows/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/4128/large/solana.png"
+  },
+  {
+    "slug": "sec-innovatsiya-ozodligi-token-aksiya-18-sent",
+    "title": "SEC tokenlashtirilgan AQSh aksiyalari uchun innovatsiya ozodligini ochdi",
+    "summary": "AQSh SEC ruxsat etilgan AMM maydonlariga besh yillik innovatsiya ozodligini berdi. Tokenlashtirilgan an'anaviy aksiyalar onchain savdosi uchun federal yo'l ochildi.",
+    "body": "CoinDesk xabariga kora, AQSh Qimmatli qog'ozlar va birja komissiyasi (SEC) uzoq kutilgan innovatsiya ozodligini e'lon qildi. Qoida ruxsat etilgan avtomatlashtirilgan bozor-meykerlarni birja sifatida tasniflashdan vaqtincha himoya qiladi. Muddat besh yil. Maqsad — tokenlashtirilgan AQSh aksiyalarini blokcheynda savdo qilish uchun tartibga solingan yo'lak ochish.\n\nRegulyator savdo hajmi, kirish va emitent huquqlarini qattiq nazoratda ushlab turadi. Bu to'liq ochiq ruxsatsiz DeFi emas, balki ruxsat etilgan infratuzilma. Securitize bosh direktori Carlos Domingo qoidani o'qigan sari ko'proq ijobiy jihatlarini ko'rayotganini yozdi.\n\nClarity Act Senatda yiqilganidan keyin kripto aktsiyalari keskin tushgan edi. Coinbase, Circle, Bullish, Robinhood va Securitize premarketda yo'qotishlarning bir qismini qaytardi. Ondo tokeni ham yangilik fonida ko'tarildi.\n\nBu qadam bozor tuzilmasi qonunisiz ham SEC ning ma'muriy yo'l bilan tokenlashtirishni sinab ko'rishini ko'rsatadi. An'anaviy brokerlar va onchain platformalar o'rtasidagi raqobat kuchayishi mumkin. Investor himoyasi, hisobot va emitent huquqlari hali markazda.\n\nQisqa muddatda bu yangilik tartibga solish premiumini qisman tikladi. Uzoq muddatda esa tokenlashtirilgan qimmatli qog'ozlar hajmi real likvidlikka aylanadimi-yo'qmi, sandbox shartlari va birja hamkorliklari hal qiladi. Manba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/policy/2026/09/17/sec-rolls-out-long-awaited-innovation-exemption-for-tokenized-securities-venues",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/6319/large/usdc.png"
+  },
+  {
+    "slug": "house-strategik-btc-zaxira-qonuni-18-sent",
+    "title": "Palata qomitasi Strategik Bitcoin zaxirasi qonunini 28-21 ovoz bilan o'tkazdi",
+    "summary": "AQSh Palatasi moliyaviy xizmatlar qomitasi H.R. 8957 ni 28 ga 21 ovoz bilan maqulladi. Loyiha federal Bitcoin zaxirasini ko'rib chiqishni oldinga suradi.",
+    "body": "Binance Square va Benzinga xabariga kora, AQSh Palatasi Financial Services qo'mitasi 17-sentabrda H.R. 8957 — U.S. Reserve Modernization Act ni 28 ga 21 ovoz bilan oldinga surdi. Qonun loyihasi Strategik Bitcoin zaxirasini rasmiylashtirish yo'lini ochadi.\n\nYangilik kechki sessiyada BTC, ETH, XRP, SOL va DOGE ga qisqa turtki berdi. Bitcoin $76 400 atrofida 1,2 foiz oshgani qayd etilgan. Ether 1,5 foiz, Solana 2,7 foiz, XRP 2 foiz atrofida ko'tarilgan. Coinglass ma'lumotida $330 million likuidatsiya, shundan $185 million shortlar yopilgan.\n\nBu hali to'liq Kongress qonuni emas. Qo'mita ovozi faqat palata muhokamasiga yo'l ochadi. Senatdagi Clarity mag'lubiyati fonida zaxira qonuni alohida siyosiy yo'lak. Demokratlar va respublikachilar o'rtasidagi tafovut saqlanadi.\n\nEl Salvador davlat zaxirasi 7 777 BTC ga yetgani parallel xabar. O'rtacha xarid narxi taxminan $55 718, realizatsiya qilinmagan foyda $162 million atrofida. Mamlakat 2024-yil 16-martdan beri 916 kun davomida kuniga 1 BTC sotib olgan.\n\nBozor uchun signal: federal zaxira g'oyasi AQShda ham muhokamada, lekin qabul qilish muddati noaniq. Qisqa muddatda bu xabar stavka oshirishidan keyingi tiklanishni qo'llab-quvvatladi. Manba: Binance Square / Benzinga.",
+    "manba": "Benzinga",
+    "url": "https://www.benzinga.com/crypto/cryptocurrency/26/09/61832741/bitcoin-ethereum-xrp-dogecoin-gain-btc-reserve-bill-rate-hikes-analyst",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "ripple-xrp-stripe-tempo-tolov-18-sent",
+    "title": "Ripple XRP to'lovlarini Stripe va Tempo AI standartiga qo'shdi",
+    "summary": "Ripple yangi dasturchi to'plamida XRP to'lovlarini Stripe va Tempo AI standartiga uladi. XRP 3 foiz atrofida oshib, $1,30 zonasida ushlandi.",
+    "body": "Benzinga va CoinDesk xabariga kora, Ripple XRP to'lovlarini Stripe va Tempo AI standartiga qo'shgan yangi dasturchi to'plamini e'lon qildi. Maqsad — tijorat to'lovlari va AI agentlari orqali avtomatik hisob-kitobni birlashtirish.\n\nXRP payshanba sessiyasida taxminan 3 foiz oshib, $1,30 atrofida savdo qildi. Oldingi Clarity ovozidan keyingi 8-10 foizlik tushishdan keyin bu qisman tiklanish. Texnik jihatdan token harakatlanuvchi o'rtacha klasteri ustida turibdi, lekin momentum ko'rsatkichlari hali zaif.\n\nETF tomoni aralash. 16-sentabrda XRP fondlari $3,50 million kirim oldi, BTC va ETH chiqim yozgan paytda. Kumulativ kirim $1,72 milliard, aktivlar $1,40 milliard. Institutsional mahsulot relsi ishlayapti, lekin kunlik hajm hali kichik.\n\nStripe integratsiyasi real tijorat oqimi uchun muhim. Agar savdogarlar XRP ni hisob-kitob qatlamida ko'rsa, onchain foydalanish oshishi mumkin. Tempo AI standarti esa avtomatlashtirilgan agent to'lovlariga yo'l ochadi.\n\nQisqa muddat $1,25 qo'llab-quvvatlash, $1,40 qarshilik. Uzoq hikoya to'lov relsi va ETF saqlanadi. Clarity kechikishi yuridik aniqlikni sustlashtiradi, lekin mahsulot chiqishlari davom etmoqda. Manba: Benzinga / CoinDesk.",
+    "manba": "Benzinga",
+    "url": "https://www.benzinga.com/crypto/cryptocurrency/26/09/61856481/bitcoin-holds-76000-as-ethereum-xrp-dogecoin-spike-2",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png"
+  },
+  {
+    "slug": "near-16-foiz-altcoin-tiklanish-18-sent",
+    "title": "NEAR 16 foiz oshdi: altcoinlar Fed dan keyin spekulyatsiyaga qaytdi",
+    "summary": "NEAR Protocol 24 soatda 16 foiz oshib $2,82 ga yetdi. Kichik kapitallar CoinDesk 80 da 4,7 foiz oshdi, Altcoin Season 39/100.",
+    "body": "CoinDesk Token talk bo'limiga ko'ra, NEAR Protocol 24 soatda 16 foiz oshib $2,82 ga yetdi. UTC yarimidan keyingi o'sish 7,6 foiz. Bu o'rta kapitallar doskasidagi yetakchilardan biri. Token Fed qarori va keng risk-on harakatiga qo'shildi.\n\nVenice Token (VVV) 14 foiz tiklanib $25,45 ga qaytdi. Bu Clarity ovozidan oldingi sathga yaqinlashish. Pump.fun 7,9 foiz, Lighter (LIT) 7 foiz, Fartcoin 6,4 foiz oshdi. Spekulyativ treiderlar avgust qisqa siqilishidan keyin yana mem va mid-cap larga qaytmoqda.\n\nCoinDesk 80 indeksi 4,7 foiz, CoinDesk 5 esa atigi 1,2 foiz oshdi. Bu kenglik bitcoin og'irligidan tashqarida ekanini ko'rsatadi. 100 ta asosiy aktivning 94 tasi yashil. Altcoin Season indikatori 32/100 dan 39/100 ga ko'tarildi.\n\nMakro fon hali ehtiyotkor. ETF chiqimlari, yuqori xazina daromadliligi va neft narxi risk-ishhtahani cheklashi mumkin. Lekin derivativlarda ochiq qiziqish oshishi va long/short nisbatining musbatligi qisqa muddatli likvidlik oqimini qo'llab-quvvatlamoqda.\n\nNEAR uchun $2,50-$2,60 zona endi diqqat markazida. Agar hajm saqlansa, $3,00 sathi keyingi qarshilik. Aks holda Fed keyingi qadami oldidan tuzatish tez qaytishi mumkin. Manba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/17/crypto-rallies-through-the-fed-s-first-rate-increase-since-2023",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/10365/large/near.jpg"
+  },
+  {
+    "slug": "oleary-clarity-2027-soliq-qonuni-18-sent",
+    "title": "Kevin O'Leary: Kongress Clarity ni 2027 boshida qayta ko'radi",
+    "summary": "Shark Tank investori Clarity Act erta kelasi yil qayta muhokama qilinishini aytdi. Palata soliq qomitasi kripto soliq qonunini oldinga surmoqda.",
+    "body": "CoinDesk Policy xabariga kora, investor Kevin O'Leary Kongress Clarity Act ni 2027-yil boshida, taxminan ikkinchi chorak oldidan, qayta ko'rishga majbur bo'lishini aytdi. Sabab — sanoat yuridik aniqlik so'rayveradi, soliq qonuni esa alohida yo'lakda oldinga ketyapti.\n\nSenatda Clarity prosedural ovozi 50-49 hisobida yiqilgan edi. Demokratlar etika va xavfsizlik himoyasi yetarli emasligini aytdi. Respublikachilar talablarning o'zgarib turganini aybladi. Natijada 2026-yilgi bozor tuzilmasi oynasi deyarli yopildi.\n\nShu bilan birga Palata soliq qo'mitasi Digital Asset Tax Certainty Act ni oldinga surdi. Loyiha kichik tranzaksiyalar, steyblkoin o'tkazmalari va kundalik foydalanishdagi soliq chalkashligini kamaytirishga qaratilgan. Bu to'liq bozor qonuni o'rnini bosa olmaydi, lekin foydalanuvchi yukini yengillashtirishi mumkin.\n\nO'Learyning ohangi: sanoat qonunsiz ham o'sadi, lekin AQSh kapital bozorlari aniq qoidasiz raqobatda orqada qolishi mumkin. SEC ning innovatsiya ozodligi shu bo'shliqni qisman to'ldiradi.\n\nBozor qisqa muddatda qonun premiumiga emas, stavka va ETF oqimiga qaramoqda. Agar 2027-yilda qayta urinish bo'lsa, tartibga solishga sezgir tokenlar yana oldindan narxlashi mumkin. Manba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/policy/2026/09/17/kevin-o-leary-says-congress-will-revisit-clarity-by-second-quarter-as-crypto-tax-bill-advances",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "sp-global-openzeppelin-sotib-oldi-18-sent",
+    "title": "S&P Global OpenZeppelin ni sotib oldi: tokenlashtirish riski uchun",
+    "summary": "Reyting giganti S&P Global smart-kontrakt xavfsizlik firmasi OpenZeppelin ni sotib oldi. Maqsad tokenlashtirilgan moliya riskini o'lchash.",
+    "body": "CoinDesk Business xabariga kora, reyting agentligi S&P Global smart-kontrakt audit va xavfsizlik platformasi OpenZeppelin ni sotib oldi. Bitim tokenlashtirilgan moliya riskini an'anaviy kredit-reyting infratuzilmasiga bog'lashga qaratilgan.\n\nOpenZeppelin Ethereum ekotizimida kutubxona, audit va himoya vositalari bilan tanilgan. S&P esa korporativ va suveren reytinglarda global standart. Ikkisining birlashuvi onchain aktivlar uchun formal risk bahosini osonlashtirishi mumkin.\n\nBu xabar SEC ning tokenlashtirilgan aksiya ozodligi bilan bir kunga to'g'ri keldi. An'anaviy moliya onchain relsga kirayotganida audit, reyting va sug'urta qatlami zarur. S&P qadami shu bo'shliqni to'ldirish urinishi.\n\nNarx ta'siri to'g'ridan-to'g'ri token emas, balki institutsional ishonch orqali bo'ladi. Agar tokenlashtirilgan fondlar va qimmatli qog'ozlar S&P metodologiyasiga tushsa, pensiya va aktiv-menejerlar uchun kirish osonlashadi.\n\nRisk tomoni: markazlashgan reyting onchain madaniyatiga zid ko'rinishi mumkin. Lekin tartibga solingan RWA oqimi uchun mustaqil baholash talab qilinadi. 2026-yil oxiriga qadar shu yo'nalishdagi qo'shimcha bitimlar kutilishi mumkin. Manba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/business/2026/09/17/ratings-giant-s-and-p-global-acquires-openzeppelin-in-tokenized-finance-risk-push",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+  },
+  {
+    "slug": "eth-2400-ustida-etf-chiqim-18-sent",
+    "title": "Ethereum $2 400 ustida ushlandi: ETF chiqimiga qaramay barqaror",
+    "summary": "ETH $2 450 atrofida 1-1,5 foiz oshdi. Spot ether ETF-lari $224 million chiqardi, lekin kumulativ aktivlar $15 milliard atrofida qolmoqda.",
+    "body": "FXStreet va Benzinga kotirovkalariga ko'ra, Ethereum payshanba kuni $2 450 atrofida savdo qildi. 24 soatlik o'sish taxminan 1,4-1,5 foiz. Fed 25 punktlik oshirishi va $224 million ETF chiqimiga qaramay, token $2 400 sathini saqladi.\n\nSoSoValue: chorshanba kuni ETH fondlari $224 million chiqardi, oldingi kun $141 million. Kumulativ kirim taxminan $13 milliard, sof aktivlar $15 milliard. Bu uzoq muddatli institutsional kanalning hali yopilmaganini ko'rsatadi.\n\nTahlilchilar $2 510 qarshilik va $2 570 yorilish sathini belgilagan. Agar hajm bilan $2 570 oshilsa, $2 700 va $3 000 nishonlari ochilishi mumkin. Qisqa muddatda $2 350-$2 400 zona muhim qo'llab-quvvatlash.\n\nOnchain tomonda yirik hamyonlar dipni sotib olishda davom etgani xabar qilingan. Bitmine Immersion kabi g'azna kompaniyalari ETH zaxirasini oshirgan. Staking va L2 faoliyati narx tuzatishini qisman yumshatadi.\n\nBozor kengligi ijobiy: SOL $101-$103, BNB $720-$750 oralig'ida o'sdi. Lekin ETF oqimi tiklanmasa, ETH ning $2 500 yorilishi kechikishi mumkin. Keyingi sessiya oqimlari yo'nalishni tasdiqlaydi. Manba: FXStreet / Benzinga.",
+    "manba": "Benzinga",
+    "url": "https://www.benzinga.com/crypto/cryptocurrency/26/09/61856481/bitcoin-holds-76000-as-ethereum-xrp-dogecoin-spike-2",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-18",
+    "image": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+  }
+]
