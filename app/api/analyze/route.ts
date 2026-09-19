@@ -64,29 +64,6 @@ async function fetchMarketData(symbol: string, interval: string) {
 }
 
 /**
- * H1 signal uchun H4 filtr: H4 side H1 bilan bir xil bo'lishi shart.
- */
-async function passesHigherTimeframeFilter(
-  symbol: string,
-  interval: string,
-  side: 'BUY' | 'SELL'
-): Promise<boolean> {
-  if (interval !== '1h') return true
-
-  try {
-    const { candles: h4Candles } = await fetchMarketData(symbol, '4h')
-    const h4Closed = h4Candles.length > 1 ? h4Candles.slice(0, -1) : h4Candles
-    if (h4Closed.length < 60) return false
-
-    const h4 = analyze(h4Closed, '4h')
-    return h4.side === side
-  } catch (e) {
-    console.error(`H4 filter failed for ${symbol}:`, e)
-    return false
-  }
-}
-
-/**
  * Telegram + tracker.
  * Avval Redis trackerga yoziladi, keyin Telegram.
  */
@@ -116,9 +93,6 @@ async function notifyTelegramForNewSignal(
   if (current.side === previous.side) {
     return { tracked: false, telegram: false, reason: 'same-side' }
   }
-
-  const htfOk = await passesHigherTimeframeFilter(symbol, interval, current.side)
-  if (!htfOk) return { tracked: false, telegram: false, reason: 'htf-filter' }
 
   const signalTime = closedCandles[closedCandles.length - 1].time
   const timeframe = (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1'
