@@ -89,6 +89,25 @@ export default function SubscribeSection() {
           </a>
         </div>
 
+        <div className="planCard featured nftPlanCard">
+          <div className="planBadge">LIFETIME</div>
+          <div className="planName">GoldenWeb NFT</div>
+          <div className="planPrice">NFT<span> pass</span></div>
+          <ul>
+            <li>Premium uchun lifetime access</li>
+            <li>Wallet ownership orqali avtomatik kirish</li>
+            <li>NFT transfer qilinsa access yangi egaga o‘tadi</li>
+            <li>GoldenWeb NFT kolleksiyasi</li>
+          </ul>
+          <Link
+            href="/nft"
+            className="planBtn"
+            style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}
+          >
+            GoldenWeb NFT olish
+          </Link>
+        </div>
+
         <div className="planCard featured">
           <div className="planBadge">$19/oy</div>
           <div className="planName">Premium</div>
