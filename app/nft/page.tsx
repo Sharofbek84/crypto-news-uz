@@ -5,6 +5,7 @@ import { BrowserProvider, Contract, formatUnits } from 'ethers'
 import { useEffect, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
+import Image from 'next/image'
 
 const ABI = [
   'function mint(uint256 quantity)',
@@ -122,48 +123,81 @@ export default function GoldenWebNFTPage() {
   return (
     <>
       <SiteHeader />
-      <main className="container" style={{ padding: '40px 18px 70px' }}>
-        <section className="nftHero">
-          <div className="nftKicker">GOLDENWEB NFT</div>
-          <h1>GoldenWeb NFT Pass</h1>
-          <p>
-            GoldenWeb NFT egasi bo‘lgan wallet GOLDENWEB.UZ Premium imkoniyatlariga
-            lifetime access oladi. NFT boshqa walletga o‘tsa, Premium huquqi ham yangi egaga o‘tadi.
-          </p>
+      <main className="container" style={{ padding: '28px 18px 70px' }}>
+        <section className="nftLanding">
+          <div className="nftHeroCopy">
+            <div className="nftKicker">LIMITED EDITION</div>
+            <h1><span>GOLDENWEB</span> NFT</h1>
+            <h2>GoldenWeb NFT Pass</h2>
+            <p>
+              GoldenWeb NFT egasi bo‘lgan wallet GOLDENWEB.UZ Premium imkoniyatlariga
+              lifetime access oladi. NFT boshqa walletga o‘tsa, Premium huquqi ham yangi egaga o‘tadi.
+            </p>
 
-          <div className="nftStats">
-            <div><span>Mint narxi</span><strong>{price === '—' ? '—' : `${price} USDT`}</strong></div>
-            <div><span>Qolgan NFT</span><strong>{remaining}</strong></div>
-            <div><span>Sizdagi NFT</span><strong>{owned}</strong></div>
-          </div>
-
-          {!address ? (
-            <button className="planBtn nftMainBtn" onClick={connect} disabled={busy}>
-              {busy ? 'Ulanmoqda...' : 'Wallet ulash'}
-            </button>
-          ) : (
-            <div className="nftMintArea">
-              <div className="nftWallet">{short(address)}</div>
-              <div className="nftQuantity">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-                <strong>{quantity}</strong>
-                <button onClick={() => setQuantity(Math.min(10, quantity + 1))}>+</button>
-              </div>
-              <button className="planBtn nftMainBtn" onClick={mint} disabled={busy}>
-                {busy ? 'Mint qilinmoqda...' : 'GoldenWeb NFT mint qilish'}
-              </button>
+            <div className="nftStats">
+              <div><span>Mint narxi</span><strong>{price === '—' ? '—' : `${price} USDT`}</strong></div>
+              <div><span>Jami supply</span><strong>1,000 NFT</strong></div>
+              <div><span>Qolgan NFT</span><strong>{remaining}</strong></div>
             </div>
-          )}
 
-          {message && <div className="nftMessage">{message}</div>}
+            <div className="nftMintPanel">
+              {!address ? (
+                <button className="planBtn nftMainBtn" onClick={connect} disabled={busy}>
+                  {busy ? 'Ulanmoqda...' : 'Walletni ulash'}
+                </button>
+              ) : (
+                <div className="nftMintArea">
+                  <div className="nftWallet">{short(address)}</div>
+                  <div className="nftQuantity">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+                    <strong>{quantity}</strong>
+                    <button onClick={() => setQuantity(Math.min(10, quantity + 1))}>+</button>
+                  </div>
+                  <button className="planBtn nftMainBtn" onClick={mint} disabled={busy}>
+                    {busy ? 'Mint qilinmoqda...' : 'GoldenWeb NFT mint qilish'}
+                  </button>
+                </div>
+              )}
 
-          <div className="nftBenefits">
-            <div><b>∞</b><span>Lifetime Premium</span></div>
-            <div><b>◆</b><span>On-chain ownership</span></div>
-            <div><b>↗</b><span>Transfer qilinadi</span></div>
+              {message && <div className="nftMessage">{message}</div>}
+            </div>
+
+            <div className="nftBenefits">
+              <div><b>♛</b><span>Lifetime Premium</span></div>
+              <div><b>▣</b><span>Exclusive Analytics</span></div>
+              <div><b>♧</b><span>Traders Community</span></div>
+              <div><b>◆</b><span>Special Opportunities</span></div>
+            </div>
+
+            <div className="nftMintNote">USDT orqali to‘lov · BNB Smart Chain (BSC) · Maksimum 10 NFT / wallet</div>
+            <p className="nftBack"><Link href="/premium">Premium sahifasiga qaytish →</Link></p>
           </div>
 
-          <p className="nftBack"><Link href="/premium">Premium sahifasiga qaytish →</Link></p>
+          <div className="nftVisual">
+            <Image
+              src="/goldenweb-nft-pass.webp"
+              alt="GoldenWeb Traders Club NFT Pass"
+              width={1290}
+              height={1219}
+              priority
+              className="nftPassImage"
+            />
+          </div>
+        </section>
+
+        <section className="nftPriceTimeline">
+          <div>
+            <div className="nftKicker">MINT NARXI O‘SISH JADVALI</div>
+            <p>Har 30 kunda mint narxi 2 baravar oshadi va 640 USDT darajasida barqarorlashadi.</p>
+          </div>
+          <div className="nftPriceSteps">
+            {['10','20','40','80','160','320','640'].map((p, i) => (
+              <div key={p} className={i === 6 ? 'active' : ''}>
+                <small>{i < 6 ? `${i + 1}-oy` : '7-oy va keyin'}</small>
+                <strong>{p} USDT</strong>
+              </div>
+            ))}
+          </div>
         </section>
       </main>
       <SiteFooter />
