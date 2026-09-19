@@ -455,7 +455,7 @@ export default function PremiumAnalyst() {
   const urlSymbol = (searchParams.get('symbol') || '').toUpperCase()
   const initial = coins.includes(urlSymbol) ? urlSymbol : 'BTC'
   const [coin, setCoin] = useState(initial)
-  const [interval, setInterval] = useState('4h')
+  const [interval, setInterval] = useState('1h')
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -508,122 +508,119 @@ export default function PremiumAnalyst() {
           <button onClick={load}>Yangilash</button>
         </div>
       </div>
+
       {loading ? (
-        <div className="homeLoading">Premium grafik yuklanmoqda...</div>
+        <div className="homeLoading">Grafik va tahlil yuklanmoqda...</div>
       ) : error ? (
         <div className="homeLoading error">{error}</div>
-      ) : (
-        r && (
-          <>
-            <div className="homeChartPanel">
-              <CleanChart candles={data.candles} result={r} coin={coin} interval={interval} />
+      ) : r && (
+        <>
+          <div className="homeChartPanel">
+            <CleanChart candles={data.candles} result={r} coin={coin} interval={interval} />
+          </div>
+
+          <div className="proAnalysis">
+            <div className="proCard">
+              <h3>TEXNIK TAHLIL · {tf}</h3>
+              <div className="proRow">
+                <span>TREND</span>
+                <strong className={r.trend === 'BULLISH' ? 'good' : r.trend === 'BEARISH' ? 'bad' : ''}>
+                  {r.trend === 'BULLISH' ? 'Bullish' : r.trend === 'BEARISH' ? 'Bearish' : 'Neytral'}
+                </strong>
+              </div>
+              <div className="proRow">
+                <span>SIGNAL</span>
+                <strong className={r.side === 'SELL' ? 'bad' : 'good'}>{r.side === 'SELL' ? 'SELL' : 'BUY'}</strong>
+              </div>
+              <div className="proRow">
+                <span>RSI (14)</span>
+                <strong>{r.rsi.toFixed(2)}</strong>
+              </div>
+              <p className="proNote">
+                {r.rsi >= 50
+                  ? "RSI 50 dan yuqorida, bu bullish momentumni ko'rsatadi."
+                  : 'RSI 50 dan past, momentum susaygan.'}
+              </p>
+              <div className="proRow">
+                <span>ASOSIY XULOSA</span>
+              </div>
+              <p className="proSummary">{r.summary}</p>
             </div>
-            <div className="proAnalysis">
-              <div className="proCard">
-                <h3>TEXNIK TAHLIL · {tf}</h3>
-                <div className="proRow">
-                  <span>TREND</span>
-                  <strong className={r.trend === 'BULLISH' ? 'good' : r.trend === 'BEARISH' ? 'bad' : ''}>
-                    {r.trend === 'BULLISH' ? 'Bullish' : r.trend === 'BEARISH' ? 'Bearish' : 'Neytral'}
-                  </strong>
-                </div>
-                <div className="proRow">
-                  <span>SIGNAL</span>
-                  <strong className={r.side === 'SELL' ? 'bad' : 'good'}>
-                    {r.signalTone === 'caution'
-                      ? r.side === 'SELL'
-                        ? 'Ehtiyotkor SELL'
-                        : 'Ehtiyotkor BUY'
-                      : r.side === 'SELL'
-                        ? 'SELL'
-                        : 'BUY'}
-                  </strong>
-                </div>
-                <div className="proRow">
-                  <span>RSI (14)</span>
-                  <strong>{r.rsi.toFixed(2)}</strong>
-                </div>
-                <p className="proNote">
-                  {r.rsi >= 50
-                    ? "RSI 50 dan yuqorida, bu bullish momentumni ko'rsatadi."
-                    : 'RSI 50 dan past, momentum susaygan.'}
-                </p>
-                <div className="proRow">
-                  <span>ASOSIY XULOSA</span>
-                </div>
-                <p className="proSummary">{r.summary}</p>
+
+            <div className="proCard">
+              <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
+                <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
+                <strong>
+                  {money$(r.entryLow)} – {money$(r.entryHigh)}
+                </strong>
               </div>
-              <div className="proCard">
-                <div className={`proBox ${r.side === 'SELL' ? 'red' : 'green'}`}>
-                  <b>KIRISH ZONASI ({r.side === 'SELL' ? 'SELL' : 'BUY'})</b>
-                  <strong>
-                    {money$(r.entryLow)} – {money$(r.entryHigh)}
-                  </strong>
-                </div>
-                <div className="proBox red">
-                  <b>STOP LOSS (SL)</b>
-                  <strong>{money$(r.invalidation)}</strong>
-                  <small>
-                    {r.side === 'SELL' ? 'yuqorisida' : 'pastida'} {tf} candle yopilsa
-                  </small>
-                </div>
-                <div className="proBox tp">
-                  <b>TAKE PROFIT (TP)</b>
-                  <div className="tpLine">
-                    <span>TP1</span>
-                    <strong>{money$(r.tp[0])}</strong>
-                  </div>
-                  <div className="tpLine">
-                    <span>TP2</span>
-                    <strong>{money$(r.tp[1])}</strong>
-                  </div>
-                  <div className="tpLine">
-                    <span>TP3</span>
-                    <strong>{money$(r.tp[2])}</strong>
-                  </div>
-                </div>
+              <div className="proBox red">
+                <b>STOP LOSS (SL)</b>
+                <strong>{money$(r.invalidation)}</strong>
+                <small>
+                  {r.side === 'SELL' ? 'yuqorisida' : 'pastida'} {tf} candle yopilsa
+                </small>
               </div>
-              <div className="proCard bullCard">
-                <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
-                <p>{r.bullish}</p>
-                <div className="levelPath greenPath">
-                  {r.side === 'SELL' ? (
-                    <>
-                      {money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}
-                    </>
-                  ) : (
-                    <>
-                      {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
-                    </>
-                  )}
+              <div className="proBox tp">
+                <b>TAKE PROFIT (TP)</b>
+                <div className="tpLine">
+                  <span>TP1</span>
+                  <strong>{money$(r.tp[0])}</strong>
                 </div>
-              </div>
-              <div className="proCard bearCard">
-                <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
-                <p>{r.bearish}</p>
-                <div className="levelPath redPath">
-                  {r.side === 'SELL' ? (
-                    <>
-                      {money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}
-                    </>
-                  ) : (
-                    <>
-                      {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
-                    </>
-                  )}
+                <div className="tpLine">
+                  <span>TP2</span>
+                  <strong>{money$(r.tp[1])}</strong>
+                </div>
+                <div className="tpLine">
+                  <span>TP3</span>
+                  <strong>{money$(r.tp[2])}</strong>
                 </div>
               </div>
             </div>
-            <p className="homeDisclaimer">
-              Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz
-              tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat
-              yuqotishga tayyor bo'lgan pulingiz bilan kiring.
-            </p>
-            <CryptoAnalystAI analysis={r} coin={coin} interval={interval} />
-          </>
-        )
+
+            <div className="proCard bullCard">
+              <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
+              <p>{r.bullish}</p>
+              <div className="levelPath greenPath">
+                {r.side === 'SELL' ? (
+                  <>
+                    {money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}
+                  </>
+                ) : (
+                  <>
+                    {money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="proCard bearCard">
+              <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
+              <p>{r.bearish}</p>
+              <div className="levelPath redPath">
+                {r.side === 'SELL' ? (
+                  <>
+                    {money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}
+                  </>
+                ) : (
+                  <>
+                    {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <SignalStatsPanel />
+          <CryptoAnalystAI symbol={coin} interval={interval} />
+
+          <p className="homeDisclaimer">
+            Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz tahlil
+            qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat yuqotishga tayyor
+            bo'lgan pulingiz bilan kiring.
+          </p>
+        </>
       )}
-      <SignalStatsPanel />
     </section>
   )
 }
