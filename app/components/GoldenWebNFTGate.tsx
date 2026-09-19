@@ -16,7 +16,7 @@ async function readOwnership(address: string) {
       const provider = new JsonRpcProvider(NFT_RPC_URL)
       const contract = new Contract(NFT_CONTRACT, NFT_ABI, provider)
       const balance = await contract.balanceOf(address)
-      return balance > 0n
+      return balance > BigInt(0)
     }
 
     if (typeof window !== 'undefined' && (window as any).ethereum) {
@@ -25,7 +25,7 @@ async function readOwnership(address: string) {
       if (Number(network.chainId) !== NFT_CHAIN_ID) return false
       const contract = new Contract(NFT_CONTRACT, NFT_ABI, provider)
       const balance = await contract.balanceOf(address)
-      return balance > 0n
+      return balance > BigInt(0)
     }
   } catch {
     return false
