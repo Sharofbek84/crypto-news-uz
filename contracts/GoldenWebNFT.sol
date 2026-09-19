@@ -17,14 +17,12 @@ contract GoldenWebNFT is ERC721, Ownable {
     IERC20 public immutable usdt;
     uint256 public immutable maxSupply;
     uint256 public immutable launchTimestamp;
-    uint256 public mintPrice;
     uint256 public maxPerWallet;
     uint256 private _nextTokenId = 1;
     string private _baseTokenURI;
 
     mapping(address => uint256) public mintedByWallet;
 
-    event MintPriceUpdated(uint256 newPrice);
     event BaseURIUpdated(string newBaseURI);
     event MaxPerWalletUpdated(uint256 newMaxPerWallet);
 
@@ -45,7 +43,6 @@ contract GoldenWebNFT is ERC721, Ownable {
         maxPerWallet = maxPerWallet_;
         launchTimestamp = launchTimestamp_ == 0 ? block.timestamp : launchTimestamp_;
         _baseTokenURI = baseTokenURI_;
-        mintPrice = 10 * 10 ** 6; // 10 USDT, assuming 6-decimal BSC USDT
     }
 
     function mint(uint256 quantity) external {
@@ -54,7 +51,7 @@ contract GoldenWebNFT is ERC721, Ownable {
         require(totalSupply() + quantity <= maxSupply, "Sold out");
         require(mintedByWallet[msg.sender] + quantity <= maxPerWallet, "Wallet limit");
 
-        uint256 totalCost = mintPrice * quantity;
+        uint256 totalCost = mintPrice() * quantity;
         usdt.safeTransferFrom(msg.sender, address(this), totalCost);
 
         mintedByWallet[msg.sender] += quantity;
@@ -69,7 +66,7 @@ contract GoldenWebNFT is ERC721, Ownable {
         return (block.timestamp - launchTimestamp) / 30 days;
     }
 
-    function currentMintPrice() public view returns (uint256) {
+    function mintPrice() public view returns (uint256) {
         uint256 monthIndex = currentMonth();
         if (monthIndex >= 6) return 640 * 10 ** 6;
         return (10 * 10 ** 6) * (2 ** monthIndex);
@@ -83,11 +80,6 @@ contract GoldenWebNFT is ERC721, Ownable {
         return maxSupply - totalSupply();
     }
 
-    function setMintPrice(uint256 newPrice) external onlyOwner {
-        mintPrice = newPrice;
-        emit MintPriceUpdated(newPrice);
-    }
-
     function setMaxPerWallet(uint256 newMaxPerWallet) external onlyOwner {
         require(newMaxPerWallet > 0 && newMaxPerWallet <= 10, "Invalid wallet limit");
         maxPerWallet = newMaxPerWallet;
@@ -97,11 +89,6 @@ contract GoldenWebNFT is ERC721, Ownable {
     function setBaseURI(string calldata newBaseURI) external onlyOwner {
         _baseTokenURI = newBaseURI;
         emit BaseURIUpdated(newBaseURI);
-    }
-
-    function syncMintPrice() public {
-        mintPrice = currentMintPrice();
-        emit MintPriceUpdated(mintPrice);
     }
 
     function _baseURI() internal view override returns (string memory) {
