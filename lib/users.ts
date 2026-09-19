@@ -133,6 +133,17 @@ export async function activatePremium(email: string, days = 30): Promise<PublicU
   return pub
 }
 
+export async function activateLifetimePremium(email: string): Promise<PublicUser | null> {
+  const user = await findUserByEmail(email)
+  if (!user) return null
+  user.plan = 'premium'
+  user.subscriptionStatus = 'active'
+  user.subscriptionEndsAt = null // lifetime — no end date
+  await saveUser(user)
+  const { passwordHash: _, ...pub } = user
+  return pub
+}
+
 export async function cancelPremium(email: string): Promise<PublicUser | null> {
   const user = await findUserByEmail(email)
   if (!user) return null
