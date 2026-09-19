@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import PremiumAnalyst from '../components/PremiumAnalyst'
 import TelegramPremiumButton from '../components/TelegramPremiumButton'
+import GoldenWebNFTGate from '../components/GoldenWebNFTGate'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 
@@ -10,40 +11,25 @@ export const metadata: Metadata = {
   title: 'Premium texnik tahlil',
   description:
     'GOLDENWEB.UZ Premium: kengaytirilgan kripto texnik tahlil, RSI divergensiya, Entry · TP · SL va AI yordamchi.',
-  alternates: {
-    canonical: '/premium',
-  },
+  alternates: { canonical: '/premium' },
   openGraph: {
     title: 'Premium texnik tahlil | GOLDENWEB.UZ',
-    description:
-      'Kengaytirilgan kripto texnik tahlil, RSI divergensiya va savdo darajalari.',
+    description: 'Kengaytirilgan kripto texnik tahlil, RSI divergensiya va savdo darajalari.',
     url: '/premium',
     type: 'website',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 }
 
-/** Premium: 16 ta — Home + XAUT, XRP, XLM, BCH, LINK, AVAX */
 const PREMIUM_COINS: { symbol: string; geckoId: string }[] = [
-  { symbol: 'BTC', geckoId: 'bitcoin' },
-  { symbol: 'ETH', geckoId: 'ethereum' },
-  { symbol: 'LTC', geckoId: 'litecoin' },
-  { symbol: 'SOL', geckoId: 'solana' },
-  { symbol: 'BNB', geckoId: 'binancecoin' },
-  { symbol: 'NEAR', geckoId: 'near' },
-  { symbol: 'GRAM', geckoId: 'the-open-network' },
-  { symbol: 'SUI', geckoId: 'sui' },
-  { symbol: 'APT', geckoId: 'aptos' },
-  { symbol: 'ATOM', geckoId: 'cosmos' },
-  { symbol: 'XAUT', geckoId: 'tether-gold' },
-  { symbol: 'XRP', geckoId: 'ripple' },
-  { symbol: 'XLM', geckoId: 'stellar' },
-  { symbol: 'BCH', geckoId: 'bitcoin-cash' },
-  { symbol: 'LINK', geckoId: 'chainlink' },
-  { symbol: 'AVAX', geckoId: 'avalanche-2' },
+  { symbol: 'BTC', geckoId: 'bitcoin' }, { symbol: 'ETH', geckoId: 'ethereum' },
+  { symbol: 'LTC', geckoId: 'litecoin' }, { symbol: 'SOL', geckoId: 'solana' },
+  { symbol: 'BNB', geckoId: 'binancecoin' }, { symbol: 'NEAR', geckoId: 'near' },
+  { symbol: 'GRAM', geckoId: 'the-open-network' }, { symbol: 'SUI', geckoId: 'sui' },
+  { symbol: 'APT', geckoId: 'aptos' }, { symbol: 'ATOM', geckoId: 'cosmos' },
+  { symbol: 'XAUT', geckoId: 'tether-gold' }, { symbol: 'XRP', geckoId: 'ripple' },
+  { symbol: 'XLM', geckoId: 'stellar' }, { symbol: 'BCH', geckoId: 'bitcoin-cash' },
+  { symbol: 'LINK', geckoId: 'chainlink' }, { symbol: 'AVAX', geckoId: 'avalanche-2' },
 ]
 
 async function getPrices(coins: { symbol: string; geckoId: string }[]) {
@@ -59,16 +45,10 @@ async function getPrices(coins: { symbol: string; geckoId: string }[]) {
     const byId = new Map(data.map((c: any) => [c.id, c]))
     return coins.map(({ symbol, geckoId }) => {
       const c = byId.get(geckoId)
-      if (!c)
-        return {
-          id: geckoId,
-          symbol,
-          name: symbol,
-          image: '',
-          current_price: null,
-          price_change_percentage_24h: null,
-        }
-      return { ...c, symbol }
+      return c ? { ...c, symbol } : {
+        id: geckoId, symbol, name: symbol, image: '', current_price: null,
+        price_change_percentage_24h: null,
+      }
     })
   } catch {
     return []
@@ -96,17 +76,10 @@ export default async function PremiumPage() {
             ) : (
               <div className="priceSidebarList">
                 {prices.map((c: any) => (
-                  <Link
-                    key={c.symbol}
-                    href={`/premium?symbol=${c.symbol}`}
-                    className="priceRow"
-                    title={`${c.symbol} premium tahlilini ochish`}
-                  >
-                    {c.image ? (
-                      <img src={c.image} alt={c.name} width={28} height={28} />
-                    ) : (
-                      <div className="coinPlaceholder sm">{c.symbol.slice(0, 2)}</div>
-                    )}
+                  <Link key={c.symbol} href={`/premium?symbol=${c.symbol}`} className="priceRow"
+                    title={`${c.symbol} premium tahlilini ochish`}>
+                    {c.image ? <img src={c.image} alt={c.name} width={28} height={28} /> :
+                      <div className="coinPlaceholder sm">{c.symbol.slice(0, 2)}</div>}
                     <div className="priceRowMain">
                       <span className="priceRowSym">{c.symbol}</span>
                       <span className="priceRowName">{c.name}</span>
@@ -125,10 +98,12 @@ export default async function PremiumPage() {
           </aside>
 
           <div className="homeMain">
-            <Suspense fallback={<div className="homeLoading">Premium tahlil yuklanmoqda...</div>}>
-              <PremiumAnalyst />
-            </Suspense>
-            <TelegramPremiumButton />
+            <GoldenWebNFTGate>
+              <Suspense fallback={<div className="homeLoading">Premium tahlil yuklanmoqda...</div>}>
+                <PremiumAnalyst />
+              </Suspense>
+              <TelegramPremiumButton />
+            </GoldenWebNFTGate>
           </div>
         </div>
       </main>
