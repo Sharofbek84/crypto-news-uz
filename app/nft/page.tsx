@@ -175,7 +175,7 @@ export default function GoldenWebNFTPage() {
 
           <div className="nftVisual">
             <Image
-              src="/goldenweb-nft-pass.webp"
+              src="/goldenweb-nft-pass.jpg"
               alt="GoldenWeb Traders Club NFT Pass"
               width={1290}
               height={1219}
