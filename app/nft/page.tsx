@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { BrowserProvider, Contract, formatUnits } from 'ethers'
 import { useEffect, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
+import { NFT_PASS_B64 } from '../../lib/nft-pass-b64'
 import {
   NFT_ABI,
   NFT_CHAIN_ID,
@@ -208,12 +208,12 @@ export default function GoldenWebNFTPage() {
           </div>
 
           <div className="nftVisual">
-            <Image
-              src="/goldenweb-nft-pass.jpg"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`data:image/jpeg;base64,${NFT_PASS_B64}`}
               alt="GoldenWeb Traders Club NFT Pass"
-              width={1290}
-              height={1219}
-              priority
+              width={560}
+              height={529}
               className="nftPassImage"
             />
           </div>
