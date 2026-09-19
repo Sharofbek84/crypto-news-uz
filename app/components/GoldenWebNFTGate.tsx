@@ -2,34 +2,33 @@
 
 import { BrowserProvider, Contract, JsonRpcProvider } from 'ethers'
 import { useEffect, useState } from 'react'
-
-const ABI = ['function balanceOf(address owner) view returns (uint256)']
-
-const CHAIN_ID = Number(process.env.NEXT_PUBLIC_GOLDENWEB_CHAIN_ID || '84532')
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GOLDENWEB_NFT_CONTRACT || ''
+import { NFT_ABI, NFT_CHAIN_ID, NFT_CHAIN_NAME, NFT_CONTRACT, NFT_RPC_URL } from '../../lib/nft-config'
 
 function shortAddress(address: string) {
   return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''
 }
 
 async function readOwnership(address: string) {
-  if (!CONTRACT_ADDRESS) return false
+  if (!NFT_CONTRACT) return false
 
-  const rpc = process.env.NEXT_PUBLIC_GOLDENWEB_RPC_URL
-  if (rpc) {
-    const provider = new JsonRpcProvider(rpc)
-    const contract = new Contract(CONTRACT_ADDRESS, ABI, provider)
-    const balance = await contract.balanceOf(address)
-    return balance > 0n
-  }
+  try {
+    if (NFT_RPC_URL) {
+      const provider = new JsonRpcProvider(NFT_RPC_URL)
+      const contract = new Contract(NFT_CONTRACT, NFT_ABI, provider)
+      const balance = await contract.balanceOf(address)
+      return balance > 0n
+    }
 
-  if (typeof window !== 'undefined' && (window as any).ethereum) {
-    const provider = new BrowserProvider((window as any).ethereum)
-    const network = await provider.getNetwork()
-    if (Number(network.chainId) !== CHAIN_ID) return false
-    const contract = new Contract(CONTRACT_ADDRESS, ABI, provider)
-    const balance = await contract.balanceOf(address)
-    return balance > 0n
+    if (typeof window !== 'undefined' && (window as any).ethereum) {
+      const provider = new BrowserProvider((window as any).ethereum)
+      const network = await provider.getNetwork()
+      if (Number(network.chainId) !== NFT_CHAIN_ID) return false
+      const contract = new Contract(NFT_CONTRACT, NFT_ABI, provider)
+      const balance = await contract.balanceOf(address)
+      return balance > 0n
+    }
+  } catch {
+    return false
   }
 
   return false
@@ -53,15 +52,26 @@ export default function GoldenWebNFTGate({ children }: { children: React.ReactNo
       const accounts = await provider.send('eth_requestAccounts', [])
       const wallet = accounts[0]
       const network = await provider.getNetwork()
-      const chainId = Number(network.chainId)
-      setAddress(wallet)
-      setWrongNetwork(chainId !== CHAIN_ID)
+      let chainId = Number(network.chainId)
 
-      if (chainId === CHAIN_ID) {
-        setHasNFT(await readOwnership(wallet))
-      } else {
-        setHasNFT(false)
+      if (chainId !== NFT_CHAIN_ID) {
+        try {
+          await (window as any).ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x' + NFT_CHAIN_ID.toString(16) }],
+          })
+          chainId = NFT_CHAIN_ID
+        } catch {
+          setAddress(wallet)
+          setWrongNetwork(true)
+          setHasNFT(false)
+          return
+        }
       }
+
+      setAddress(wallet)
+      setWrongNetwork(false)
+      setHasNFT(await readOwnership(wallet))
     } catch {
       setHasNFT(false)
     } finally {
@@ -70,7 +80,7 @@ export default function GoldenWebNFTGate({ children }: { children: React.ReactNo
   }
 
   useEffect(() => {
-    if (!CONTRACT_ADDRESS) return
+    if (!NFT_CONTRACT) return
     const ethereum = (window as any).ethereum
     if (!ethereum) return
 
@@ -91,7 +101,7 @@ export default function GoldenWebNFTGate({ children }: { children: React.ReactNo
     }
   }, [])
 
-  if (!CONTRACT_ADDRESS) {
+  if (!NFT_CONTRACT) {
     return (
       <section className="nftGate">
         <div className="nftGateIcon">◆</div>
@@ -120,9 +130,12 @@ export default function GoldenWebNFTGate({ children }: { children: React.ReactNo
       <section className="nftGate">
         <div className="nftGateIcon">!</div>
         <h2>Noto‘g‘ri network</h2>
-        <p>Walletni GoldenWeb NFT uchun sozlangan networkka o‘tkazing.</p>
-        <button className="planBtn" onClick={connect}>Qayta tekshirish</button>
-        <small>Chain ID: {CHAIN_ID}</small>
+        <p>
+          Walletni {NFT_CHAIN_NAME} ga o‘tkazing (Chain ID: {NFT_CHAIN_ID}).
+        </p>
+        <button className="planBtn" onClick={connect}>
+          Qayta tekshirish
+        </button>
       </section>
     )
   }
@@ -133,7 +146,9 @@ export default function GoldenWebNFTGate({ children }: { children: React.ReactNo
         <div className="nftGateIcon">◆</div>
         <h2>GoldenWeb NFT talab qilinadi</h2>
         <p>{shortAddress(address)} walletida GoldenWeb NFT topilmadi.</p>
-        <a href="/nft" className="planBtn nftGateLink">GoldenWeb NFT olish</a>
+        <a href="/nft" className="planBtn nftGateLink">
+          GoldenWeb NFT olish
+        </a>
       </section>
     )
   }
