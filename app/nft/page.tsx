@@ -1,13 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { BrowserProvider, Contract, formatEther, parseEther } from 'ethers'
+import { BrowserProvider, Contract, formatUnits } from 'ethers'
 import { useEffect, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 
 const ABI = [
-  'function mint(uint256 quantity) payable',
+  'function mint(uint256 quantity)',
   'function mintPrice() view returns (uint256)',
   'function maxSupply() view returns (uint256)',
   'function totalSupply() view returns (uint256)',
@@ -16,9 +16,15 @@ const ABI = [
   'function balanceOf(address) view returns (uint256)',
 ]
 
+const USDT_ABI = [
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function approve(address spender, uint256 amount) returns (bool)',
+]
+
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GOLDENWEB_NFT_CONTRACT || ''
-const CHAIN_ID = Number(process.env.NEXT_PUBLIC_GOLDENWEB_CHAIN_ID || '84532')
-const CHAIN_NAME = process.env.NEXT_PUBLIC_GOLDENWEB_CHAIN_NAME || 'Base Sepolia'
+const USDT_ADDRESS = process.env.NEXT_PUBLIC_GOLDENWEB_USDT_CONTRACT || '0x55d398326f99059fF775485246999027B3197955'
+const CHAIN_ID = Number(process.env.NEXT_PUBLIC_GOLDENWEB_CHAIN_ID || '56')
+const CHAIN_NAME = process.env.NEXT_PUBLIC_GOLDENWEB_CHAIN_NAME || 'BNB Smart Chain'
 
 function short(address: string) {
   return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''
@@ -38,7 +44,7 @@ export default function GoldenWebNFTPage() {
     const provider = new BrowserProvider((window as any).ethereum)
     const contract = new Contract(CONTRACT_ADDRESS, ABI, provider)
     const [p, left] = await Promise.all([contract.mintPrice(), contract.remainingSupply()])
-    setPrice(formatEther(p))
+    setPrice(formatUnits(p, 6))
     setRemaining(left.toString())
     if (wallet) {
       const balance = await contract.balanceOf(wallet)
@@ -89,7 +95,14 @@ export default function GoldenWebNFTPage() {
       const contract = new Contract(CONTRACT_ADDRESS, ABI, signer)
       const mintPrice = await contract.mintPrice()
       const total = mintPrice * BigInt(quantity)
-      const tx = await contract.mint(quantity, { value: total })
+      const usdt = new Contract(USDT_ADDRESS, USDT_ABI, signer)
+      const allowance = await usdt.allowance(address, CONTRACT_ADDRESS)
+      if (allowance < total) {
+        setMessage('USDT sarflashiga ruxsat berilmoqda...')
+        const approval = await usdt.approve(CONTRACT_ADDRESS, total)
+        await approval.wait()
+      }
+      const tx = await contract.mint(quantity)
       setMessage('Transaction yuborildi. Blockchain tasdiqlanishi kutilmoqda...')
       await tx.wait()
       setMessage('Tabriklaymiz! GoldenWeb NFT muvaffaqiyatli olindi.')
@@ -119,7 +132,7 @@ export default function GoldenWebNFTPage() {
           </p>
 
           <div className="nftStats">
-            <div><span>Mint narxi</span><strong>{price === '—' ? '—' : `${price} ETH`}</strong></div>
+            <div><span>Mint narxi</span><strong>{price === '—' ? '—' : `${price} USDT`}</strong></div>
             <div><span>Qolgan NFT</span><strong>{remaining}</strong></div>
             <div><span>Sizdagi NFT</span><strong>{owned}</strong></div>
           </div>
@@ -134,7 +147,7 @@ export default function GoldenWebNFTPage() {
               <div className="nftQuantity">
                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
                 <strong>{quantity}</strong>
-                <button onClick={() => setQuantity(Math.min(5, quantity + 1))}>+</button>
+                <button onClick={() => setQuantity(Math.min(10, quantity + 1))}>+</button>
               </div>
               <button className="planBtn nftMainBtn" onClick={mint} disabled={busy}>
                 {busy ? 'Mint qilinmoqda...' : 'GoldenWeb NFT mint qilish'}
