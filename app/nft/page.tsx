@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { BrowserProvider, Contract, formatUnits, JsonRpcProvider } from 'ethers'
+import { BrowserProvider, Contract, formatUnits, JsonRpcProvider, type Provider } from 'ethers'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
@@ -43,16 +43,16 @@ export default function GoldenWebNFTPage() {
   const sessionRef = useRef<ConnectResult | null>(null)
   const unsubRef = useRef<(() => void) | null>(null)
 
-  const loadStats = useCallback(async (wallet?: string, provider?: ConnectResult['provider']) => {
+  const loadStats = useCallback(async (wallet?: string, provider?: Provider) => {
     if (!NFT_CONTRACT) return
     try {
-      let p = provider || sessionRef.current?.provider
+      let p: Provider | null = provider || sessionRef.current?.provider || null
       if (!p) {
-        p = NFT_RPC_URL
-          ? new JsonRpcProvider(NFT_RPC_URL)
-          : typeof window !== 'undefined' && (window as any).ethereum
-            ? new BrowserProvider((window as any).ethereum)
-            : null
+        if (NFT_RPC_URL) {
+          p = new JsonRpcProvider(NFT_RPC_URL)
+        } else if (typeof window !== 'undefined' && (window as any).ethereum) {
+          p = new BrowserProvider((window as any).ethereum)
+        }
       }
       if (!p) return
       const contract = new Contract(NFT_CONTRACT, NFT_ABI, p)
