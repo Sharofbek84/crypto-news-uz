@@ -373,8 +373,8 @@ function KabinetContent() {
           GoldenWeb NFT · Lifetime Premium
         </h2>
         <p style={{ color: '#9aa7b8', fontSize: 14, marginBottom: 14, lineHeight: 1.55 }}>
-          NFT qo‘shimcha imkoniyat. GoldenWeb NFT mint qilgandan so‘ng shu yerda walletni ulab
-          Lifetime Premium ni yoqing. Oddiy oylik Premium obuna o‘z holicha ishlayveradi.
+          Agar siz Goldenweb NFT egasi bo‘lsangiz, shu yerda walletingizni ulab, Lifetime Premiumni
+          yoqing va Premium imkoniyatlardan cheksiz foydalaning.
         </p>
 
         {/* Ulangan wallet holati */}
