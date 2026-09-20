@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Contract, formatUnits } from 'ethers'
+import { BrowserProvider, Contract, formatUnits } from 'ethers'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
@@ -42,13 +42,10 @@ export default function GoldenWebNFTPage() {
   const loadStats = useCallback(async (wallet?: string, provider?: ConnectResult['provider']) => {
     if (!NFT_CONTRACT) return
     try {
-      const p =
-        provider ||
-        sessionRef.current?.provider ||
-        (hasInjectedWallet()
-          ? (await import('ethers')).BrowserProvider &&
-            new (await import('ethers')).BrowserProvider((window as any).ethereum)
-          : null)
+      let p = provider || sessionRef.current?.provider
+      if (!p && typeof window !== 'undefined' && (window as any).ethereum) {
+        p = new BrowserProvider((window as any).ethereum)
+      }
       if (!p) return
       const contract = new Contract(NFT_CONTRACT, NFT_ABI, p)
       const [mintP, left] = await Promise.all([contract.mintPrice(), contract.remainingSupply()])
@@ -85,7 +82,6 @@ export default function GoldenWebNFTPage() {
           }
         },
         onChain: () => {
-          // chain o‘zgarsa qayta tekshiramiz
           loadStats(sessionRef.current?.address, sessionRef.current?.provider)
         },
         onDisconnect: () => {
@@ -99,7 +95,6 @@ export default function GoldenWebNFTPage() {
     [loadStats]
   )
 
-  // Sahifa yuklanganda avtomatik tiklash
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -113,7 +108,6 @@ export default function GoldenWebNFTPage() {
     }
   }, [applySession])
 
-  // Public stats (walletsiz)
   useEffect(() => {
     if (!NFT_CONTRACT) return
     loadStats().catch(() => {})
@@ -266,9 +260,13 @@ export default function GoldenWebNFTPage() {
                     Uzish
                   </button>
                   <div className="nftQuantity">
-                    <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+                    <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+                      −
+                    </button>
                     <strong>{quantity}</strong>
-                    <button type="button" onClick={() => setQuantity(Math.min(10, quantity + 1))}>+</button>
+                    <button type="button" onClick={() => setQuantity(Math.min(10, quantity + 1))}>
+                      +
+                    </button>
                   </div>
                   <button className="planBtn nftMainBtn" onClick={mint} disabled={busy}>
                     {busy ? 'Mint qilinmoqda...' : 'GoldenWeb NFT mint qilish'}
