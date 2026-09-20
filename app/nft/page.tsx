@@ -208,19 +208,16 @@ export default function GoldenWebNFTPage() {
             <h1 className="nftTitle">GOLDENWEB NFT</h1>
             <h2 className="nftSubtitle">Erta foydalanuvchilar uchun eksklyuziv imkoniyat!</h2>
             <div className="nftIntro">
-              <p>Ushbu Goldenweb NFT passport egasi quyidagi imkoniyatlarga ega bo‘ladi:</p>
+              <p>Ushbu Goldenweb NFT egasi quyidagi imkoniyatlarga ega bo‘ladi:</p>
               <ul>
                 <li>Goldenweb.uz Premium imkoniyatlaridan cheksiz foydalanish;</li>
-                <li>Goldenweb Traderlar Clubi a’zosi bo‘lish;</li>
-                <li>
-                  2027 yil Q2 da o‘tkazilishi rejalashtirilgan $GWEB token airdropida davogarlik qilish.
-                  (Har bir Goldenweb NFT uchun 100K $GWEB dan taqsimlanadi.);
-                </li>
-                <li>
-                  Goldenweb NFT qiymati har oyda 100% ga o‘sib boradi va dastlabki 7 oy ichida NFT
-                  sotuvlaridan 64X gacha foyda qilishingiz mumkin.
-                </li>
+                <li>Goldenweb Traderlar Clubi VIP guruhi a’zosi bo‘lish;</li>
+                <li>NFT dan foydalanish huquqini mustaqil boshqarish.</li>
               </ul>
+              <p className="nftIntroNote">
+                Goldenweb NFT qiymati har oyda ikki barobarga o‘sib boradi, shunday ekan, uni dastlabki
+                oylarda discount narxlarda mint qilish imkoniyatini o‘tkazib yubormang!
+              </p>
             </div>
 
             <div className="nftStats">
