@@ -4,6 +4,7 @@ import PwaRegister from './components/PwaRegister'
 import './globals.css'
 import './news-images.css'
 import './price-sidebar.css'
+import './goldenweb-nft.css'
 
 const SITE_URL = 'https://goldenweb.uz'
 const SITE_NAME = 'GOLDENWEB.UZ'
