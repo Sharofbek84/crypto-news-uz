@@ -1,4 +1,4 @@
-/* GoldenWeb NFT extra — connect / disconnect / price schedule */
+/* GoldenWeb NFT extra — connect / disconnect / price schedule / copy */
 .nftConnectStack{display:flex;flex-direction:column;gap:10px;max-width:360px}
 .nftConnectStack .planBtn{width:100%}
 .nftWcBtn{background:#1a2430!important;color:#e6edf3!important;border:1px solid #2a3648!important}
@@ -9,7 +9,47 @@
 .nftMintArea .nftDisconnect{flex-shrink:0}
 .nftPriceRange{display:block;margin-top:4px;font-size:.72rem;color:#8492a2;font-weight:500;line-height:1.3}
 .nftPriceSteps .active .nftPriceRange{color:rgba(11,15,20,.75)}
+
+/* Smaller main title */
+.nftHeroCopy h1.nftTitle,
+.nftHeroCopy h1{
+  font-size:clamp(1.85rem,3.6vw,2.75rem)!important;
+  line-height:1.05!important;
+  letter-spacing:-0.8px!important;
+  margin:8px 0 14px!important;
+}
+.nftHeroCopy h1.nftTitle span{
+  display:inline!important;
+}
+
+/* New intro copy */
+.nftIntro{
+  color:#aeb9c6;
+  line-height:1.65;
+  max-width:620px;
+  margin-bottom:8px;
+  font-size:.95rem;
+}
+.nftIntro p{margin:0 0 10px}
+.nftIntro p strong{color:#e6edf3;font-weight:700}
+.nftIntro ul{
+  margin:0 0 12px;
+  padding-left:18px;
+  list-style:disc;
+}
+.nftIntro li{
+  margin-bottom:8px;
+  color:#b0bcc9;
+}
+.nftIntroNote{
+  margin:0!important;
+  font-size:.88rem;
+  color:#9aa7b8!important;
+}
+
 @media(max-width:600px){
   .nftConnectStack{max-width:none}
   .nftMintArea .nftDisconnect{width:100%}
+  .nftHeroCopy h1.nftTitle,
+  .nftHeroCopy h1{font-size:1.7rem!important}
 }
