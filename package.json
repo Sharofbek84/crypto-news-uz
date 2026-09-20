@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@upstash/redis": "^1.35.3",
+    "@walletconnect/ethereum-provider": "^2.21.1",
     "bcryptjs": "^2.4.3",
     "ethers": "^6.15.0",
     "next": "14.2.5",

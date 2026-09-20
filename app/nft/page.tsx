@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { BrowserProvider, Contract, formatUnits } from 'ethers'
-import { useEffect, useState } from 'react'
+import { Contract, formatUnits } from 'ethers'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 import {
@@ -16,10 +16,16 @@ import {
   USDT_CONTRACT,
   USDT_DECIMALS,
 } from '../../lib/nft-config'
-
-function short(address: string) {
-  return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''
-}
+import {
+  connectWallet,
+  disconnectWallet,
+  hasInjectedWallet,
+  hasWalletConnectConfig,
+  shortAddress,
+  subscribeWalletEvents,
+  tryRestoreWallet,
+  type ConnectResult,
+} from '../../lib/wallet-client'
 
 export default function GoldenWebNFTPage() {
   const [address, setAddress] = useState('')
@@ -29,52 +35,100 @@ export default function GoldenWebNFTPage() {
   const [quantity, setQuantity] = useState(1)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [method, setMethod] = useState('')
+  const sessionRef = useRef<ConnectResult | null>(null)
+  const unsubRef = useRef<(() => void) | null>(null)
 
-  async function loadStats(wallet?: string) {
-    if (!NFT_CONTRACT || !(window as any).ethereum) return
-    const provider = new BrowserProvider((window as any).ethereum)
-    const contract = new Contract(NFT_CONTRACT, NFT_ABI, provider)
-    const [p, left] = await Promise.all([contract.mintPrice(), contract.remainingSupply()])
-    setPrice(formatUnits(p, USDT_DECIMALS))
-    setRemaining(left.toString())
-    if (wallet) {
-      const balance = await contract.balanceOf(wallet)
-      setOwned(balance.toString())
+  const loadStats = useCallback(async (wallet?: string, provider?: ConnectResult['provider']) => {
+    if (!NFT_CONTRACT) return
+    try {
+      const p =
+        provider ||
+        sessionRef.current?.provider ||
+        (hasInjectedWallet()
+          ? (await import('ethers')).BrowserProvider &&
+            new (await import('ethers')).BrowserProvider((window as any).ethereum)
+          : null)
+      if (!p) return
+      const contract = new Contract(NFT_CONTRACT, NFT_ABI, p)
+      const [mintP, left] = await Promise.all([contract.mintPrice(), contract.remainingSupply()])
+      setPrice(formatUnits(mintP, USDT_DECIMALS))
+      setRemaining(left.toString())
+      if (wallet) {
+        const balance = await contract.balanceOf(wallet)
+        setOwned(balance.toString())
+      }
+    } catch {
+      /* RPC xatosi — silent */
     }
-  }
+  }, [])
 
-  async function connect() {
+  const applySession = useCallback(
+    async (session: ConnectResult) => {
+      sessionRef.current = session
+      setAddress(session.address)
+      setMethod(session.method)
+      setMessage('')
+      await loadStats(session.address, session.provider)
+
+      unsubRef.current?.()
+      unsubRef.current = subscribeWalletEvents(session.eip1193, {
+        onAccounts: (accounts) => {
+          if (!accounts?.[0]) {
+            setAddress('')
+            setMethod('')
+            sessionRef.current = null
+            setOwned('0')
+          } else {
+            setAddress(accounts[0])
+            loadStats(accounts[0], session.provider)
+          }
+        },
+        onChain: () => {
+          // chain o‘zgarsa qayta tekshiramiz
+          loadStats(sessionRef.current?.address, sessionRef.current?.provider)
+        },
+        onDisconnect: () => {
+          setAddress('')
+          setMethod('')
+          sessionRef.current = null
+          setOwned('0')
+        },
+      })
+    },
+    [loadStats]
+  )
+
+  // Sahifa yuklanganda avtomatik tiklash
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const restored = await tryRestoreWallet()
+      if (cancelled || !restored) return
+      await applySession(restored)
+    })()
+    return () => {
+      cancelled = true
+      unsubRef.current?.()
+    }
+  }, [applySession])
+
+  // Public stats (walletsiz)
+  useEffect(() => {
+    if (!NFT_CONTRACT) return
+    loadStats().catch(() => {})
+  }, [loadStats])
+
+  async function handleConnect(preferred?: 'injected' | 'walletconnect') {
     if (!NFT_CONTRACT) {
       setMessage('NFT contract address hali Vercel environment variable sifatida kiritilmagan.')
       return
     }
-    if (!(window as any).ethereum) {
-      setMessage('MetaMask yoki boshqa Web3 wallet kerak.')
-      return
-    }
-
     try {
       setBusy(true)
       setMessage('')
-      const provider = new BrowserProvider((window as any).ethereum)
-      const accounts = await provider.send('eth_requestAccounts', [])
-      const network = await provider.getNetwork()
-
-      if (Number(network.chainId) !== NFT_CHAIN_ID) {
-        try {
-          await (window as any).ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x' + NFT_CHAIN_ID.toString(16) }],
-          })
-        } catch {
-          setMessage(`${NFT_CHAIN_NAME} networkiga o‘ting. Chain ID: ${NFT_CHAIN_ID}`)
-          return
-        }
-      }
-
-      const wallet = accounts[0]
-      setAddress(wallet)
-      await loadStats(wallet)
+      const session = await connectWallet(preferred)
+      await applySession(session)
     } catch (e: any) {
       setMessage(e?.shortMessage || e?.message || 'Wallet ulashda xatolik.')
     } finally {
@@ -82,25 +136,42 @@ export default function GoldenWebNFTPage() {
     }
   }
 
+  async function handleDisconnect() {
+    setBusy(true)
+    try {
+      await disconnectWallet(method)
+    } catch {
+      /* ignore */
+    }
+    sessionRef.current = null
+    unsubRef.current?.()
+    unsubRef.current = null
+    setAddress('')
+    setMethod('')
+    setOwned('0')
+    setMessage('')
+    setBusy(false)
+  }
+
   async function mint() {
-    if (!address || !(window as any).ethereum || !NFT_CONTRACT) return
+    const session = sessionRef.current
+    if (!session?.address || !NFT_CONTRACT) return
 
     try {
       setBusy(true)
       setMessage('')
-      const provider = new BrowserProvider((window as any).ethereum)
-      const network = await provider.getNetwork()
+      const network = await session.provider.getNetwork()
       if (Number(network.chainId) !== NFT_CHAIN_ID) {
         setMessage(`${NFT_CHAIN_NAME} networkiga o‘ting. Chain ID: ${NFT_CHAIN_ID}`)
         return
       }
 
-      const signer = await provider.getSigner()
+      const signer = await session.provider.getSigner()
       const contract = new Contract(NFT_CONTRACT, NFT_ABI, signer)
       const mintPrice = await contract.mintPrice()
       const total = mintPrice * BigInt(quantity)
       const usdt = new Contract(USDT_CONTRACT, USDT_ABI, signer)
-      const allowance = await usdt.allowance(address, NFT_CONTRACT)
+      const allowance = await usdt.allowance(session.address, NFT_CONTRACT)
       if (allowance < total) {
         setMessage('USDT sarflashiga ruxsat berilmoqda...')
         const approval = await usdt.approve(NFT_CONTRACT, total)
@@ -110,7 +181,7 @@ export default function GoldenWebNFTPage() {
       setMessage('Transaction yuborildi. Blockchain tasdiqlanishi kutilmoqda...')
       await tx.wait()
       setMessage('Tabriklaymiz! GoldenWeb NFT muvaffaqiyatli olindi.')
-      await loadStats(address)
+      await loadStats(session.address, session.provider)
     } catch (e: any) {
       setMessage(e?.shortMessage || e?.reason || e?.message || 'Mint xatoligi.')
     } finally {
@@ -118,10 +189,7 @@ export default function GoldenWebNFTPage() {
     }
   }
 
-  useEffect(() => {
-    if (!NFT_CONTRACT || !(window as any).ethereum) return
-    loadStats().catch(() => {})
-  }, [])
+  const showWc = hasWalletConnectConfig() || !hasInjectedWallet()
 
   return (
     <>
@@ -156,19 +224,51 @@ export default function GoldenWebNFTPage() {
 
             <div className="nftMintPanel">
               {!address ? (
-                <button className="planBtn nftMainBtn" onClick={connect} disabled={busy}>
-                  {busy ? 'Ulanmoqda...' : 'Walletni ulash'}
-                </button>
+                <div className="nftConnectStack">
+                  {hasInjectedWallet() && (
+                    <button
+                      className="planBtn nftMainBtn"
+                      onClick={() => handleConnect('injected')}
+                      disabled={busy}
+                    >
+                      {busy ? 'Ulanmoqda...' : 'MetaMask / Browser wallet'}
+                    </button>
+                  )}
+                  {showWc && (
+                    <button
+                      className="planBtn nftMainBtn nftWcBtn"
+                      onClick={() => handleConnect('walletconnect')}
+                      disabled={busy}
+                    >
+                      {busy ? 'Ulanmoqda...' : 'WalletConnect (mobil)'}
+                    </button>
+                  )}
+                  {!hasInjectedWallet() && !hasWalletConnectConfig() && (
+                    <p className="nftHint">
+                      MetaMask o‘rnating yoki mobil uchun WalletConnect Project ID qo‘shing.
+                    </p>
+                  )}
+                </div>
               ) : (
                 <div className="nftMintArea">
                   <div className="nftWallet">
-                    {short(address)}
+                    {shortAddress(address)}
                     {owned !== '0' ? ` · ${owned} NFT` : ''}
+                    {method === 'walletconnect' ? ' · WC' : ''}
                   </div>
+                  <button
+                    type="button"
+                    className="nftDisconnect"
+                    onClick={handleDisconnect}
+                    disabled={busy}
+                    title="Walletni uzish"
+                  >
+                    Uzish
+                  </button>
                   <div className="nftQuantity">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+                    <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
                     <strong>{quantity}</strong>
-                    <button onClick={() => setQuantity(Math.min(10, quantity + 1))}>+</button>
+                    <button type="button" onClick={() => setQuantity(Math.min(10, quantity + 1))}>+</button>
                   </div>
                   <button className="planBtn nftMainBtn" onClick={mint} disabled={busy}>
                     {busy ? 'Mint qilinmoqda...' : 'GoldenWeb NFT mint qilish'}
