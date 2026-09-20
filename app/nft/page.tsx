@@ -322,8 +322,7 @@ export default function GoldenWebNFTPage() {
             </div>
 
             <div className="nftMintNote">
-              USDT orqali to‘lov · BNB Smart Chain (BSC) · Maksimum 10 NFT / wallet · Tushumlar treasury
-              walletga
+              USDT orqali to‘lov · BNB Smart Chain (BSC) · Maksimum 10 NFT / wallet
             </div>
             <p className="nftBack">
               <Link href="/premium">Premium sahifasiga qaytish →</Link>
