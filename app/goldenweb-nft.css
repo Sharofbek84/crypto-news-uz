@@ -1,4 +1,4 @@
-/* GoldenWeb NFT extra — connect / disconnect */
+/* GoldenWeb NFT extra — connect / disconnect / price schedule */
 .nftConnectStack{display:flex;flex-direction:column;gap:10px;max-width:360px}
 .nftConnectStack .planBtn{width:100%}
 .nftWcBtn{background:#1a2430!important;color:#e6edf3!important;border:1px solid #2a3648!important}
@@ -7,6 +7,8 @@
 .nftDisconnect:hover{border-color:#f6465d;color:#f6465d}
 .nftHint{font-size:.8rem;color:#8492a2;margin:0;line-height:1.45}
 .nftMintArea .nftDisconnect{flex-shrink:0}
+.nftPriceRange{display:block;margin-top:4px;font-size:.72rem;color:#8492a2;font-weight:500;line-height:1.3}
+.nftPriceSteps .active .nftPriceRange{color:rgba(11,15,20,.75)}
 @media(max-width:600px){
   .nftConnectStack{max-width:none}
   .nftMintArea .nftDisconnect{width:100%}

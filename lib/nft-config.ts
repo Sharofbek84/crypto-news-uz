@@ -21,6 +21,7 @@ export const NFT_ABI = [
   'function mintedByWallet(address) view returns (uint256)',
   'function balanceOf(address) view returns (uint256)',
   'function treasury() view returns (address)',
+  'function saleStart() view returns (uint256)',
 ] as const
 
 export const USDT_ABI = [
@@ -32,3 +33,37 @@ export const USDT_ABI = [
 
 /** UI price schedule (matches on-chain: 10 * 2^month, cap 640) */
 export const PRICE_SCHEDULE = ['10', '20', '40', '80', '160', '320', '640'] as const
+
+/** 30 days in seconds — matches contract PRICE_STEP_SECONDS */
+export const PRICE_STEP_SECONDS = 30 * 24 * 60 * 60
+
+export function formatDateDDMMYYYY(tsSec: number): string {
+  const d = new Date(tsSec * 1000)
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const year = d.getUTCFullYear()
+  return `${day}.${month}.${year}`
+}
+
+/** Build schedule rows from on-chain saleStart */
+export function buildPriceSchedule(saleStartSec: number) {
+  const now = Math.floor(Date.now() / 1000)
+  return PRICE_SCHEDULE.map((price, i) => {
+    const from = saleStartSec + i * PRICE_STEP_SECONDS
+    const to = saleStartSec + (i + 1) * PRICE_STEP_SECONDS
+    const isCap = i === PRICE_SCHEDULE.length - 1
+    const active =
+      isCap ? now >= from : now >= from && now < to
+    return {
+      price,
+      label: isCap ? '7-oy va keyin' : `${i + 1}-oy`,
+      fromLabel: formatDateDDMMYYYY(from),
+      toLabel: isCap ? null : formatDateDDMMYYYY(to),
+      rangeLabel: isCap
+        ? `${formatDateDDMMYYYY(from)} dan`
+        : `${formatDateDDMMYYYY(from)} — ${formatDateDDMMYYYY(to)}`,
+      active,
+      isCap,
+    }
+  })
+}

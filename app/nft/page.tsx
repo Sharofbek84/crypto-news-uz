@@ -2,16 +2,17 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { BrowserProvider, Contract, formatUnits } from 'ethers'
+import { BrowserProvider, Contract, formatUnits, JsonRpcProvider } from 'ethers'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 import {
+  buildPriceSchedule,
   NFT_ABI,
   NFT_CHAIN_ID,
   NFT_CHAIN_NAME,
   NFT_CONTRACT,
-  PRICE_SCHEDULE,
+  NFT_RPC_URL,
   USDT_ABI,
   USDT_CONTRACT,
   USDT_DECIMALS,
@@ -27,6 +28,8 @@ import {
   type ConnectResult,
 } from '../../lib/wallet-client'
 
+type ScheduleRow = ReturnType<typeof buildPriceSchedule>[number]
+
 export default function GoldenWebNFTPage() {
   const [address, setAddress] = useState('')
   const [price, setPrice] = useState('—')
@@ -36,6 +39,7 @@ export default function GoldenWebNFTPage() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [method, setMethod] = useState('')
+  const [schedule, setSchedule] = useState<ScheduleRow[]>([])
   const sessionRef = useRef<ConnectResult | null>(null)
   const unsubRef = useRef<(() => void) | null>(null)
 
@@ -43,14 +47,23 @@ export default function GoldenWebNFTPage() {
     if (!NFT_CONTRACT) return
     try {
       let p = provider || sessionRef.current?.provider
-      if (!p && typeof window !== 'undefined' && (window as any).ethereum) {
-        p = new BrowserProvider((window as any).ethereum)
+      if (!p) {
+        p = NFT_RPC_URL
+          ? new JsonRpcProvider(NFT_RPC_URL)
+          : typeof window !== 'undefined' && (window as any).ethereum
+            ? new BrowserProvider((window as any).ethereum)
+            : null
       }
       if (!p) return
       const contract = new Contract(NFT_CONTRACT, NFT_ABI, p)
-      const [mintP, left] = await Promise.all([contract.mintPrice(), contract.remainingSupply()])
+      const [mintP, left, start] = await Promise.all([
+        contract.mintPrice(),
+        contract.remainingSupply(),
+        contract.saleStart(),
+      ])
       setPrice(formatUnits(mintP, USDT_DECIMALS))
       setRemaining(left.toString())
+      setSchedule(buildPriceSchedule(Number(start)))
       if (wallet) {
         const balance = await contract.balanceOf(wallet)
         setOwned(balance.toString())
@@ -321,13 +334,34 @@ export default function GoldenWebNFTPage() {
         <section className="nftPriceTimeline">
           <div>
             <div className="nftKicker">MINT NARXI O‘SISH JADVALI</div>
-            <p>Har 30 kunda mint narxi 2 baravar oshadi va 640 USDT darajasida barqarorlashadi.</p>
+            <p>
+              Narx kontrakt deploy qilingan kundan boshlab har 30 kunda 2 baravar oshadi va 640 USDT
+              da to‘xtaydi. Hozirgi bosqich sariq bilan belgilangan.
+            </p>
           </div>
           <div className="nftPriceSteps">
-            {PRICE_SCHEDULE.map((p, i) => (
-              <div key={p} className={i === 6 ? 'active' : ''}>
-                <small>{i < 6 ? `${i + 1}-oy` : '7-oy va keyin'}</small>
-                <strong>{p} USDT</strong>
+            {(schedule.length
+              ? schedule
+              : [
+                  { label: '1-oy', price: '10', rangeLabel: '…', active: false, isCap: false },
+                  { label: '2-oy', price: '20', rangeLabel: '…', active: false, isCap: false },
+                  { label: '3-oy', price: '40', rangeLabel: '…', active: false, isCap: false },
+                  { label: '4-oy', price: '80', rangeLabel: '…', active: false, isCap: false },
+                  { label: '5-oy', price: '160', rangeLabel: '…', active: false, isCap: false },
+                  { label: '6-oy', price: '320', rangeLabel: '…', active: false, isCap: false },
+                  {
+                    label: '7-oy va keyin',
+                    price: '640',
+                    rangeLabel: '…',
+                    active: false,
+                    isCap: true,
+                  },
+                ]
+            ).map((row) => (
+              <div key={row.label} className={row.active ? 'active' : ''}>
+                <small>{row.label}</small>
+                <strong>{row.price} USDT</strong>
+                <span className="nftPriceRange">{row.rangeLabel}</span>
               </div>
             ))}
           </div>
