@@ -210,7 +210,7 @@ export default function GoldenWebNFTPage() {
             <div className="nftIntro">
               <p>Ushbu Goldenweb NFT passport egasi quyidagi imkoniyatlarga ega bo‘ladi:</p>
               <ul>
-                <li>Goldenweb.uz Premium imkoniyatlaridan cheklanmagan vaqt davomida foydalanish;</li>
+                <li>Goldenweb.uz Premium imkoniyatlaridan cheksiz foydalanish;</li>
                 <li>Goldenweb Traderlar Clubi a’zosi bo‘lish;</li>
                 <li>
                   2027 yil Q2 da o‘tkazilishi rejalashtirilgan $GWEB token airdropida davogarlik qilish.
@@ -221,9 +221,6 @@ export default function GoldenWebNFTPage() {
                   sotuvlaridan 64X gacha foyda qilishingiz mumkin.
                 </li>
               </ul>
-              <p className="nftIntroNote">
-                Agar NFT boshqa wallet addressga o‘tsa, Premium huquqi ham yangi addressga o‘tadi.
-              </p>
             </div>
 
             <div className="nftStats">
