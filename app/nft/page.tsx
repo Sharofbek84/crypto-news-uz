@@ -205,14 +205,10 @@ export default function GoldenWebNFTPage() {
         <section className="nftLanding">
           <div className="nftHeroCopy">
             <div className="nftKicker">LIMITED EDITION</div>
-            <h1 className="nftTitle">
-              <span>GOLDENWEB</span> NFT
-            </h1>
+            <h1 className="nftTitle">GOLDENWEB NFT</h1>
+            <h2 className="nftSubtitle">Erta foydalanuvchilar uchun eksklyuziv imkoniyat!</h2>
             <div className="nftIntro">
-              <p>
-                <strong>Erta foydalanuvchilar uchun eksklyuziv imkoniyat!</strong> Ushbu Goldenweb NFT
-                passport egasi quyidagi imkoniyatlarga ega bo‘ladi:
-              </p>
+              <p>Ushbu Goldenweb NFT passport egasi quyidagi imkoniyatlarga ega bo‘ladi:</p>
               <ul>
                 <li>Goldenweb.uz Premium imkoniyatlaridan cheklanmagan vaqt davomida foydalanish;</li>
                 <li>Goldenweb Traderlar Clubi a’zosi bo‘lish;</li>
