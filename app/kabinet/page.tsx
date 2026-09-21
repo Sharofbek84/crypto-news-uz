@@ -3,19 +3,9 @@
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
-import {
-  connectWallet,
-  disconnectWallet,
-  hasInjectedWallet,
-  hasWalletConnectConfig,
-  shortAddress,
-  subscribeWalletEvents,
-  tryRestoreWallet,
-  type ConnectResult,
-} from '../../lib/wallet-client'
 
 type MeResponse = {
   user: {
@@ -48,7 +38,7 @@ function formatDateDDMMYYYY(iso: string): string {
 }
 
 function KabinetContent() {
-  const { data: session, status, update: updateSession } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const needPremium = searchParams.get('need') === 'premium'
@@ -56,12 +46,6 @@ function KabinetContent() {
   const [me, setMe] = useState<MeResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [nftBusy, setNftBusy] = useState(false)
-  const [nftMsg, setNftMsg] = useState('')
-  const [walletAddress, setWalletAddress] = useState('')
-  const [walletMethod, setWalletMethod] = useState('')
-  const sessionRef = useRef<ConnectResult | null>(null)
-  const unsubRef = useRef<(() => void) | null>(null)
 
   const loadMe = useCallback(async () => {
     setLoading(true)
@@ -80,29 +64,6 @@ function KabinetContent() {
     }
   }, [])
 
-  const applyWallet = useCallback((s: ConnectResult) => {
-    sessionRef.current = s
-    setWalletAddress(s.address)
-    setWalletMethod(s.method)
-    unsubRef.current?.()
-    unsubRef.current = subscribeWalletEvents(s.eip1193, {
-      onAccounts: (accounts) => {
-        if (!accounts?.[0]) {
-          setWalletAddress('')
-          setWalletMethod('')
-          sessionRef.current = null
-        } else {
-          setWalletAddress(accounts[0])
-        }
-      },
-      onDisconnect: () => {
-        setWalletAddress('')
-        setWalletMethod('')
-        sessionRef.current = null
-      },
-    })
-  }, [])
-
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/sign-in?callbackUrl=/kabinet')
@@ -110,93 +71,6 @@ function KabinetContent() {
     }
     if (status === 'authenticated') loadMe()
   }, [status, router, loadMe])
-
-  // NFT sahifasida ulangan walletni kabinetda ham tiklash
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      const restored = await tryRestoreWallet()
-      if (cancelled || !restored) return
-      applyWallet(restored)
-    })()
-    return () => {
-      cancelled = true
-      unsubRef.current?.()
-    }
-  }, [applyWallet])
-
-  async function handleConnect(preferred?: 'injected' | 'walletconnect') {
-    setNftBusy(true)
-    setNftMsg('')
-    try {
-      const s = await connectWallet(preferred)
-      applyWallet(s)
-      setNftMsg(`Wallet ulandi: ${shortAddress(s.address)}`)
-    } catch (e: any) {
-      setNftMsg(e?.message || 'Wallet ulashda xatolik')
-    } finally {
-      setNftBusy(false)
-    }
-  }
-
-  async function handleDisconnect() {
-    setNftBusy(true)
-    try {
-      await disconnectWallet(walletMethod)
-    } catch {
-      /* ignore */
-    }
-    sessionRef.current = null
-    unsubRef.current?.()
-    unsubRef.current = null
-    setWalletAddress('')
-    setWalletMethod('')
-    setNftMsg('')
-    setNftBusy(false)
-  }
-
-  async function activateNftLifetime() {
-    let wallet = walletAddress || sessionRef.current?.address
-
-    // Hali ulanmagan bo‘lsa — avval ulash
-    if (!wallet) {
-      setNftBusy(true)
-      setNftMsg('')
-      try {
-        const preferred =
-          hasInjectedWallet() ? 'injected' : hasWalletConnectConfig() ? 'walletconnect' : undefined
-        const s = await connectWallet(preferred)
-        applyWallet(s)
-        wallet = s.address
-      } catch (e: any) {
-        setNftMsg(e?.message || 'Wallet ulanmadi')
-        setNftBusy(false)
-        return
-      }
-    }
-
-    setNftBusy(true)
-    setNftMsg('')
-    try {
-      const res = await fetch('/api/subscription/activate-nft', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setNftMsg(data.error || 'Xatolik')
-        return
-      }
-      setNftMsg(data.message || 'Lifetime Premium yoqildi')
-      await loadMe()
-      await updateSession()
-    } catch (e: any) {
-      setNftMsg(e?.message || 'Wallet xatosi')
-    } finally {
-      setNftBusy(false)
-    }
-  }
 
   if (status === 'loading' || loading) {
     return <p style={{ color: '#848e9c', padding: 24 }}>Yuklanmoqda...</p>
@@ -211,8 +85,6 @@ function KabinetContent() {
     : isLifetime
       ? 'Lifetime'
       : null
-
-  const showWc = hasWalletConnectConfig() || !hasInjectedWallet()
 
   return (
     <main className="container" style={{ paddingTop: 28, paddingBottom: 48, maxWidth: 720 }}>
@@ -233,7 +105,7 @@ function KabinetContent() {
             fontSize: 14,
           }}
         >
-          Premium sahifaga kirish uchun avval Telegram Tribute orqali to‘lang yoki NFT orqali Lifetime yoqing.
+          Premium sahifaga kirish uchun avval Telegram Tribute orqali to‘lang.
         </div>
       )}
 
@@ -360,121 +232,7 @@ function KabinetContent() {
         )}
       </section>
 
-      <section
-        style={{
-          background: '#1e2329',
-          border: '1px solid rgba(240,185,11,0.35)',
-          borderRadius: 14,
-          padding: 20,
-          marginBottom: 20,
-        }}
-      >
-        <h2 style={{ fontSize: 16, margin: '0 0 8px', color: '#f0b90b' }}>
-          GoldenWeb NFT · Lifetime Premium
-        </h2>
-        <p style={{ color: '#9aa7b8', fontSize: 14, marginBottom: 14, lineHeight: 1.55 }}>
-          Agar siz Goldenweb NFT egasi bo‘lsangiz, shu yerda walletingizni ulab, Lifetime Premiumni
-          yoqing va Premium imkoniyatlardan cheksiz foydalaning.
-        </p>
-
-        {/* Ulangan wallet holati */}
-        {walletAddress ? (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              flexWrap: 'wrap',
-              marginBottom: 14,
-              padding: '10px 12px',
-              background: '#0d1117',
-              border: '1px solid #2b3139',
-              borderRadius: 10,
-            }}
-          >
-            <span style={{ color: '#0ecb81', fontSize: 13, fontWeight: 600 }}>
-              ● Ulangan
-            </span>
-            <span style={{ color: '#eaecef', fontSize: 13, fontFamily: 'monospace' }}>
-              {shortAddress(walletAddress)}
-            </span>
-            {walletMethod === 'walletconnect' && (
-              <span style={{ color: '#848e9c', fontSize: 12 }}>WalletConnect</span>
-            )}
-            <button
-              type="button"
-              className="nftDisconnect"
-              onClick={handleDisconnect}
-              disabled={nftBusy}
-              style={{ marginLeft: 'auto' }}
-            >
-              Uzish
-            </button>
-          </div>
-        ) : (
-          <div className="nftConnectStack" style={{ maxWidth: 320, marginBottom: 14 }}>
-            {hasInjectedWallet() && (
-              <button
-                className="planBtn"
-                onClick={() => handleConnect('injected')}
-                disabled={nftBusy}
-              >
-                {nftBusy ? 'Ulanmoqda...' : 'MetaMask / Browser wallet'}
-              </button>
-            )}
-            {showWc && (
-              <button
-                className="planBtn nftWcBtn"
-                onClick={() => handleConnect('walletconnect')}
-                disabled={nftBusy}
-              >
-                {nftBusy ? 'Ulanmoqda...' : 'WalletConnect (mobil)'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {isLifetime ? (
-          <div style={{ color: '#0ecb81', fontSize: 14, fontWeight: 600 }}>
-            Lifetime Premium faol
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <button
-              className="planBtn"
-              onClick={activateNftLifetime}
-              disabled={nftBusy}
-              style={{ maxWidth: 320 }}
-            >
-              {nftBusy
-                ? 'Tekshirilmoqda...'
-                : walletAddress
-                  ? 'Lifetime Premium yoqish'
-                  : 'Wallet ulab Lifetime Premium yoqish'}
-            </button>
-            <Link href="/nft" style={{ color: '#f0b90b', fontSize: 13 }}>
-              GoldenWeb NFT olish →
-            </Link>
-          </div>
-        )}
-
-        {nftMsg && (
-          <div
-            style={{
-              marginTop: 12,
-              color:
-                nftMsg.includes('yoqildi') ||
-                nftMsg.includes('faol') ||
-                nftMsg.includes('ulandi')
-                  ? '#0ecb81'
-                  : '#f6465d',
-              fontSize: 13,
-            }}
-          >
-            {nftMsg}
-          </div>
-        )}
-      </section>
+      {/* GoldenWeb NFT bo‘limi vaqtincha yashirilgan */}
 
       <p style={{ fontSize: 13, color: '#848e9c' }}>
         <Link href="/" style={{ color: '#9aa7b8' }}>

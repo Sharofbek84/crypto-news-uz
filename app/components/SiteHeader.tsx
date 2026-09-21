@@ -9,7 +9,7 @@ const NAV = [
   { href: '/', label: 'Bosh sahifa' },
   { href: '/yangiliklar', label: 'Yangiliklar' },
   { href: '/obuna', label: 'Premium obuna' },
-  { href: '/nft', label: 'GoldenWeb NFT' },
+  // { href: '/nft', label: 'GoldenWeb NFT' }, // vaqtincha yashirilgan
 ]
 
 function isActive(pathname: string, href: string) {
@@ -105,7 +105,7 @@ export default function SiteHeader() {
       {open && (
         <button
           type="button"
-          className="menuBackdrop"
+          className="mobileMenuBackdrop"
           aria-label="Menyuni yopish"
           onClick={() => setOpen(false)}
         />
