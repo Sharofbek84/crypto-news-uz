@@ -233,12 +233,6 @@ function KabinetContent() {
       </section>
 
       {/* GoldenWeb NFT bo‘limi vaqtincha yashirilgan */}
-
-      <p style={{ fontSize: 13, color: '#848e9c' }}>
-        <Link href="/" style={{ color: '#9aa7b8' }}>
-          ← Bosh sahifa
-        </Link>
-      </p>
     </main>
   )
 }
