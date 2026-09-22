@@ -134,11 +134,12 @@ function rsiSeries(candles: Candle[], p = 14) {
   return out
 }
 
-function uniqLevels(values: number[], maxCount: number) {
+/** Darajalar orasida kamida minGapPct farq — yorliqlar yopishmasin */
+function uniqLevels(values: number[], maxCount: number, minGapPct = 0.02) {
   const out: number[] = []
   for (const v of values) {
-    if (!Number.isFinite(v)) continue
-    if (out.some((x) => Math.abs(x - v) / Math.max(Math.abs(v), 1) < 0.0015)) continue
+    if (!Number.isFinite(v) || v <= 0) continue
+    if (out.some((x) => Math.abs(x - v) / Math.max(Math.abs(x), Math.abs(v), 1) < minGapPct)) continue
     out.push(v)
     if (out.length >= maxCount) break
   }
@@ -151,7 +152,7 @@ function toNums(value: unknown): number[] {
 }
 
 function buildTradeLevels(result: Record<string, unknown> | null | undefined, price: number): TradeLevels {
-  if (!result || !Number.isFinite(price)) return { buys: [], sells: [], side: null }
+  if (!result || !Number.isFinite(price) || price <= 0) return { buys: [], sells: [], side: null }
 
   const side = typeof result.side === 'string' ? result.side : null
   const support = toNums(result.support)
@@ -161,48 +162,39 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const entryHigh = Number(result.entryHigh)
   const invalidation = Number(result.invalidation)
 
-  const buyCandidates: number[] = [...support, entryLow, entryHigh]
-    .filter((v: number) => Number.isFinite(v) && v < price * 0.999)
-    .sort((a: number, b: number) => b - a)
-
-  let sellCandidates: number[] = [...resistance, ...tp]
-    .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
-    .sort((a: number, b: number) => a - b)
-
+  // BUY: avvalo entry, keyin support (yaqindan uzoqqa), min 2.5% oraliq
+  const buyPool: number[] = []
+  if (Number.isFinite(entryLow) && entryLow < price * 0.999) buyPool.push(entryLow)
+  if (Number.isFinite(entryHigh) && entryHigh < price * 0.998) buyPool.push(entryHigh)
+  buyPool.push(...support.filter((v: number) => v < price * 0.999))
   if (side === 'SELL') {
-    const above = [invalidation, entryHigh, entryLow, ...resistance]
+    buyPool.push(...tp.filter((v: number) => v < price * 0.999))
+  }
+  buyPool.sort((a: number, b: number) => b - a)
+
+  let sellPool: number[] = []
+  if (side === 'SELL') {
+    sellPool = [invalidation, entryHigh, entryLow, ...resistance]
       .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
       .sort((a: number, b: number) => a - b)
-    if (above.length) sellCandidates = above
-    const belowTp = tp
-      .filter((v: number) => Number.isFinite(v) && v < price * 0.999)
-      .sort((a: number, b: number) => b - a)
-    if (belowTp.length && buyCandidates.length < 3) {
-      buyCandidates.push(...belowTp)
-    }
   } else {
-    const tpUp = tp
+    sellPool = [...tp, ...resistance]
       .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
       .sort((a: number, b: number) => a - b)
-    if (tpUp.length) sellCandidates = [...tpUp, ...sellCandidates]
   }
 
-  const buys = uniqLevels(
-    buyCandidates.sort((a: number, b: number) => b - a),
-    3
-  )
-  const sells = uniqLevels(
-    sellCandidates.sort((a: number, b: number) => a - b),
-    3
-  )
+  const buys = uniqLevels(buyPool, 3, 0.025)
+  const sells = uniqLevels(sellPool, 3, 0.025)
 
-  while (buys.length < 3) {
-    const last = buys[buys.length - 1] ?? price
-    buys.push(last * (1 - 0.02 * (buys.length + 1)))
+  const fillBuys = [0.025, 0.05, 0.08]
+  for (let i = buys.length; i < 3; i++) {
+    const base = buys.length ? buys[buys.length - 1] : price
+    buys.push(base * (1 - fillBuys[i]))
   }
-  while (sells.length < 3) {
-    const last = sells[sells.length - 1] ?? price
-    sells.push(last * (1 + 0.02 * (sells.length + 1)))
+  const fillSells = [0.025, 0.05, 0.08]
+  for (let i = sells.length; i < 3; i++) {
+    const base = sells.length ? sells[sells.length - 1] : price
+    sells.push(base * (1 + fillSells[i]))
   }
 
   return { buys: buys.slice(0, 3), sells: sells.slice(0, 3), side }
