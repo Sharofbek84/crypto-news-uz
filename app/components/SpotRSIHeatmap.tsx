@@ -44,6 +44,12 @@ type ApiResponse = {
 
 type Candle = { time: number; open: number; high: number; low: number; close: number; volume: number }
 
+type TradeLevels = {
+  buys: number[]
+  sells: number[]
+  side: string | null
+}
+
 function rsiColor(rsi: number | null): string {
   if (rsi == null || !Number.isFinite(rsi)) return '#2a3038'
   const v = Math.max(0, Math.min(100, rsi))
@@ -128,31 +134,93 @@ function rsiSeries(candles: Candle[], p = 14) {
   return out
 }
 
+function uniqLevels(values: number[], maxCount: number) {
+  const out: number[] = []
+  for (const v of values) {
+    if (!Number.isFinite(v)) continue
+    if (out.some((x) => Math.abs(x - v) / Math.max(Math.abs(v), 1) < 0.0015)) continue
+    out.push(v)
+    if (out.length >= maxCount) break
+  }
+  return out
+}
+
+function buildTradeLevels(result: any, price: number): TradeLevels {
+  if (!result || !Number.isFinite(price)) return { buys: [], sells: [], side: null }
+
+  const side = (result.side as string) || null
+  const support = Array.isArray(result.support) ? result.support.map(Number) : []
+  const resistance = Array.isArray(result.resistance) ? result.resistance.map(Number) : []
+  const tp = Array.isArray(result.tp) ? result.tp.map(Number) : []
+  const entryLow = Number(result.entryLow)
+  const entryHigh = Number(result.entryHigh)
+  const invalidation = Number(result.invalidation)
+
+  const buyCandidates = [...support, entryLow, entryHigh]
+    .filter((v) => Number.isFinite(v) && v < price * 0.999)
+    .sort((a, b) => b - a)
+
+  let sellCandidates = [...resistance, ...tp]
+    .filter((v) => Number.isFinite(v) && v > price * 1.001)
+    .sort((a, b) => a - b)
+
+  if (side === 'SELL') {
+    const above = [invalidation, entryHigh, entryLow, ...resistance]
+      .filter((v) => Number.isFinite(v) && v > price * 1.001)
+      .sort((a, b) => a - b)
+    if (above.length) sellCandidates = above
+    const belowTp = tp.filter((v) => Number.isFinite(v) && v < price * 0.999).sort((a, b) => b - a)
+    if (belowTp.length && buyCandidates.length < 3) {
+      buyCandidates.push(...belowTp)
+    }
+  } else {
+    const tpUp = tp.filter((v) => Number.isFinite(v) && v > price * 1.001).sort((a, b) => a - b)
+    if (tpUp.length) sellCandidates = [...tpUp, ...sellCandidates]
+  }
+
+  const buys = uniqLevels(buyCandidates.sort((a, b) => b - a), 3)
+  const sells = uniqLevels(sellCandidates.sort((a, b) => a - b), 3)
+
+  while (buys.length < 3) {
+    const last = buys[buys.length - 1] ?? price
+    buys.push(last * (1 - 0.02 * (buys.length + 1)))
+  }
+  while (sells.length < 3) {
+    const last = sells[sells.length - 1] ?? price
+    sells.push(last * (1 + 0.02 * (sells.length + 1)))
+  }
+
+  return { buys: buys.slice(0, 3), sells: sells.slice(0, 3), side }
+}
+
 function CandleChart({
   candles,
   coin,
   tf,
+  levels,
 }: {
   candles: Candle[]
   coin: string
   tf: string
+  levels: TradeLevels | null
 }) {
   if (!candles.length) return <div className="rsiChartEmpty">Grafik ma'lumoti yo'q</div>
 
   const W = 1700
   const H = 720
   const L = 24
-  const R = 140
+  const R = 150
   const T = 56
   const MB = 480
   const RT = 520
   const RB = 680
   const plotRight = W - R
   const candleRight = L + (plotRight - L) * 0.97
-  const labelX = plotRight + 10
+  const labelX = plotRight + 8
 
-  const min = Math.min(...candles.map((c) => c.low)) * 0.997
-  const max = Math.max(...candles.map((c) => c.high)) * 1.003
+  const levelPrices = [...(levels?.buys || []), ...(levels?.sells || [])]
+  const min = Math.min(...candles.map((c) => c.low), ...levelPrices) * 0.997
+  const max = Math.max(...candles.map((c) => c.high), ...levelPrices) * 1.003
   const x = (i: number) => L + (i * (candleRight - L)) / Math.max(1, candles.length - 1)
   const y = (v: number) => MB - ((v - min) / (max - min || 1)) * (MB - T)
   const ry = (v: number) => RB - (Math.max(0, Math.min(100, v)) / 100) * (RB - RT)
@@ -173,6 +241,18 @@ function CandleChart({
   const lx = x(candles.length - 1)
 
   const priceTicks = [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => max - (max - min) * t)
+
+  const rightBox = (yy: number, text: string, bg: string, w = 118) => (
+    <g>
+      <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke={bg} strokeWidth="1.3" strokeDasharray="6 5" opacity="0.85" />
+      <rect x={labelX} y={yy - 12} width={w} height={24} rx="4" fill={bg} />
+      <text x={labelX + w / 2} y={yy + 5} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="800">
+        {text}
+      </text>
+    </g>
+  )
+
+  const sideLabel = levels?.side === 'SELL' ? 'SELL' : levels?.side === 'BUY' ? 'BUY' : ''
 
   return (
     <div className="homeChartWrap">
@@ -198,15 +278,13 @@ function CandleChart({
             return (
               <g key={i}>
                 <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke="#182230" />
-                <text x={labelX} y={yy + 4} fill="#7a8796" fontSize="12">
-                  {money(v)}
-                </text>
               </g>
             )
           })}
 
           <text x={L + 8} y="28" fill="#f0b90b" fontSize="18" fontWeight="800">
             {coin}/USDT · {tf}
+            {sideLabel ? ` · ${sideLabel}` : ''}
           </text>
           <text x={L + 8} y="50" fill="#9aa7b8" fontSize="12">
             O {money(last.open)} H {money(last.high)} L {money(last.low)} C {money(latest)}{' '}
@@ -255,6 +333,9 @@ function CandleChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
+          {levels?.buys.map((p, i) => rightBox(y(p), `BUY${i + 1}  ${money(p)}`, '#148f55'))}
+          {levels?.sells.map((p, i) => rightBox(y(p), `SELL${i + 1}  ${money(p)}`, '#c52f3a'))}
+
           <line
             x1={L}
             x2={plotRight}
@@ -264,8 +345,8 @@ function CandleChart({
             strokeDasharray="3 4"
             strokeWidth="1.2"
           />
-          <rect x={labelX} y={y(latest) - 13} width={110} height={26} rx="4" fill="#1a6f9a" />
-          <text x={labelX + 55} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
+          <rect x={labelX} y={y(latest) - 13} width={118} height={26} rx="4" fill="#1a6f9a" />
+          <text x={labelX + 59} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
             {money(latest)}
           </text>
           <circle cx={lx} cy={y(latest)} r="3.5" fill="#65d9ff" />
@@ -274,15 +355,7 @@ function CandleChart({
             RSI 14 {rs[rs.length - 1]?.toFixed(2) ?? '—'}
           </text>
           {[30, 50, 70].map((v) => (
-            <line
-              key={v}
-              x1={L}
-              x2={plotRight}
-              y1={ry(v)}
-              y2={ry(v)}
-              stroke="#3a4658"
-              strokeDasharray="4 6"
-            />
+            <line key={v} x1={L} x2={plotRight} y1={ry(v)} y2={ry(v)} stroke="#3a4658" strokeDasharray="4 6" />
           ))}
           <polyline points={rpoly(rs)} fill="none" stroke="#a78bfa" strokeWidth="2" />
           <rect x={labelX} y={ry(rs[rs.length - 1] ?? 50) - 12} width={70} height={24} rx="4" fill="#5b4a9a" />
@@ -318,7 +391,10 @@ export default function SpotRSIHeatmap() {
   const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('W1')
   const [coin, setCoin] = useState<(typeof COINS)[number]>('BTC')
   const [candles, setCandles] = useState<Candle[]>([])
+  const [levels, setLevels] = useState<TradeLevels | null>(null)
   const [chartLoading, setChartLoading] = useState(true)
+
+  const interval = TIMEFRAMES.find((t) => t.key === tf)?.interval || '1w'
 
   const loadHeatmap = useCallback(async () => {
     try {
@@ -333,18 +409,39 @@ export default function SpotRSIHeatmap() {
     }
   }, [])
 
-  const loadChart = useCallback(async (c: string, timeframe: string) => {
+  const loadChart = useCallback(async (c: string, timeframe: string, intv: string) => {
     setChartLoading(true)
     try {
-      const res = await fetch(
-        `/api/spot-heatmap/chart?coin=${encodeURIComponent(c)}&tf=${encodeURIComponent(timeframe)}`,
-        { cache: 'no-store' }
-      )
-      if (!res.ok) throw new Error('chart')
-      const data = await res.json()
-      setCandles(Array.isArray(data.candles) ? data.candles : [])
+      const [chartRes, analyzeRes] = await Promise.all([
+        fetch(`/api/spot-heatmap/chart?coin=${encodeURIComponent(c)}&tf=${encodeURIComponent(timeframe)}`, {
+          cache: 'no-store',
+        }),
+        fetch(`/api/analyze?symbol=${encodeURIComponent(c)}&interval=${encodeURIComponent(intv)}`, {
+          cache: 'no-store',
+        }),
+      ])
+
+      if (chartRes.ok) {
+        const data = await chartRes.json()
+        setCandles(Array.isArray(data.candles) ? data.candles : [])
+      } else {
+        setCandles([])
+      }
+
+      if (analyzeRes.ok) {
+        const data = await analyzeRes.json()
+        const result = data.result || data
+        const price =
+          Array.isArray(data.candles) && data.candles.length
+            ? data.candles[data.candles.length - 1].close
+            : result?.entryHigh || 0
+        setLevels(buildTradeLevels(result, Number(price)))
+      } else {
+        setLevels(null)
+      }
     } catch {
       setCandles([])
+      setLevels(null)
     } finally {
       setChartLoading(false)
     }
@@ -357,8 +454,8 @@ export default function SpotRSIHeatmap() {
   }, [loadHeatmap])
 
   useEffect(() => {
-    loadChart(coin, tf)
-  }, [coin, tf, loadChart])
+    loadChart(coin, tf, interval)
+  }, [coin, tf, interval, loadChart])
 
   const selectedCell = payload?.data?.[coin]?.[tf]
 
@@ -417,6 +514,14 @@ export default function SpotRSIHeatmap() {
           border-radius:12px;color:#d8a1a1
         }
         .rsiHmFoot{margin-top:12px;color:#8b949e;font-size:.76rem;text-align:right}
+        .rsiLevelsNote{
+          margin-top:10px;padding:10px 12px;border-radius:10px;
+          background:#111820;border:1px solid #252d38;font-size:.78rem;color:#9aa7b8;
+          display:flex;flex-wrap:wrap;gap:10px 16px
+        }
+        .rsiLevelsNote b{color:#e6edf3}
+        .rsiBuy{color:#20d67a}
+        .rsiSell{color:#ff5360}
         @media(max-width:560px){
           .rsiHm{padding:14px}
           .rsiCards{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -482,7 +587,26 @@ export default function SpotRSIHeatmap() {
           {chartLoading ? (
             <div className="rsiChartEmpty">Grafik yuklanmoqda...</div>
           ) : (
-            <CandleChart candles={candles} coin={coin} tf={tf} />
+            <>
+              <CandleChart candles={candles} coin={coin} tf={tf} levels={levels} />
+              {levels && (levels.buys.length > 0 || levels.sells.length > 0) && (
+                <div className="rsiLevelsNote">
+                  <span>
+                    Signal: <b>{levels.side || '—'}</b>
+                  </span>
+                  {levels.buys.map((p, i) => (
+                    <span key={`b${i}`} className="rsiBuy">
+                      BUY{i + 1}: <b>{money(p)}</b>
+                    </span>
+                  ))}
+                  {levels.sells.map((p, i) => (
+                    <span key={`s${i}`} className="rsiSell">
+                      SELL{i + 1}: <b>{money(p)}</b>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {selectedCell && (
