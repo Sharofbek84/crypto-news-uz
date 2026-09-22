@@ -103,12 +103,20 @@ export default function SpotRSIHeatmap() {
         .gwDot { width:9px; height:9px; border-radius:50%; display:inline-block; }
         .gwGridWrap { overflow-x:auto; border:1px solid #252d38; border-radius:14px; }
         .gwGrid { min-width:650px; }
-        .gwRow { display:grid; grid-template-columns:120px repeat(3, minmax(120px,1fr)); }
+        .gwRow { display:grid; grid-template-columns:250px repeat(3, minmax(120px,1fr)); }
         .gwHead { background:#111820; color:#8b949e; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
-        .gwCell { min-height:76px; border-right:1px solid rgba(255,255,255,.055); border-bottom:1px solid rgba(255,255,255,.055); display:flex; align-items:center; justify-content:center; }
+        .gwCell { min-height:64px; border-right:1px solid rgba(255,255,255,.055); border-bottom:1px solid rgba(255,255,255,.055); display:flex; align-items:center; justify-content:center; }
         .gwRow > :last-child { border-right:0; }
         .gwRow:last-child > .gwCell { border-bottom:0; }
-        .gwCoin { justify-content:flex-start; padding:0 14px; font-weight:800; }
+        .gwCoin { justify-content:flex-start; padding:8px 14px; font-weight:800; background:#0d1117; }
+        .gwCoinInfo { display:flex; align-items:center; gap:10px; width:100%; }
+        .gwCoinIcon { width:32px; height:32px; border-radius:50%; background:#1a2430; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:800; color:#f0b90b; flex-shrink:0; border:1px solid #202938; }
+        .gwCoinMain { min-width:0; }
+        .gwCoinSymbol { display:block; font-size:.9rem; line-height:1.05; font-weight:800; }
+        .gwCoinName { display:block; margin-top:3px; color:#8b949e; font-size:.7rem; font-weight:500; }
+        .gwCoinPrice { margin-left:auto; text-align:right; white-space:nowrap; }
+        .gwCoinPriceValue { display:block; font-size:.82rem; font-weight:700; color:#e6edf3; }
+        .gwCoinPriceDir { display:block; margin-top:1px; font-size:.78rem; font-weight:800; }
         .gwCoin small { display:block; margin-top:3px; color:#718096; font-size:.67rem; font-weight:500; }
         .gwRsiCell { cursor:pointer; transition:transform .12s ease, filter .12s ease; position:relative; }
         .gwRsiCell:hover { filter:brightness(1.12); transform:scale(.985); z-index:1; }
@@ -135,8 +143,8 @@ export default function SpotRSIHeatmap() {
           .gwHeatmap { padding:14px; border-radius:14px; }
           .gwHeatHeader { display:block; }
           .gwHeatMeta { justify-content:flex-start; margin-top:10px; }
-          .gwRow { grid-template-columns:92px repeat(3, 115px); }
-          .gwCoin { padding:0 10px; }
+          .gwRow { grid-template-columns:210px repeat(3, 115px); }
+          .gwCoin { padding:8px 10px; }
         }
       `}</style>
 
