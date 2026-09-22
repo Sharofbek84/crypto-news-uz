@@ -54,6 +54,7 @@ function arrow(direction: Direction) {
   if (direction === 'flat') return '→'
   return '•'
 }
+
 export default function SpotRSIHeatmap() {
   const [payload, setPayload] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -102,27 +103,24 @@ export default function SpotRSIHeatmap() {
         .gwLegend span { display:inline-flex; align-items:center; gap:5px; padding:4px 7px; border:1px solid #252d38; border-radius:6px; background:#10161d; }
         .gwDot { width:8px; height:8px; border-radius:2px; display:inline-block; }
         .gwGridWrap { overflow-x:auto; border:1px solid #252d38; border-radius:14px; }
-        .gwGrid { min-width:760px; }
-        .gwRow { display:grid; grid-template-columns:280px repeat(3, minmax(150px,1fr)); }
-        .gwHead { background:#111820; color:#8b949e; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
-        .gwCell { min-height:82px; border-right:1px solid rgba(255,255,255,.055); border-bottom:1px solid rgba(255,255,255,.055); display:flex; align-items:center; justify-content:center; }
-        .gwRow > :last-child { border-right:0; }
-        .gwRow:last-child > .gwCell { border-bottom:0; }
-        .gwCoin { justify-content:flex-start; padding:8px 14px; font-weight:800; background:#0d1117; }
-        .gwCoinInfo { display:flex; align-items:center; gap:10px; width:100%; }
-        .gwCoinIcon { width:32px; height:32px; border-radius:50%; background:#1a2430; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:800; color:#f0b90b; flex-shrink:0; border:1px solid #202938; }
-        .gwCoinMain { min-width:0; }
-        .gwCoinSymbol { display:block; font-size:.9rem; line-height:1.05; font-weight:800; }
-        .gwCoinName { display:block; margin-top:3px; color:#8b949e; font-size:.7rem; font-weight:500; }
-        .gwCoinPrice { margin-left:auto; text-align:right; white-space:nowrap; }
-        .gwCoinPriceValue { display:block; font-size:.82rem; font-weight:700; color:#e6edf3; }
-        .gwCoinPriceDir { display:block; margin-top:1px; font-size:.78rem; font-weight:800; }
-        .gwCoin small { display:block; margin-top:3px; color:#718096; font-size:.67rem; font-weight:500; }
-        .gwRsiCell { cursor:pointer; transition:transform .12s ease, filter .12s ease; position:relative; }
-        .gwRsiCell:hover { filter:brightness(1.12); transform:scale(.985); z-index:1; }
-        .gwRsi { font-size:1.35rem; font-weight:850; }
-        .gwRsiDirection { margin-top:4px; font-size:.86rem; font-weight:900; }
-        .gwState { display:block; font-size:.63rem; margin-top:4px; opacity:.78; }
+        .gwGrid { min-width:760px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+        .gwTfColumn { min-width:0; border-right:1px solid rgba(255,255,255,.055); }
+        .gwTfColumn:last-child { border-right:0; }
+        .gwTfHeader { padding:11px 14px; background:#111820; color:#aeb9c7; font-size:.78rem; font-weight:800; letter-spacing:.08em; text-align:center; border-bottom:1px solid rgba(255,255,255,.055); }
+        .gwTiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:8px; }
+        .gwTile { min-height:118px; border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:12px; color:#fff; text-align:left; cursor:pointer; transition:transform .12s ease, filter .12s ease, border-color .12s ease; box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
+        .gwTile:hover { filter:brightness(1.12); transform:translateY(-2px); border-color:rgba(255,255,255,.25); }
+        .gwTileTop,.gwTileBottom { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .gwTileCoin { font-size:.82rem; font-weight:900; letter-spacing:.02em; }
+        .gwTilePrice { font-size:.68rem; font-weight:700; opacity:.9; }
+        .gwTileMiddle { display:flex; align-items:center; justify-content:center; gap:8px; margin:14px 0 10px; }
+        .gwRsi { font-size:1.5rem; font-weight:900; line-height:1; }
+        .gwRsiDirection { font-size:1rem; font-weight:900; }
+        .gwUp { color:#d9ffd9; }
+        .gwDown { color:#ffd9d9; }
+        .gwFlat { color:#f3f3f3; }
+        .gwState { font-size:.64rem; font-weight:700; opacity:.88; }
+        .gwPeriod { font-size:.61rem; opacity:.65; }
         .extreme-low { background:linear-gradient(135deg,#6f42a1,#4d2c77); }
         .low { background:linear-gradient(135deg,#2463a8,#184a82); }
         .low-mid { background:linear-gradient(135deg,#197a61,#135b49); }
@@ -139,13 +137,8 @@ export default function SpotRSIHeatmap() {
         .gwLoading { padding:70px 20px; text-align:center; color:#8b949e; }
         .gwError { padding:22px; border-radius:12px; background:rgba(194,53,53,.10); border:1px solid rgba(194,53,53,.3); color:#d8a1a1; }
         .gwRefresh { border:1px solid #303846; background:#111820; color:#d7dee7; border-radius:8px; padding:7px 10px; cursor:pointer; }
-        @media (max-width:700px) {
-          .gwHeatmap { padding:14px; border-radius:14px; }
-          .gwHeatHeader { display:block; }
-          .gwHeatMeta { justify-content:flex-start; margin-top:10px; }
-          .gwRow { grid-template-columns:210px repeat(3, 115px); }
-          .gwCoin { padding:8px 10px; }
-        }
+        @media (max-width:900px) { .gwGrid { min-width:720px; } .gwTiles { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media (max-width:560px) { .gwHeatmap { padding:14px; border-radius:14px; } .gwGrid { min-width:690px; } .gwTiles { grid-template-columns:1fr; } }
       `}</style>
 
       <div className="gwHeatHeader">
@@ -187,9 +180,9 @@ export default function SpotRSIHeatmap() {
                         <button
                           key={coin}
                           type="button"
-                          className={\`gwTile \${tone(cell?.rsi ?? null)}\`}
+                          className={`gwTile ${tone(cell?.rsi ?? null)}`}
                           onClick={() => setSelected({ coin, tf })}
-                          title={\`\${coin} \${tf} RSI: \${cell?.rsi == null ? 'N/A' : cell.rsi.toFixed(1)} \${arrow(rsiDirection)} • Narx: \${formatPrice(cell?.price ?? null)}\`}
+                          title={`${coin} ${tf} RSI: ${cell?.rsi == null ? 'N/A' : cell.rsi.toFixed(1)} ${arrow(rsiDirection)} • Narx: ${formatPrice(cell?.price ?? null)}`}
                         >
                           <div className="gwTileTop">
                             <span className="gwTileCoin">{coin}</span>
@@ -197,7 +190,7 @@ export default function SpotRSIHeatmap() {
                           </div>
                           <div className="gwTileMiddle">
                             <span className="gwRsi">{cell?.rsi == null ? '—' : cell.rsi.toFixed(1)}</span>
-                            <span className={\`gwRsiDirection \${rsiDirection === 'up' ? 'gwUp' : rsiDirection === 'down' ? 'gwDown' : 'gwFlat'}\`}>{arrow(rsiDirection)}</span>
+                            <span className={`gwRsiDirection ${rsiDirection === 'up' ? 'gwUp' : rsiDirection === 'down' ? 'gwDown' : 'gwFlat'}`}>{arrow(rsiDirection)}</span>
                           </div>
                           <div className="gwTileBottom">
                             <span className="gwState">{label(cell?.rsi ?? null)}</span>
@@ -211,6 +204,7 @@ export default function SpotRSIHeatmap() {
               ))}
             </div>
           </div>
+
           <div className="gwBottom">
             <div className="gwStats">
               <span className="gwStat">Oversold: <strong>{stats.oversold}</strong></span>
