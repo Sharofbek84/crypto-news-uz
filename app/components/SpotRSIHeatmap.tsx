@@ -113,6 +113,7 @@ export default function SpotRSIHeatmap() {
         .gwRsiCell { cursor:pointer; transition:transform .12s ease, filter .12s ease; position:relative; }
         .gwRsiCell:hover { filter:brightness(1.12); transform:scale(.985); z-index:1; }
         .gwRsi { font-size:1.08rem; font-weight:850; }
+        .gwRsiDirection { margin-top:4px; font-size:.86rem; font-weight:900; }
         .gwState { display:block; font-size:.63rem; margin-top:4px; opacity:.78; }
         .extreme-low { background:rgba(112,72,190,.50); }
         .low { background:rgba(48,104,184,.48); }
@@ -172,30 +173,53 @@ export default function SpotRSIHeatmap() {
                 {TIMEFRAMES.map((tf) => <div key={tf} className="gwCell">{tf}</div>)}
               </div>
 
-              {COINS.map((coin) => (
-                <div className="gwRow" key={coin}>
-                  <div className="gwCell gwCoin">
-                    <div>{coin}<small>/{coin === 'GRAM' ? 'USDT' : 'USDT'}</small></div>
-                  </div>
-                  {TIMEFRAMES.map((tf) => {
-                    const cell = payload?.data?.[coin]?.[tf]
-                    return (
-                      <button
-                        key={tf}
-                        type="button"
-                        className={`gwCell gwRsiCell ${tone(cell?.rsi ?? null)}`}
-                        onClick={() => setSelected({ coin, tf })}
-                        title={`${coin} ${tf} RSI: ${cell?.rsi ?? 'N/A'}`}
-                      >
-                        <div>
-                          <div className="gwRsi">{cell?.rsi == null ? '—' : cell.rsi.toFixed(1)}</div>
-                          <span className="gwState">{label(cell?.rsi ?? null)}</span>
+              {COINS.map((coin) => {
+                const coinCell = payload?.data?.[coin]?.H4
+                const priceDirection = coinCell?.priceDirection ?? null
+
+                return (
+                  <div className="gwRow" key={coin}>
+                    <div className="gwCell gwCoin">
+                      <div className="gwCoinInfo">
+                        <div className="gwCoinIcon">{coin.slice(0, 2)}</div>
+                        <div className="gwCoinMain">
+                          <span className="gwCoinSymbol">{coin}</span>
+                          <span className="gwCoinName">/USDT</span>
                         </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              ))}
+                        <div className="gwCoinPrice">
+                          <span className="gwCoinPriceValue">{formatPrice(coinCell?.price ?? null)}</span>
+                          <span className={`gwCoinPriceDir ${priceDirection === 'up' ? 'gwUp' : priceDirection === 'down' ? 'gwDown' : 'gwFlat'}`}>
+                            {arrow(priceDirection)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {TIMEFRAMES.map((tf) => {
+                      const cell = payload?.data?.[coin]?.[tf]
+                      const rsiDirection = cell?.rsiDirection ?? null
+
+                      return (
+                        <button
+                          key={tf}
+                          type="button"
+                          className={`gwCell gwRsiCell ${tone(cell?.rsi ?? null)}`}
+                          onClick={() => setSelected({ coin, tf })}
+                          title={`${coin} ${tf} RSI: ${cell?.rsi == null ? 'N/A' : cell.rsi.toFixed(1)} ${arrow(rsiDirection)}`}
+                        >
+                          <div>
+                            <div className="gwRsi">{cell?.rsi == null ? '—' : cell.rsi.toFixed(1)}</div>
+                            <div className={`gwRsiDirection ${rsiDirection === 'up' ? 'gwUp' : rsiDirection === 'down' ? 'gwDown' : 'gwFlat'}`}>
+                              {arrow(rsiDirection)}
+                            </div>
+                            <span className="gwState">{label(cell?.rsi ?? null)}</span>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )
+              })}
             </div>
           </div>
 
