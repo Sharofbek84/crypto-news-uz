@@ -128,7 +128,6 @@ function rsiSeries(candles: Candle[], p = 14) {
   return out
 }
 
-/** Premium uslubidagi shamchali grafik — 300 sham, o‘ngda narx, zoom yo‘q */
 function CandleChart({
   candles,
   coin,
@@ -138,7 +137,7 @@ function CandleChart({
   coin: string
   tf: string
 }) {
-  if (!candles.length) return <div className="rsiChartEmpty">Grafik ma&apos;lumoti yo&apos;q</div>
+  if (!candles.length) return <div className="rsiChartEmpty">Grafik ma'lumoti yo'q</div>
 
   const W = 1700
   const H = 720
@@ -256,7 +255,6 @@ function CandleChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
-          {/* Joriy narx — o‘ng tomonda Premium kabi */}
           <line
             x1={L}
             x2={plotRight}
@@ -272,7 +270,6 @@ function CandleChart({
           </text>
           <circle cx={lx} cy={y(latest)} r="3.5" fill="#65d9ff" />
 
-          {/* RSI panel */}
           <text x={L + 8} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
             RSI 14 {rs[rs.length - 1]?.toFixed(2) ?? '—'}
           </text>
@@ -429,9 +426,7 @@ export default function SpotRSIHeatmap() {
       <div className="rsiHmHead">
         <div>
           <h1 className="rsiHmTitle">Spot RSI Heatmap</h1>
-          <p className="rsiHmSub">
-            RSI kartasini bosing — pastida shamchali grafik ochiladi (300 ta sham).
-          </p>
+          <p className="rsiHmSub">Top kriptovalyutalar trendini bir joyda kuzating.</p>
         </div>
         <div className="rsiTfGroup" role="group" aria-label="Timeframe">
           {TIMEFRAMES.map((t) => (
@@ -448,10 +443,10 @@ export default function SpotRSIHeatmap() {
       </div>
 
       {loading ? (
-        <div className="rsiHmLoading">Ma&apos;lumot yuklanmoqda...</div>
+        <div className="rsiHmLoading">Ma'lumot yuklanmoqda...</div>
       ) : error ? (
         <div className="rsiHmError">
-          Ma&apos;lumot olinmadi.{' '}
+          Ma'lumot olinmadi.{' '}
           <button type="button" className="rsiTfBtn" onClick={loadHeatmap}>
             Qayta urinish
           </button>
