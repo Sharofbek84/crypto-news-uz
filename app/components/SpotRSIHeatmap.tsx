@@ -157,23 +157,22 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
-  const entryLow = Number(result.entryLow)
-  const entryHigh = Number(result.entryHigh)
   const invalidation = Number(result.invalidation)
 
-  // Premium bullish/bearish ssenariyasi:
-  // BUY:  BUY1/2 = support/entry, SELL1/2 = TP1/TP2
-  // SELL: SELL1/2 = entryHigh + invalidation, BUY1/2 = TP1/TP2
-  // Yorliqlar yopishmasin: min 1.2% oralik
-  const MIN_GAP = 0.012
+  // Entry ishlatilmaydi. Uzoqroq support / qarshilik + TP1/TP2. Min 1.5% oralik.
+  const MIN_GAP = 0.015
 
   const supportsBelow = support
-    .filter((v: number) => v < price * 0.999)
+    .filter((v: number) => v < price * 0.995)
     .sort((a: number, b: number) => b - a)
 
   const resistsAbove = resistance
-    .filter((v: number) => v > price * 1.001)
+    .filter((v: number) => v > price * 1.005)
     .sort((a: number, b: number) => a - b)
+
+  // Eng yaqinni o'tkazib, uzoqroq zonalar
+  const farSupports = supportsBelow.length >= 2 ? supportsBelow.slice(1) : supportsBelow
+  const farResists = resistsAbove.length >= 2 ? resistsAbove.slice(1) : resistsAbove
 
   const tp1 = Number.isFinite(tp[0]) ? tp[0] : NaN
   const tp2 = Number.isFinite(tp[1]) ? tp[1] : NaN
@@ -183,10 +182,10 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
 
   if (side === 'SELL') {
     const buyPool: number[] = []
-    if (Number.isFinite(tp1) && tp1 < price * 0.999) buyPool.push(tp1)
-    if (Number.isFinite(tp2) && tp2 < price * 0.999) buyPool.push(tp2)
+    if (Number.isFinite(tp1) && tp1 < price * 0.995) buyPool.push(tp1)
+    if (Number.isFinite(tp2) && tp2 < price * 0.995) buyPool.push(tp2)
     if (buyPool.length < 2) {
-      for (const v of supportsBelow) {
+      for (const v of farSupports.length ? farSupports : supportsBelow) {
         if (buyPool.length >= 2) break
         buyPool.push(v)
       }
@@ -194,31 +193,26 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
     buys = uniqLevels(buyPool, 2, MIN_GAP)
 
     const sellPool: number[] = []
-    if (Number.isFinite(entryHigh) && entryHigh > price * 1.001) sellPool.push(entryHigh)
-    if (Number.isFinite(invalidation) && invalidation > price * 1.001) sellPool.push(invalidation)
-    for (const v of resistsAbove) {
-      if (sellPool.length >= 4) break
-      sellPool.push(v)
-    }
+    if (Number.isFinite(invalidation) && invalidation > price * 1.005) sellPool.push(invalidation)
+    for (const v of farResists.length ? farResists : resistsAbove) sellPool.push(v)
+    for (const v of resistsAbove) sellPool.push(v)
     sells = uniqLevels(sellPool, 2, MIN_GAP)
   } else {
     const buyPool: number[] = []
-    if (Number.isFinite(entryLow) && entryLow < price * 0.999) buyPool.push(entryLow)
+    for (const v of farSupports.length ? farSupports : supportsBelow) buyPool.push(v)
     for (const v of supportsBelow) buyPool.push(v)
     buys = uniqLevels(buyPool, 2, MIN_GAP)
 
     const sellPool: number[] = []
-    if (Number.isFinite(tp1) && tp1 > price * 1.001) sellPool.push(tp1)
-    if (Number.isFinite(tp2) && tp2 > price * 1.001) sellPool.push(tp2)
+    if (Number.isFinite(tp1) && tp1 > price * 1.005) sellPool.push(tp1)
+    if (Number.isFinite(tp2) && tp2 > price * 1.005) sellPool.push(tp2)
     if (sellPool.length < 2) {
-      for (const v of resistsAbove) {
+      for (const v of farResists.length ? farResists : resistsAbove) {
         if (sellPool.length >= 2) break
         sellPool.push(v)
       }
     }
-    if (Number.isFinite(invalidation) && invalidation > price * 1.001) {
-      sellPool.push(invalidation)
-    }
+    if (Number.isFinite(invalidation) && invalidation > price * 1.005) sellPool.push(invalidation)
     sells = uniqLevels(sellPool, 2, MIN_GAP)
   }
 
@@ -271,7 +265,6 @@ function CandleChart({
   const chg = latest - prevC
   const chgPct = prevC ? (chg / prevC) * 100 : 0
   const up = chg >= 0
-  const lx = x(candles.length - 1)
 
   const priceTicks = [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => max - (max - min) * t)
 
@@ -429,7 +422,6 @@ function CandleChart({
           <text x={labelX + 59} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
             {money(latest)}
           </text>
-          <circle cx={lx} cy={y(latest)} r="3.5" fill="#65d9ff" />
 
           <text x={L + 8} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
             RSI 14 {rs[rs.length - 1]?.toFixed(2) ?? '—'}
