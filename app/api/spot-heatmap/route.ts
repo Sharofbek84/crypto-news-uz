@@ -3,14 +3,31 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-const COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'LTC', 'NEAR', 'SUI', 'APT', 'ATOM', 'GRAM'] as const
+const COINS = [
+  'BTC',
+  'ETH',
+  'LTC',
+  'SOL',
+  'BNB',
+  'NEAR',
+  'GRAM',
+  'SUI',
+  'APT',
+  'ATOM',
+  'XAUT',
+  'XRP',
+  'XLM',
+  'BCH',
+  'LINK',
+  'AVAX',
+] as const
+
 const TIMEFRAMES = [
   { key: 'H4', interval: '4h' },
   { key: 'D1', interval: '1d' },
   { key: 'W1', interval: '7d' },
 ] as const
 
-/** Gate.io: [timestamp, volume, close, high, low, open] — oldest first */
 type Candle = [string, string, string, string, string, string, string?]
 
 function calculateRSI(closes: number[], period = 14): number | null {
@@ -29,36 +46,29 @@ function calculateRSI(closes: number[], period = 14): number | null {
 
   for (let i = period + 1; i < closes.length; i++) {
     const change = closes[i] - closes[i - 1]
-    const currentGain = Math.max(change, 0)
-    const currentLoss = Math.max(-change, 0)
-    avgGain = (avgGain * (period - 1) + currentGain) / period
-    avgLoss = (avgLoss * (period - 1) + currentLoss) / period
+    avgGain = (avgGain * (period - 1) + Math.max(change, 0)) / period
+    avgLoss = (avgLoss * (period - 1) + Math.max(-change, 0)) / period
   }
 
   if (avgLoss === 0) return 100
-  const rs = avgGain / avgLoss
-  return 100 - 100 / (1 + rs)
+  return 100 - 100 / (1 + avgGain / avgLoss)
 }
 
 async function getRSI(symbol: string, interval: string) {
   const url = new URL('https://api.gateio.ws/api/v4/spot/candlesticks')
   url.searchParams.set('currency_pair', `${symbol}_USDT`)
   url.searchParams.set('interval', interval)
-  url.searchParams.set('limit', '100')
+  url.searchParams.set('limit', '150')
 
   const res = await fetch(url.toString(), {
     cache: 'no-store',
     headers: { Accept: 'application/json' },
   })
-
   if (!res.ok) throw new Error(`Gate.io ${symbol} ${interval}: ${res.status}`)
 
   const rows = (await res.json()) as Candle[]
-  if (!Array.isArray(rows) || rows.length === 0) {
-    throw new Error(`Empty candles ${symbol} ${interval}`)
-  }
+  if (!Array.isArray(rows) || rows.length === 0) throw new Error('Empty')
 
-  // Ensure chronological order (oldest → newest)
   const sorted = [...rows].sort((a, b) => Number(a[0]) - Number(b[0]))
   const closes = sorted.map((row) => Number(row[2])).filter((v) => Number.isFinite(v))
 
@@ -69,14 +79,8 @@ async function getRSI(symbol: string, interval: string) {
   const price = last ? Number(last[2]) : null
 
   const direction = (current: number | null, previous: number | null) => {
-    if (
-      current == null ||
-      previous == null ||
-      !Number.isFinite(current) ||
-      !Number.isFinite(previous)
-    ) {
+    if (current == null || previous == null || !Number.isFinite(current) || !Number.isFinite(previous))
       return null
-    }
     if (current > previous) return 'up' as const
     if (current < previous) return 'down' as const
     return 'flat' as const
@@ -151,10 +155,6 @@ export async function GET() {
       data,
       updatedAt: Date.now(),
     },
-    {
-      headers: {
-        'Cache-Control': 'no-store, max-age=0',
-      },
-    }
+    { headers: { 'Cache-Control': 'no-store, max-age=0' } }
   )
 }
