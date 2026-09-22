@@ -59,12 +59,24 @@ async function getRSI(symbol: string, interval: string) {
     .filter((value) => Number.isFinite(value))
 
   const rsi = calculateRSI(closes)
+  const previousRsi = closes.length > 1 ? calculateRSI(closes.slice(0, -1)) : null
   const last = rows[rows.length - 1]
+  const previousPrice = rows.length > 1 ? Number(rows[rows.length - 2][2]) : null
+  const price = last ? Number(last[2]) : null
+
+  const direction = (current: number | null, previous: number | null) => {
+    if (current == null || previous == null || !Number.isFinite(current) || !Number.isFinite(previous)) return null
+    if (current > previous) return 'up' as const
+    if (current < previous) return 'down' as const
+    return 'flat' as const
+  }
 
   return {
     rsi: rsi == null ? null : Math.round(rsi * 10) / 10,
-    price: last ? Number(last[2]) : null,
+    price,
     timestamp: last ? Number(last[0]) : null,
+    priceDirection: direction(price, previousPrice),
+    rsiDirection: direction(rsi, previousRsi),
   }
 }
 
@@ -75,13 +87,13 @@ export async function GET() {
         try {
           return [symbol, key, await getRSI(symbol, interval)] as const
         } catch {
-          return [symbol, key, { rsi: null, price: null, timestamp: null }] as const
+          return [symbol, key, { rsi: null, price: null, timestamp: null, priceDirection: null, rsiDirection: null }] as const
         }
       })
     )
   )
 
-  const data: Record<string, Record<string, { rsi: number | null; price: number | null; timestamp: number | null }>> = {}
+  const data: Record<string, Record<string, { rsi: number | null; price: number | null; timestamp: number | null; priceDirection: 'up' | 'down' | 'flat' | null; rsiDirection: 'up' | 'down' | 'flat' | null }>> = {}
 
   for (const symbol of COINS) {
     data[symbol] = {}
