@@ -156,30 +156,15 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const side = typeof result.side === 'string' ? result.side : null
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
-  const tp = toNums(result.tp)
-  const invalidation = Number(result.invalidation)
 
-  // Faqat support / TP / resistance — entry zona yo'q. Faqat BUY1-2, SELL1-2.
-  const buyPool: number[] = support
+  // BUY = support zonalar, SELL = resistance (qarshilik) zonalar
+  const buyPool = support
     .filter((v: number) => v < price * 0.999)
     .sort((a: number, b: number) => b - a)
 
-  if (side === 'SELL') {
-    buyPool.push(
-      ...tp.filter((v: number) => v < price * 0.999).sort((a: number, b: number) => b - a)
-    )
-  }
-
-  let sellPool: number[] = []
-  if (side === 'SELL') {
-    sellPool = [invalidation, ...resistance]
-      .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
-      .sort((a: number, b: number) => a - b)
-  } else {
-    sellPool = [...tp, ...resistance]
-      .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
-      .sort((a: number, b: number) => a - b)
-  }
+  const sellPool = resistance
+    .filter((v: number) => v > price * 1.001)
+    .sort((a: number, b: number) => a - b)
 
   const buys = uniqLevels(buyPool, 2, 0.03)
   const sells = uniqLevels(sellPool, 2, 0.03)
@@ -208,7 +193,7 @@ function CandleChart({
   const W = 1700
   const H = 720
   const L = 24
-  const R = 150
+  const R = 160
   const T = 56
   const MB = 480
   const RT = 520
@@ -243,10 +228,13 @@ function CandleChart({
 
   const sideLabel = levels?.side === 'SELL' ? 'SELL' : levels?.side === 'BUY' ? 'BUY' : ''
 
-  // Yorliqlar: chiziq haqiqiy narxda, yorliq min 28px oraliq bilan
   const levelLabels: { p: number; label: string; bg: string }[] = []
-  levels?.buys.forEach((p, i) => levelLabels.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' }))
-  levels?.sells.forEach((p, i) => levelLabels.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' }))
+  levels?.buys.forEach((p, i) =>
+    levelLabels.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' })
+  )
+  levels?.sells.forEach((p, i) =>
+    levelLabels.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' })
+  )
   levelLabels.sort((a, b) => b.p - a.p)
   const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
   const minGap = 28
@@ -286,6 +274,9 @@ function CandleChart({
             return (
               <g key={i}>
                 <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke="#182230" />
+                <text x={L + 4} y={yy - 4} fill="#8b949e" fontSize="11" fontWeight="600">
+                  {money(v)}
+                </text>
               </g>
             )
           })}
@@ -634,6 +625,7 @@ export default function SpotRSIHeatmap() {
                   <span>
                     Signal: <b>{levels.side || '—'}</b>
                   </span>
+                  <span style={{ opacity: 0.75 }}>Support / Qarshilik</span>
                   {levels.buys.map((p, i) => (
                     <span key={`b${i}`} className="rsiBuy">
                       BUY{i + 1}: <b>{money(p)}</b>
