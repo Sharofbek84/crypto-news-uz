@@ -134,8 +134,7 @@ function rsiSeries(candles: Candle[], p = 14) {
   return out
 }
 
-/** Darajalar orasida kamida minGapPct farq — yorliqlar yopishmasin */
-function uniqLevels(values: number[], maxCount: number, minGapPct = 0.02) {
+function uniqLevels(values: number[], maxCount: number, minGapPct = 0.03) {
   const out: number[] = []
   for (const v of values) {
     if (!Number.isFinite(v) || v <= 0) continue
@@ -158,23 +157,22 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
-  const entryLow = Number(result.entryLow)
-  const entryHigh = Number(result.entryHigh)
   const invalidation = Number(result.invalidation)
 
-  // BUY: avvalo entry, keyin support (yaqindan uzoqqa), min 2.5% oraliq
-  const buyPool: number[] = []
-  if (Number.isFinite(entryLow) && entryLow < price * 0.999) buyPool.push(entryLow)
-  if (Number.isFinite(entryHigh) && entryHigh < price * 0.998) buyPool.push(entryHigh)
-  buyPool.push(...support.filter((v: number) => v < price * 0.999))
+  // Faqat support / TP / resistance — entry zona yo'q. Faqat BUY1-2, SELL1-2.
+  const buyPool: number[] = support
+    .filter((v: number) => v < price * 0.999)
+    .sort((a: number, b: number) => b - a)
+
   if (side === 'SELL') {
-    buyPool.push(...tp.filter((v: number) => v < price * 0.999))
+    buyPool.push(
+      ...tp.filter((v: number) => v < price * 0.999).sort((a: number, b: number) => b - a)
+    )
   }
-  buyPool.sort((a: number, b: number) => b - a)
 
   let sellPool: number[] = []
   if (side === 'SELL') {
-    sellPool = [invalidation, entryHigh, entryLow, ...resistance]
+    sellPool = [invalidation, ...resistance]
       .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
       .sort((a: number, b: number) => a - b)
   } else {
@@ -183,21 +181,15 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
       .sort((a: number, b: number) => a - b)
   }
 
-  const buys = uniqLevels(buyPool, 3, 0.025)
-  const sells = uniqLevels(sellPool, 3, 0.025)
+  const buys = uniqLevels(buyPool, 2, 0.03)
+  const sells = uniqLevels(sellPool, 2, 0.03)
 
-  const fillBuys = [0.025, 0.05, 0.08]
-  for (let i = buys.length; i < 3; i++) {
-    const base = buys.length ? buys[buys.length - 1] : price
-    buys.push(base * (1 - fillBuys[i]))
-  }
-  const fillSells = [0.025, 0.05, 0.08]
-  for (let i = sells.length; i < 3; i++) {
-    const base = sells.length ? sells[sells.length - 1] : price
-    sells.push(base * (1 + fillSells[i]))
-  }
+  if (buys.length < 1) buys.push(price * 0.97)
+  if (buys.length < 2) buys.push(buys[0] * 0.97)
+  if (sells.length < 1) sells.push(price * 1.03)
+  if (sells.length < 2) sells.push(sells[0] * 1.03)
 
-  return { buys: buys.slice(0, 3), sells: sells.slice(0, 3), side }
+  return { buys: buys.slice(0, 2), sells: sells.slice(0, 2), side }
 }
 
 function CandleChart({
@@ -249,17 +241,26 @@ function CandleChart({
 
   const priceTicks = [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => max - (max - min) * t)
 
-  const rightBox = (yy: number, text: string, bg: string, w = 118) => (
-    <g>
-      <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke={bg} strokeWidth="1.3" strokeDasharray="6 5" opacity="0.85" />
-      <rect x={labelX} y={yy - 12} width={w} height={24} rx="4" fill={bg} />
-      <text x={labelX + w / 2} y={yy + 5} textAnchor="middle" fill="#fff" fontSize="11" fontWeight="800">
-        {text}
-      </text>
-    </g>
-  )
-
   const sideLabel = levels?.side === 'SELL' ? 'SELL' : levels?.side === 'BUY' ? 'BUY' : ''
+
+  // Yorliqlar: chiziq haqiqiy narxda, yorliq min 28px oraliq bilan
+  const levelLabels: { p: number; label: string; bg: string }[] = []
+  levels?.buys.forEach((p, i) => levelLabels.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' }))
+  levels?.sells.forEach((p, i) => levelLabels.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' }))
+  levelLabels.sort((a, b) => b.p - a.p)
+  const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
+  const minGap = 28
+  for (const it of levelLabels) {
+    let yy = y(it.p)
+    for (const prev of placedLabels) {
+      if (Math.abs(yy - prev.yy) < minGap) {
+        if (yy >= prev.yy) yy = prev.yy + minGap
+        else yy = prev.yy - minGap
+      }
+    }
+    yy = Math.max(T + 14, Math.min(MB - 14, yy))
+    placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
+  }
 
   return (
     <div className="homeChartWrap">
@@ -340,8 +341,40 @@ function CandleChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
-          {levels?.buys.map((p, i) => rightBox(y(p), `BUY${i + 1}  ${money(p)}`, '#148f55'))}
-          {levels?.sells.map((p, i) => rightBox(y(p), `SELL${i + 1}  ${money(p)}`, '#c52f3a'))}
+          {placedLabels.map((it, i) => (
+            <g key={i}>
+              <line
+                x1={L}
+                x2={plotRight}
+                y1={y(it.p)}
+                y2={y(it.p)}
+                stroke={it.bg}
+                strokeWidth="1.3"
+                strokeDasharray="6 5"
+                opacity="0.85"
+              />
+              <line
+                x1={plotRight}
+                x2={labelX}
+                y1={y(it.p)}
+                y2={it.yy}
+                stroke={it.bg}
+                strokeWidth="1"
+                opacity="0.45"
+              />
+              <rect x={labelX} y={it.yy - 12} width={118} height={24} rx="4" fill={it.bg} />
+              <text
+                x={labelX + 59}
+                y={it.yy + 5}
+                textAnchor="middle"
+                fill="#fff"
+                fontSize="11"
+                fontWeight="800"
+              >
+                {it.label}
+              </text>
+            </g>
+          ))}
 
           <line
             x1={L}
