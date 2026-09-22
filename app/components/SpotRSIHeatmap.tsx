@@ -158,57 +158,60 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
 
-  // TP1/TP2 + support1/2 + qarshilik1/2. Yorliqlar yopishmasin: min 1.5% oralik.
-  const MIN_GAP = 0.015
+  // 1-chi zona har doim saqlanadi; 2-chi uchun oralikli KEYINGI support/qarshilik.
+  const MIN_GAP = 0.012
 
-  const support12 = uniqLevels(
-    support.filter((v: number) => v < price * 0.999).sort((a: number, b: number) => b - a),
-    2,
-    MIN_GAP
-  )
+  const supportsBelow = support
+    .filter((v: number) => v < price * 0.999)
+    .sort((a: number, b: number) => b - a)
 
-  const resist12 = uniqLevels(
-    resistance.filter((v: number) => v > price * 1.001).sort((a: number, b: number) => a - b),
-    2,
-    MIN_GAP
-  )
+  const resistsAbove = resistance
+    .filter((v: number) => v > price * 1.001)
+    .sort((a: number, b: number) => a - b)
+
+  function firstAndNext(ordered: number[]): number[] {
+    if (!ordered.length) return []
+    const first = ordered[0]
+    const out = [first]
+    for (let i = 1; i < ordered.length; i++) {
+      const v = ordered[i]
+      if (Math.abs(v - first) / Math.max(Math.abs(first), Math.abs(v), 1) >= MIN_GAP) {
+        out.push(v)
+        break
+      }
+      // yaqin — keyingisini qidiramiz (ro'yxat davom etadi)
+    }
+    return out
+  }
+
+  const supportLevels = firstAndNext(supportsBelow)
+  const resistLevels = firstAndNext(resistsAbove)
 
   const tp1 = Number.isFinite(tp[0]) ? tp[0] : NaN
   const tp2 = Number.isFinite(tp[1]) ? tp[1] : NaN
-  const tpAbove = uniqLevels(
-    [tp1, tp2].filter((v: number) => Number.isFinite(v) && v > price * 1.001),
-    2,
-    MIN_GAP
-  )
-  const tpBelow = uniqLevels(
-    [tp1, tp2].filter((v: number) => Number.isFinite(v) && v < price * 0.999),
-    2,
-    MIN_GAP
-  )
+  const tpsBelow = [tp1, tp2].filter((v: number) => Number.isFinite(v) && v < price * 0.999)
+  const tpsAbove = [tp1, tp2].filter((v: number) => Number.isFinite(v) && v > price * 1.001)
 
   let buys: number[] = []
   let sells: number[] = []
 
   if (side === 'SELL') {
-    buys = tpBelow.length ? tpBelow : support12
-    if (buys.length < 2) {
-      buys = uniqLevels([...buys, ...support12], 2, MIN_GAP)
+    buys = firstAndNext(tpsBelow.length ? tpsBelow : supportsBelow)
+    if (buys.length < 2 && supportsBelow.length) {
+      buys = firstAndNext([...buys, ...supportsBelow.filter((v) => !buys.includes(v))])
     }
-    sells = resist12.length ? resist12 : tpAbove
-    if (sells.length < 2) {
-      sells = uniqLevels([...sells, ...tpAbove, ...resist12], 2, MIN_GAP)
-    }
+    sells = resistLevels.length ? resistLevels : firstAndNext(tpsAbove)
   } else {
-    buys = support12
-    sells = tpAbove.length ? tpAbove : resist12
-    if (sells.length < 2) {
-      sells = uniqLevels([...sells, ...resist12, ...tpAbove], 2, MIN_GAP)
+    buys = supportLevels
+    sells = firstAndNext(tpsAbove.length ? tpsAbove : resistsAbove)
+    if (sells.length < 2 && resistsAbove.length) {
+      sells = firstAndNext([...sells, ...resistsAbove.filter((v) => !sells.includes(v))])
     }
   }
 
   return {
-    buys: uniqLevels(buys, 2, MIN_GAP),
-    sells: uniqLevels(sells, 2, MIN_GAP),
+    buys: buys.slice(0, 2),
+    sells: sells.slice(0, 2),
     side,
   }
 }
