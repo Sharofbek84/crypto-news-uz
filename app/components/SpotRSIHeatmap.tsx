@@ -56,7 +56,6 @@ function rsiColor(rsi: number | null): string {
   if (v < 30) return lerpHex('#1a4a9e', '#2d6fd4', v / 30)
   if (v < 50) return lerpHex('#2d6fd4', '#3a424d', (v - 30) / 20)
   if (v < 70) return lerpHex('#3a424d', '#c47a12', (v - 50) / 20)
-  // 70+: to'qroq qizil (overbought)
   return lerpHex('#c62828', '#6b0f14', (v - 70) / 30)
 }
 
@@ -183,6 +182,8 @@ function buildTradeLevels(
   const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
+  // 2-chi zona juda uzoq bo'lsa: max = 2 * ATR
+  const maxBetween = Math.max(atrSafe * 2, price * 0.02)
 
   const supportsBelow = support
     .filter((v) => v <= price - minFromPrice)
@@ -194,27 +195,30 @@ function buildTradeLevels(
 
   function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
     const fallback1 = direction === 'down' ? price - atrSafe : price + atrSafe
-    const fallback2 = direction === 'down' ? price - atrSafe * 2 : price + atrSafe * 2
+    const fallback2 = direction === 'down' ? fallback1 - atrSafe : fallback1 + atrSafe
 
     if (!ordered.length) {
       return [fallback1, fallback2]
     }
 
     const first = ordered[0]
-    const out: number[] = [first]
+    let second: number | null = null
+
     for (let i = 1; i < ordered.length; i++) {
       const v = ordered[i]
-      if (Math.abs(v - first) >= minBetween) {
-        out.push(v)
-        break
-      }
+      const dist = Math.abs(v - first)
+      if (dist < minBetween) continue
+      // Juda uzoq — 1-chi ± ATR
+      if (dist > maxBetween) break
+      second = v
+      break
     }
-    if (out.length < 2) {
-      const second =
-        direction === 'down' ? first - Math.max(minBetween, atrSafe) : first + Math.max(minBetween, atrSafe)
-      out.push(second)
+
+    if (second == null) {
+      second = direction === 'down' ? first - atrSafe : first + atrSafe
     }
-    return out.slice(0, 2)
+
+    return [first, second]
   }
 
   return {
