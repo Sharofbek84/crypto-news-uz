@@ -176,61 +176,41 @@ export default function SpotRSIHeatmap() {
         <>
           <div className="gwGridWrap">
             <div className="gwGrid">
-              <div className="gwRow gwHead">
-                <div className="gwCell gwCoin">COIN</div>
-                {TIMEFRAMES.map((tf) => <div key={tf} className="gwCell">{tf}</div>)}
-              </div>
-
-              {COINS.map((coin) => {
-                const coinCell = payload?.data?.[coin]?.H4
-                const priceDirection = coinCell?.priceDirection ?? null
-
-                return (
-                  <div className="gwRow" key={coin}>
-                    <div className="gwCell gwCoin">
-                      <div className="gwCoinInfo">
-                        <div className="gwCoinIcon">{coin.slice(0, 2)}</div>
-                        <div className="gwCoinMain">
-                          <span className="gwCoinSymbol">{coin}</span>
-                          <span className="gwCoinName">/USDT</span>
-                        </div>
-                        <div className="gwCoinPrice">
-                          <span className="gwCoinPriceValue">{formatPrice(coinCell?.price ?? null)}</span>
-                          <span className={`gwCoinPriceDir ${priceDirection === 'up' ? 'gwUp' : priceDirection === 'down' ? 'gwDown' : 'gwFlat'}`}>
-                            {arrow(priceDirection)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {TIMEFRAMES.map((tf) => {
+              {TIMEFRAMES.map((tf) => (
+                <div className="gwTfColumn" key={tf}>
+                  <div className="gwTfHeader">{tf}</div>
+                  <div className="gwTiles">
+                    {COINS.map((coin) => {
                       const cell = payload?.data?.[coin]?.[tf]
                       const rsiDirection = cell?.rsiDirection ?? null
-
                       return (
                         <button
-                          key={tf}
+                          key={coin}
                           type="button"
-                          className={`gwCell gwRsiCell ${tone(cell?.rsi ?? null)}`}
+                          className={\`gwTile \${tone(cell?.rsi ?? null)}\`}
                           onClick={() => setSelected({ coin, tf })}
-                          title={`${coin} ${tf} RSI: ${cell?.rsi == null ? 'N/A' : cell.rsi.toFixed(1)} ${arrow(rsiDirection)}`}
+                          title={\`\${coin} \${tf} RSI: \${cell?.rsi == null ? 'N/A' : cell.rsi.toFixed(1)} \${arrow(rsiDirection)} • Narx: \${formatPrice(cell?.price ?? null)}\`}
                         >
-                          <div>
-                            <div className="gwRsi">{cell?.rsi == null ? '—' : cell.rsi.toFixed(1)}</div>
-                            <div className={`gwRsiDirection ${rsiDirection === 'up' ? 'gwUp' : rsiDirection === 'down' ? 'gwDown' : 'gwFlat'}`}>
-                              {arrow(rsiDirection)}
-                            </div>
+                          <div className="gwTileTop">
+                            <span className="gwTileCoin">{coin}</span>
+                            <span className="gwTilePrice">{formatPrice(cell?.price ?? null)}</span>
+                          </div>
+                          <div className="gwTileMiddle">
+                            <span className="gwRsi">{cell?.rsi == null ? '—' : cell.rsi.toFixed(1)}</span>
+                            <span className={\`gwRsiDirection \${rsiDirection === 'up' ? 'gwUp' : rsiDirection === 'down' ? 'gwDown' : 'gwFlat'}\`}>{arrow(rsiDirection)}</span>
+                          </div>
+                          <div className="gwTileBottom">
                             <span className="gwState">{label(cell?.rsi ?? null)}</span>
+                            <span className="gwPeriod">RSI(14)</span>
                           </div>
                         </button>
                       )
                     })}
                   </div>
-                )
-              })}
+                </div>
+              ))}
             </div>
           </div>
-
           <div className="gwBottom">
             <div className="gwStats">
               <span className="gwStat">Oversold: <strong>{stats.oversold}</strong></span>
