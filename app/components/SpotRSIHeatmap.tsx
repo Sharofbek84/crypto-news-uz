@@ -180,40 +180,42 @@ function buildTradeLevels(
   const resistance = toNums(result.resistance)
 
   const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
+  // Narx ↔ zona: min 0.6 ATR, max 2 ATR
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
+  const maxFromPrice = Math.max(atrSafe * 2, price * 0.02)
+  // Ikki zona oralig'i
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
-  // 2-chi zona juda uzoq bo'lsa: max = 2 * ATR
   const maxBetween = Math.max(atrSafe * 2, price * 0.02)
 
   const supportsBelow = support
-    .filter((v) => v <= price - minFromPrice)
+    .filter((v) => {
+      const d = price - v
+      return d >= minFromPrice && d <= maxFromPrice
+    })
     .sort((a, b) => b - a)
 
   const resistsAbove = resistance
-    .filter((v) => v >= price + minFromPrice)
+    .filter((v) => {
+      const d = v - price
+      return d >= minFromPrice && d <= maxFromPrice
+    })
     .sort((a, b) => a - b)
 
   function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
-    const fallback1 = direction === 'down' ? price - atrSafe : price + atrSafe
-    const fallback2 = direction === 'down' ? fallback1 - atrSafe : fallback1 + atrSafe
+    const firstDefault = direction === 'down' ? price - atrSafe : price + atrSafe
+    const secondDefault = direction === 'down' ? price - atrSafe * 2 : price + atrSafe * 2
 
-    if (!ordered.length) {
-      return [fallback1, fallback2]
-    }
+    const first = ordered.length ? ordered[0] : firstDefault
 
-    const first = ordered[0]
     let second: number | null = null
-
     for (let i = 1; i < ordered.length; i++) {
       const v = ordered[i]
       const dist = Math.abs(v - first)
       if (dist < minBetween) continue
-      // Juda uzoq — 1-chi ± ATR
       if (dist > maxBetween) break
       second = v
       break
     }
-
     if (second == null) {
       second = direction === 'down' ? first - atrSafe : first + atrSafe
     }
