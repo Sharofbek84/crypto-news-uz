@@ -179,30 +179,41 @@ function buildTradeLevels(
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
 
-  // Minimal oralik = max(0.8 * ATR, narxning 0.4%) — zonalar yopishmasin
-  const gap = Math.max(Number.isFinite(atr) && atr > 0 ? atr * 0.8 : 0, price * 0.004)
+  const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
+  // Narxdan minimal masofa: 0.6 * ATR yoki 0.8%
+  const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
+  // Ikki zona oralig'i: 0.8 * ATR yoki 0.5%
+  const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
 
-  const supportsBelow = support.filter((v) => v < price * 0.999).sort((a, b) => b - a)
-  const resistsAbove = resistance.filter((v) => v > price * 1.001).sort((a, b) => a - b)
+  const supportsBelow = support
+    .filter((v) => v <= price - minFromPrice)
+    .sort((a, b) => b - a)
+
+  const resistsAbove = resistance
+    .filter((v) => v >= price + minFromPrice)
+    .sort((a, b) => a - b)
 
   function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
+    const fallback1 = direction === 'down' ? price - atrSafe : price + atrSafe
+    const fallback2 = direction === 'down' ? price - atrSafe * 2 : price + atrSafe * 2
+
     if (!ordered.length) {
-      if (!(Number.isFinite(atr) && atr > 0)) return []
-      if (direction === 'down') return [price - atr, price - atr * 2]
-      return [price + atr, price + atr * 2]
+      return [fallback1, fallback2]
     }
+
     const first = ordered[0]
     const out: number[] = [first]
     for (let i = 1; i < ordered.length; i++) {
       const v = ordered[i]
-      if (Math.abs(v - first) >= gap) {
+      if (Math.abs(v - first) >= minBetween) {
         out.push(v)
         break
       }
     }
-    if (out.length < 2 && Number.isFinite(atr) && atr > 0) {
-      if (direction === 'down') out.push(first - Math.max(gap, atr))
-      else out.push(first + Math.max(gap, atr))
+    if (out.length < 2) {
+      const second =
+        direction === 'down' ? first - Math.max(minBetween, atrSafe) : first + Math.max(minBetween, atrSafe)
+      out.push(second)
     }
     return out.slice(0, 2)
   }
