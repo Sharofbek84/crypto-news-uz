@@ -157,8 +157,16 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
+  const entryLow = Number(result.entryLow)
+  const entryHigh = Number(result.entryHigh)
+  const invalidation = Number(result.invalidation)
 
-  // Premium: BUY ← support, SELL ← TP1/TP2 (yoki qarshilik)
+  // Premium bullish/bearish ssenariyasi:
+  // BUY:  BUY1/2 = support/entry, SELL1/2 = TP1/TP2
+  // SELL: SELL1/2 = entryHigh + invalidation, BUY1/2 = TP1/TP2
+  // Yorliqlar yopishmasin: min 1.2% oralik
+  const MIN_GAP = 0.012
+
   const supportsBelow = support
     .filter((v: number) => v < price * 0.999)
     .sort((a: number, b: number) => b - a)
@@ -167,25 +175,51 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
     .filter((v: number) => v > price * 1.001)
     .sort((a: number, b: number) => a - b)
 
-  const tpAbove: number[] = []
-  const tpBelow: number[] = []
-  for (let i = 0; i < Math.min(2, tp.length); i++) {
-    const v = tp[i]
-    if (!Number.isFinite(v)) continue
-    if (v > price * 1.001) tpAbove.push(v)
-    else if (v < price * 0.999) tpBelow.push(v)
-  }
+  const tp1 = Number.isFinite(tp[0]) ? tp[0] : NaN
+  const tp2 = Number.isFinite(tp[1]) ? tp[1] : NaN
 
   let buys: number[] = []
   let sells: number[] = []
 
-  // 0.3% min farq — XAUT kabi yaqin zonalar ham chiqadi
   if (side === 'SELL') {
-    sells = uniqLevels(resistsAbove, 2, 0.003)
-    buys = uniqLevels(tpBelow.length ? tpBelow : supportsBelow, 2, 0.003)
+    const buyPool: number[] = []
+    if (Number.isFinite(tp1) && tp1 < price * 0.999) buyPool.push(tp1)
+    if (Number.isFinite(tp2) && tp2 < price * 0.999) buyPool.push(tp2)
+    if (buyPool.length < 2) {
+      for (const v of supportsBelow) {
+        if (buyPool.length >= 2) break
+        buyPool.push(v)
+      }
+    }
+    buys = uniqLevels(buyPool, 2, MIN_GAP)
+
+    const sellPool: number[] = []
+    if (Number.isFinite(entryHigh) && entryHigh > price * 1.001) sellPool.push(entryHigh)
+    if (Number.isFinite(invalidation) && invalidation > price * 1.001) sellPool.push(invalidation)
+    for (const v of resistsAbove) {
+      if (sellPool.length >= 4) break
+      sellPool.push(v)
+    }
+    sells = uniqLevels(sellPool, 2, MIN_GAP)
   } else {
-    buys = uniqLevels(supportsBelow, 2, 0.003)
-    sells = uniqLevels(tpAbove.length ? tpAbove : resistsAbove, 2, 0.003)
+    const buyPool: number[] = []
+    if (Number.isFinite(entryLow) && entryLow < price * 0.999) buyPool.push(entryLow)
+    for (const v of supportsBelow) buyPool.push(v)
+    buys = uniqLevels(buyPool, 2, MIN_GAP)
+
+    const sellPool: number[] = []
+    if (Number.isFinite(tp1) && tp1 > price * 1.001) sellPool.push(tp1)
+    if (Number.isFinite(tp2) && tp2 > price * 1.001) sellPool.push(tp2)
+    if (sellPool.length < 2) {
+      for (const v of resistsAbove) {
+        if (sellPool.length >= 2) break
+        sellPool.push(v)
+      }
+    }
+    if (Number.isFinite(invalidation) && invalidation > price * 1.001) {
+      sellPool.push(invalidation)
+    }
+    sells = uniqLevels(sellPool, 2, MIN_GAP)
   }
 
   return { buys: buys.slice(0, 2), sells: sells.slice(0, 2), side }
