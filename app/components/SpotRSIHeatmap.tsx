@@ -157,62 +157,38 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
-  const sl = Number(result.invalidation)
 
-  // Premium grafik tahlili bilan bir xil:
-  // BUY → BUY1/2 = support (+ SL), SELL1/2 = TP1/TP2
-  // SELL → SELL1/2 = resistance (+ SL), BUY1/2 = TP1/TP2
+  // Premium grafik tahlili:
+  // BUY1/BUY2 ← support1, support2
+  // SELL1/SELL2 ← TP1, TP2 (yo'q bo'lsa → qarshilik1, 2)
+
+  const supportsBelow = support
+    .filter((v: number) => v < price * 0.999)
+    .sort((a: number, b: number) => b - a)
+
+  const resistsAbove = resistance
+    .filter((v: number) => v > price * 1.001)
+    .sort((a: number, b: number) => a - b)
+
+  const tpAbove: number[] = []
+  const tpBelow: number[] = []
+  for (let i = 0; i < Math.min(2, tp.length); i++) {
+    const v = tp[i]
+    if (!Number.isFinite(v)) continue
+    if (v > price * 1.001) tpAbove.push(v)
+    else if (v < price * 0.999) tpBelow.push(v)
+  }
+
   let buys: number[] = []
   let sells: number[] = []
 
   if (side === 'SELL') {
-    const tpDown = tp.filter((v: number) => v < price * 0.999).sort((a: number, b: number) => b - a)
-    if (tp.length >= 1) {
-      const ordered: number[] = []
-      if (Number.isFinite(tp[0]) && tp[0] < price * 0.999) ordered.push(tp[0])
-      if (tp.length > 1 && Number.isFinite(tp[1]) && tp[1] < price * 0.999) ordered.push(tp[1])
-      buys = uniqLevels(ordered.length ? ordered : tpDown, 2, 0.01)
-    } else {
-      buys = uniqLevels(tpDown, 2, 0.015)
-    }
-    const sellPool = [
-      ...resistance.filter((v: number) => v > price * 1.001),
-      ...(Number.isFinite(sl) && sl > price * 1.001 ? [sl] : []),
-    ].sort((a: number, b: number) => a - b)
-    sells = uniqLevels(sellPool, 2, 0.015)
+    sells = uniqLevels(resistsAbove, 2, 0.01)
+    buys = uniqLevels(tpBelow.length ? tpBelow : supportsBelow, 2, 0.01)
   } else {
-    const buyPool = [
-      ...support.filter((v: number) => v < price * 0.999),
-      ...(Number.isFinite(sl) && sl < price * 0.999 ? [sl] : []),
-    ].sort((a: number, b: number) => b - a)
-    buys = uniqLevels(buyPool, 2, 0.015)
-
-    if (tp.length >= 1) {
-      const ordered: number[] = []
-      if (Number.isFinite(tp[0]) && tp[0] > price * 1.001) ordered.push(tp[0])
-      if (tp.length > 1 && Number.isFinite(tp[1]) && tp[1] > price * 1.001) ordered.push(tp[1])
-      sells = uniqLevels(
-        ordered.length
-          ? ordered
-          : resistance.filter((v: number) => v > price * 1.001).sort((a: number, b: number) => a - b),
-        2,
-        0.01
-      )
-    } else {
-      sells = uniqLevels(
-        resistance.filter((v: number) => v > price * 1.001).sort((a: number, b: number) => a - b),
-        2,
-        0.015
-      )
-    }
+    buys = uniqLevels(supportsBelow, 2, 0.01)
+    sells = uniqLevels(tpAbove.length ? tpAbove : resistsAbove, 2, 0.01)
   }
-
-  if (buys.length < 1 && Number.isFinite(sl) && sl < price) buys.push(sl)
-  if (buys.length < 1) buys.push(price * 0.97)
-  if (buys.length < 2) buys.push(buys[0] * 0.97)
-  if (sells.length < 1 && Number.isFinite(sl) && sl > price) sells.push(sl)
-  if (sells.length < 1) sells.push(price * 1.03)
-  if (sells.length < 2) sells.push(sells[0] * 1.03)
 
   return { buys: buys.slice(0, 2), sells: sells.slice(0, 2), side }
 }
@@ -244,8 +220,8 @@ function CandleChart({
   const labelX = plotRight + 72
 
   const levelPrices = [...(levels?.buys || []), ...(levels?.sells || [])]
-  const min = Math.min(...candles.map((c) => c.low), ...levelPrices) * 0.997
-  const max = Math.max(...candles.map((c) => c.high), ...levelPrices) * 1.003
+  const min = Math.min(...candles.map((c) => c.low), ...(levelPrices.length ? levelPrices : [Infinity])) * 0.997
+  const max = Math.max(...candles.map((c) => c.high), ...(levelPrices.length ? levelPrices : [0])) * 1.003
   const x = (i: number) => L + (i * (candleRight - L)) / Math.max(1, candles.length - 1)
   const y = (v: number) => MB - ((v - min) / (max - min || 1)) * (MB - T)
   const ry = (v: number) => RB - (Math.max(0, Math.min(100, v)) / 100) * (RB - RT)
