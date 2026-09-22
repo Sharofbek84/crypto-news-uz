@@ -157,66 +157,60 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
-  const invalidation = Number(result.invalidation)
 
-  // Entry ishlatilmaydi. Uzoqroq support / qarshilik + TP1/TP2. Min 1.5% oralik.
+  // TP1/TP2 + support1/2 + qarshilik1/2. Yorliqlar yopishmasin: min 1.5% oralik.
   const MIN_GAP = 0.015
 
-  const supportsBelow = support
-    .filter((v: number) => v < price * 0.995)
-    .sort((a: number, b: number) => b - a)
+  const support12 = uniqLevels(
+    support.filter((v: number) => v < price * 0.999).sort((a: number, b: number) => b - a),
+    2,
+    MIN_GAP
+  )
 
-  const resistsAbove = resistance
-    .filter((v: number) => v > price * 1.005)
-    .sort((a: number, b: number) => a - b)
-
-  // Eng yaqinni o'tkazib, uzoqroq zonalar
-  const farSupports = supportsBelow.length >= 2 ? supportsBelow.slice(1) : supportsBelow
-  const farResists = resistsAbove.length >= 2 ? resistsAbove.slice(1) : resistsAbove
+  const resist12 = uniqLevels(
+    resistance.filter((v: number) => v > price * 1.001).sort((a: number, b: number) => a - b),
+    2,
+    MIN_GAP
+  )
 
   const tp1 = Number.isFinite(tp[0]) ? tp[0] : NaN
   const tp2 = Number.isFinite(tp[1]) ? tp[1] : NaN
+  const tpAbove = uniqLevels(
+    [tp1, tp2].filter((v: number) => Number.isFinite(v) && v > price * 1.001),
+    2,
+    MIN_GAP
+  )
+  const tpBelow = uniqLevels(
+    [tp1, tp2].filter((v: number) => Number.isFinite(v) && v < price * 0.999),
+    2,
+    MIN_GAP
+  )
 
   let buys: number[] = []
   let sells: number[] = []
 
   if (side === 'SELL') {
-    const buyPool: number[] = []
-    if (Number.isFinite(tp1) && tp1 < price * 0.995) buyPool.push(tp1)
-    if (Number.isFinite(tp2) && tp2 < price * 0.995) buyPool.push(tp2)
-    if (buyPool.length < 2) {
-      for (const v of farSupports.length ? farSupports : supportsBelow) {
-        if (buyPool.length >= 2) break
-        buyPool.push(v)
-      }
+    buys = tpBelow.length ? tpBelow : support12
+    if (buys.length < 2) {
+      buys = uniqLevels([...buys, ...support12], 2, MIN_GAP)
     }
-    buys = uniqLevels(buyPool, 2, MIN_GAP)
-
-    const sellPool: number[] = []
-    if (Number.isFinite(invalidation) && invalidation > price * 1.005) sellPool.push(invalidation)
-    for (const v of farResists.length ? farResists : resistsAbove) sellPool.push(v)
-    for (const v of resistsAbove) sellPool.push(v)
-    sells = uniqLevels(sellPool, 2, MIN_GAP)
+    sells = resist12.length ? resist12 : tpAbove
+    if (sells.length < 2) {
+      sells = uniqLevels([...sells, ...tpAbove, ...resist12], 2, MIN_GAP)
+    }
   } else {
-    const buyPool: number[] = []
-    for (const v of farSupports.length ? farSupports : supportsBelow) buyPool.push(v)
-    for (const v of supportsBelow) buyPool.push(v)
-    buys = uniqLevels(buyPool, 2, MIN_GAP)
-
-    const sellPool: number[] = []
-    if (Number.isFinite(tp1) && tp1 > price * 1.005) sellPool.push(tp1)
-    if (Number.isFinite(tp2) && tp2 > price * 1.005) sellPool.push(tp2)
-    if (sellPool.length < 2) {
-      for (const v of farResists.length ? farResists : resistsAbove) {
-        if (sellPool.length >= 2) break
-        sellPool.push(v)
-      }
+    buys = support12
+    sells = tpAbove.length ? tpAbove : resist12
+    if (sells.length < 2) {
+      sells = uniqLevels([...sells, ...resist12, ...tpAbove], 2, MIN_GAP)
     }
-    if (Number.isFinite(invalidation) && invalidation > price * 1.005) sellPool.push(invalidation)
-    sells = uniqLevels(sellPool, 2, MIN_GAP)
   }
 
-  return { buys: buys.slice(0, 2), sells: sells.slice(0, 2), side }
+  return {
+    buys: uniqLevels(buys, 2, MIN_GAP),
+    sells: uniqLevels(sells, 2, MIN_GAP),
+    side,
+  }
 }
 
 function CandleChart({
