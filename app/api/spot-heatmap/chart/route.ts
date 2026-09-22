@@ -7,15 +7,18 @@ const TF_MAP: Record<string, string> = {
   H4: '4h',
   D1: '1d',
   W1: '7d',
+  '4h': '4h',
+  '1d': '1d',
+  '1w': '7d',
 }
 
 /** Gate.io: [timestamp, volume, close, high, low, open] */
-type Candle = [string, string, string, string, string, string]
+type GateRow = [string, string, string, string, string, string]
 
 export async function GET(req: NextRequest) {
   const coin = (req.nextUrl.searchParams.get('coin') || 'BTC').toUpperCase()
-  const tf = (req.nextUrl.searchParams.get('tf') || 'H4').toUpperCase()
-  const interval = TF_MAP[tf] || '4h'
+  const tfRaw = (req.nextUrl.searchParams.get('tf') || 'W1').toUpperCase()
+  const interval = TF_MAP[tfRaw] || TF_MAP[req.nextUrl.searchParams.get('tf') || ''] || '7d'
 
   if (!/^[A-Z0-9]{2,12}$/.test(coin)) {
     return NextResponse.json({ error: 'Invalid coin' }, { status: 400 })
@@ -25,7 +28,7 @@ export async function GET(req: NextRequest) {
     const url = new URL('https://api.gateio.ws/api/v4/spot/candlesticks')
     url.searchParams.set('currency_pair', `${coin}_USDT`)
     url.searchParams.set('interval', interval)
-    url.searchParams.set('limit', '80')
+    url.searchParams.set('limit', '300')
 
     const res = await fetch(url.toString(), {
       cache: 'no-store',
@@ -35,27 +38,29 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Gate.io error' }, { status: 502 })
     }
 
-    const rows = (await res.json()) as Candle[]
+    const rows = (await res.json()) as GateRow[]
     if (!Array.isArray(rows) || rows.length === 0) {
       return NextResponse.json({ error: 'No data' }, { status: 404 })
     }
 
-    const sorted = [...rows].sort((a, b) => Number(a[0]) - Number(b[0]))
-    const points = sorted
-      .map((row) => ({
-        t: Number(row[0]) * (String(row[0]).length <= 10 ? 1000 : 1),
-        o: Number(row[5]),
-        h: Number(row[3]),
-        l: Number(row[4]),
-        c: Number(row[2]),
+    const candles = [...rows]
+      .map((k) => ({
+        time: +k[0] * 1000,
+        volume: +k[1],
+        close: +k[2],
+        high: +k[3],
+        low: +k[4],
+        open: +k[5],
       }))
-      .filter((p) => Number.isFinite(p.c))
+      .filter((c) => Number.isFinite(c.close))
+      .sort((a, b) => a.time - b.time)
 
     return NextResponse.json({
       coin,
-      tf,
+      tf: tfRaw,
       interval,
-      points,
+      candles,
+      count: candles.length,
       updatedAt: Date.now(),
     })
   } catch {

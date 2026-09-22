@@ -128,7 +128,7 @@ function rsiSeries(candles: Candle[], p = 14) {
   return out
 }
 
-/** Premium CleanChart uslubidagi shamchali grafik (ko‘proq sham) */
+/** Premium uslubidagi shamchali grafik — 300 sham, o‘ngda narx, zoom yo‘q */
 function CandleChart({
   candles,
   coin,
@@ -138,19 +138,19 @@ function CandleChart({
   coin: string
   tf: string
 }) {
-  const [zoom, setZoom] = useState(1)
   if (!candles.length) return <div className="rsiChartEmpty">Grafik ma&apos;lumoti yo&apos;q</div>
 
   const W = 1700
   const H = 720
-  const L = 68
-  const R = 120
+  const L = 24
+  const R = 140
   const T = 56
   const MB = 480
   const RT = 520
   const RB = 680
   const plotRight = W - R
-  const candleRight = L + (plotRight - L) * 0.96
+  const candleRight = L + (plotRight - L) * 0.97
+  const labelX = plotRight + 10
 
   const min = Math.min(...candles.map((c) => c.low)) * 0.997
   const max = Math.max(...candles.map((c) => c.high)) * 1.003
@@ -163,64 +163,68 @@ function CandleChart({
   const rs = rsiSeries(candles)
   const poly = (arr: number[]) => arr.map((v, i) => `${x(i)},${y(v)}`).join(' ')
   const rpoly = (arr: number[]) => arr.map((v, i) => `${x(i)},${ry(v)}`).join(' ')
-  const cw = Math.max(2.2, ((candleRight - L) / candles.length) * 0.62)
+  const cw = Math.max(1.6, Math.min(8, ((candleRight - L) / candles.length) * 0.65))
 
   const last = candles[candles.length - 1]
-  const first = candles[0]
-  const chg = last.close - first.close
-  const chgPct = (chg / first.close) * 100
+  const prev = candles[candles.length - 2]?.close ?? last.close
+  const latest = last.close
+  const chg = latest - prev
+  const chgPct = prev ? (chg / prev) * 100 : 0
   const up = chg >= 0
+  const lx = x(candles.length - 1)
+
+  const priceTicks = [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => max - (max - min) * t)
 
   return (
     <div className="homeChartWrap">
-      <div className="chartZoomControls">
-        <button type="button" onClick={() => setZoom((z) => Math.max(1, z - 0.25))}>
-          −
-        </button>
-        <span>{Math.round(zoom * 100)}%</span>
-        <button type="button" onClick={() => setZoom((z) => Math.min(2.5, z + 0.25))}>
-          +
-        </button>
-      </div>
       <div className="homeChartScroller">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="homeChart"
-          style={{ minWidth: `${Math.round(100 * zoom)}%` }}
+          style={{ width: '100%', maxWidth: 'none' }}
           role="img"
           aria-label={`${coin} ${tf} chart`}
         >
-          <rect x="0" y="0" width={W} height={H} fill="#0b1018" />
+          <defs>
+            <linearGradient id="hmMain" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#0a1018" />
+              <stop offset="1" stopColor="#070b11" />
+            </linearGradient>
+          </defs>
+          <rect width={W} height={H} fill="url(#hmMain)" />
+          <rect x="0" y={RT - 16} width={W} height={RB - RT + 50} fill="#0e1320" />
 
-          {[0, 0.25, 0.5, 0.75, 1].map((t, i) => {
-            const v = min + (max - min) * (1 - t)
+          {priceTicks.map((v, i) => {
             const yy = y(v)
             return (
               <g key={i}>
-                <line x1={L} x2={candleRight} y1={yy} y2={yy} stroke="#1e2530" strokeWidth="1" />
-                <text x={L - 8} y={yy + 4} textAnchor="end" fill="#6b7585" fontSize="12">
+                <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke="#182230" />
+                <text x={labelX} y={yy + 4} fill="#7a8796" fontSize="12">
                   {money(v)}
                 </text>
               </g>
             )
           })}
 
-          <text x={L} y="28" fill="#e6edf3" fontSize="18" fontWeight="800">
+          <text x={L + 8} y="28" fill="#f0b90b" fontSize="18" fontWeight="800">
             {coin}/USDT · {tf}
           </text>
-          <text x={L + 220} y="28" fill={up ? '#36d66f' : '#ff4d5a'} fontSize="16" fontWeight="700">
-            ${money(last.close)}{' '}
-            {up ? '+' : ''}
-            {money(chg)} ({chgPct >= 0 ? '+' : ''}
-            {chgPct.toFixed(2)}%)
+          <text x={L + 8} y="50" fill="#9aa7b8" fontSize="12">
+            O {money(last.open)} H {money(last.high)} L {money(last.low)} C {money(latest)}{' '}
+            <tspan fill={up ? '#20d67a' : '#ff5360'}>
+              {chg >= 0 ? '+' : ''}
+              {money(chg)} ({chgPct >= 0 ? '+' : ''}
+              {chgPct.toFixed(2)}%)
+            </tspan>
           </text>
-          <text x={L} y="48" fill="#ff9f0a" fontSize="12" fontWeight="700">
+
+          <text x={L + 8} y="70" fill="#ff9f0a" fontSize="12" fontWeight="700">
             EMA 10: {money(e10[e10.length - 1])}
           </text>
-          <text x={L + 200} y="48" fill="#00c7e6" fontSize="12" fontWeight="700">
+          <text x={L + 200} y="70" fill="#00c7e6" fontSize="12" fontWeight="700">
             EMA 20: {money(e20[e20.length - 1])}
           </text>
-          <text x={L + 400} y="48" fill="#4aa8ff" fontSize="12" fontWeight="700">
+          <text x={L + 400} y="70" fill="#4aa8ff" fontSize="12" fontWeight="700">
             EMA 50: {money(e50[e50.length - 1])}
           </text>
 
@@ -234,13 +238,13 @@ function CandleChart({
                   y1={y(c.high)}
                   y2={y(c.low)}
                   stroke={bull ? '#36d66f' : '#ff4d5a'}
-                  strokeWidth="1.15"
+                  strokeWidth="1.05"
                 />
                 <rect
                   x={x(i) - cw / 2}
                   y={Math.min(y(c.open), y(c.close))}
                   width={cw}
-                  height={Math.max(1.4, Math.abs(y(c.open) - y(c.close)))}
+                  height={Math.max(1.2, Math.abs(y(c.open) - y(c.close)))}
                   fill={bull ? '#36d66f' : '#ff4d5a'}
                   rx="1"
                 />
@@ -252,32 +256,58 @@ function CandleChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
-          {/* RSI panel */}
-          <line x1={L} x2={candleRight} y1={RT} y2={RT} stroke="#252d38" strokeWidth="1" />
-          <text x={L} y={RT - 8} fill="#8b949e" fontSize="12" fontWeight="700">
-            RSI(14): {rs[rs.length - 1]?.toFixed(1) ?? '—'}
+          {/* Joriy narx — o‘ng tomonda Premium kabi */}
+          <line
+            x1={L}
+            x2={plotRight}
+            y1={y(latest)}
+            y2={y(latest)}
+            stroke="#65d9ff"
+            strokeDasharray="3 4"
+            strokeWidth="1.2"
+          />
+          <rect x={labelX} y={y(latest) - 13} width={110} height={26} rx="4" fill="#1a6f9a" />
+          <text x={labelX + 55} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
+            {money(latest)}
           </text>
-          <line
-            x1={L}
-            x2={candleRight}
-            y1={ry(70)}
-            y2={ry(70)}
-            stroke="#c62828"
-            strokeWidth="1"
-            strokeDasharray="4 3"
-            opacity="0.5"
-          />
-          <line
-            x1={L}
-            x2={candleRight}
-            y1={ry(30)}
-            y2={ry(30)}
-            stroke="#2d6fd4"
-            strokeWidth="1"
-            strokeDasharray="4 3"
-            opacity="0.5"
-          />
-          <polyline points={rpoly(rs)} fill="none" stroke="#c9a227" strokeWidth="1.6" />
+          <circle cx={lx} cy={y(latest)} r="3.5" fill="#65d9ff" />
+
+          {/* RSI panel */}
+          <text x={L + 8} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
+            RSI 14 {rs[rs.length - 1]?.toFixed(2) ?? '—'}
+          </text>
+          {[30, 50, 70].map((v) => (
+            <line
+              key={v}
+              x1={L}
+              x2={plotRight}
+              y1={ry(v)}
+              y2={ry(v)}
+              stroke="#3a4658"
+              strokeDasharray="4 6"
+            />
+          ))}
+          <polyline points={rpoly(rs)} fill="none" stroke="#a78bfa" strokeWidth="2" />
+          <rect x={labelX} y={ry(rs[rs.length - 1] ?? 50) - 12} width={70} height={24} rx="4" fill="#5b4a9a" />
+          <text
+            x={labelX + 35}
+            y={ry(rs[rs.length - 1] ?? 50) + 5}
+            textAnchor="middle"
+            fill="#fff"
+            fontSize="12"
+            fontWeight="700"
+          >
+            {(rs[rs.length - 1] ?? 0).toFixed(1)}
+          </text>
+          <text x={plotRight - 6} y={ry(70) - 5} textAnchor="end" fill="#7a8796" fontSize="11">
+            70
+          </text>
+          <text x={plotRight - 6} y={ry(50) - 5} textAnchor="end" fill="#7a8796" fontSize="11">
+            50
+          </text>
+          <text x={plotRight - 6} y={ry(30) - 5} textAnchor="end" fill="#7a8796" fontSize="11">
+            30
+          </text>
         </svg>
       </div>
     </div>
@@ -288,12 +318,10 @@ export default function SpotRSIHeatmap() {
   const [payload, setPayload] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('H4')
+  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('W1')
   const [coin, setCoin] = useState<(typeof COINS)[number]>('BTC')
   const [candles, setCandles] = useState<Candle[]>([])
   const [chartLoading, setChartLoading] = useState(true)
-
-  const interval = TIMEFRAMES.find((t) => t.key === tf)?.interval || '4h'
 
   const loadHeatmap = useCallback(async () => {
     try {
@@ -308,12 +336,11 @@ export default function SpotRSIHeatmap() {
     }
   }, [])
 
-  const loadChart = useCallback(async (c: string, intv: string) => {
+  const loadChart = useCallback(async (c: string, timeframe: string) => {
     setChartLoading(true)
     try {
-      // Premium bilan bir xil manba — ko‘proq sham (150)
       const res = await fetch(
-        `/api/analyze?symbol=${encodeURIComponent(c)}&interval=${encodeURIComponent(intv)}`,
+        `/api/spot-heatmap/chart?coin=${encodeURIComponent(c)}&tf=${encodeURIComponent(timeframe)}`,
         { cache: 'no-store' }
       )
       if (!res.ok) throw new Error('chart')
@@ -333,8 +360,8 @@ export default function SpotRSIHeatmap() {
   }, [loadHeatmap])
 
   useEffect(() => {
-    loadChart(coin, interval)
-  }, [coin, interval, loadChart])
+    loadChart(coin, tf)
+  }, [coin, tf, loadChart])
 
   const selectedCell = payload?.data?.[coin]?.[tf]
 
@@ -403,7 +430,7 @@ export default function SpotRSIHeatmap() {
         <div>
           <h1 className="rsiHmTitle">Spot RSI Heatmap</h1>
           <p className="rsiHmSub">
-            RSI kartasini bosing — pastida Premium uslubidagi shamchali grafik ochiladi.
+            RSI kartasini bosing — pastida shamchali grafik ochiladi (300 ta sham).
           </p>
         </div>
         <div className="rsiTfGroup" role="group" aria-label="Timeframe">
