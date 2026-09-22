@@ -157,9 +157,10 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
+  const invalidation = Number(result.invalidation)
 
-  // 1-chi zona har doim saqlanadi; 2-chi uchun oralikli KEYINGI support/qarshilik.
-  const MIN_GAP = 0.012
+  // XAUT kabi past volatillik: min 0.35%. 1-chi saqlanadi, 2-chi = keyingi oralikli.
+  const MIN_GAP = 0.0035
 
   const supportsBelow = support
     .filter((v: number) => v < price * 0.999)
@@ -172,40 +173,55 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   function firstAndNext(ordered: number[]): number[] {
     if (!ordered.length) return []
     const first = ordered[0]
-    const out = [first]
+    const out: number[] = [first]
     for (let i = 1; i < ordered.length; i++) {
       const v = ordered[i]
+      if (!Number.isFinite(v) || v <= 0) continue
       if (Math.abs(v - first) / Math.max(Math.abs(first), Math.abs(v), 1) >= MIN_GAP) {
         out.push(v)
         break
       }
-      // yaqin — keyingisini qidiramiz (ro'yxat davom etadi)
     }
     return out
   }
 
-  const supportLevels = firstAndNext(supportsBelow)
-  const resistLevels = firstAndNext(resistsAbove)
+  const tpsBelow = tp.filter((v: number) => Number.isFinite(v) && v < price * 0.999)
+  const tpsAbove = tp.filter((v: number) => Number.isFinite(v) && v > price * 1.001)
 
-  const tp1 = Number.isFinite(tp[0]) ? tp[0] : NaN
-  const tp2 = Number.isFinite(tp[1]) ? tp[1] : NaN
-  const tpsBelow = [tp1, tp2].filter((v: number) => Number.isFinite(v) && v < price * 0.999)
-  const tpsAbove = [tp1, tp2].filter((v: number) => Number.isFinite(v) && v > price * 1.001)
+  const sellPool = [...resistsAbove]
+  if (Number.isFinite(invalidation) && invalidation > price * 1.001) {
+    sellPool.push(invalidation)
+    sellPool.sort((a, b) => a - b)
+  }
 
   let buys: number[] = []
   let sells: number[] = []
 
   if (side === 'SELL') {
     buys = firstAndNext(tpsBelow.length ? tpsBelow : supportsBelow)
-    if (buys.length < 2 && supportsBelow.length) {
-      buys = firstAndNext([...buys, ...supportsBelow.filter((v) => !buys.includes(v))])
+    if (buys.length < 2) {
+      const extra = supportsBelow.filter((v) => !buys.includes(v))
+      buys = firstAndNext([...buys, ...extra])
     }
-    sells = resistLevels.length ? resistLevels : firstAndNext(tpsAbove)
+    if (buys.length < 2 && supportsBelow.length >= 2) {
+      buys = [supportsBelow[0], supportsBelow[supportsBelow.length - 1]]
+    }
+    sells = firstAndNext(sellPool.length ? sellPool : tpsAbove)
+    if (sells.length < 2 && sellPool.length >= 2) {
+      sells = [sellPool[0], sellPool[sellPool.length - 1]]
+    }
   } else {
-    buys = supportLevels
-    sells = firstAndNext(tpsAbove.length ? tpsAbove : resistsAbove)
-    if (sells.length < 2 && resistsAbove.length) {
-      sells = firstAndNext([...sells, ...resistsAbove.filter((v) => !sells.includes(v))])
+    buys = firstAndNext(supportsBelow)
+    if (buys.length < 2 && supportsBelow.length >= 2) {
+      buys = [supportsBelow[0], supportsBelow[supportsBelow.length - 1]]
+    }
+    sells = firstAndNext(tpsAbove.length ? tpsAbove : sellPool)
+    if (sells.length < 2) {
+      const extra = sellPool.filter((v) => !sells.includes(v))
+      sells = firstAndNext([...sells, ...extra])
+    }
+    if (sells.length < 2 && sellPool.length >= 2) {
+      sells = [sellPool[0], sellPool[sellPool.length - 1]]
     }
   }
 
