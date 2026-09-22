@@ -8,6 +8,7 @@ import HeaderAuth from './HeaderAuth'
 const NAV = [
   { href: '/', label: 'Bosh sahifa' },
   { href: '/yangiliklar', label: 'Yangiliklar' },
+  { href: '/spot-heatmap', label: 'Heatmap' },
   { href: '/obuna', label: 'Premium obuna' },
   // { href: '/nft', label: 'GoldenWeb NFT' }, // vaqtincha yashirilgan
 ]
@@ -21,18 +22,13 @@ export default function SiteHeader() {
   const pathname = usePathname() || '/'
   const [open, setOpen] = useState(false)
 
-  // Sahifa o‘zgarganda menyuni yopish
   useEffect(() => {
     setOpen(false)
   }, [pathname])
 
-  // Scrollni bloklash ochiq menyuda (mobile)
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    if (open) document.body.style.overflow = 'hidden'
+    else document.body.style.overflow = ''
     return () => {
       document.body.style.overflow = ''
     }
@@ -45,16 +41,11 @@ export default function SiteHeader() {
           GOLDENWEB<span>.UZ</span>
         </Link>
 
-        {/* Desktop menyu */}
         <nav className="siteNav siteNavDesktop" aria-label="Asosiy menyu">
           {NAV.map((item) => {
             const active = isActive(pathname, item.href)
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={active ? 'siteNavLink active' : 'siteNavLink'}
-              >
+              <Link key={item.href} href={item.href} className={active ? 'siteNavLink active' : 'siteNavLink'}>
                 {item.label}
               </Link>
             )
@@ -65,7 +56,6 @@ export default function SiteHeader() {
           <div className="siteHeaderAuth desktopOnly">
             <HeaderAuth />
           </div>
-
           <button
             type="button"
             className={`menuToggle${open ? ' open' : ''}`}
@@ -73,14 +63,11 @@ export default function SiteHeader() {
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
-            <span />
-            <span />
-            <span />
+            <span /><span /><span />
           </button>
         </div>
       </div>
 
-      {/* Mobile panel */}
       <div className={`mobileMenu${open ? ' open' : ''}`} aria-hidden={!open}>
         <nav className="mobileNav" aria-label="Mobil menyu">
           {NAV.map((item) => {
@@ -97,9 +84,7 @@ export default function SiteHeader() {
             )
           })}
         </nav>
-        <div className="mobileAuth">
-          <HeaderAuth />
-        </div>
+        <div className="mobileAuth"><HeaderAuth /></div>
       </div>
 
       {open && (
