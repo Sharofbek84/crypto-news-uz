@@ -158,10 +158,7 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const resistance = toNums(result.resistance)
   const tp = toNums(result.tp)
 
-  // Premium grafik tahlili:
-  // BUY1/BUY2 ← support1, support2
-  // SELL1/SELL2 ← TP1, TP2 (yo'q bo'lsa → qarshilik1, 2)
-
+  // Premium: BUY ← support, SELL ← TP1/TP2 (yoki qarshilik)
   const supportsBelow = support
     .filter((v: number) => v < price * 0.999)
     .sort((a: number, b: number) => b - a)
@@ -182,12 +179,13 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   let buys: number[] = []
   let sells: number[] = []
 
+  // 0.3% min farq — XAUT kabi yaqin zonalar ham chiqadi
   if (side === 'SELL') {
-    sells = uniqLevels(resistsAbove, 2, 0.01)
-    buys = uniqLevels(tpBelow.length ? tpBelow : supportsBelow, 2, 0.01)
+    sells = uniqLevels(resistsAbove, 2, 0.003)
+    buys = uniqLevels(tpBelow.length ? tpBelow : supportsBelow, 2, 0.003)
   } else {
-    buys = uniqLevels(supportsBelow, 2, 0.01)
-    sells = uniqLevels(tpAbove.length ? tpAbove : resistsAbove, 2, 0.01)
+    buys = uniqLevels(supportsBelow, 2, 0.003)
+    sells = uniqLevels(tpAbove.length ? tpAbove : resistsAbove, 2, 0.003)
   }
 
   return { buys: buys.slice(0, 2), sells: sells.slice(0, 2), side }
