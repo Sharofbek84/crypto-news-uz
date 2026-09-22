@@ -157,7 +157,6 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
 
-  // BUY = support zonalar, SELL = resistance (qarshilik) zonalar
   const buyPool = support
     .filter((v: number) => v < price * 0.999)
     .sort((a: number, b: number) => b - a)
@@ -193,14 +192,15 @@ function CandleChart({
   const W = 1700
   const H = 720
   const L = 24
-  const R = 160
+  const R = 200
   const T = 56
   const MB = 480
   const RT = 520
   const RB = 680
   const plotRight = W - R
   const candleRight = L + (plotRight - L) * 0.97
-  const labelX = plotRight + 8
+  const priceLabelX = plotRight + 6
+  const labelX = plotRight + 72
 
   const levelPrices = [...(levels?.buys || []), ...(levels?.sells || [])]
   const min = Math.min(...candles.map((c) => c.low), ...levelPrices) * 0.997
@@ -274,7 +274,7 @@ function CandleChart({
             return (
               <g key={i}>
                 <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke="#182230" />
-                <text x={L + 4} y={yy - 4} fill="#8b949e" fontSize="11" fontWeight="600">
+                <text x={priceLabelX} y={yy + 4} fill="#8b949e" fontSize="11" fontWeight="600">
                   {money(v)}
                 </text>
               </g>
@@ -625,7 +625,6 @@ export default function SpotRSIHeatmap() {
                   <span>
                     Signal: <b>{levels.side || '—'}</b>
                   </span>
-                  <span style={{ opacity: 0.75 }}>Support / Qarshilik</span>
                   {levels.buys.map((p, i) => (
                     <span key={`b${i}`} className="rsiBuy">
                       BUY{i + 1}: <b>{money(p)}</b>
