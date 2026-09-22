@@ -156,20 +156,61 @@ function buildTradeLevels(result: Record<string, unknown> | null | undefined, pr
   const side = typeof result.side === 'string' ? result.side : null
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
+  const tp = toNums(result.tp)
+  const sl = Number(result.invalidation)
 
-  const buyPool = support
-    .filter((v: number) => v < price * 0.999)
-    .sort((a: number, b: number) => b - a)
+  // Premium grafik tahlili bilan bir xil:
+  // BUY → BUY1/2 = support (+ SL), SELL1/2 = TP1/TP2
+  // SELL → SELL1/2 = resistance (+ SL), BUY1/2 = TP1/TP2
+  let buys: number[] = []
+  let sells: number[] = []
 
-  const sellPool = resistance
-    .filter((v: number) => v > price * 1.001)
-    .sort((a: number, b: number) => a - b)
+  if (side === 'SELL') {
+    const tpDown = tp.filter((v: number) => v < price * 0.999).sort((a: number, b: number) => b - a)
+    if (tp.length >= 1) {
+      const ordered: number[] = []
+      if (Number.isFinite(tp[0]) && tp[0] < price * 0.999) ordered.push(tp[0])
+      if (tp.length > 1 && Number.isFinite(tp[1]) && tp[1] < price * 0.999) ordered.push(tp[1])
+      buys = uniqLevels(ordered.length ? ordered : tpDown, 2, 0.01)
+    } else {
+      buys = uniqLevels(tpDown, 2, 0.015)
+    }
+    const sellPool = [
+      ...resistance.filter((v: number) => v > price * 1.001),
+      ...(Number.isFinite(sl) && sl > price * 1.001 ? [sl] : []),
+    ].sort((a: number, b: number) => a - b)
+    sells = uniqLevels(sellPool, 2, 0.015)
+  } else {
+    const buyPool = [
+      ...support.filter((v: number) => v < price * 0.999),
+      ...(Number.isFinite(sl) && sl < price * 0.999 ? [sl] : []),
+    ].sort((a: number, b: number) => b - a)
+    buys = uniqLevels(buyPool, 2, 0.015)
 
-  const buys = uniqLevels(buyPool, 2, 0.03)
-  const sells = uniqLevels(sellPool, 2, 0.03)
+    if (tp.length >= 1) {
+      const ordered: number[] = []
+      if (Number.isFinite(tp[0]) && tp[0] > price * 1.001) ordered.push(tp[0])
+      if (tp.length > 1 && Number.isFinite(tp[1]) && tp[1] > price * 1.001) ordered.push(tp[1])
+      sells = uniqLevels(
+        ordered.length
+          ? ordered
+          : resistance.filter((v: number) => v > price * 1.001).sort((a: number, b: number) => a - b),
+        2,
+        0.01
+      )
+    } else {
+      sells = uniqLevels(
+        resistance.filter((v: number) => v > price * 1.001).sort((a: number, b: number) => a - b),
+        2,
+        0.015
+      )
+    }
+  }
 
+  if (buys.length < 1 && Number.isFinite(sl) && sl < price) buys.push(sl)
   if (buys.length < 1) buys.push(price * 0.97)
   if (buys.length < 2) buys.push(buys[0] * 0.97)
+  if (sells.length < 1 && Number.isFinite(sl) && sl > price) sells.push(sl)
   if (sells.length < 1) sells.push(price * 1.03)
   if (sells.length < 2) sells.push(sells[0] * 1.03)
 
@@ -217,10 +258,10 @@ function CandleChart({
   const cw = Math.max(1.6, Math.min(8, ((candleRight - L) / candles.length) * 0.65))
 
   const last = candles[candles.length - 1]
-  const prev = candles[candles.length - 2]?.close ?? last.close
+  const prevC = candles[candles.length - 2]?.close ?? last.close
   const latest = last.close
-  const chg = latest - prev
-  const chgPct = prev ? (chg / prev) * 100 : 0
+  const chg = latest - prevC
+  const chgPct = prevC ? (chg / prevC) * 100 : 0
   const up = chg >= 0
   const lx = x(candles.length - 1)
 
