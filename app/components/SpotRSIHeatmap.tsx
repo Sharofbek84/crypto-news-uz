@@ -134,6 +134,24 @@ function rsiSeries(candles: Candle[], p = 14) {
   return out
 }
 
+function atrSeries(candles: Candle[], period = 14): number {
+  if (candles.length < 2) return 0
+  const trs: number[] = []
+  for (let i = 1; i < candles.length; i++) {
+    const c = candles[i]
+    const prev = candles[i - 1].close
+    const tr = Math.max(c.high - c.low, Math.abs(c.high - prev), Math.abs(c.low - prev))
+    trs.push(tr)
+  }
+  if (!trs.length) return 0
+  const n = Math.min(period, trs.length)
+  let atr = trs.slice(0, n).reduce((a, b) => a + b, 0) / n
+  for (let i = n; i < trs.length; i++) {
+    atr = (atr * (period - 1) + trs[i]) / period
+  }
+  return atr
+}
+
 function uniqLevels(values: number[], maxCount: number, minGapPct = 0.03) {
   const out: number[] = []
   for (const v of values) {
@@ -150,78 +168,48 @@ function toNums(value: unknown): number[] {
   return value.map((x: unknown) => Number(x)).filter((n: number) => Number.isFinite(n))
 }
 
-function buildTradeLevels(result: Record<string, unknown> | null | undefined, price: number): TradeLevels {
+function buildTradeLevels(
+  result: Record<string, unknown> | null | undefined,
+  price: number,
+  atr: number
+): TradeLevels {
   if (!result || !Number.isFinite(price) || price <= 0) return { buys: [], sells: [], side: null }
 
   const side = typeof result.side === 'string' ? result.side : null
   const support = toNums(result.support)
   const resistance = toNums(result.resistance)
-  const tp = toNums(result.tp)
-  const invalidation = Number(result.invalidation)
 
-  // Grafikda yopishmaslik: 2-chi zona kamida ~1% uzoqda.
-  // To'liq ro'yxat (TP3 gacha) bo'ylab — yaqin o'tkazib, keyingi uzoq zona.
-  const MIN_GAP = 0.01
+  // Minimal oralik = max(0.8 * ATR, narxning 0.4%) — zonalar yopishmasin
+  const gap = Math.max(Number.isFinite(atr) && atr > 0 ? atr * 0.8 : 0, price * 0.004)
 
-  const supportsBelow = support
-    .filter((v: number) => v < price * 0.999)
-    .sort((a: number, b: number) => b - a)
+  const supportsBelow = support.filter((v) => v < price * 0.999).sort((a, b) => b - a)
+  const resistsAbove = resistance.filter((v) => v > price * 1.001).sort((a, b) => a - b)
 
-  const resistsAbove = resistance
-    .filter((v: number) => v > price * 1.001)
-    .sort((a: number, b: number) => a - b)
-
-  function firstAndNext(ordered: number[]): number[] {
-    if (!ordered.length) return []
+  function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
+    if (!ordered.length) {
+      if (!(Number.isFinite(atr) && atr > 0)) return []
+      if (direction === 'down') return [price - atr, price - atr * 2]
+      return [price + atr, price + atr * 2]
+    }
     const first = ordered[0]
     const out: number[] = [first]
     for (let i = 1; i < ordered.length; i++) {
       const v = ordered[i]
-      if (!Number.isFinite(v) || v <= 0) continue
-      if (Math.abs(v - first) / Math.max(Math.abs(first), Math.abs(v), 1) >= MIN_GAP) {
+      if (Math.abs(v - first) >= gap) {
         out.push(v)
         break
       }
     }
-    return out
-  }
-
-  const tpsBelow = tp
-    .filter((v: number) => Number.isFinite(v) && v < price * 0.999)
-    .sort((a: number, b: number) => b - a)
-  const tpsAbove = tp
-    .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
-    .sort((a: number, b: number) => a - b)
-
-  const sellPool = [...resistsAbove]
-  if (Number.isFinite(invalidation) && invalidation > price * 1.001) {
-    sellPool.push(invalidation)
-  }
-  const sellOrdered = Array.from(new Set(sellPool.map((v) => Math.round(v * 1e6) / 1e6)))
-    .filter((v) => v > price * 1.001)
-    .sort((a, b) => a - b)
-
-  let buys: number[] = []
-  let sells: number[] = []
-
-  if (side === 'SELL') {
-    const buyPool = tpsBelow.length ? tpsBelow : supportsBelow
-    buys = firstAndNext(buyPool)
-    if (buys.length < 2 && supportsBelow.length) {
-      buys = firstAndNext([...new Set([...buys, ...supportsBelow])].sort((a, b) => b - a))
+    if (out.length < 2 && Number.isFinite(atr) && atr > 0) {
+      if (direction === 'down') out.push(first - Math.max(gap, atr))
+      else out.push(first + Math.max(gap, atr))
     }
-    sells = firstAndNext(sellOrdered.length ? sellOrdered : tpsAbove)
-  } else {
-    buys = firstAndNext(supportsBelow)
-    sells = firstAndNext(tpsAbove.length ? tpsAbove : sellOrdered)
-    if (sells.length < 2 && sellOrdered.length) {
-      sells = firstAndNext([...new Set([...sells, ...sellOrdered])].sort((a, b) => a - b))
-    }
+    return out.slice(0, 2)
   }
 
   return {
-    buys: buys.slice(0, 2),
-    sells: sells.slice(0, 2),
+    buys: pickTwo(supportsBelow, 'down'),
+    sells: pickTwo(resistsAbove, 'up'),
     side,
   }
 }
@@ -502,21 +490,31 @@ export default function SpotRSIHeatmap() {
 
       if (chartRes.ok) {
         const data = await chartRes.json()
-        setCandles(Array.isArray(data.candles) ? data.candles : [])
+        const nextCandles: Candle[] = Array.isArray(data.candles) ? data.candles : []
+        setCandles(nextCandles)
+
+        if (analyzeRes.ok) {
+          const aData = await analyzeRes.json()
+          const result = aData.result || aData
+          const price =
+            nextCandles.length > 0
+              ? nextCandles[nextCandles.length - 1].close
+              : Number(result?.entryHigh) || 0
+          const atr = atrSeries(nextCandles, 14)
+          setLevels(buildTradeLevels(result as Record<string, unknown>, Number(price), atr))
+        } else {
+          setLevels(null)
+        }
       } else {
         setCandles([])
-      }
-
-      if (analyzeRes.ok) {
-        const data = await analyzeRes.json()
-        const result = data.result || data
-        const price =
-          Array.isArray(data.candles) && data.candles.length
-            ? data.candles[data.candles.length - 1].close
-            : result?.entryHigh || 0
-        setLevels(buildTradeLevels(result as Record<string, unknown>, Number(price)))
-      } else {
-        setLevels(null)
+        if (analyzeRes.ok) {
+          const aData = await analyzeRes.json()
+          const result = aData.result || aData
+          const price = Number(result?.entryHigh) || 0
+          setLevels(buildTradeLevels(result as Record<string, unknown>, Number(price), 0))
+        } else {
+          setLevels(null)
+        }
       }
     } catch {
       setCandles([])
