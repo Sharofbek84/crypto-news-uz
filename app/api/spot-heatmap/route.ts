@@ -3,21 +3,21 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM'] as const
+const COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'LTC', 'NEAR', 'SUI', 'APT', 'ATOM', 'GRAM'] as const
 const TIMEFRAMES = [
   { key: 'H4', interval: '4h' },
   { key: 'D1', interval: '1d' },
   { key: 'W1', interval: '7d' },
 ] as const
 
+/** Gate.io: [timestamp, volume, close, high, low, open] — oldest first */
 type Candle = [string, string, string, string, string, string, string?]
 
-function calculateRSI(closes: number[], period = 14) {
+function calculateRSI(closes: number[], period = 14): number | null {
   if (closes.length <= period) return null
 
   let gain = 0
   let loss = 0
-
   for (let i = 1; i <= period; i++) {
     const change = closes[i] - closes[i - 1]
     if (change >= 0) gain += change
@@ -54,18 +54,29 @@ async function getRSI(symbol: string, interval: string) {
   if (!res.ok) throw new Error(`Gate.io ${symbol} ${interval}: ${res.status}`)
 
   const rows = (await res.json()) as Candle[]
-  const closes = rows
-    .map((row) => Number(row[2]))
-    .filter((value) => Number.isFinite(value))
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw new Error(`Empty candles ${symbol} ${interval}`)
+  }
+
+  // Ensure chronological order (oldest → newest)
+  const sorted = [...rows].sort((a, b) => Number(a[0]) - Number(b[0]))
+  const closes = sorted.map((row) => Number(row[2])).filter((v) => Number.isFinite(v))
 
   const rsi = calculateRSI(closes)
   const previousRsi = closes.length > 1 ? calculateRSI(closes.slice(0, -1)) : null
-  const last = rows[rows.length - 1]
-  const previousPrice = rows.length > 1 ? Number(rows[rows.length - 2][2]) : null
+  const last = sorted[sorted.length - 1]
+  const previousPrice = sorted.length > 1 ? Number(sorted[sorted.length - 2][2]) : null
   const price = last ? Number(last[2]) : null
 
   const direction = (current: number | null, previous: number | null) => {
-    if (current == null || previous == null || !Number.isFinite(current) || !Number.isFinite(previous)) return null
+    if (
+      current == null ||
+      previous == null ||
+      !Number.isFinite(current) ||
+      !Number.isFinite(previous)
+    ) {
+      return null
+    }
     if (current > previous) return 'up' as const
     if (current < previous) return 'down' as const
     return 'flat' as const
@@ -87,13 +98,35 @@ export async function GET() {
         try {
           return [symbol, key, await getRSI(symbol, interval)] as const
         } catch {
-          return [symbol, key, { rsi: null, price: null, timestamp: null, priceDirection: null, rsiDirection: null }] as const
+          return [
+            symbol,
+            key,
+            {
+              rsi: null,
+              price: null,
+              timestamp: null,
+              priceDirection: null,
+              rsiDirection: null,
+            },
+          ] as const
         }
       })
     )
   )
 
-  const data: Record<string, Record<string, { rsi: number | null; price: number | null; timestamp: number | null; priceDirection: 'up' | 'down' | 'flat' | null; rsiDirection: 'up' | 'down' | 'flat' | null }>> = {}
+  const data: Record<
+    string,
+    Record<
+      string,
+      {
+        rsi: number | null
+        price: number | null
+        timestamp: number | null
+        priceDirection: 'up' | 'down' | 'flat' | null
+        rsiDirection: 'up' | 'down' | 'flat' | null
+      }
+    >
+  > = {}
 
   for (const symbol of COINS) {
     data[symbol] = {}
@@ -109,16 +142,19 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({
-    source: 'Gate.io',
-    period: 14,
-    timeframes: TIMEFRAMES.map((x) => x.key),
-    coins: COINS,
-    data,
-    updatedAt: Date.now(),
-  }, {
-    headers: {
-      'Cache-Control': 'no-store, max-age=0',
+  return NextResponse.json(
+    {
+      source: 'Gate.io',
+      period: 14,
+      timeframes: TIMEFRAMES.map((x) => x.key),
+      coins: COINS,
+      data,
+      updatedAt: Date.now(),
     },
-  })
+    {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+      },
+    }
+  )
 }

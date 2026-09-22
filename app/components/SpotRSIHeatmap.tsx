@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM'] as const
+const COINS = ['BTC', 'ETH', 'BNB', 'SOL', 'LTC', 'NEAR', 'SUI', 'APT', 'ATOM', 'GRAM'] as const
 const TIMEFRAMES = ['H4', 'D1', 'W1'] as const
 
 type Direction = 'up' | 'down' | 'flat' | null
@@ -22,23 +22,40 @@ type ApiResponse = {
   data: Record<string, Record<string, Cell>>
 }
 
-function tone(rsi: number | null) {
-  if (rsi == null) return 'unknown'
-  if (rsi < 20) return 'extreme-low'
-  if (rsi < 30) return 'low'
-  if (rsi < 45) return 'low-mid'
-  if (rsi < 55) return 'neutral'
-  if (rsi < 70) return 'high-mid'
-  if (rsi < 80) return 'high'
-  return 'extreme-high'
+/** CMC-style RSI color: blue (oversold) → gray → red (overbought) */
+function rsiColor(rsi: number | null): string {
+  if (rsi == null || !Number.isFinite(rsi)) return '#2a3038'
+  const v = Math.max(0, Math.min(100, rsi))
+  // 0=deep blue, 30=blue, 50=neutral dark, 70=orange, 100=red
+  if (v < 30) {
+    const t = v / 30
+    return lerpHex('#1a4a9e', '#2d6fd4', t)
+  }
+  if (v < 50) {
+    const t = (v - 30) / 20
+    return lerpHex('#2d6fd4', '#3a424d', t)
+  }
+  if (v < 70) {
+    const t = (v - 50) / 20
+    return lerpHex('#3a424d', '#c47a12', t)
+  }
+  const t = (v - 70) / 30
+  return lerpHex('#c47a12', '#c62828', t)
 }
 
-function label(rsi: number | null) {
-  if (rsi == null) return 'N/A'
-  if (rsi < 30) return 'Oversold'
-  if (rsi >= 70) return 'Overbought'
-  if (rsi >= 55) return 'Bullish'
-  return 'Neutral'
+function lerpHex(a: string, b: string, t: number) {
+  const parse = (h: string) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]
+  const [ar, ag, ab] = parse(a)
+  const [br, bg, bb] = parse(b)
+  const r = Math.round(ar + (br - ar) * t)
+  const g = Math.round(ag + (bg - ag) * t)
+  const bl = Math.round(ab + (bb - ab) * t)
+  return `rgb(${r},${g},${bl})`
+}
+
+function textOn(rsi: number | null) {
+  if (rsi == null) return '#8b949e'
+  return rsi >= 40 && rsi <= 60 ? '#c9d1d9' : '#ffffff'
 }
 
 function formatPrice(price: number | null) {
@@ -48,18 +65,16 @@ function formatPrice(price: number | null) {
   return '$' + price.toLocaleString('en-US', { maximumFractionDigits: 4 })
 }
 
-function arrow(direction: Direction) {
-  if (direction === 'up') return '↑'
-  if (direction === 'down') return '↓'
-  if (direction === 'flat') return '→'
-  return '•'
+function arrow(d: Direction) {
+  if (d === 'up') return '↑'
+  if (d === 'down') return '↓'
+  return ''
 }
 
 export default function SpotRSIHeatmap() {
   const [payload, setPayload] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [selected, setSelected] = useState<{ coin: string; tf: string } | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -85,140 +100,219 @@ export default function SpotRSIHeatmap() {
     const valid = cells.filter((x): x is number => x != null)
     return {
       oversold: valid.filter((x) => x < 30).length,
-      bullish: valid.filter((x) => x >= 55 && x < 70).length,
+      neutral: valid.filter((x) => x >= 30 && x < 70).length,
       overbought: valid.filter((x) => x >= 70).length,
     }
   }, [payload])
 
   return (
-    <section className="gwHeatmap">
+    <section className="rsiHm">
       <style>{`
-        .gwHeatmap { background:#0d1117; border:1px solid #252d38; border-radius:18px; padding:20px; color:#e6edf3; box-shadow:0 10px 30px rgba(0,0,0,.18); }
-        .gwHeatHeader { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; margin-bottom:18px; }
-        .gwHeatTitle { margin:0; font-size:1.35rem; font-weight:800; letter-spacing:.01em; }
-        .gwHeatSub { margin:5px 0 0; color:#8b949e; font-size:.84rem; }
-        .gwHeatMeta { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-        .gwBadge { border:1px solid #303846; background:#111820; border-radius:999px; padding:6px 9px; color:#aeb9c7; font-size:.74rem; }
-        .gwLegend { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; color:#9aa7b8; font-size:.72rem; }
-        .gwLegend span { display:inline-flex; align-items:center; gap:5px; padding:4px 7px; border:1px solid #252d38; border-radius:6px; background:#10161d; }
-        .gwDot { width:8px; height:8px; border-radius:2px; display:inline-block; }
-        .gwGridWrap { overflow-x:auto; border:1px solid #252d38; border-radius:14px; }
-        .gwGrid { min-width:760px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
-        .gwTfColumn { min-width:0; border-right:1px solid rgba(255,255,255,.055); }
-        .gwTfColumn:last-child { border-right:0; }
-        .gwTfHeader { padding:11px 14px; background:#111820; color:#aeb9c7; font-size:.78rem; font-weight:800; letter-spacing:.08em; text-align:center; border-bottom:1px solid rgba(255,255,255,.055); }
-        .gwTiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:8px; }
-        .gwTile { min-height:118px; border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:12px; color:#fff; text-align:left; cursor:pointer; transition:transform .12s ease, filter .12s ease, border-color .12s ease; box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
-        .gwTile:hover { filter:brightness(1.12); transform:translateY(-2px); border-color:rgba(255,255,255,.25); }
-        .gwTileTop,.gwTileBottom { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-        .gwTileCoin { font-size:.82rem; font-weight:900; letter-spacing:.02em; }
-        .gwTilePrice { font-size:.68rem; font-weight:700; opacity:.9; }
-        .gwTileMiddle { display:flex; align-items:center; justify-content:center; gap:8px; margin:14px 0 10px; }
-        .gwRsi { font-size:1.5rem; font-weight:900; line-height:1; }
-        .gwRsiDirection { font-size:1rem; font-weight:900; }
-        .gwUp { color:#d9ffd9; }
-        .gwDown { color:#ffd9d9; }
-        .gwFlat { color:#f3f3f3; }
-        .gwState { font-size:.64rem; font-weight:700; opacity:.88; }
-        .gwPeriod { font-size:.61rem; opacity:.65; }
-        .extreme-low { background:linear-gradient(135deg,#6f42a1,#4d2c77); }
-        .low { background:linear-gradient(135deg,#2463a8,#184a82); }
-        .low-mid { background:linear-gradient(135deg,#197a61,#135b49); }
-        .neutral { background:linear-gradient(135deg,#4b535e,#373e47); }
-        .high-mid { background:linear-gradient(135deg,#a98220,#806619); }
-        .high { background:linear-gradient(135deg,#b45f1c,#874314); }
-        .extreme-high { background:linear-gradient(135deg,#b93d3d,#812929); }
-        .unknown { background:#252b33; color:#aeb7c3; }
-        .gwBottom { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; color:#8b949e; font-size:.76rem; }
-        .gwStats { display:flex; gap:10px; flex-wrap:wrap; }
-        .gwStat { padding:6px 9px; border-radius:8px; background:#111820; border:1px solid #252d38; }
-        .gwDetail { margin-top:14px; border:1px solid #303846; background:#10161d; border-radius:12px; padding:13px 14px; }
-        .gwDetail strong { color:#f0b90b; }
-        .gwLoading { padding:70px 20px; text-align:center; color:#8b949e; }
-        .gwError { padding:22px; border-radius:12px; background:rgba(194,53,53,.10); border:1px solid rgba(194,53,53,.3); color:#d8a1a1; }
-        .gwRefresh { border:1px solid #303846; background:#111820; color:#d7dee7; border-radius:8px; padding:7px 10px; cursor:pointer; }
-        @media (max-width:900px) { .gwGrid { min-width:720px; } .gwTiles { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-        @media (max-width:560px) { .gwHeatmap { padding:14px; border-radius:14px; } .gwGrid { min-width:690px; } .gwTiles { grid-template-columns:1fr; } }
+        .rsiHm{
+          background:#0d1117;
+          border:1px solid #252d38;
+          border-radius:16px;
+          padding:20px;
+          color:#e6edf3;
+        }
+        .rsiHmHead{
+          display:flex;
+          justify-content:space-between;
+          gap:14px;
+          align-items:flex-start;
+          flex-wrap:wrap;
+          margin-bottom:16px;
+        }
+        .rsiHmTitle{margin:0;font-size:1.3rem;font-weight:800}
+        .rsiHmSub{margin:6px 0 0;color:#8b949e;font-size:.84rem;line-height:1.45}
+        .rsiHmMeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .rsiHmBadge{
+          border:1px solid #303846;background:#111820;border-radius:999px;
+          padding:5px 10px;color:#aeb9c7;font-size:.74rem;font-weight:600
+        }
+        .rsiHmBtn{
+          border:1px solid #303846;background:#111820;color:#d7dee7;
+          border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.8rem;font-weight:600
+        }
+        .rsiHmBtn:hover{border-color:#f0b90b;color:#f0b90b}
+        .rsiHmLegend{
+          display:flex;align-items:center;gap:10px;margin-bottom:14px;
+          color:#9aa7b8;font-size:.72rem;flex-wrap:wrap
+        }
+        .rsiHmScale{
+          height:10px;width:160px;border-radius:4px;
+          background:linear-gradient(90deg,#1a4a9e,#2d6fd4,#3a424d,#c47a12,#c62828);
+          border:1px solid #303846
+        }
+        .rsiHmTableWrap{overflow-x:auto;border:1px solid #252d38;border-radius:12px}
+        .rsiHmTable{
+          width:100%;min-width:420px;border-collapse:collapse;
+          table-layout:fixed
+        }
+        .rsiHmTable th,.rsiHmTable td{
+          border:1px solid #1e2530;
+          text-align:center;
+          vertical-align:middle
+        }
+        .rsiHmTable thead th{
+          background:#111820;
+          color:#aeb9c7;
+          font-size:.78rem;
+          font-weight:800;
+          letter-spacing:.06em;
+          padding:12px 8px
+        }
+        .rsiHmCoin{
+          background:#111820!important;
+          color:#e6edf3!important;
+          text-align:left!important;
+          padding:10px 14px!important;
+          font-weight:800;
+          font-size:.88rem;
+          width:22%
+        }
+        .rsiHmPrice{
+          display:block;
+          font-size:.7rem;
+          font-weight:600;
+          color:#8b949e;
+          margin-top:2px
+        }
+        .rsiHmCell{
+          padding:14px 8px;
+          font-weight:800;
+          font-size:1.05rem;
+          cursor:default;
+          transition:filter .12s ease
+        }
+        .rsiHmCell:hover{filter:brightness(1.15)}
+        .rsiHmArrow{font-size:.75rem;margin-left:4px;opacity:.85}
+        .rsiHmFoot{
+          display:flex;justify-content:space-between;align-items:center;
+          gap:12px;margin-top:14px;color:#8b949e;font-size:.76rem;flex-wrap:wrap
+        }
+        .rsiHmStats{display:flex;gap:8px;flex-wrap:wrap}
+        .rsiHmStat{
+          padding:5px 9px;border-radius:8px;background:#111820;
+          border:1px solid #252d38
+        }
+        .rsiHmStat strong{color:#e6edf3}
+        .rsiHmLoading,.rsiHmError{
+          padding:48px 16px;text-align:center;color:#8b949e
+        }
+        .rsiHmError{
+          background:rgba(194,53,53,.1);border:1px solid rgba(194,53,53,.3);
+          border-radius:12px;color:#d8a1a1
+        }
+        @media(max-width:560px){
+          .rsiHm{padding:14px}
+          .rsiHmCell{padding:12px 4px;font-size:.95rem}
+          .rsiHmCoin{padding:10px 10px!important;font-size:.8rem}
+        }
       `}</style>
 
-      <div className="gwHeatHeader">
+      <div className="rsiHmHead">
         <div>
-          <h2 className="gwHeatTitle">GOLDENWEB Spot RSI Heatmap</h2>
-          <p className="gwHeatSub">Top 10 spot coin • RSI(14) • Gate.io market data • H4 / D1 / W1</p>
+          <h1 className="rsiHmTitle">Spot RSI Heatmap</h1>
+          <p className="rsiHmSub">
+            RSI(14) — H4 / D1 / W1. Ma&apos;lumot: Gate.io spot. Har 60 soniyada yangilanadi.
+          </p>
         </div>
-        <div className="gwHeatMeta">
-          <span className="gwBadge">Gate.io Spot</span>
-          <span className="gwBadge">RSI 14</span>
-          <button className="gwRefresh" onClick={load}>↻ Yangilash</button>
+        <div className="rsiHmMeta">
+          <span className="rsiHmBadge">Gate.io</span>
+          <span className="rsiHmBadge">RSI 14</span>
+          <button type="button" className="rsiHmBtn" onClick={load}>
+            ↻ Yangilash
+          </button>
         </div>
       </div>
 
-      <div className="gwLegend">
-        <span><i className="gwDot extreme-low" /> &lt;20</span>
-        <span><i className="gwDot low" /> 20–30</span>
-        <span><i className="gwDot low-mid" /> 30–45</span>
-        <span><i className="gwDot neutral" /> 45–55</span>
-        <span><i className="gwDot high-mid" /> 55–70</span>
-        <span><i className="gwDot high" /> 70–80</span>
-        <span><i className="gwDot extreme-high" /> 80+</span>
+      <div className="rsiHmLegend">
+        <span>Oversold</span>
+        <div className="rsiHmScale" aria-hidden />
+        <span>Overbought</span>
+        <span style={{ marginLeft: 8, opacity: 0.8 }}>&lt;30 · 30–70 · &gt;70</span>
       </div>
 
-      {loading ? <div className="gwLoading">Gate.io ma'lumotlari yuklanmoqda...</div> : error ? (
-        <div className="gwError">Gate.io ma'lumotlarini olishda xatolik yuz berdi. <button className="gwRefresh" onClick={load}>Qayta urinish</button></div>
+      {loading ? (
+        <div className="rsiHmLoading">Ma&apos;lumot yuklanmoqda...</div>
+      ) : error ? (
+        <div className="rsiHmError">
+          Ma&apos;lumot olinmadi.{' '}
+          <button type="button" className="rsiHmBtn" onClick={load}>
+            Qayta urinish
+          </button>
+        </div>
       ) : (
         <>
-          <div className="gwGridWrap">
-            <div className="gwGrid">
-              {TIMEFRAMES.map((tf) => (
-                <div className="gwTfColumn" key={tf}>
-                  <div className="gwTfHeader">{tf}</div>
-                  <div className="gwTiles">
-                    {COINS.map((coin) => {
-                      const cell = payload?.data?.[coin]?.[tf]
-                      const rsiDirection = cell?.rsiDirection ?? null
-                      return (
-                        <button
-                          key={coin}
-                          type="button"
-                          className={`gwTile ${tone(cell?.rsi ?? null)}`}
-                          onClick={() => setSelected({ coin, tf })}
-                          title={`${coin} ${tf} RSI: ${cell?.rsi == null ? 'N/A' : cell.rsi.toFixed(1)} ${arrow(rsiDirection)} • Narx: ${formatPrice(cell?.price ?? null)}`}
-                        >
-                          <div className="gwTileTop">
-                            <span className="gwTileCoin">{coin}</span>
-                            <span className="gwTilePrice">{formatPrice(cell?.price ?? null)}</span>
-                          </div>
-                          <div className="gwTileMiddle">
-                            <span className="gwRsi">{cell?.rsi == null ? '—' : cell.rsi.toFixed(1)}</span>
-                            <span className={`gwRsiDirection ${rsiDirection === 'up' ? 'gwUp' : rsiDirection === 'down' ? 'gwDown' : 'gwFlat'}`}>{arrow(rsiDirection)}</span>
-                          </div>
-                          <div className="gwTileBottom">
-                            <span className="gwState">{label(cell?.rsi ?? null)}</span>
-                            <span className="gwPeriod">RSI(14)</span>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="rsiHmTableWrap">
+            <table className="rsiHmTable">
+              <thead>
+                <tr>
+                  <th className="rsiHmCoin">Coin</th>
+                  {TIMEFRAMES.map((tf) => (
+                    <th key={tf}>{tf}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {COINS.map((coin) => {
+                  const price =
+                    payload?.data?.[coin]?.H4?.price ??
+                    payload?.data?.[coin]?.D1?.price ??
+                    null
+                  return (
+                    <tr key={coin}>
+                      <td className="rsiHmCoin">
+                        {coin}
+                        <span className="rsiHmPrice">{formatPrice(price)}</span>
+                      </td>
+                      {TIMEFRAMES.map((tf) => {
+                        const cell = payload?.data?.[coin]?.[tf]
+                        const rsi = cell?.rsi ?? null
+                        const dir = cell?.rsiDirection ?? null
+                        return (
+                          <td
+                            key={tf}
+                            className="rsiHmCell"
+                            style={{
+                              background: rsiColor(rsi),
+                              color: textOn(rsi),
+                            }}
+                            title={`${coin} ${tf}: RSI ${rsi ?? 'N/A'} ${arrow(dir)}`}
+                          >
+                            {rsi == null ? '—' : rsi.toFixed(1)}
+                            {dir && dir !== 'flat' ? (
+                              <span className="rsiHmArrow">{arrow(dir)}</span>
+                            ) : null}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
 
-          <div className="gwBottom">
-            <div className="gwStats">
-              <span className="gwStat">Oversold: <strong>{stats.oversold}</strong></span>
-              <span className="gwStat">Bullish: <strong>{stats.bullish}</strong></span>
-              <span className="gwStat">Overbought: <strong>{stats.overbought}</strong></span>
+          <div className="rsiHmFoot">
+            <div className="rsiHmStats">
+              <span className="rsiHmStat">
+                Oversold (&lt;30): <strong>{stats.oversold}</strong>
+              </span>
+              <span className="rsiHmStat">
+                Neutral: <strong>{stats.neutral}</strong>
+              </span>
+              <span className="rsiHmStat">
+                Overbought (≥70): <strong>{stats.overbought}</strong>
+              </span>
             </div>
-            <span>{payload?.updatedAt ? `Yangilandi: ${new Date(payload.updatedAt).toLocaleTimeString()}` : ''}</span>
+            <span>
+              {payload?.updatedAt
+                ? `Yangilandi: ${new Date(payload.updatedAt).toLocaleTimeString()}`
+                : ''}
+            </span>
           </div>
-
-          {selected && (
-            <div className="gwDetail">
-              <strong>{selected.coin} / {selected.tf}</strong> — RSI(14): {payload?.data?.[selected.coin]?.[selected.tf]?.rsi ?? 'N/A'} • Narx: {formatPrice(payload?.data?.[selected.coin]?.[selected.tf]?.price ?? null)}
-            </div>
-          )}
         </>
       )}
     </section>
