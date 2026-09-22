@@ -99,7 +99,13 @@ export async function GET() {
     data[symbol] = {}
     for (const { key } of TIMEFRAMES) {
       const item = results.find(([s, tf]) => s === symbol && tf === key)
-      data[symbol][key] = item?.[2] ?? { rsi: null, price: null, timestamp: null }
+      data[symbol][key] = item?.[2] ?? {
+        rsi: null,
+        price: null,
+        timestamp: null,
+        priceDirection: null,
+        rsiDirection: null,
+      }
     }
   }
 
