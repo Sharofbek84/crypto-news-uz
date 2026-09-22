@@ -56,7 +56,8 @@ function rsiColor(rsi: number | null): string {
   if (v < 30) return lerpHex('#1a4a9e', '#2d6fd4', v / 30)
   if (v < 50) return lerpHex('#2d6fd4', '#3a424d', (v - 30) / 20)
   if (v < 70) return lerpHex('#3a424d', '#c47a12', (v - 50) / 20)
-  return lerpHex('#c47a12', '#c62828', (v - 70) / 30)
+  // 70+: to'qroq qizil (overbought)
+  return lerpHex('#c62828', '#6b0f14', (v - 70) / 30)
 }
 
 function lerpHex(a: string, b: string, t: number) {
@@ -180,9 +181,7 @@ function buildTradeLevels(
   const resistance = toNums(result.resistance)
 
   const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
-  // Narxdan minimal masofa: 0.6 * ATR yoki 0.8%
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
-  // Ikki zona oralig'i: 0.8 * ATR yoki 0.5%
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
 
   const supportsBelow = support
