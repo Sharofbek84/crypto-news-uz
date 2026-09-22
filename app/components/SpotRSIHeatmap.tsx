@@ -145,41 +145,56 @@ function uniqLevels(values: number[], maxCount: number) {
   return out
 }
 
-function buildTradeLevels(result: any, price: number): TradeLevels {
+function toNums(value: unknown): number[] {
+  if (!Array.isArray(value)) return []
+  return value.map((x: unknown) => Number(x)).filter((n: number) => Number.isFinite(n))
+}
+
+function buildTradeLevels(result: Record<string, unknown> | null | undefined, price: number): TradeLevels {
   if (!result || !Number.isFinite(price)) return { buys: [], sells: [], side: null }
 
-  const side = (result.side as string) || null
-  const support = Array.isArray(result.support) ? result.support.map(Number) : []
-  const resistance = Array.isArray(result.resistance) ? result.resistance.map(Number) : []
-  const tp = Array.isArray(result.tp) ? result.tp.map(Number) : []
+  const side = typeof result.side === 'string' ? result.side : null
+  const support = toNums(result.support)
+  const resistance = toNums(result.resistance)
+  const tp = toNums(result.tp)
   const entryLow = Number(result.entryLow)
   const entryHigh = Number(result.entryHigh)
   const invalidation = Number(result.invalidation)
 
-  const buyCandidates = [...support, entryLow, entryHigh]
-    .filter((v) => Number.isFinite(v) && v < price * 0.999)
-    .sort((a, b) => b - a)
+  const buyCandidates: number[] = [...support, entryLow, entryHigh]
+    .filter((v: number) => Number.isFinite(v) && v < price * 0.999)
+    .sort((a: number, b: number) => b - a)
 
-  let sellCandidates = [...resistance, ...tp]
-    .filter((v) => Number.isFinite(v) && v > price * 1.001)
-    .sort((a, b) => a - b)
+  let sellCandidates: number[] = [...resistance, ...tp]
+    .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
+    .sort((a: number, b: number) => a - b)
 
   if (side === 'SELL') {
     const above = [invalidation, entryHigh, entryLow, ...resistance]
-      .filter((v) => Number.isFinite(v) && v > price * 1.001)
-      .sort((a, b) => a - b)
+      .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
+      .sort((a: number, b: number) => a - b)
     if (above.length) sellCandidates = above
-    const belowTp = tp.filter((v) => Number.isFinite(v) && v < price * 0.999).sort((a, b) => b - a)
+    const belowTp = tp
+      .filter((v: number) => Number.isFinite(v) && v < price * 0.999)
+      .sort((a: number, b: number) => b - a)
     if (belowTp.length && buyCandidates.length < 3) {
       buyCandidates.push(...belowTp)
     }
   } else {
-    const tpUp = tp.filter((v) => Number.isFinite(v) && v > price * 1.001).sort((a, b) => a - b)
+    const tpUp = tp
+      .filter((v: number) => Number.isFinite(v) && v > price * 1.001)
+      .sort((a: number, b: number) => a - b)
     if (tpUp.length) sellCandidates = [...tpUp, ...sellCandidates]
   }
 
-  const buys = uniqLevels(buyCandidates.sort((a, b) => b - a), 3)
-  const sells = uniqLevels(sellCandidates.sort((a, b) => a - b), 3)
+  const buys = uniqLevels(
+    buyCandidates.sort((a: number, b: number) => b - a),
+    3
+  )
+  const sells = uniqLevels(
+    sellCandidates.sort((a: number, b: number) => a - b),
+    3
+  )
 
   while (buys.length < 3) {
     const last = buys[buys.length - 1] ?? price
@@ -435,7 +450,7 @@ export default function SpotRSIHeatmap() {
           Array.isArray(data.candles) && data.candles.length
             ? data.candles[data.candles.length - 1].close
             : result?.entryHigh || 0
-        setLevels(buildTradeLevels(result, Number(price)))
+        setLevels(buildTradeLevels(result as Record<string, unknown>, Number(price)))
       } else {
         setLevels(null)
       }
