@@ -53,8 +53,10 @@ type TradeLevels = {
 function rsiColor(rsi: number | null): string {
   if (rsi == null || !Number.isFinite(rsi)) return '#2a3038'
   const v = Math.max(0, Math.min(100, rsi))
-  if (v < 30) return lerpHex('#1a4a9e', '#2d6fd4', v / 30)
-  if (v < 50) return lerpHex('#2d6fd4', '#3a424d', (v - 30) / 20)
+  // 0–20: to'q yashil, 20–30: yashil (oversold)
+  if (v < 20) return lerpHex('#0a4d2e', '#148f55', v / 20)
+  if (v < 30) return lerpHex('#148f55', '#2ecc71', (v - 20) / 10)
+  if (v < 50) return lerpHex('#2ecc71', '#3a424d', (v - 30) / 20)
   if (v < 70) return lerpHex('#3a424d', '#c47a12', (v - 50) / 20)
   return lerpHex('#c62828', '#6b0f14', (v - 70) / 30)
 }
@@ -180,10 +182,8 @@ function buildTradeLevels(
   const resistance = toNums(result.resistance)
 
   const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
-  // Narx ↔ zona: min 0.6 ATR, max 2 ATR
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
   const maxFromPrice = Math.max(atrSafe * 2, price * 0.02)
-  // Ikki zona oralig'i
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
   const maxBetween = Math.max(atrSafe * 2, price * 0.02)
 
