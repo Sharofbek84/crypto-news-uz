@@ -618,7 +618,7 @@ export default function SpotRSIHeatmap() {
         }
         .rsiLevelsNote b{color:#e6edf3}
         .rsiTradeLine{margin-bottom:4px}
-        .rsiTradeLabel{font-weight:800}.rsiTradeLabel.buy{color:#20d67a}.rsiTradeLabel.sell{color:#ff5360}
+        .rsiTradeLabel{color:#e6edf3;font-weight:700}
         .rsiBuy{color:#20d67a}
         .rsiSell{color:#ff5360}
         
@@ -692,7 +692,7 @@ export default function SpotRSIHeatmap() {
               {levels && (levels.buys.length > 0 || levels.sells.length > 0) && (
                 <div className="rsiLevelsNote">
                   <div className="rsiTradeLine">
-                    <span className="rsiTradeLabel buy">Sotib olish:</span>{' '}
+                    <span className="rsiTradeLabel">Sotib olish:</span>{' '}
                     {levels.buys.map((p, i) => (
                       <span key={`b${i}`} className="rsiBuy">
                         BUY{i + 1}: <b>{money(p)}</b>{i < levels.buys.length - 1 ? ', ' : ''}
@@ -700,7 +700,7 @@ export default function SpotRSIHeatmap() {
                     ))}
                   </div>
                   <div className="rsiTradeLine">
-                    <span className="rsiTradeLabel sell">Sotish:</span>{' '}
+                    <span className="rsiTradeLabel">Sotish:</span>{' '}
                     {levels.sells.map((p, i) => (
                       <span key={`s${i}`} className="rsiSell">
                         SELL{i + 1}: <b>{money(p)}</b>{i < levels.sells.length - 1 ? ', ' : ''}
@@ -717,7 +717,7 @@ export default function SpotRSIHeatmap() {
 
           {selectedCell && (
             <div className="rsiHmFoot">
-              {coin} · {tf} · RSI(14): {selectedCell.rsi ?? '—'} · Shamlar: {candles.length} ·
+              {coin} · {tf} · RSI(14): {selectedCell.rsi ?? '—'} ·
               Yangilandi:{' '}
               {payload?.updatedAt ? new Date(payload.updatedAt).toLocaleTimeString() : '—'}
             </div>
