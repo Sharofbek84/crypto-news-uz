@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 const COINS = [
   'BTC',
@@ -53,7 +55,6 @@ type TradeLevels = {
 function rsiColor(rsi: number | null): string {
   if (rsi == null || !Number.isFinite(rsi)) return '#2a3038'
   const v = Math.max(0, Math.min(100, rsi))
-  // 0–20: to'q yashil, 20–30: yashil (oversold)
   if (v < 20) return lerpHex('#0a4d2e', '#148f55', v / 20)
   if (v < 30) return lerpHex('#148f55', '#2ecc71', (v - 20) / 10)
   if (v < 50) return lerpHex('#2ecc71', '#3a424d', (v - 30) / 20)
@@ -468,6 +469,9 @@ function CandleChart({
 }
 
 export default function SpotRSIHeatmap() {
+  const { data: session } = useSession()
+  const hasPremium = Boolean((session?.user as { premium?: boolean } | undefined)?.premium)
+  const premiumHref = hasPremium ? '/premium' : '/obuna'
   const [payload, setPayload] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -615,6 +619,13 @@ export default function SpotRSIHeatmap() {
         .rsiLevelsNote b{color:#e6edf3}
         .rsiBuy{color:#20d67a}
         .rsiSell{color:#ff5360}
+        .rsiSpotNote{
+          margin-top:8px;padding:10px 12px;border-radius:10px;
+          background:#0f141c;border:1px solid #252d38;
+          font-size:.78rem;color:#9aa7b8;line-height:1.5
+        }
+        .rsiSpotNote a{color:#f0b90b;font-weight:700;text-decoration:none}
+        .rsiSpotNote a:hover{text-decoration:underline}
         @media(max-width:560px){
           .rsiHm{padding:14px}
           .rsiCards{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -699,6 +710,11 @@ export default function SpotRSIHeatmap() {
                   ))}
                 </div>
               )}
+              <div className="rsiSpotNote">
+                Izoh: ushbu signal spot savdosi uchun tavsiya qilinadi. Fyuchers uchun aniq
+                signallar va texnik tahlil Premium sahifada berilgan{' '}
+                <Link href={premiumHref}>{'>>>'}</Link>
+              </div>
             </>
           )}
 
