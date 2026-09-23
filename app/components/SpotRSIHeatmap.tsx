@@ -617,6 +617,8 @@ export default function SpotRSIHeatmap() {
           line-height:1.6
         }
         .rsiLevelsNote b{color:#e6edf3}
+        .rsiTradeLine{margin-bottom:4px}
+        .rsiTradeLabel{color:#e6edf3;font-weight:700}
         .rsiBuy{color:#20d67a}
         .rsiSell{color:#ff5360}
         
@@ -689,19 +691,19 @@ export default function SpotRSIHeatmap() {
               <CandleChart candles={candles} coin={coin} tf={tf} levels={levels} />
               {levels && (levels.buys.length > 0 || levels.sells.length > 0) && (
                 <div className="rsiLevelsNote">
-                  <div>
-                    <span className="rsiBuy">Sotib olish: </span>
+                  <div className="rsiTradeLine">
+                    <span className="rsiTradeLabel">Sotib olish:</span>{' '}
                     {levels.buys.map((p, i) => (
                       <span key={`b${i}`} className="rsiBuy">
-                        <b>BUY{i + 1}: {money(p)}</b>{i < levels.buys.length - 1 ? ', ' : ''}
+                        BUY{i + 1}: <b>{money(p)}</b>{i < levels.buys.length - 1 ? ', ' : ''}
                       </span>
                     ))}
                   </div>
-                  <div>
-                    <span className="rsiSell">Sotish: </span>
+                  <div className="rsiTradeLine">
+                    <span className="rsiTradeLabel">Sotish:</span>{' '}
                     {levels.sells.map((p, i) => (
                       <span key={`s${i}`} className="rsiSell">
-                        <b>SELL{i + 1}: {money(p)}</b>{i < levels.sells.length - 1 ? ', ' : ''}
+                        SELL{i + 1}: <b>{money(p)}</b>{i < levels.sells.length - 1 ? ', ' : ''}
                       </span>
                     ))}
                   </div>
