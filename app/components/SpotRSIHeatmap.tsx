@@ -612,20 +612,14 @@ export default function SpotRSIHeatmap() {
         }
         .rsiHmFoot{margin-top:12px;color:#8b949e;font-size:.76rem;text-align:right}
         .rsiLevelsNote{
-          margin-top:10px;padding:10px 12px;border-radius:10px;
+          margin-top:10px;padding:12px 14px;border-radius:10px;
           background:#111820;border:1px solid #252d38;font-size:.78rem;color:#9aa7b8;
-          display:flex;flex-wrap:wrap;gap:10px 16px
+          line-height:1.6
         }
         .rsiLevelsNote b{color:#e6edf3}
         .rsiBuy{color:#20d67a}
         .rsiSell{color:#ff5360}
-        .rsiSpotNote{
-          margin-top:8px;padding:10px 12px;border-radius:10px;
-          background:#0f141c;border:1px solid #252d38;
-          font-size:.78rem;color:#9aa7b8;line-height:1.5
-        }
-        .rsiSpotNote a{color:#f0b90b;font-weight:700;text-decoration:none}
-        .rsiSpotNote a:hover{text-decoration:underline}
+        
         @media(max-width:560px){
           .rsiHm{padding:14px}
           .rsiCards{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -695,26 +689,27 @@ export default function SpotRSIHeatmap() {
               <CandleChart candles={candles} coin={coin} tf={tf} levels={levels} />
               {levels && (levels.buys.length > 0 || levels.sells.length > 0) && (
                 <div className="rsiLevelsNote">
-                  <span>
-                    Signal: <b>{levels.side || '—'}</b>
-                  </span>
-                  {levels.buys.map((p, i) => (
-                    <span key={`b${i}`} className="rsiBuy">
-                      BUY{i + 1}: <b>{money(p)}</b>
-                    </span>
-                  ))}
-                  {levels.sells.map((p, i) => (
-                    <span key={`s${i}`} className="rsiSell">
-                      SELL{i + 1}: <b>{money(p)}</b>
-                    </span>
-                  ))}
+                  <div>
+                    <span className="rsiBuy">Sotib olish: </span>
+                    {levels.buys.map((p, i) => (
+                      <span key={`b${i}`} className="rsiBuy">
+                        <b>BUY{i + 1}: {money(p)}</b>{i < levels.buys.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </div>
+                  <div>
+                    <span className="rsiSell">Sotish: </span>
+                    {levels.sells.map((p, i) => (
+                      <span key={`s${i}`} className="rsiSell">
+                        <b>SELL{i + 1}: {money(p)}</b>{i < levels.sells.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </div>
+                  <div>
+                    <b>Izoh:</b> Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
+                  </div>
                 </div>
               )}
-              <div className="rsiSpotNote">
-                Izoh: ushbu signal spot savdosi uchun tavsiya qilinadi. Fyuchers uchun aniq
-                signallar va texnik tahlil Premium sahifada berilgan{' '}
-                <Link href={premiumHref}>{'>>>'}</Link>
-              </div>
             </>
           )}
 
