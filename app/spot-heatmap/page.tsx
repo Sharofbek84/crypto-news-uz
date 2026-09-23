@@ -15,6 +15,17 @@ export default function SpotHeatmapPage() {
       <SiteHeader />
       <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
         <SpotRSIHeatmap />
+        <p
+          style={{
+            margin: '18px 0 0',
+            color: '#8b949e',
+            fontSize: '0.78rem',
+            lineHeight: 1.65,
+            textAlign: 'center',
+          }}
+        >
+          Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o‘zingiz tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat yo‘qotishga tayyor bo‘lgan pulingiz bilan kiring.
+        </p>
       </main>
       <SiteFooter />
     </>
