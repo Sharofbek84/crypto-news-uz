@@ -1,0 +1,112 @@
+[
+  {
+    "slug": "btc-86000-etf-715-mln-24-sent",
+    "title": "Bitcoin $86 000 atrofida mustahkamlandi, ETF-lar $715 million oldi",
+    "summary": "Chorshanba sessiyasida Bitcoin $86 000–$86 400 oralig‘ida konsolidatsiya qildi. AQSh spot bitcoin ETF-lari 22-sentabrda $714,7–$715 million sof kirim oldi. To‘rt kunlik oqim $2,3 milliardga yetdi.",
+    "body": "CoinDesk Markets Today ma’lumotiga ko‘ra, Bitcoin chorshanba ertalab Yevropa sessiyasida $86 379 atrofida savdo qildi: UTC yarim tunidan +0,24 foiz, 24 soatda +1,3 foiz. Kunlik savdo hajmi 36 foizga tushib $38 milliardga tushdi. Dushanba yorilishidan keyin rally toraydi: CoinDesk 100 ning 38 ta komponenti kun ichida pasaygan.\n\nFarside Investors va News.Bitcoin.com yakuniy raqamlari 22-sentabr uchun $714,75 million sof kirimni tasdiqladi. BlackRock IBIT $350,35 million, Fidelity FBTC $257,42 million, Morgan Stanley MSBT $99,01 million oldi. Grayscale Mini Trust $4,95 million, VanEck HODL $2,44 million, ARKB $573 ming. Hech bir yirik bitcoin fondi chiqim yozmagan.\n\nTo‘rt sessiya (19–22 sentabr) jami taxminan $2,3 milliard. 21-sentabrdagi $999 million va 22-sentabrdagi $715 million birgalikda $1,71 milliard. Kumulativ spot bitcoin ETF kirimi $56,87 milliard, sof aktivlar $110,84 milliard — BTC bozor kapitallashuvining 6,4 foizi.\n\nBrent nefti $99,13 ga tushib, 9-sentabrdan beri birinchi marta $100 ostiga tushdi. Bu inflyatsiya qo‘rquvini yumshatdi. Tahlilchilar keyingi qarshilikni $87 000–$89 500, tayanchni $84 000–$82 000 deb belgilaydi. Haftalik o‘sish taxminan 14 foiz.\n\nAgar ETF oqimi saqlansa, $90 000 sathi ochiq qoladi. Hajm pasayishi va toraygan kenglik esa qisqa tuzatish xavfini oshiradi.\n\nManba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/23/bitcoin-consolidates-near-usd86-000-as-rally-narrows-and-brent-slips-below-usd100",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "eth-etf-162-mln-2750-24-sent",
+    "title": "Ether $2 750 atrofida, spot ETH ETF-lari $162 million oldi",
+    "summary": "Ethereum chorshanba sessiyasida $2 720–$2 750 oralig‘ida savdo qildi. Spot ether ETF-lari 22-sentabrda $162,3 million kirim oldi. BlackRock ETHA $88 million yetakchilik qildi.",
+    "body": "Decrypt Morning Minute va Farside ma’lumotlariga ko‘ra, Ethereum 23-sentabr ertalab $2 720–$2 750 oralig‘ida, ba’zi aggregatorlarda $2 768. Haftalik o‘sish 15–16 foiz atrofida. CoinDesk kesimida ether chorshanba ertalab deyarli tekis ($2 750,24, −0,09 foiz) yopildi.\n\n22-sentabrda AQSh spot ether ETF-lari $162,31 million sof kirim oldi. BlackRock ETHA $88,13 million, Fidelity FETH $33,64 million, Grayscale Ether Mini Trust $27,31 million. Bu sentabrning uchinchi eng yirik ether kuni. 21-sentabrdagi $270 milliondan keyin ikki kunlik yig‘indi $432 milliondan oshadi.\n\nKumulativ ether ETF kirimi $13,68 milliard, sof aktivlar $17,92 milliard — ETH bozor kapitallashuvining 5,34 foizi. Institutsional talab bitcoin bilan parallel, lekin hajm kichikroq.\n\nMakro fon: neftning arzonlashishi va Nasdaq rekordlari risk-on kayfiyatini ushlab turdi. Tahlilchilar $2 700 ni asosiy tayanch, $2 800–$3 000 ni keyingi nishon deb belgilaydi. Agar ETF oqimi to‘xtasa, $2 550–$2 640 qayta testdan o‘tishi mumkin.\n\nEther rallysi hozircha spot va ETF talabiga tayanadi. Leveraj bitcoinnikidan pastroq, bu tuzatishda ETH ni nisbatan barqarorroq qilishi mumkin.\n\nManba: Decrypt / Farside.",
+    "manba": "Decrypt",
+    "url": "https://decrypt.co/379033/morning-minute-bitcoin-hits-86000-as-oil-slides-and-etfs-bid",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+  },
+  {
+    "slug": "sol-alpenglow-testnet-150ms-24-sent",
+    "title": "Solana Alpenglow testnetga chiqdi: finality 13 soniyadan 150 ms ga",
+    "summary": "Solana Alpenglow yangilanishi ommaviy testnetga o‘tdi. Maqsad — tranzaksiya yakuniyligini 12,8 soniyadan 150 millisoniyaga tushirish. SOL $117–$120 atrofida, ETF-lar $29 million oldi.",
+    "body": "CoinDesk Tech xabariga ko‘ra, Solana ning Alpenglow yangilanishi ommaviy test tarmog‘iga ko‘chirildi. Dasturchilar to‘lovning qaytarilmas bo‘lish vaqtini taxminan 13 soniyadan 0,15 soniyaga tushirishni sinaydi. Bu birjalar, ko‘priklar va savdogarlarga to‘lovlarni deyarli darhol yakuniy deb qabul qilish imkonini beradi.\n\nAlpenglow TowerBFT o‘rniga Votor protokolini qo‘yadi. Validatorlar ovozlarni to‘g‘ridan-to‘g‘ri bir-biriga yuboradi va blokni bir yoki ikki raunddan keyin yakunlaydi. Foydalanuvchi tranzaksiya yuborish usuli o‘zgarmaydi. Dastlabki migratsiya Agave 4.3 ni talab qiladi; Firedancer va Frankendancer hozircha qo‘llab-quvvatlanmaydi.\n\n28-sentabr Anza jadvalida Agave 4.3 xususiyatlarini mainnetda yoqishning taxminiy sanasi sifatida qoladi, lekin bu Alpenglow ishga tushishi tasdiqlangan sana emas. Validatorlar 21-sentabrdan Agave 4.3 ni tavsiya etilgan client sifatida qabul qila boshlagan.\n\nNarx tomonida SOL $117–$120, haftalik o‘sish 21–23 foiz. 22-sentabrda Solana ETF-lari $28,87 million oldi: Bitwise BSOL $26,38 million, Grayscale GSOL $1,79 million, Fidelity FSOL $696 ming. Kumulativ SOL ETF kirimi $1,47 milliard, sof aktivlar $1,77 milliard.\n\nAgar testnet muvaffaqiyatli o‘tsa, tezlik narrativi SOL ni L1 poygasida oldinga suradi. $114 tayanch, $123–$125 qarshilik. Mainnet sanasi noaniqligi spekulyatsiyani ushlab turadi.\n\nManba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/tech/2026/09/23/solana-starts-testing-upgrade-that-could-cut-finality-from-12-8-seconds-to-150-milliseconds",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/4128/large/solana.png"
+  },
+  {
+    "slug": "bnb-circle-100-mln-usdc-24-sent",
+    "title": "Binance Circle aksiyasiga $100 million kiritdi, BNB $791 atrofida",
+    "summary": "Binance 1,237 million Circle A-sinf aksiyasini $80,84 dan oldi. Circle 5 yil davomida USDC balansiga bog‘langan oylik to‘lov qiladi. BNB $791–$794 oralig‘ida.",
+    "body": "CoinDesk Policy va Decrypt xabariga ko‘ra, Binance 17-sentabrda yopilgan xususiy joylashtirish orqali Circle ning 1 237 011 dona A-sinf aksiyasini $80,84 dan, jami $100 millionga sotib oldi. SEC 8-K hujjati 22-sentabrda e’lon qilindi. Narx o‘sha kun yopilishidan ($85,09) taxminan 5 foiz chegirma.\n\nBir vaqtning o‘zida 5 yillik tijorat kelishuvi imzolandi. Circle Modular Smart Contract Wallet orqali ushlab turilgan USDC miqdoriga foiz hisobida oylik rag‘bat to‘laydi. Binance platformada USDC ni targ‘ib qiladi. Bitim 2024-yil noyabr va 2025-yil avgustdagi oldingi kelishuvlarni almashtiradi.\n\nBinance aksiyalarni 2 yil yoki tijorat shartnomasi tugaguncha sota olmaydi va xedjlay olmaydi, lekin ovoz huquqi saqlanadi. 21-sentabr yopilishida ($94,49) paket qog‘ozda $116,9 millionga baholangan — $16,9 million qog‘oz foyda.\n\nBNB 23-sentabrda $791–$794 atrofida, haftalik o‘sish 11–12 foiz. Kelishuv Binance Wallet va BNB Chain dagi USDC likvidligini oshirishi kutiladi. Steyblkoin raqobatida bu USDT ga qarshi tarqatish kanali.\n\nQisqa muddatda BNB uchun $800 psixologik sath. Agar USDC ulushi oshsa, ekotizim komissiyasi va BNB burn narrativi qo‘llab-quvvatlanadi.\n\nManba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/policy/2026/09/22/binance-buys-usd100-million-circle-stake-in-five-year-usdc-promotion-deal",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png"
+  },
+  {
+    "slug": "coinbase-fixed-rate-btc-usdc-24-sent",
+    "title": "Coinbase endi bitcoin garovida qat’iy foizli USDC qarz beradi",
+    "summary": "Coinbase foydalanuvchilari BTC garovida USDC ni qat’iy foiz va belgilangan qaytarish sanasi bilan olishi mumkin. Mahsulot Morpho Midnight va Base tarmog‘ida ishlaydi. O‘zgaruvchan foizli portfel $1,4 milliard.",
+    "body": "CoinDesk Markets xabariga ko‘ra, Nasdaq dagi Coinbase chorshanba e’lonida foydalanuvchilarga bitcoin garovida USDC qarzini qat’iy foiz va oldindan belgilangan qaytarish sanasi bilan taklif qildi. Bu o‘zgaruvchan foizli modeldan farq qiladi va xarajatni oldindan aniq qiladi.\n\nKreditlar Morpho Midnight protokolida ishlaydi — 2026-yil iyulida ishga tushgan, qat’iy foiz va muddatli kriptokreditlar uchun mo‘ljallangan. Coinbase ilova interfeysini boshqaradi, Morpho kredit infratuzilmasini beradi, hisob-kitob Base (Coinbase Ethereum L2) da amalga oshadi.\n\nMavjud o‘zgaruvchan foizli biznes $1,4 milliarddan oshiq faol kredit va taxminan $3 milliard garovga ega. Coinbase avval XRP va Dogecoin ni ham garov sifatida qo‘shgan. Yangi mahsulot shu qatorning davomi.\n\nDecrypt ta’kidlashicha, bu Morpho Midnight ning birinchi korporativ miqyosdagi joylashuvi. Foiz va muddat origination paytida qulflanadi. Foydalanuvchi BTC ni sotmasdan likvidlik oladi.\n\nBu institutsional va chakana holderlarga bitcoinni sotmasdan naqd olish yo‘lini kengaytiradi. Agar talab oshsa, cbBTC va Base likvidligi ham oshishi mumkin. Risk tomoni — LTV va avtomatik likvidatsiya qoidalari o‘zgaruvchan modeldagiga o‘xshash qoladi.\n\nManba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/23/coinbase-users-can-now-borrow-usdc-against-bitcoin-at-a-fixed-rate",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "blackrock-ai-agent-stablecoin-24-sent",
+    "title": "BlackRock: AI agentlar steyblkoin va kripto talabini oshiradi",
+    "summary": "Dunyodagi eng yirik aktiv boshqaruvchi AI agentlar ma’lumot va hisoblash quvvatini steyblkoin bilan to‘lashi mumkinligini yozdi. Steyblkoin bozori $300 milliarddan oshiq. To‘lovlar yaqinroq imkoniyat.",
+    "body": "CoinDesk Markets xabariga ko‘ra, BlackRock yangi tadqiqotida sun’iy intellekt agentlari xizmat, ma’lumot va hisoblash quvvatini avtonom sotib olishi kripto qabul qilishning katta drayveri bo‘lishi mumkinligini ta’kidladi. AI «mashina-tabiatli intellekt», raqamli aktivlar esa to‘lov va hisob-kitob relslarini beradi.\n\nStablkoinlar birinchi yirik foydalanuvchi bo‘lishi kutiladi: barqaror qiymat xizmatlarni narxlashni osonlashtiradi, blokcheyn esa 24/7 to‘lovni yoqadi. BlackRock Coinbase x402 protokolini agentlarning API chaqiriqlari uchun to‘lash usuli sifatida tilga oldi.\n\nFirma Amazon, Microsoft va Google bulut bizneslarining 2030-yilga borib $1,1 trillion daromadga yetishi haqidagi tahlilchi baholarini keltirdi. Hisoblash quvvatiga tokenlashtirilgan da’volar keyinchalik savdo yoki garov bo‘lishi mumkin, lekin standart shartnomalar va likvid bozorlar hali yo‘q.\n\nDecrypt qo‘shimcha qiladi: BlackRock steyblkoin aylanma kapitallashuvini 2026-yil sentabrida $300 milliarddan oshiq, 2025-yilda tuzatilgan tranzaksiya hajmini $11 trillion deb belgilagan. TRM Labs esa x402 da AI agentlar hozircha hajmning 0,6–7,5 foizini tashkil etishini yozgan.\n\nBu narrativ ETH, SOL va steyblkoin emitentlari uchun uzoq muddatli talab argumenti. Qisqa muddatda esa bu makro va ETF oqimidan keyingi uchinchi qatlam — hali narxga to‘g‘ridan-to‘g‘ri ta’sir kichik.\n\nManba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/23/ai-agents-will-soon-buy-their-own-computing-power-and-data-using-stablecoins-according-to-blackrock",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/6319/large/usdc.png"
+  },
+  {
+    "slug": "near-ai-rally-privacy-perps-24-sent",
+    "title": "NEAR AI tokenlar yetakchisi: haftada 90 foiz, maxfiy perps",
+    "summary": "NEAR Protocol AI tokenlar rallysida yetakchi. Haftalik o‘sish 90 foizdan oshiq, narx $4,30–$4,35. near.com dagi Hyperliquid depozitlari sukut bo‘yicha maxfiy qilindi.",
+    "body": "CoinMarketCap Academy tahliliga ko‘ra, AI va big data tokenlari seshanba kuni 4,7 foiz oshib $25 milliard kapitallashuvga chiqdi. Bitcoin 1 foizdan kam o‘sdi, ether tekis. NEAR 7,6 foiz, Bittensor 8 foiz qo‘shdi. Chorshanba sessiyasida NEAR $4,35 atrofida +1,8 foiz qoldi.\n\nHaftalik rasm: 10 ta yirik AI tokenining barchasi musbat, beshtasi 40 foizdan oshiq. NEAR $2,20 dan $4,34 gacha — 90 foizdan ko‘p. Kategoriya ichida $5,67 milliard kapitallashuv bilan eng yirik.\n\nAsosiy katalizator — 17-sentabrdan near.com orqali Hyperliquid perpetual savdosi uchun depozit va yechimlarning sukut bo‘yicha maxfiy qilinishi. Treyderning moliyalashtirish hamyoni va savdo hisobi orasidagi bog‘liqlik yashiriladi.\n\nBloomingbit altkoin hisobotida NEAR ni keng rallyda +88,5 foiz guruhida tilga oldi. Cryptowisser 23-sentabrda NEAR Intents da 30+ tarmoq bo‘ylab limit-orderlar yoqilganini va Ondo Finance bilan tokenlashtirilgan AQSh aksiyalari (Nvidia, Tesla) integratsiyasini yozdi.\n\nTexnik sath $4,20–$4,50. Ushlab qolinsa $5 ochiq. RSI yuqori bo‘lgani uchun $3,30–$3,50 qayta testi ehtimoli saqlanadi. AI rotatsiyasi bitcoin stall qilganda chakana e’tiborni ushlab turadi.\n\nManba: CoinMarketCap.",
+    "manba": "CoinMarketCap",
+    "url": "https://coinmarketcap.com/academy/article/ai-tokens-lead-for-a-second-day-as-crypto-stalls",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/10365/large/near.jpg"
+  },
+  {
+    "slug": "sui-apt-atom-alt-rally-24-sent",
+    "title": "SUI, APT va ATOM L1 to‘lqinida: SUI 48 foizgacha oshgan",
+    "summary": "Keng altkoin rallysida Sui 47–48 foiz, Aptos 57 foiz guruhida qayd etildi. ATOM Cosmos IBC va tokenizatsiya hikoyasida sekinroq, lekin ijobiy. L1 rotatsiyasi bitcoin konsolidatsiyasida davom etmoqda.",
+    "body": "Bloomingbit altkoin sharhiga ko‘ra, Clarity Act Senatdagi muvaffaqiyatsizligi va Fed stavka oshirishiga qaramay, keng altkoin bozori o‘sishda qoldi. Sui (SUI) 47,8 foiz, Aptos (APT) 57 foiz, Avalanche 52,6 foiz guruhida. Solana 21 foiz.\n\nSUI $1 atrofida psixologik sathni testdan o‘tkazgan. Oldingi sessiyadagi GraphQL subscriptions yangilanishi — JSON-RPC o‘rniga yagona WebSocket orqali jonli checkpoint va hodisalar — dApp va indekslovchilar uchun argument sifatida saqlanadi.\n\nAptos Move L1 va RWA/tokenizatsiya narrativida. CME ning BCH va UNI fyuchers rejalari kabi institutsional mahsulotlar L1 e’tiborini kengaytirgan. APT narxi SUI va NEAR dan orqada qolishi mumkin, lekin hajm oshgan.\n\nATOM tomonida Cosmos IBC, Noble USDC va bank tokenizatsiyasi hikoyasi bor, lekin narx bitcoin va SOL dan sekin. Circle va ECB Pontes kabi ulgurji hisob-kitob tashabbuslari Cosmos ni infratuzilma qatlami sifatida tilga oladi.\n\nAgar bitcoin $86 000 ustida qolsa, L1 rotatsiyasi davom etishi mumkin. SUI uchun $1 tayanch, APT uchun o‘rtacha sathlar, ATOM uchun esa alohida katalizator kerak. Kenglik torayishi (CoinDesk 100 da 38 ta pasayish) bu to‘lqinning zaiflashish xavfini ko‘rsatadi.\n\nManba: Bloomingbit.",
+    "manba": "Bloomingbit",
+    "url": "https://en.bloomingbit.io/feed/news/120911",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/26375/large/sui-ocean-square.png"
+  },
+  {
+    "slug": "ltc-61-fidelity-decentralization-24-sent",
+    "title": "Litecoin $61 atrofida: Fidelity to‘lov utilitasi va 96 ball markazsizlashuv",
+    "summary": "LTC $60,99–$61,83 oralig‘ida savdo qildi. Fidelity Digital Assets LTC ning Bitcoin ga qaraganda tezroq blok vaqtini to‘lovlar uchun ijobiy baholadi. BlockIndexAI markazsizlashuv balli 96.",
+    "body": "Blockchain.News flash lentasiga ko‘ra, 23-sentabrda Litecoin $60,99 atrofida savdo qildi. BlockIndexAI ma’lumotida LTC markazsizlashuv balli 96, Bitcoin 98, 2017-yildan keyingi ko‘plab tarmoqlar 60 dan past. Bu PoW «eski gvardiya» argumentini qayta ko‘taradi.\n\n22-sentabrda Litecoin rasmiy akkaunti Fidelity Digital Assets ning LTC ni to‘lov utilitasi sifatida e’tirofini tarqatdi: tezroq blok vaqti Bitcoin ga nisbatan chakana to‘lovlar uchun qulayroq. O‘sha paytda narx $61,13 edi.\n\nOldingi haftalarda Litecoin Core v0.21.5.8 xavfsizlik yangilanishi, MWEB manzillarining yangi ATH va 519 ming LTC MWEB da saqlanishi xabar qilingan. SwissBorg LTC va ZEC listingini qo‘shgan. Lekin 21–23 sentabr keng rallysida LTC bitcoin va SOL dan sekinroq.\n\nLTC ETF oqimlari yirik bitcoin va ether fondlariga qaraganda kichik. To‘lov tarmog‘i va ETF listingi bor, lekin yangi protokol katalizatori yo‘q. Narx asosan BTC betasiga tayanadi.\n\nAgar bitcoin $86 000 ustida qolsa, LTC $65–$70 zonani testdan o‘tkazishi mumkin. Aks holda $55–$58 tayanch qayta ochiladi. Fidelity e’tirof institutlar uchun narrativ, lekin oqim hali kichik.\n\nManba: Blockchain.News.",
+    "manba": "Blockchain.News",
+    "url": "https://blockchain.news/flashnews/Litecoin",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/2/large/litecoin.png"
+  },
+  {
+    "slug": "gram-ton-wallet-keeper-24-sent",
+    "title": "GRAM (TON) Telegram wallet va Keeper rebrendi fonida kutishda",
+    "summary": "GRAM tokeni Telegram native hamyon tarqatilishi va Tonkeeper ning Keeper rebrendidan keyin texnik qarshilikda. Wallet endi 7 ta tarmoqni qo‘llab-quvvatlaydi. Narx asosiy altkoinlardan sekinroq.",
+    "body": "CoinMarketCap CMC AI yangilanishiga ko‘ra, GRAM (avvalgi Toncoin) ekotizim kengayishi va token narxi o‘rtasidagi tafovutda. 15-sentabrda Tonkeeper Keeper ga rebrend qilindi va 7 ta tarmoqni qo‘llab-quvvatlay boshladi: TON, Bitcoin, Ethereum, TRON, BNB Smart Chain, Arbitrum va Base. Foydalanuvchilar 77 milliondan oshiq.\n\n31-avgustda Telegram asoschisi Pavel Durov Gram Wallet tarqatilishini boshlaganini e’lon qilgan edi. Bu 137 foizlik hajm o‘sishi va qisqa rallyni keltirgan. Jamiyat sentabrda Telegram ilovasidagi native, non-kustodial hamyonning kengroq rolloutini kutmoqda.\n\nKeng 21–23 sentabr rallysida GRAM SOL, SUI va NEAR dan orqada qoldi. Token texnik qarshilik zonasida. Kapitallashuv bir necha milliard dollar atrofida, lekin yangi chakana to‘lqin hali to‘liq ochilmagan.\n\nKeeper ning multichain yo‘nalishi TON ni yagona ekotizimdan chiqarib, default hamyon bo‘lishga urinadi. Gasless tranzaksiyalar kirish to‘sig‘ini pasaytirishi mumkin. Lekin GRAM narxi hozircha BTC va L1 rotatsiyasiga bog‘liq.\n\nAgar native wallet milliardlik Telegram bazasiga chiqsa, on-chain faollik oshishi mumkin. Aks holda token asosiy rallydan ajralib qoladi. Qisqa muddatda hajm va listing yangiliklari muhimroq, protokol yangilanishi esa o‘rta muddatli.\n\nManba: CoinMarketCap.",
+    "manba": "CoinMarketCap",
+    "url": "https://coinmarketcap.com/cmc-ai/gram/latest-updates/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-24",
+    "image": "https://assets.coingecko.com/coins/images/17980/large/ton_symbol.png"
+  }
+]
