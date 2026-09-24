@@ -534,13 +534,13 @@ export default function SpotRSIHeatmap() {
   const [payload, setPayload] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('W1')
+  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('D1')
   const [coin, setCoin] = useState<(typeof COINS)[number]>('BTC')
   const [candles, setCandles] = useState<Candle[]>([])
   const [levels, setLevels] = useState<TradeLevels | null>(null)
   const [chartLoading, setChartLoading] = useState(true)
 
-  const interval = TIMEFRAMES.find((t) => t.key === tf)?.interval || '1w'
+  const interval = TIMEFRAMES.find((t) => t.key === tf)?.interval || '1d'
 
   const loadHeatmap = useCallback(async () => {
     try {
@@ -766,7 +766,7 @@ export default function SpotRSIHeatmap() {
                       </div>
                       <div className="rsiTradeLine">
                         <span className="rsiTradeLabel">Sotib olish:</span>{' '}
-                        <span>tavsiya etilmaydi</span>
+                        <span>tavsiya etilmaydi.</span>
                       </div>
                     </>
                   ) : oversold ? (
@@ -786,7 +786,7 @@ export default function SpotRSIHeatmap() {
                       </div>
                       <div className="rsiTradeLine">
                         <span className="rsiTradeLabel">Sotish:</span>{' '}
-                        <span>tavsiya etilmaydi</span>
+                        <span>tavsiya etilmaydi.</span>
                       </div>
                     </>
                   ) : (
