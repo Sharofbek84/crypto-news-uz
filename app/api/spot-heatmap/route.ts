@@ -14,12 +14,12 @@ const COINS = [
   'SUI',
   'APT',
   'ATOM',
-  'XAUT',
-  'XRP',
-  'XLM',
-  'BCH',
-  'LINK',
-  'AVAX',
+  'TIA',
+  'CORE',
+  'PLUME',
+  'MYX',
+  'WCT',
+  'WLD',
 ] as const
 
 const TIMEFRAMES = [
