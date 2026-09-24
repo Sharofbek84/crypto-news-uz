@@ -733,7 +733,7 @@ export default function SpotRSIHeatmap() {
                     ))}
                   </div>
                   <div>
-                    <b>Izoh:</b> BUY/SELL darajalari swing + ATR filtrlari asosida mustaqil hisoblanadi (premium signal emas). Fyuchers signallari Premium sahifada <Link href={premiumHref}>{'>>>'}</Link>
+                    <b>Izoh:</b> Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
                   </div>
                 </div>
               )}
