@@ -155,34 +155,81 @@ function atrSeries(candles: Candle[], period = 14): number {
   return atr
 }
 
-function uniqLevels(values: number[], maxCount: number, minGapPct = 0.03) {
-  const out: number[] = []
-  for (const v of values) {
-    if (!Number.isFinite(v) || v <= 0) continue
-    if (out.some((x) => Math.abs(x - v) / Math.max(Math.abs(x), Math.abs(v), 1) < minGapPct)) continue
-    out.push(v)
-    if (out.length >= maxCount) break
+function findSwingPoints(candles: Candle[], left = 2, right = 2) {
+  const swings: { price: number; type: 'high' | 'low'; index: number }[] = []
+  for (let i = left; i < candles.length - right; i++) {
+    const c = candles[i]
+    let isHigh = true
+    let isLow = true
+    for (let j = 1; j <= left; j++) {
+      if (candles[i - j].high >= c.high) isHigh = false
+      if (candles[i - j].low <= c.low) isLow = false
+    }
+    for (let j = 1; j <= right; j++) {
+      if (candles[i + j].high >= c.high) isHigh = false
+      if (candles[i + j].low <= c.low) isLow = false
+    }
+    if (isHigh) swings.push({ price: c.high, type: 'high', index: i })
+    if (isLow) swings.push({ price: c.low, type: 'low', index: i })
   }
-  return out
+  return swings
 }
 
-function toNums(value: unknown): number[] {
-  if (!Array.isArray(value)) return []
-  return value.map((x: unknown) => Number(x)).filter((n: number) => Number.isFinite(n))
+function clusterLevels(prices: number[], tolerance: number) {
+  if (!prices.length) return [] as number[]
+  const sorted = [...prices].sort((a, b) => a - b)
+  const clusters: number[] = []
+  let group = [sorted[0]]
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] - group[group.length - 1] <= tolerance) {
+      group.push(sorted[i])
+    } else {
+      clusters.push(group.reduce((a, b) => a + b, 0) / group.length)
+      group = [sorted[i]]
+    }
+  }
+  clusters.push(group.reduce((a, b) => a + b, 0) / group.length)
+  return clusters
 }
 
-function buildTradeLevels(
-  result: Record<string, unknown> | null | undefined,
-  price: number,
-  atr: number
+function structureWindow(interval: string) {
+  return interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : 48
+}
+
+/** Premium analizdan mustaqil: swing + cluster + ATR filtrlar */
+function computeIndependentTradeLevels(
+  candles: Candle[],
+  interval: string
 ): TradeLevels {
-  if (!result || !Number.isFinite(price) || price <= 0) return { buys: [], sells: [], side: null }
+  if (!candles.length) return { buys: [], sells: [], side: null }
 
-  const side = typeof result.side === 'string' ? result.side : null
-  const support = toNums(result.support)
-  const resistance = toNums(result.resistance)
+  const price = candles[candles.length - 1].close
+  if (!Number.isFinite(price) || price <= 0) return { buys: [], sells: [], side: null }
 
+  const window = structureWindow(interval)
+  const recent = candles.slice(-Math.min(candles.length, window))
+  const atr = atrSeries(recent, 14)
   const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
+
+  const tol =
+    price *
+    (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
+
+  const swings = findSwingPoints(recent, 2, 2)
+  const rawLows = swings.filter((s) => s.type === 'low').map((s) => s.price)
+  const rawHighs = swings.filter((s) => s.type === 'high').map((s) => s.price)
+
+  if (!rawLows.length) rawLows.push(price - atrSafe)
+  if (!rawHighs.length) rawHighs.push(price + atrSafe)
+
+  const support = clusterLevels(rawLows, tol)
+    .filter((p) => p < price)
+    .sort((a, b) => b - a)
+  const resistance = clusterLevels(rawHighs, tol)
+    .filter((p) => p > price)
+    .sort((a, b) => a - b)
+
+  // ATR filtrlari (avvalgidek saqlangan)
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
   const maxFromPrice = Math.max(atrSafe * 2, price * 0.02)
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
@@ -227,7 +274,7 @@ function buildTradeLevels(
   return {
     buys: pickTwo(supportsBelow, 'down'),
     sells: pickTwo(resistsAbove, 'up'),
-    side,
+    side: null,
   }
 }
 
@@ -499,42 +546,20 @@ export default function SpotRSIHeatmap() {
   const loadChart = useCallback(async (c: string, timeframe: string, intv: string) => {
     setChartLoading(true)
     try {
-      const [chartRes, analyzeRes] = await Promise.all([
-        fetch(`/api/spot-heatmap/chart?coin=${encodeURIComponent(c)}&tf=${encodeURIComponent(timeframe)}`, {
-          cache: 'no-store',
-        }),
-        fetch(`/api/analyze?symbol=${encodeURIComponent(c)}&interval=${encodeURIComponent(intv)}`, {
-          cache: 'no-store',
-        }),
-      ])
+      const chartRes = await fetch(
+        `/api/spot-heatmap/chart?coin=${encodeURIComponent(c)}&tf=${encodeURIComponent(timeframe)}`,
+        { cache: 'no-store' }
+      )
 
       if (chartRes.ok) {
         const data = await chartRes.json()
         const nextCandles: Candle[] = Array.isArray(data.candles) ? data.candles : []
         setCandles(nextCandles)
-
-        if (analyzeRes.ok) {
-          const aData = await analyzeRes.json()
-          const result = aData.result || aData
-          const price =
-            nextCandles.length > 0
-              ? nextCandles[nextCandles.length - 1].close
-              : Number(result?.entryHigh) || 0
-          const atr = atrSeries(nextCandles, 14)
-          setLevels(buildTradeLevels(result as Record<string, unknown>, Number(price), atr))
-        } else {
-          setLevels(null)
-        }
+        // Premium analizdan mustaqil: faqat shamlar + ATR filtrlar
+        setLevels(computeIndependentTradeLevels(nextCandles, intv))
       } else {
         setCandles([])
-        if (analyzeRes.ok) {
-          const aData = await analyzeRes.json()
-          const result = aData.result || aData
-          const price = Number(result?.entryHigh) || 0
-          setLevels(buildTradeLevels(result as Record<string, unknown>, Number(price), 0))
-        } else {
-          setLevels(null)
-        }
+        setLevels(null)
       }
     } catch {
       setCandles([])
@@ -708,7 +733,7 @@ export default function SpotRSIHeatmap() {
                     ))}
                   </div>
                   <div>
-                    <b>Izoh:</b> Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
+                    <b>Izoh:</b> BUY/SELL darajalari swing + ATR filtrlari asosida mustaqil hisoblanadi (premium signal emas). Fyuchers signallari Premium sahifada <Link href={premiumHref}>{'>>>'}</Link>
                   </div>
                 </div>
               )}
