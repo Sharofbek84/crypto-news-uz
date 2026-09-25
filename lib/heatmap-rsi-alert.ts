@@ -29,6 +29,9 @@ export const RSI_UP_LEVELS = [70, 80, 90] as const
 /** Pastga kesish darajalari */
 export const RSI_DOWN_LEVELS = [30, 20, 10] as const
 
+/** Bir xil coin+tf+direction+level signalini qayta yubormaslik (soat) */
+const ALERT_DEDUP_HOURS = 8
+
 type Candle = [string, string, string, string, string, string, string?]
 
 export type RsiCross = {
@@ -106,11 +109,10 @@ export async function getStoredRsi(coin: string, tf: string): Promise<number | n
 export async function setStoredRsi(coin: string, tf: string, rsi: number): Promise<void> {
   const redis = getRedis()
   if (!redis) return
-  // 14 kun saqlash — yetarli history
   await redis.set(stateKey(coin, tf), String(rsi), { ex: 60 * 60 * 24 * 14 })
 }
 
-/** Bir xil daraja kesishini qayta-yubormaslik (12 soat) */
+/** Bir xil daraja kesishini qayta-yubormaslik (8 soat, coin+tf+level) */
 export async function claimRsiAlert(
   coin: string,
   tf: string,
@@ -121,7 +123,7 @@ export async function claimRsiAlert(
   if (!redis) return true
   const result = await redis.set(alertKey(coin, tf, direction, level), '1', {
     nx: true,
-    ex: 60 * 60 * 12,
+    ex: 60 * 60 * ALERT_DEDUP_HOURS,
   })
   return result === 'OK'
 }
