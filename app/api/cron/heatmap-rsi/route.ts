@@ -4,7 +4,7 @@ import {
   HEATMAP_ALERT_TFS,
   claimRsiAlert,
   detectCrosses,
-  fetchGateRsi,
+  fetchGateSnapshot,
   getStoredRsi,
   sendTelegramRsiAlerts,
   setStoredRsi,
@@ -41,7 +41,8 @@ export async function GET(request: NextRequest) {
     const batch = jobs.slice(i, i + CONCURRENCY)
     const results = await Promise.allSettled(
       batch.map(async (job) => {
-        const current = await fetchGateRsi(job.coin, job.interval)
+        const snap = await fetchGateSnapshot(job.coin, job.interval)
+        const current = snap.rsi
         const prev = await getStoredRsi(job.coin, job.tf)
 
         if (current != null) {
@@ -49,6 +50,8 @@ export async function GET(request: NextRequest) {
             ...c,
             coin: job.coin,
             tf: job.tf,
+            buys: snap.buys,
+            sells: snap.sells,
           }))
 
           for (const cross of found) {
@@ -100,6 +103,8 @@ export async function GET(request: NextRequest) {
       prev: c.prev,
       current: c.current,
       label: c.label,
+      buys: c.buys,
+      sells: c.sells,
     })),
     errors,
     generatedAt: new Date().toISOString(),
