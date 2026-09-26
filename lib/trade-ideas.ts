@@ -45,7 +45,6 @@ function strengthLabel(side: 'BUY' | 'SELL', rsi: number): string {
 function scoreIdea(side: 'BUY' | 'SELL', rsi: number, tf: string): number {
   let score = 0
   if (side === 'BUY') {
-    // pastroq RSI = yuqori ball
     score = Math.max(0, 40 - rsi) * 2
     if (rsi <= 20) score += 15
     else if (rsi <= 30) score += 8
@@ -55,7 +54,6 @@ function scoreIdea(side: 'BUY' | 'SELL', rsi: number, tf: string): number {
     else if (rsi >= 80) score += 10
     else if (rsi >= 70) score += 5
   }
-  // D1 biroz ustun
   if (tf === 'D1') score += 5
   return Math.round(score * 10) / 10
 }
@@ -129,14 +127,15 @@ export async function computeTopTradeIdeas(limit = 10): Promise<TradeIdea[]> {
     }
   }
 
-  // Bir coindan eng kuchli TF ni saqlash (D1/H4 dublikatini kamaytirish)
   const bestByCoin = new Map<string, (typeof candidates)[0]>()
   for (const c of candidates) {
     const prev = bestByCoin.get(c.coin)
     if (!prev || c.score > prev.score) bestByCoin.set(c.coin, c)
   }
 
-  const ranked = [...bestByCoin.values()].sort((a, b) => b.score - a.score).slice(0, limit)
+  const ranked = Array.from(bestByCoin.values())
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
 
   return ranked.map((item, index) => ({ ...item, rank: index + 1 }))
 }
