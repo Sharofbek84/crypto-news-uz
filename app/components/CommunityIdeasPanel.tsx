@@ -152,78 +152,72 @@ export default function CommunityIdeasPanel() {
   ) : !ideas.length ? (
     <div className="ciEmpty">Hali e’lon qilingan g‘oyalar yo‘q. Birinchi bo‘lib yozing!</div>
   ) : (
-    <div className="newsList">
-      {ideas.map((idea) => {
-        const comments = idea.comments || []
-        const opened = openComments[idea.id]
-        return (
-          <article key={idea.id} className="newsCard ciIdeaCard">
-            {idea.imageData ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="newsCardImage" src={idea.imageData} alt="" loading="lazy" />
-            ) : null}
-            <div className="newsCardBody">
-              <div className="newsCardMeta">
-                <span>{idea.authorName}</span>
-                <span>• {formatDt(idea.createdAt)}</span>
-              </div>
-              <h2 style={{ fontSize: '1.05rem', margin: '0 0 8px' }}>{idea.title}</h2>
-              <p className="newsCardSummary ciBodyText">{idea.body}</p>
+    ideas.map((idea) => {
+      const comments = idea.comments || []
+      const opened = openComments[idea.id]
+      return (
+        <article key={idea.id} className="ciCard">
+          <h3>{idea.title}</h3>
+          <div className="ciMeta">
+            {idea.authorName} · {formatDt(idea.createdAt)}
+          </div>
+          {idea.imageData ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="ciImg" src={idea.imageData} alt={idea.title} />
+          ) : null}
+          <p className="ciBody">{idea.body}</p>
 
-              <button
-                type="button"
-                className="ciCommentsToggle"
-                onClick={() => setOpenComments((s) => ({ ...s, [idea.id]: !s[idea.id] }))}
-              >
-                Fikrlar ({comments.length}) {opened ? '▲' : '▼'}
-              </button>
+          <button
+            type="button"
+            className="ciCommentsToggle"
+            onClick={() => setOpenComments((s) => ({ ...s, [idea.id]: !s[idea.id] }))}
+          >
+            Fikrlar ({comments.length}) {opened ? '▲' : '▼'}
+          </button>
 
-              {opened ? (
-                <div className="ciCommentList">
-                  {comments.length === 0 ? (
-                    <div className="ciFormMeta">Hali fikr yo‘q.</div>
-                  ) : (
-                    comments.map((c) => (
-                      <div key={c.id} className="ciComment">
-                        <strong>{c.authorName}</strong>
-                        <span>{formatDt(c.createdAt)}</span>
-                        <p>{c.text}</p>
-                      </div>
-                    ))
-                  )}
+          {opened ? (
+            <div className="ciCommentList">
+              {comments.length === 0 ? (
+                <div className="ciFormMeta">Hali fikr yo‘q.</div>
+              ) : (
+                comments.map((c) => (
+                  <div key={c.id} className="ciComment">
+                    <strong>{c.authorName}</strong>
+                    <span>{formatDt(c.createdAt)}</span>
+                    <p>{c.text}</p>
+                  </div>
+                ))
+              )}
 
-                  {loggedIn ? (
-                    <div className="ciCommentForm">
-                      <input
-                        type="text"
-                        placeholder="Fikringizni yozing…"
-                        value={commentDraft[idea.id] || ''}
-                        onChange={(e) =>
-                          setCommentDraft((s) => ({ ...s, [idea.id]: e.target.value }))
-                        }
-                        maxLength={1000}
-                      />
-                      <button
-                        type="button"
-                        disabled={commentBusy[idea.id]}
-                        onClick={() => submitComment(idea.id)}
-                      >
-                        Yuborish
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="ciFormMeta">
-                      Fikr yozish uchun{' '}
-                      <Link href="/sign-in?callbackUrl=/savdo-goyalari">kiring</Link>.
-                    </div>
-                  )}
+              {loggedIn ? (
+                <div className="ciCommentForm">
+                  <input
+                    type="text"
+                    placeholder="Fikringizni yozing…"
+                    value={commentDraft[idea.id] || ''}
+                    onChange={(e) =>
+                      setCommentDraft((s) => ({ ...s, [idea.id]: e.target.value }))
+                    }
+                    maxLength={1000}
+                  />
+                  <button
+                    type="button"
+                    disabled={commentBusy[idea.id]}
+                    onClick={() => submitComment(idea.id)}
+                  >
+                    Yuborish
+                  </button>
                 </div>
-              ) : null}
+              ) : (
+                <div className="ciFormMeta">
+                  Fikr yozish uchun <Link href="/sign-in?callbackUrl=/savdo-goyalari">kiring</Link>.
+                </div>
+              )}
             </div>
-          </article>
-        )
-      })}
-    </div>
+          ) : null}
+        </article>
+      )
+    })
   )
 
   const formBlock =
@@ -281,9 +275,17 @@ export default function CommunityIdeasPanel() {
     )
 
   return (
-    <div className="ciWrap">
+    <section className="ciPanel">
       <style>{`
-        .ciWrap { color: #e6edf3; }
+        .ciPanel {
+          background: #0d1117;
+          border: 1px solid #252d38;
+          border-radius: 16px;
+          padding: 20px;
+          color: #e6edf3;
+        }
+        .ciTitle { margin: 0; font-size: 1.35rem; font-weight: 800; }
+        .ciSub { margin: 8px 0 16px; color: #8b949e; font-size: 0.86rem; line-height: 1.5; }
         .ciSectionLabel {
           margin: 0 0 12px;
           font-size: 0.78rem;
@@ -340,15 +342,29 @@ export default function CommunityIdeasPanel() {
           font-size: 0.88rem;
         }
         .ciLoginHint a { color: #f0b90b; }
-        .ciList { margin-bottom: 22px; }
-        .ciIdeaCard .newsCardImage {
-          max-height: 280px;
-          object-fit: cover;
-          width: 100%;
+        .ciList { margin-bottom: 20px; }
+        .ciCard {
+          border: 1px solid #252d38;
+          border-radius: 12px;
+          padding: 14px 16px;
+          background: #111820;
+          margin-bottom: 12px;
         }
-        .ciBodyText {
+        .ciCard h3 { margin: 0 0 6px; font-size: 1.05rem; }
+        .ciMeta { color: #8b949e; font-size: 0.78rem; margin-bottom: 10px; }
+        .ciBody {
           white-space: pre-wrap;
-          margin-bottom: 10px;
+          color: #c8d1dc;
+          font-size: 0.9rem;
+          line-height: 1.55;
+          margin: 0 0 12px;
+        }
+        .ciImg {
+          max-width: 100%;
+          max-height: 360px;
+          border-radius: 10px;
+          margin-bottom: 12px;
+          border: 1px solid #252d38;
         }
         .ciCommentsToggle {
           background: transparent;
@@ -391,14 +407,11 @@ export default function CommunityIdeasPanel() {
         .ciEmpty { text-align: center; padding: 24px; color: #8b949e; }
       `}</style>
 
-      <div className="newsPageHead">
-        <div className="subscribeKicker">💡 SAVDO G&apos;OYALARI</div>
-        <h1>Savdo g&apos;oyalari</h1>
-        <p>
-          Foydalanuvchilar e&apos;lon qilgan tahlillar. Sahifada eng so&apos;nggi 10 ta g&apos;oya
-          saqlanadi.
-        </p>
-      </div>
+      <h1 className="ciTitle">Savdo g&apos;oyalari</h1>
+      <p className="ciSub">
+        Foydalanuvchilar e&apos;lon qilgan tahlillar. Sahifada eng so&apos;nggi 10 ta g&apos;oya
+        saqlanadi.
+      </p>
 
       <div className="ciList">
         <div className="ciSectionLabel">E&apos;lon qilingan g&apos;oyalar</div>
@@ -407,6 +420,6 @@ export default function CommunityIdeasPanel() {
 
       <div className="ciSectionLabel">Yangi g&apos;oya qo&apos;shish</div>
       {formBlock}
-    </div>
+    </section>
   )
 }
