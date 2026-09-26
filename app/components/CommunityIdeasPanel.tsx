@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -37,6 +37,8 @@ function formatDt(iso: string) {
 
 export default function CommunityIdeasPanel() {
   const { data: session, status } = useSession()
+  const isAdmin = Boolean(session?.user && (session.user as { isAdmin?: boolean }).isAdmin)
+
   const [ideas, setIdeas] = useState<CommunityIdea[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,10 +49,20 @@ export default function CommunityIdeasPanel() {
   const [imageName, setImageName] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [formMsg, setFormMsg] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({})
   const [commentDraft, setCommentDraft] = useState<Record<string, string>>({})
   const [commentBusy, setCommentBusy] = useState<Record<string, boolean>>({})
+
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editBody, setEditBody] = useState('')
+  const [editImageData, setEditImageData] = useState<string | null>(null)
+  const [editImageName, setEditImageName] = useState('')
+  const [editReplaceImage, setEditReplaceImage] = useState(false)
+  const [editBusy, setEditBusy] = useState(false)
+  const editFileRef = useRef<HTMLInputElement>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -72,28 +84,29 @@ export default function CommunityIdeasPanel() {
     load()
   }, [load])
 
+  async function readImageFile(file: File | null): Promise<{ data: string | null; name: string; error?: string }> {
+    if (!file) return { data: null, name: '' }
+    if (!file.type.startsWith('image/')) return { data: null, name: '', error: 'Faqat rasm fayli tanlang.' }
+    if (file.size > 1024 * 1024) return { data: null, name: '', error: 'Rasm hajmi 1 MB dan oshmasin.' }
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve({ data: String(reader.result || ''), name: file.name })
+      reader.onerror = () => resolve({ data: null, name: '', error: 'Rasmni o‘qib bo‘lmadi.' })
+      reader.readAsDataURL(file)
+    })
+  }
+
   async function onFileChange(file: File | null) {
     setFormMsg(null)
-    if (!file) {
+    const result = await readImageFile(file)
+    if (result.error) {
+      setFormMsg(result.error)
       setImageData(null)
       setImageName('')
       return
     }
-    if (!file.type.startsWith('image/')) {
-      setFormMsg('Faqat rasm fayli tanlang.')
-      return
-    }
-    if (file.size > 1024 * 1024) {
-      setFormMsg('Rasm hajmi 1 MB dan oshmasin.')
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = () => {
-      setImageData(String(reader.result || ''))
-      setImageName(file.name)
-    }
-    reader.onerror = () => setFormMsg('Rasmni o‘qib bo‘lmadi.')
-    reader.readAsDataURL(file)
+    setImageData(result.data)
+    setImageName(result.name)
   }
 
   async function submitIdea(e: React.FormEvent) {
@@ -112,6 +125,7 @@ export default function CommunityIdeasPanel() {
       setBody('')
       setImageData(null)
       setImageName('')
+      if (fileRef.current) fileRef.current.value = ''
       setFormMsg('G‘oya e’lon qilindi.')
       await load()
     } catch (err: unknown) {
@@ -143,6 +157,61 @@ export default function CommunityIdeasPanel() {
     }
   }
 
+  function startEdit(idea: CommunityIdea) {
+    setEditingId(idea.id)
+    setEditTitle(idea.title)
+    setEditBody(idea.body)
+    setEditImageData(idea.imageData)
+    setEditImageName(idea.imageData ? 'Joriy rasm' : '')
+    setEditReplaceImage(false)
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditTitle('')
+    setEditBody('')
+    setEditImageData(null)
+    setEditImageName('')
+    setEditReplaceImage(false)
+  }
+
+  async function saveEdit(ideaId: string) {
+    setEditBusy(true)
+    try {
+      const res = await fetch(`/api/community-ideas/${ideaId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editTitle,
+          body: editBody,
+          replaceImage: editReplaceImage,
+          imageData: editReplaceImage ? editImageData : undefined,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Saqlash xatosi')
+      setIdeas((prev) => prev.map((i) => (i.id === ideaId ? data.idea : i)))
+      cancelEdit()
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Xatolik')
+    } finally {
+      setEditBusy(false)
+    }
+  }
+
+  async function deleteIdea(ideaId: string) {
+    if (!confirm('Bu g‘oyani o‘chirishni tasdiqlaysizmi?')) return
+    try {
+      const res = await fetch(`/api/community-ideas/${ideaId}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok || !data.ok) throw new Error(data.error || 'O‘chirish xatosi')
+      setIdeas((prev) => prev.filter((i) => i.id !== ideaId))
+      if (editingId === ideaId) cancelEdit()
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Xatolik')
+    }
+  }
+
   const loggedIn = status === 'authenticated' && Boolean(session?.user)
 
   const ideasBlock = loading ? (
@@ -155,17 +224,99 @@ export default function CommunityIdeasPanel() {
     ideas.map((idea) => {
       const comments = idea.comments || []
       const opened = openComments[idea.id]
+      const isEditing = editingId === idea.id
+
       return (
         <article key={idea.id} className="ciCard">
-          <h3>{idea.title}</h3>
-          <div className="ciMeta">
-            {idea.authorName} · {formatDt(idea.createdAt)}
-          </div>
-          {idea.imageData ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="ciImg" src={idea.imageData} alt={idea.title} />
-          ) : null}
-          <p className="ciBody">{idea.body}</p>
+          {isEditing ? (
+            <div className="ciEditBox">
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                maxLength={120}
+                className="ciEditInput"
+              />
+              <textarea
+                value={editBody}
+                onChange={(e) => setEditBody(e.target.value)}
+                maxLength={5000}
+                className="ciEditTextarea"
+              />
+              <div className="ciFileRow">
+                <input
+                  ref={editFileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="ciFileNative"
+                  onChange={async (e) => {
+                    const result = await readImageFile(e.target.files?.[0] || null)
+                    if (result.error) {
+                      alert(result.error)
+                      return
+                    }
+                    setEditImageData(result.data)
+                    setEditImageName(result.name || '')
+                    setEditReplaceImage(true)
+                  }}
+                />
+                <button
+                  type="button"
+                  className="ciFileBtn"
+                  onClick={() => editFileRef.current?.click()}
+                >
+                  Fayl tanlang
+                </button>
+                <span className="ciFileName">{editImageName || 'Fayl tanlanmagan'}</span>
+                {editImageData ? (
+                  <button
+                    type="button"
+                    className="ciAdminBtn"
+                    onClick={() => {
+                      setEditImageData(null)
+                      setEditImageName('')
+                      setEditReplaceImage(true)
+                      if (editFileRef.current) editFileRef.current.value = ''
+                    }}
+                  >
+                    Rasmni olib tashlash
+                  </button>
+                ) : null}
+              </div>
+              <div className="ciAdminRow">
+                <button type="button" className="ciBtn" disabled={editBusy} onClick={() => saveEdit(idea.id)}>
+                  {editBusy ? 'Saqlanmoqda…' : 'Saqlash'}
+                </button>
+                <button type="button" className="ciAdminBtn" onClick={cancelEdit}>
+                  Bekor qilish
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="ciCardHead">
+                <h3>{idea.title}</h3>
+                {isAdmin ? (
+                  <div className="ciAdminRow">
+                    <button type="button" className="ciAdminBtn" onClick={() => startEdit(idea)}>
+                      O‘zgartirish
+                    </button>
+                    <button type="button" className="ciAdminBtn danger" onClick={() => deleteIdea(idea.id)}>
+                      O‘chirish
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+              <div className="ciMeta">
+                {idea.authorName} · {formatDt(idea.createdAt)}
+              </div>
+              {idea.imageData ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className="ciImg" src={idea.imageData} alt={idea.title} />
+              ) : null}
+              <p className="ciBody">{idea.body}</p>
+            </>
+          )}
 
           <button
             type="button"
@@ -224,7 +375,7 @@ export default function CommunityIdeasPanel() {
     status === 'loading' ? null : loggedIn ? (
       <form className="ciForm" onSubmit={submitIdea}>
         <div className="ciFormMeta">
-          Muallif: <b>{session?.user?.name || session?.user?.email}</b> · sana/vaqt avtomatik
+          Muallif: <b>{session?.user?.name || session?.user?.email}</b>
         </div>
         <div>
           <label htmlFor="ci-title">Mavzu</label>
@@ -250,14 +401,20 @@ export default function CommunityIdeasPanel() {
           />
         </div>
         <div>
-          <label htmlFor="ci-img">Rasm (ixtiyoriy, max 1 MB)</label>
-          <input
-            id="ci-img"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            onChange={(e) => onFileChange(e.target.files?.[0] || null)}
-          />
-          {imageName ? <div className="ciFormMeta">Tanlangan: {imageName}</div> : null}
+          <label>Rasm (ixtiyoriy, max 1 MB)</label>
+          <div className="ciFileRow">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="ciFileNative"
+              onChange={(e) => onFileChange(e.target.files?.[0] || null)}
+            />
+            <button type="button" className="ciFileBtn" onClick={() => fileRef.current?.click()}>
+              Fayl tanlang
+            </button>
+            <span className="ciFileName">{imageName || 'Fayl tanlanmagan'}</span>
+          </div>
         </div>
         {formMsg ? (
           <div className={`ciMsg${formMsg.includes('qilindi') ? '' : ' err'}`}>{formMsg}</div>
@@ -306,7 +463,9 @@ export default function CommunityIdeasPanel() {
         }
         .ciForm label { font-size: 0.8rem; color: #9aa7b8; font-weight: 600; display: block; margin-bottom: 4px; }
         .ciForm input[type="text"],
-        .ciForm textarea {
+        .ciForm textarea,
+        .ciEditInput,
+        .ciEditTextarea {
           width: 100%;
           box-sizing: border-box;
           border: 1px solid #303846;
@@ -317,8 +476,22 @@ export default function CommunityIdeasPanel() {
           font-size: 0.9rem;
           font-family: inherit;
         }
-        .ciForm textarea { min-height: 110px; resize: vertical; }
+        .ciForm textarea, .ciEditTextarea { min-height: 110px; resize: vertical; }
         .ciFormMeta { font-size: 0.78rem; color: #8b949e; }
+        .ciFileNative { display: none; }
+        .ciFileRow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .ciFileBtn {
+          border: 1px solid #303846;
+          background: #0d1117;
+          color: #e6edf3;
+          border-radius: 8px;
+          padding: 8px 12px;
+          font-size: 0.82rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+        .ciFileBtn:hover { border-color: #f0b90b; color: #f0b90b; }
+        .ciFileName { font-size: 0.8rem; color: #8b949e; }
         .ciBtn {
           align-self: flex-start;
           border: none;
@@ -350,6 +523,13 @@ export default function CommunityIdeasPanel() {
           background: #111820;
           margin-bottom: 12px;
         }
+        .ciCardHead {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          align-items: flex-start;
+          flex-wrap: wrap;
+        }
         .ciCard h3 { margin: 0 0 6px; font-size: 1.05rem; }
         .ciMeta { color: #8b949e; font-size: 0.78rem; margin-bottom: 10px; }
         .ciBody {
@@ -366,6 +546,20 @@ export default function CommunityIdeasPanel() {
           margin-bottom: 12px;
           border: 1px solid #252d38;
         }
+        .ciAdminRow { display: flex; gap: 8px; flex-wrap: wrap; }
+        .ciAdminBtn {
+          border: 1px solid #303846;
+          background: #0d1117;
+          color: #aeb9c7;
+          border-radius: 8px;
+          padding: 6px 10px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+        .ciAdminBtn:hover { border-color: #f0b90b; color: #f0b90b; }
+        .ciAdminBtn.danger:hover { border-color: #ff5360; color: #ff5360; }
+        .ciEditBox { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
         .ciCommentsToggle {
           background: transparent;
           border: none;
@@ -409,8 +603,7 @@ export default function CommunityIdeasPanel() {
 
       <h1 className="ciTitle">Savdo g&apos;oyalari</h1>
       <p className="ciSub">
-        Foydalanuvchilar e&apos;lon qilgan tahlillar. Sahifada eng so&apos;nggi 10 ta g&apos;oya
-        saqlanadi.
+        Saytda ro&apos;yxatdan o&apos;ting va o&apos;z savdo g&apos;oyalaringiz bilan o&apos;rtoqlashing.
       </p>
 
       <div className="ciList">

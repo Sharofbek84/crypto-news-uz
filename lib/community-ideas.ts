@@ -15,7 +15,6 @@ export type CommunityIdea = {
   authorId: string
   authorName: string
   authorEmail: string
-  /** data URL yoki null */
   imageData: string | null
   createdAt: string
   comments: IdeaComment[]
@@ -25,12 +24,11 @@ const INDEX_KEY = 'community-ideas:index'
 const IDEA_PREFIX = 'community-idea:'
 const DAILY_PREFIX = 'community-ideas:daily:'
 
-const MAX_IMAGE_BYTES = 1 * 1024 * 1024 // 1 MB
+const MAX_IMAGE_BYTES = 1 * 1024 * 1024
 const MAX_TITLE = 120
 const MAX_BODY = 5000
 const MAX_COMMENT = 1000
 const MAX_IDEAS_PER_DAY = 5
-/** Sahifada saqlanadigan maksimal g'oyalar soni */
 export const MAX_STORED_IDEAS = 10
 
 function ideaKey(id: string) {
@@ -67,7 +65,6 @@ export function validateComment(text: string): string | null {
   return null
 }
 
-/** imageData: data:image/...;base64,... */
 export function validateImageData(imageData: string | null | undefined): string | null {
   if (!imageData) return null
   if (!imageData.startsWith('data:image/')) return 'Faqat rasm fayli (JPG, PNG, WEBP, GIF).'
@@ -83,12 +80,10 @@ export function validateImageData(imageData: string | null | undefined): string 
   return null
 }
 
-/** 10 tadan ortiq eng eski g'oyalarni o'chirish */
 async function pruneOldIdeas(): Promise<void> {
   const redis = getRedis()
   if (!redis) return
 
-  // eng yangilar index 0..9 (rev), undan pastidagilar — eski
   const staleIds = await redis.zrange(INDEX_KEY, MAX_STORED_IDEAS, -1, { rev: true })
   if (!staleIds?.length) return
 
@@ -172,10 +167,55 @@ export async function createCommunityIdea(params: {
   await redis.zadd(INDEX_KEY, { score: Date.now(), member: id })
   await redis.incr(daily)
   await redis.expire(daily, 60 * 60 * 48)
-
   await pruneOldIdeas()
 
   return { ok: true, idea }
+}
+
+export async function updateCommunityIdea(params: {
+  id: string
+  title: string
+  body: string
+  imageData?: string | null
+  /** true bo'lsa rasmni o'zgartirish (null = o'chirish) */
+  replaceImage?: boolean
+}): Promise<{ ok: true; idea: CommunityIdea } | { ok: false; error: string }> {
+  const redis = getRedis()
+  if (!redis) return { ok: false, error: 'Saqlash tizimi (Redis) sozlanmagan.' }
+
+  const idea = await getCommunityIdea(params.id)
+  if (!idea) return { ok: false, error: 'G‘oya topilmadi.' }
+
+  const titleErr = validateTitle(params.title)
+  if (titleErr) return { ok: false, error: titleErr }
+  const bodyErr = validateBody(params.body)
+  if (bodyErr) return { ok: false, error: bodyErr }
+
+  if (params.replaceImage) {
+    const imgErr = validateImageData(params.imageData)
+    if (imgErr) return { ok: false, error: imgErr }
+    idea.imageData = params.imageData || null
+  }
+
+  idea.title = params.title.trim()
+  idea.body = params.body.trim()
+
+  await redis.set(ideaKey(idea.id), idea)
+  return { ok: true, idea }
+}
+
+export async function deleteCommunityIdea(
+  id: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const redis = getRedis()
+  if (!redis) return { ok: false, error: 'Saqlash tizimi (Redis) sozlanmagan.' }
+
+  const idea = await getCommunityIdea(id)
+  if (!idea) return { ok: false, error: 'G‘oya topilmadi.' }
+
+  await redis.del(ideaKey(id))
+  await redis.zrem(INDEX_KEY, id)
+  return { ok: true }
 }
 
 export async function addIdeaComment(params: {
