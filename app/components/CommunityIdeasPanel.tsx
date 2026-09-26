@@ -146,25 +146,165 @@ export default function CommunityIdeasPanel() {
 
   const loggedIn = status === 'authenticated' && Boolean(session?.user)
 
+  const ideasBlock = loading ? (
+    <div className="ciEmpty">Yuklanmoqda…</div>
+  ) : error ? (
+    <div className="ciEmpty">{error}</div>
+  ) : !ideas.length ? (
+    <div className="ciEmpty">Hali e’lon qilingan g‘oyalar yo‘q. Birinchi bo‘lib yozing!</div>
+  ) : (
+    ideas.map((idea) => {
+      const comments = idea.comments || []
+      const opened = openComments[idea.id]
+      return (
+        <article key={idea.id} className="ciCard">
+          <h3>{idea.title}</h3>
+          <div className="ciMeta">
+            {idea.authorName} · {formatDt(idea.createdAt)}
+          </div>
+          {idea.imageData ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="ciImg" src={idea.imageData} alt={idea.title} />
+          ) : null}
+          <p className="ciBody">{idea.body}</p>
+
+          <button
+            type="button"
+            className="ciCommentsToggle"
+            onClick={() => setOpenComments((s) => ({ ...s, [idea.id]: !s[idea.id] }))}
+          >
+            Fikrlar ({comments.length}) {opened ? '▲' : '▼'}
+          </button>
+
+          {opened ? (
+            <div className="ciCommentList">
+              {comments.length === 0 ? (
+                <div className="ciFormMeta">Hali fikr yo‘q.</div>
+              ) : (
+                comments.map((c) => (
+                  <div key={c.id} className="ciComment">
+                    <strong>{c.authorName}</strong>
+                    <span>{formatDt(c.createdAt)}</span>
+                    <p>{c.text}</p>
+                  </div>
+                ))
+              )}
+
+              {loggedIn ? (
+                <div className="ciCommentForm">
+                  <input
+                    type="text"
+                    placeholder="Fikringizni yozing…"
+                    value={commentDraft[idea.id] || ''}
+                    onChange={(e) =>
+                      setCommentDraft((s) => ({ ...s, [idea.id]: e.target.value }))
+                    }
+                    maxLength={1000}
+                  />
+                  <button
+                    type="button"
+                    disabled={commentBusy[idea.id]}
+                    onClick={() => submitComment(idea.id)}
+                  >
+                    Yuborish
+                  </button>
+                </div>
+              ) : (
+                <div className="ciFormMeta">
+                  Fikr yozish uchun <Link href="/sign-in?callbackUrl=/savdo-goyalari">kiring</Link>.
+                </div>
+              )}
+            </div>
+          ) : null}
+        </article>
+      )
+    })
+  )
+
+  const formBlock =
+    status === 'loading' ? null : loggedIn ? (
+      <form className="ciForm" onSubmit={submitIdea}>
+        <div className="ciFormMeta">
+          Muallif: <b>{session?.user?.name || session?.user?.email}</b> · sana/vaqt avtomatik
+        </div>
+        <div>
+          <label htmlFor="ci-title">Mavzu</label>
+          <input
+            id="ci-title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={120}
+            required
+            placeholder="Masalan: BTC D1 long setup"
+          />
+        </div>
+        <div>
+          <label htmlFor="ci-body">Asosiy matn</label>
+          <textarea
+            id="ci-body"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            maxLength={5000}
+            required
+            placeholder="Tahlil, entry/SL/TP, sabablar…"
+          />
+        </div>
+        <div>
+          <label htmlFor="ci-img">Rasm (ixtiyoriy, max 1 MB)</label>
+          <input
+            id="ci-img"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={(e) => onFileChange(e.target.files?.[0] || null)}
+          />
+          {imageName ? <div className="ciFormMeta">Tanlangan: {imageName}</div> : null}
+        </div>
+        {formMsg ? (
+          <div
+            className={`ciMsg${formMsg.includes('qilindi') ? '' : ' err'}`}
+          >
+            {formMsg}
+          </div>
+        ) : null}
+        <button type="submit" className="ciBtn" disabled={submitting}>
+          {submitting ? 'Yuborilmoqda…' : "G'oyani e'lon qilish"}
+        </button>
+      </form>
+    ) : (
+      <div className="ciLoginHint">
+        G‘oya qo‘shish uchun{' '}
+        <Link href="/sign-in?callbackUrl=/savdo-goyalari">tizimga kiring</Link> yoki{' '}
+        <Link href="/sign-up">ro‘yxatdan o‘ting</Link>.
+      </div>
+    )
+
   return (
     <section className="ciPanel">
       <style>{`
         .ciPanel {
-          margin-top: 22px;
           background: #0d1117;
           border: 1px solid #252d38;
           border-radius: 16px;
           padding: 20px;
           color: #e6edf3;
         }
-        .ciTitle { margin: 0; font-size: 1.25rem; font-weight: 800; }
+        .ciTitle { margin: 0; font-size: 1.35rem; font-weight: 800; }
         .ciSub { margin: 8px 0 16px; color: #8b949e; font-size: 0.86rem; line-height: 1.5; }
+        .ciSectionLabel {
+          margin: 0 0 12px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: #8b949e;
+        }
         .ciForm {
           border: 1px solid #2b3139;
           border-radius: 12px;
           padding: 14px;
           background: #111820;
-          margin-bottom: 18px;
+          margin-top: 8px;
           display: flex;
           flex-direction: column;
           gap: 10px;
@@ -202,11 +342,12 @@ export default function CommunityIdeasPanel() {
           border: 1px dashed #303846;
           border-radius: 12px;
           padding: 14px;
-          margin-bottom: 18px;
+          margin-top: 8px;
           color: #9aa7b8;
           font-size: 0.88rem;
         }
         .ciLoginHint a { color: #f0b90b; }
+        .ciList { margin-bottom: 20px; }
         .ciCard {
           border: 1px solid #252d38;
           border-radius: 12px;
@@ -271,141 +412,18 @@ export default function CommunityIdeasPanel() {
         .ciEmpty { text-align: center; padding: 24px; color: #8b949e; }
       `}</style>
 
-      <h2 className="ciTitle">Jamiyat savdo g&apos;oyalari</h2>
+      <h1 className="ciTitle">Savdo g&apos;oyalari</h1>
       <p className="ciSub">
-        Ro&apos;yxatdan o&apos;tgan foydalanuvchilar o&apos;z tahlillarini ulashishi mumkin. Har bir
-        g&apos;oya ostida fikr bildirish mumkin.
+        Foydalanuvchilar e&apos;lon qilgan tahlillar. Har bir g&apos;oya ostida fikr bildirish mumkin.
       </p>
 
-      {status === 'loading' ? null : loggedIn ? (
-        <form className="ciForm" onSubmit={submitIdea}>
-          <div className="ciFormMeta">
-            Muallif: <b>{session?.user?.name || session?.user?.email}</b> · sana/vaqt avtomatik
-          </div>
-          <div>
-            <label htmlFor="ci-title">Mavzu</label>
-            <input
-              id="ci-title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={120}
-              required
-              placeholder="Masalan: BTC D1 long setup"
-            />
-          </div>
-          <div>
-            <label htmlFor="ci-body">Asosiy matn</label>
-            <textarea
-              id="ci-body"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              maxLength={5000}
-              required
-              placeholder="Tahlil, entry/SL/TP, sabablar…"
-            />
-          </div>
-          <div>
-            <label htmlFor="ci-img">Rasm (ixtiyoriy, max 1 MB)</label>
-            <input
-              id="ci-img"
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={(e) => onFileChange(e.target.files?.[0] || null)}
-            />
-            {imageName ? <div className="ciFormMeta">Tanlangan: {imageName}</div> : null}
-          </div>
-          {formMsg ? (
-            <div className={`ciMsg${formMsg.includes('e’lon') || formMsg.includes("e'lon") ? '' : formMsg.includes('qilindi') ? '' : ' err'}`}>
-              {formMsg}
-            </div>
-          ) : null}
-          <button type="submit" className="ciBtn" disabled={submitting}>
-            {submitting ? 'Yuborilmoqda…' : "G'oyani e'lon qilish"}
-          </button>
-        </form>
-      ) : (
-        <div className="ciLoginHint">
-          G&apos;oya qo&apos;shish uchun{' '}
-          <Link href="/sign-in?callbackUrl=/savdo-goyalari">tizimga kiring</Link> yoki{' '}
-          <Link href="/sign-up">ro&apos;yxatdan o&apos;ting</Link>.
-        </div>
-      )}
+      <div className="ciList">
+        <div className="ciSectionLabel">E&apos;lon qilingan g&apos;oyalar</div>
+        {ideasBlock}
+      </div>
 
-      {loading ? (
-        <div className="ciEmpty">Yuklanmoqda…</div>
-      ) : error ? (
-        <div className="ciEmpty">{error}</div>
-      ) : !ideas.length ? (
-        <div className="ciEmpty">Hali jamiyat g&apos;oyalari yo&apos;q. Birinchi bo&apos;lib yozing!</div>
-      ) : (
-        ideas.map((idea) => {
-          const comments = idea.comments || []
-          const opened = openComments[idea.id]
-          return (
-            <article key={idea.id} className="ciCard">
-              <h3>{idea.title}</h3>
-              <div className="ciMeta">
-                {idea.authorName} · {formatDt(idea.createdAt)}
-              </div>
-              {idea.imageData ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img className="ciImg" src={idea.imageData} alt={idea.title} />
-              ) : null}
-              <p className="ciBody">{idea.body}</p>
-
-              <button
-                type="button"
-                className="ciCommentsToggle"
-                onClick={() => setOpenComments((s) => ({ ...s, [idea.id]: !s[idea.id] }))}
-              >
-                Fikrlar ({comments.length}) {opened ? '▲' : '▼'}
-              </button>
-
-              {opened ? (
-                <div className="ciCommentList">
-                  {comments.length === 0 ? (
-                    <div className="ciFormMeta">Hali fikr yo&apos;q.</div>
-                  ) : (
-                    comments.map((c) => (
-                      <div key={c.id} className="ciComment">
-                        <strong>{c.authorName}</strong>
-                        <span>{formatDt(c.createdAt)}</span>
-                        <p>{c.text}</p>
-                      </div>
-                    ))
-                  )}
-
-                  {loggedIn ? (
-                    <div className="ciCommentForm">
-                      <input
-                        type="text"
-                        placeholder="Fikringizni yozing…"
-                        value={commentDraft[idea.id] || ''}
-                        onChange={(e) =>
-                          setCommentDraft((s) => ({ ...s, [idea.id]: e.target.value }))
-                        }
-                        maxLength={1000}
-                      />
-                      <button
-                        type="button"
-                        disabled={commentBusy[idea.id]}
-                        onClick={() => submitComment(idea.id)}
-                      >
-                        Yuborish
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="ciFormMeta">
-                      Fikr yozish uchun <Link href="/sign-in?callbackUrl=/savdo-goyalari">kiring</Link>.
-                    </div>
-                  )}
-                </div>
-              ) : null}
-            </article>
-          )
-        })
-      )}
+      <div className="ciSectionLabel">Yangi g&apos;oya qo&apos;shish</div>
+      {formBlock}
     </section>
   )
 }

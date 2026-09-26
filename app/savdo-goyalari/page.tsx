@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
-import TradeIdeasPanel from '../components/TradeIdeasPanel'
 import CommunityIdeasPanel from '../components/CommunityIdeasPanel'
 
 export const metadata: Metadata = {
   title: "Savdo g'oyalari",
   description:
-    "GOLDENWEB.UZ savdo g'oyalari — tizim setuplari va jamiyat a'zolarining tahlillari (o'zbek tilida).",
+    "GOLDENWEB.UZ savdo g'oyalari — foydalanuvchilar e'lon qilgan tahlillar va fikrlar (o'zbek tilida).",
   alternates: { canonical: '/savdo-goyalari' },
 }
 
@@ -16,7 +15,6 @@ export default function SavdoGoyalariPage() {
     <>
       <SiteHeader />
       <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
-        <TradeIdeasPanel />
         <CommunityIdeasPanel />
         <p
           style={{
