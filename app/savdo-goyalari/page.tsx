@@ -2,11 +2,12 @@ import type { Metadata } from 'next'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 import TradeIdeasPanel from '../components/TradeIdeasPanel'
+import CommunityIdeasPanel from '../components/CommunityIdeasPanel'
 
 export const metadata: Metadata = {
   title: "Savdo g'oyalari",
   description:
-    "GOLDENWEB.UZ savdo g'oyalari — heatmap RSI va ATR darajalari asosida kunlik eng kuchli 10 ta setup (o'zbek tilida).",
+    "GOLDENWEB.UZ savdo g'oyalari — tizim setuplari va jamiyat a'zolarining tahlillari (o'zbek tilida).",
   alternates: { canonical: '/savdo-goyalari' },
 }
 
@@ -16,6 +17,7 @@ export default function SavdoGoyalariPage() {
       <SiteHeader />
       <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
         <TradeIdeasPanel />
+        <CommunityIdeasPanel />
         <p
           style={{
             margin: '18px 0 0',
