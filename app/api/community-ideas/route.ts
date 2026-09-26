@@ -1,22 +1,21 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { authOptions } from '@/lib/auth'
-import { createCommunityIdea, listCommunityIdeas } from '@/lib/community-ideas'
+import { createCommunityIdea, listCommunityIdeas, MAX_STORED_IDEAS } from '@/lib/community-ideas'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
 export async function GET() {
   try {
-    const ideas = await listCommunityIdeas(50)
-    // Ro‘yxatda to‘liq base64 og‘ir — qisqa preview flag
+    const ideas = await listCommunityIdeas(MAX_STORED_IDEAS)
     const slim = ideas.map((i) => ({
       ...i,
       imageData: i.imageData ? i.imageData : null,
       hasImage: Boolean(i.imageData),
       commentCount: i.comments.length,
     }))
-    return NextResponse.json({ ok: true, ideas: slim })
+    return NextResponse.json({ ok: true, ideas: slim, max: MAX_STORED_IDEAS })
   } catch (e: unknown) {
     return NextResponse.json(
       { ok: false, error: e instanceof Error ? e.message : 'Xatolik' },

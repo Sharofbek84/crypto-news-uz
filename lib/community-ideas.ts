@@ -30,7 +30,8 @@ const MAX_TITLE = 120
 const MAX_BODY = 5000
 const MAX_COMMENT = 1000
 const MAX_IDEAS_PER_DAY = 5
-const MAX_LIST = 50
+/** Sahifada saqlanadigan maksimal g'oyalar soni */
+export const MAX_STORED_IDEAS = 10
 
 function ideaKey(id: string) {
   return `${IDEA_PREFIX}${id}`
@@ -77,17 +78,34 @@ export function validateImageData(imageData: string | null | undefined): string 
     return 'Ruxsat: JPG, PNG, WEBP yoki GIF.'
   }
   const b64 = imageData.slice(comma + 1)
-  // base64 ~ 4/3 of bytes
   const approxBytes = Math.floor((b64.length * 3) / 4)
   if (approxBytes > MAX_IMAGE_BYTES) return 'Rasm hajmi 1 MB dan oshmasin.'
   return null
 }
 
-export async function listCommunityIdeas(limit = MAX_LIST): Promise<CommunityIdea[]> {
+/** 10 tadan ortiq eng eski g'oyalarni o'chirish */
+async function pruneOldIdeas(): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+
+  // eng yangilar index 0..9 (rev), undan pastidagilar — eski
+  const staleIds = await redis.zrange(INDEX_KEY, MAX_STORED_IDEAS, -1, { rev: true })
+  if (!staleIds?.length) return
+
+  for (const id of staleIds) {
+    const sid = String(id)
+    await redis.del(ideaKey(sid))
+    await redis.zrem(INDEX_KEY, sid)
+  }
+}
+
+export async function listCommunityIdeas(limit = MAX_STORED_IDEAS): Promise<CommunityIdea[]> {
   const redis = getRedis()
   if (!redis) return []
 
-  const ids = await redis.zrange(INDEX_KEY, 0, limit - 1, { rev: true })
+  await pruneOldIdeas()
+
+  const ids = await redis.zrange(INDEX_KEY, 0, Math.min(limit, MAX_STORED_IDEAS) - 1, { rev: true })
   if (!ids?.length) return []
 
   const ideas: CommunityIdea[] = []
@@ -154,6 +172,8 @@ export async function createCommunityIdea(params: {
   await redis.zadd(INDEX_KEY, { score: Date.now(), member: id })
   await redis.incr(daily)
   await redis.expire(daily, 60 * 60 * 48)
+
+  await pruneOldIdeas()
 
   return { ok: true, idea }
 }
