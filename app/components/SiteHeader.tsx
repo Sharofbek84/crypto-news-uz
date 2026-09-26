@@ -9,6 +9,7 @@ const NAV = [
   { href: '/', label: 'Bosh sahifa' },
   { href: '/yangiliklar', label: 'Yangiliklar' },
   { href: '/spot-heatmap', label: 'Heatmap' },
+  { href: '/savdo-goyalari', label: "Savdo g'oyalari" },
   { href: '/obuna', label: 'Premium obuna' },
   // { href: '/nft', label: 'GoldenWeb NFT' }, // vaqtincha yashirilgan
 ]
