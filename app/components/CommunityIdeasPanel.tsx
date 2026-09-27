@@ -258,6 +258,13 @@ export default function CommunityIdeasPanel() {
     return `${idea.title}\n\n${bodyText}\n\n${url}\n\nGOLDENWEB.UZ — savdo g'oyalari`
   }
 
+  function shareTextForTelegram(idea: CommunityIdea, maxBody = 1200) {
+    // Havola faqat url= parametrida — matnda takrorlanmasin
+    const bodyText =
+      idea.body.length > maxBody ? idea.body.slice(0, maxBody).trimEnd() + '…' : idea.body
+    return `${idea.title}\n\n${bodyText}\n\nGOLDENWEB.UZ — savdo g'oyalari`
+  }
+
   function shareTextForX(idea: CommunityIdea) {
     const url = ideaShareUrl(idea.id)
     const header = idea.title.trim()
@@ -348,8 +355,8 @@ export default function CommunityIdeasPanel() {
   }
 
   async function shareToTelegram(idea: CommunityIdea) {
-    const text = shareText(idea)
-    const used = await shareWithImage(idea, text)
+    const text = shareTextForTelegram(idea)
+    const used = await shareWithImage(idea, shareText(idea))
     if (used) {
       setShareOpen(null)
       return
@@ -602,21 +609,20 @@ export default function CommunityIdeasPanel() {
         }
         @media (max-width: 640px) {
           .ciShareMenu {
-            position: fixed;
-            left: 12px;
-            right: 12px;
-            bottom: max(16px, env(safe-area-inset-bottom));
-            top: auto;
-            max-width: none;
-            min-width: 0;
-            width: auto;
-            border-radius: 14px;
-            padding: 10px 8px;
-            box-shadow: 0 -8px 32px rgba(0,0,0,0.55);
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            left: auto;
+            bottom: auto;
+            min-width: 180px;
+            max-width: min(240px, calc(100vw - 16px));
+            border-radius: 12px;
+            padding: 6px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.5);
           }
           .ciShareItem {
-            padding: 12px 12px;
-            font-size: 0.9rem;
+            padding: 10px 12px;
+            font-size: 0.88rem;
           }
         }
         .ciShareItem { display: flex; align-items: center; gap: 10px; border: none; background: transparent; color: #e6edf3; border-radius: 8px; padding: 8px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-align: left; width: 100%; }
