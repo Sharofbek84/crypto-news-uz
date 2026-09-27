@@ -259,7 +259,6 @@ export default function CommunityIdeasPanel() {
   }
 
   function shareTextForTelegram(idea: CommunityIdea, maxBody = 1200) {
-    // Havola faqat url= parametrida — matnda takrorlanmasin
     const bodyText =
       idea.body.length > maxBody ? idea.body.slice(0, maxBody).trimEnd() + '…' : idea.body
     return `${idea.title}\n\n${bodyText}\n\nGOLDENWEB.UZ — savdo g'oyalari`
@@ -568,10 +567,23 @@ export default function CommunityIdeasPanel() {
         .ciMsg.err { color: #ff7b87; }
         .ciLoginHint { border: 1px dashed #303846; border-radius: 12px; padding: 14px; margin-top: 8px; color: #9aa7b8; font-size: 0.88rem; }
         .ciLoginHint a { color: #f0b90b; }
-        .ciList { margin-bottom: 20px; }
-        .ciCard { border: 1px solid #252d38; border-radius: 12px; padding: 14px 16px; background: #111820; margin-bottom: 12px; }
-        .ciCardHead { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
-        .ciCard h3 { margin: 0 0 6px; font-size: 1.05rem; }
+        .ciList { margin-bottom: 20px; overflow: visible; }
+        .ciCard { border: 1px solid #252d38; border-radius: 12px; padding: 14px 16px; background: #111820; margin-bottom: 12px; overflow: visible; }
+        .ciCardHead {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          align-items: flex-start;
+          flex-wrap: nowrap;
+          overflow: visible;
+        }
+        .ciCard h3 {
+          margin: 0 0 6px;
+          font-size: 1.05rem;
+          flex: 1;
+          min-width: 0;
+          overflow-wrap: anywhere;
+        }
         .ciMeta { color: #8b949e; font-size: 0.78rem; margin-bottom: 10px; }
         .ciBody { white-space: pre-wrap; color: #c8d1dc; font-size: 0.9rem; line-height: 1.55; margin: 0 0 12px; }
         .ciImgBtn { display: block; width: fit-content; max-width: 100%; padding: 0; margin: 0 0 12px; border: none; background: transparent; cursor: zoom-in; }
@@ -586,8 +598,17 @@ export default function CommunityIdeasPanel() {
         .ciAdminBtn.danger { color: #ff7b87; border-color: #4a3035; }
         .ciAdminBtn.danger:hover { border-color: #ff5360; color: #ff5360; }
         .ciEditBox { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-        .ciHeadActions { display: flex; align-items: flex-start; gap: 8px; flex-shrink: 0; }
-        .ciShareWrap { position: relative; }
+        .ciHeadActions {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          flex-shrink: 0;
+          margin-left: auto;
+        }
+        .ciShareWrap {
+          position: relative;
+          overflow: visible;
+        }
         .ciShareFab { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #303846; background: #0d1117; color: #e6edf3; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; flex-shrink: 0; }
         .ciShareFab:hover { border-color: #f0b90b; color: #f0b90b; }
         .ciShareMenu {
@@ -614,15 +635,23 @@ export default function CommunityIdeasPanel() {
             right: 0;
             left: auto;
             bottom: auto;
-            min-width: 180px;
-            max-width: min(240px, calc(100vw - 16px));
+            width: 200px;
+            min-width: 200px;
+            max-width: calc(100vw - 24px);
             border-radius: 12px;
             padding: 6px;
             box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+            transform: none;
           }
           .ciShareItem {
             padding: 10px 12px;
             font-size: 0.88rem;
+          }
+          .ciCardHead {
+            flex-wrap: nowrap;
+          }
+          .ciHeadActions {
+            margin-left: 8px;
           }
         }
         .ciShareItem { display: flex; align-items: center; gap: 10px; border: none; background: transparent; color: #e6edf3; border-radius: 8px; padding: 8px 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; text-align: left; width: 100%; }
