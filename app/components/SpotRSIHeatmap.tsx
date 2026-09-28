@@ -598,8 +598,10 @@ export default function SpotRSIHeatmap() {
       <style>{`
         .rsiHeat { color: #e6edf3; }
         .rsiHeat h1 { margin: 0 0 8px; font-size: 1.4rem; font-weight: 800; }
-        .rsiSub { color: #8b949e; font-size: 0.88rem; margin: 0 0 16px; line-height: 1.5; }
-        .rsiTfRow { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; justify-content: flex-end; }
+        .rsiSub { color: #8b949e; font-size: 0.88rem; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
+        .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 16px; flex-wrap: wrap; }
+        .rsiHmFoot { margin-top: 10px; font-size: 0.78rem; color: #8b949e; text-align: right; }
+        .rsiTfRow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; margin: 0; }
         .rsiTfBtn {
           border: 1px solid #303846; background: #111820; color: #c8d1dc;
           border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 0.84rem;
@@ -611,7 +613,7 @@ export default function SpotRSIHeatmap() {
           gap: 10px;
         }
         .rsiCard {
-          border-radius: 10px; padding: 8px 10px; min-height: 67px;
+          border-radius: 10px; padding: 8px 10px; min-height: 80px;
           display: flex; flex-direction: column; justify-content: center; gap: 2px;
           border: 1px solid #252d38; text-decoration: none; color: inherit;
           transition: transform 0.12s ease, border-color 0.12s ease;
@@ -647,21 +649,22 @@ export default function SpotRSIHeatmap() {
       `}</style>
 
       <h1>Spot RSI Heatmap</h1>
-      <p className="rsiSub">
-        Top kriptovalyutalar trendini bir joyda kuzating.
-      </p>
-
-      <div className="rsiTfRow">
-        {TIMEFRAMES.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            className={`rsiTfBtn${tf === t.key ? ' active' : ''}`}
-            onClick={() => setTf(t.key)}
-          >
-            {t.key}
-          </button>
-        ))}
+      <div className="rsiHeadRow">
+        <p className="rsiSub">
+          Top kriptovalyutalar trendini bir joyda kuzating.
+        </p>
+        <div className="rsiTfRow">
+          {TIMEFRAMES.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              className={`rsiTfBtn${tf === t.key ? ' active' : ''}`}
+              onClick={() => setTf(t.key)}
+            >
+              {t.key}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading && !payload ? (
@@ -729,6 +732,14 @@ export default function SpotRSIHeatmap() {
                 </div>
               )})()}
             </>
+          )}
+
+          {selectedCell && (
+            <div className="rsiHmFoot">
+              {coin} · {tf} · RSI(14): {selectedCell.rsi ?? '—'} ·
+              Yangilandi:{' '}
+              {payload?.updatedAt ? new Date(payload.updatedAt).toLocaleTimeString() : '—'}
+            </div>
           )}
         </>
       )}
