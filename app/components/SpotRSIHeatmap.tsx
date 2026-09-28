@@ -722,24 +722,35 @@ export default function SpotRSIHeatmap() {
               {levels && (() => {
                 const chartRsi = selectedCell?.rsi ?? null
                 const shown = filterLevelsByRsi(levels, chartRsi)
-                if (!shown || (shown.buys.length === 0 && shown.sells.length === 0)) return null
+                if (!shown) return null
+                const noBuy = chartRsi != null && chartRsi >= 70
+                const noSell = chartRsi != null && chartRsi <= 30
+                if (shown.buys.length === 0 && shown.sells.length === 0 && !noBuy && !noSell) return null
                 return (
                 <div className="rsiLevelsNote">
                   <div className="rsiTradeLine">
                     <span className="rsiTradeLabel">Sotib olish:</span>{' '}
-                    {shown.buys.map((p, i) => (
-                      <span key={`b${i}`} className="rsiBuy">
-                        BUY{i + 1}: <b>{money(p)}</b>{i < shown.buys.length - 1 ? ', ' : ''}
-                      </span>
-                    ))}
+                    {noBuy || shown.buys.length === 0 ? (
+                      <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
+                    ) : (
+                      shown.buys.map((p, i) => (
+                        <span key={`b${i}`} className="rsiBuy">
+                          BUY{i + 1}: <b>{money(p)}</b>{i < shown.buys.length - 1 ? ', ' : ''}
+                        </span>
+                      ))
+                    )}
                   </div>
                   <div className="rsiTradeLine">
                     <span className="rsiTradeLabel">Sotish:</span>{' '}
-                    {shown.sells.map((p, i) => (
-                      <span key={`s${i}`} className="rsiSell">
-                        SELL{i + 1}: <b>{money(p)}</b>{i < shown.sells.length - 1 ? ', ' : ''}
-                      </span>
-                    ))}
+                    {noSell || shown.sells.length === 0 ? (
+                      <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
+                    ) : (
+                      shown.sells.map((p, i) => (
+                        <span key={`s${i}`} className="rsiSell">
+                          SELL{i + 1}: <b>{money(p)}</b>{i < shown.sells.length - 1 ? ', ' : ''}
+                        </span>
+                      ))
+                    )}
                   </div>
                   <div>
                     <b>Izoh:</b> Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
