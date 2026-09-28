@@ -752,8 +752,9 @@ export default function SpotRSIHeatmap() {
                       ))
                     )}
                   </div>
-                  <div>
-                    <b>Izoh:</b> Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
+                  <div className="rsiTradeLine" style={{ marginBottom: 0, color: '#8b949e' }}>
+                    <span className="rsiTradeLabel">Izoh:</span>{' '}
+                    Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
                   </div>
                 </div>
               )})()}
