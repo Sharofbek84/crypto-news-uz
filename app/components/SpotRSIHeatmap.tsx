@@ -17,9 +17,9 @@ const COINS = [
   'ATOM',
   'TIA',
   'CORE',
-  'FHE',
-  'MYX',
   'WCT',
+  'MYX',
+  'FHE',
   'GTAI',
 ] as const
 
