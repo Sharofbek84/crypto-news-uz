@@ -611,18 +611,25 @@ export default function SpotRSIHeatmap() {
           gap: 10px;
         }
         .rsiCard {
-          border-radius: 12px; padding: 14px 12px; min-height: 96px;
-          display: flex; flex-direction: column; justify-content: center; gap: 4px;
+          border-radius: 10px; padding: 8px 10px; min-height: 67px;
+          display: flex; flex-direction: column; justify-content: center; gap: 2px;
           border: 1px solid #252d38; text-decoration: none; color: inherit;
           transition: transform 0.12s ease, border-color 0.12s ease;
           cursor: pointer;
         }
         .rsiCard:hover { transform: translateY(-2px); border-color: #f0b90b66; }
         .rsiCard.active { border-color: #f0b90b; box-shadow: 0 0 0 1px #f0b90b44; }
-        .rsiCoin { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.02em; }
-        .rsiVal { font-size: 1.35rem; font-weight: 800; }
-        .rsiMeta { font-size: 0.72rem; opacity: 0.9; }
-        .rsiPrice { font-size: 0.78rem; opacity: 0.85; margin-top: 2px; }
+        .rsiCardTop {
+          display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+          min-width: 0;
+        }
+        .rsiCoin { font-size: 0.88rem; font-weight: 800; letter-spacing: 0.02em; flex-shrink: 0; }
+        .rsiPrice {
+          font-size: 0.68rem; opacity: 0.9; font-weight: 600;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+        }
+        .rsiVal { font-size: 1.15rem; font-weight: 800; line-height: 1.15; }
+        .rsiMeta { font-size: 0.68rem; opacity: 0.9; }
         .rsiErr, .rsiLoad { padding: 28px; text-align: center; color: #8b949e; }
         .rsiUpdated { font-size: 0.75rem; color: #8b949e; margin-top: 14px; }
         .rsiLegend { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 16px; font-size: 0.72rem; color: #8b949e; }
@@ -699,13 +706,15 @@ export default function SpotRSIHeatmap() {
                   style={{ background: rsiColor(rsi) }}
                   onClick={() => setCoin(c)}
                 >
-                  <div className="rsiCoin">{c}</div>
+                  <div className="rsiCardTop">
+                    <span className="rsiCoin">{c}</span>
+                    <span className="rsiPrice">{formatPrice(cell?.price ?? null)}</span>
+                  </div>
                   <div className="rsiVal">
                     {rsi != null ? rsi.toFixed(1) : '—'}{' '}
-                    <span style={{ fontSize: '0.85rem' }}>{arrow(cell?.rsiDirection ?? null)}</span>
+                    <span style={{ fontSize: '0.8rem' }}>{arrow(cell?.rsiDirection ?? null)}</span>
                   </div>
                   <div className="rsiMeta">{rsiLabel(rsi)}</div>
-                  <div className="rsiPrice">{formatPrice(cell?.price ?? null)}</div>
                 </button>
               )
             })}
