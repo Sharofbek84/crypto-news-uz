@@ -604,8 +604,8 @@ export default function SpotRSIHeatmap() {
         .rsiHmFoot {
           position: absolute; bottom: 10px; right: 14px; z-index: 2;
           margin: 0; font-size: 0.72rem; color: #9aa7b8; text-align: right;
-          background: rgba(7, 11, 17, 0.82); padding: 5px 10px; border-radius: 6px;
-          border: 1px solid #252d38; pointer-events: none; white-space: nowrap;
+          background: transparent; padding: 0; border: none;
+          pointer-events: none; white-space: nowrap;
         }
         .rsiTfRow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; margin: 0; }
         .rsiTfBtn {
