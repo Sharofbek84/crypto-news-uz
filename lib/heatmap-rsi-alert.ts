@@ -149,19 +149,21 @@ export function computeTradeLevels(candles: OHLC[], interval: string): { buys: n
 
 export async function fetchGateSnapshot(
   symbol: string,
-  interval: string,
-): Promise<{ candles: OHLC[]; rsi: number | null }> {
+  interval: string
+): Promise<{ rsi: number | null; buys: number[]; sells: number[] }> {
   const url = new URL('https://api.gateio.ws/api/v4/spot/candlesticks')
   url.searchParams.set('currency_pair', `${symbol}_USDT`)
   url.searchParams.set('interval', interval)
   url.searchParams.set('limit', '150')
+
   const res = await fetch(url.toString(), {
     cache: 'no-store',
     headers: { Accept: 'application/json' },
   })
   if (!res.ok) throw new Error(`Gate.io ${symbol} ${interval}: ${res.status}`)
   const rows = (await res.json()) as GateCandle[]
-  if (!Array.isArray(rows) || rows.length === 0) return { candles: [], rsi: null }
+  if (!Array.isArray(rows) || rows.length === 0) return { rsi: null, buys: [], sells: [] }
+
   const candles = [...rows]
     .map((row) => ({
       time: Number(row[0]),
@@ -172,9 +174,12 @@ export async function fetchGateSnapshot(
     }))
     .filter((c) => Number.isFinite(c.time) && Number.isFinite(c.close))
     .sort((a, b) => a.time - b.time)
+
   const closes = candles.map((c) => c.close)
-  const rsi = calculateRSI(closes)
-  return { candles, rsi: rsi == null ? null : Math.round(rsi * 10) / 10 }
+  const rsiRaw = calculateRSI(closes)
+  const rsi = rsiRaw == null ? null : Math.round(rsiRaw * 10) / 10
+  const levels = computeTradeLevels(candles, interval)
+  return { rsi, buys: levels.buys, sells: levels.sells }
 }
 
 export async function fetchGateRsi(symbol: string, interval: string): Promise<number | null> {
@@ -257,7 +262,7 @@ export function detectCrosses(
 }
 
 function money(n: number): string {
-  if (!Number.isFinite(n)) return '—'
+  if (!Number.isFinite(n)) return '\u2014'
   if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 2 })
   if (n >= 1) return n.toLocaleString('en-US', { maximumFractionDigits: 4 })
   return n.toPrecision(4)
@@ -265,10 +270,10 @@ function money(n: number): string {
 
 function formatLevelsLine(direction: 'up' | 'down', buys: number[], sells: number[]): string {
   if (direction === 'down') {
-    const levels = buys.length ? buys.map((x) => `$${money(x)}`).join(', ') : '—'
+    const levels = buys.length ? buys.map((x) => `$${money(x)}`).join(', ') : '\u2014'
     return `Buy zonalar: ${levels}`
   }
-  const levels = sells.length ? sells.map((x) => `$${money(x)}`).join(', ') : '—'
+  const levels = sells.length ? sells.map((x) => `$${money(x)}`).join(', ') : '\u2014'
   return `Sell zonalar: ${levels}`
 }
 
@@ -280,11 +285,11 @@ export async function sendTelegramRsiAlerts(crosses: RsiCross[]): Promise<void> 
   for (const cross of crosses) {
     const ok = await claimRsiAlert(cross.coin, cross.tf, cross.direction, cross.level)
     if (!ok) continue
-    const arrow = cross.direction === 'up' ? '🔴' : '🟢'
+    const arrow = cross.direction === 'up' ? '\ud83d\udd34' : '\ud83d\udfe2'
     const text = [
-      `${arrow} <b>${cross.coin}</b> · ${cross.tf}`,
+      `${arrow} <b>${cross.coin}</b> \u00b7 ${cross.tf}`,
       labelFor(cross.direction, cross.level),
-      `RSI: ${cross.prev.toFixed(1)} → <b>${cross.curr.toFixed(1)}</b>`,
+      `RSI: ${cross.prev.toFixed(1)} \u2192 <b>${cross.curr.toFixed(1)}</b>`,
       cross.price != null ? `Narx: $${money(cross.price)}` : '',
       formatLevelsLine(cross.direction, cross.buys, cross.sells),
       `<a href="${HEATMAP_URL}">RSI Heatmap ochish</a>`,
