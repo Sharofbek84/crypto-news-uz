@@ -16,10 +16,10 @@ const COINS = [
   'ATOM',
   'TIA',
   'CORE',
-  'PLUME',
+  'FHE',
   'MYX',
   'WCT',
-  'WLD',
+  'GTAI',
 ] as const
 
 const TIMEFRAMES = [
@@ -46,52 +46,42 @@ function calculateRSI(closes: number[], period = 14): number | null {
 
   for (let i = period + 1; i < closes.length; i++) {
     const change = closes[i] - closes[i - 1]
-    avgGain = (avgGain * (period - 1) + Math.max(change, 0)) / period
-    avgLoss = (avgLoss * (period - 1) + Math.max(-change, 0)) / period
+    const g = change > 0 ? change : 0
+    const l = change < 0 ? -change : 0
+    avgGain = (avgGain * (period - 1) + g) / period
+    avgLoss = (avgLoss * (period - 1) + l) / period
   }
 
   if (avgLoss === 0) return 100
-  return 100 - 100 / (1 + avgGain / avgLoss)
+  const rs = avgGain / avgLoss
+  return 100 - 100 / (1 + rs)
 }
 
 async function getRSI(symbol: string, interval: string) {
   const url = new URL('https://api.gateio.ws/api/v4/spot/candlesticks')
   url.searchParams.set('currency_pair', `${symbol}_USDT`)
   url.searchParams.set('interval', interval)
-  url.searchParams.set('limit', '150')
+  url.searchParams.set('limit', '100')
 
-  const res = await fetch(url.toString(), {
-    cache: 'no-store',
-    headers: { Accept: 'application/json' },
-  })
+  const res = await fetch(url.toString(), { cache: 'no-store' })
   if (!res.ok) throw new Error(`Gate.io ${symbol} ${interval}: ${res.status}`)
-
-  const rows = (await res.json()) as Candle[]
-  if (!Array.isArray(rows) || rows.length === 0) throw new Error('Empty')
-
-  const sorted = [...rows].sort((a, b) => Number(a[0]) - Number(b[0]))
-  const closes = sorted.map((row) => Number(row[2])).filter((v) => Number.isFinite(v))
-
-  const rsi = calculateRSI(closes)
-  const previousRsi = closes.length > 1 ? calculateRSI(closes.slice(0, -1)) : null
-  const last = sorted[sorted.length - 1]
-  const previousPrice = sorted.length > 1 ? Number(sorted[sorted.length - 2][2]) : null
-  const price = last ? Number(last[2]) : null
-
-  const direction = (current: number | null, previous: number | null) => {
-    if (current == null || previous == null || !Number.isFinite(current) || !Number.isFinite(previous))
-      return null
-    if (current > previous) return 'up' as const
-    if (current < previous) return 'down' as const
-    return 'flat' as const
+  const raw = (await res.json()) as Candle[]
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return { rsi: null, price: null, timestamp: null }
   }
 
+  // Gate returns oldest->newest or newest->oldest depending; sort by time
+  const sorted = [...raw].sort((a, b) => Number(a[0]) - Number(b[0]))
+  const closes = sorted.map((c) => Number(c[2]))
+  const last = sorted[sorted.length - 1]
+  const price = Number(last[2])
+  const timestamp = Number(last[0]) * 1000
+  const rsi = calculateRSI(closes)
+
   return {
-    rsi: rsi == null ? null : Math.round(rsi * 10) / 10,
-    price,
-    timestamp: last ? Number(last[0]) : null,
-    priceDirection: direction(price, previousPrice),
-    rsiDirection: direction(rsi, previousRsi),
+    rsi: rsi != null && Number.isFinite(rsi) ? rsi : null,
+    price: Number.isFinite(price) ? price : null,
+    timestamp: Number.isFinite(timestamp) ? timestamp : null,
   }
 }
 
@@ -101,35 +91,21 @@ export async function GET() {
       TIMEFRAMES.map(async ({ key, interval }) => {
         try {
           return [symbol, key, await getRSI(symbol, interval)] as const
-        } catch {
+        } catch (e) {
+          console.error('heatmap rsi error', symbol, interval, e)
           return [
             symbol,
             key,
-            {
-              rsi: null,
-              price: null,
-              timestamp: null,
-              priceDirection: null,
-              rsiDirection: null,
-            },
+            { rsi: null, price: null, timestamp: null },
           ] as const
         }
-      })
-    )
+      }),
+    ),
   )
 
   const data: Record<
     string,
-    Record<
-      string,
-      {
-        rsi: number | null
-        price: number | null
-        timestamp: number | null
-        priceDirection: 'up' | 'down' | 'flat' | null
-        rsiDirection: 'up' | 'down' | 'flat' | null
-      }
-    >
+    Record<string, { rsi: number | null; price: number | null; timestamp: number | null }>
   > = {}
 
   for (const symbol of COINS) {
@@ -140,21 +116,15 @@ export async function GET() {
         rsi: null,
         price: null,
         timestamp: null,
-        priceDirection: null,
-        rsiDirection: null,
       }
     }
   }
 
-  return NextResponse.json(
-    {
-      source: 'Gate.io',
-      period: 14,
-      timeframes: TIMEFRAMES.map((x) => x.key),
-      coins: COINS,
-      data,
-      updatedAt: Date.now(),
-    },
-    { headers: { 'Cache-Control': 'no-store, max-age=0' } }
-  )
+  return NextResponse.json({
+    ok: true,
+    updatedAt: Date.now(),
+    coins: COINS,
+    timeframes: TIMEFRAMES.map((t) => t.key),
+    data,
+  })
 }
