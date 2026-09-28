@@ -600,7 +600,13 @@ export default function SpotRSIHeatmap() {
         .rsiHeat h1 { margin: 0 0 8px; font-size: 1.4rem; font-weight: 800; }
         .rsiSub { color: #8b949e; font-size: 0.88rem; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
         .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 16px; flex-wrap: wrap; }
-        .rsiHmFoot { margin-top: 10px; font-size: 0.78rem; color: #8b949e; text-align: right; }
+        .rsiChartOuter { position: relative; }
+        .rsiHmFoot {
+          position: absolute; bottom: 10px; right: 14px; z-index: 2;
+          margin: 0; font-size: 0.72rem; color: #9aa7b8; text-align: right;
+          background: rgba(7, 11, 17, 0.82); padding: 5px 10px; border-radius: 6px;
+          border: 1px solid #252d38; pointer-events: none; white-space: nowrap;
+        }
         .rsiTfRow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; margin: 0; }
         .rsiTfBtn {
           border: 1px solid #303846; background: #111820; color: #c8d1dc;
@@ -703,7 +709,16 @@ export default function SpotRSIHeatmap() {
             <div className="rsiLoad">Grafik yuklanmoqda…</div>
           ) : (
             <>
-              <CandleChart candles={candles} coin={coin} tf={tf} levels={levels} />
+              <div className="rsiChartOuter">
+                <CandleChart candles={candles} coin={coin} tf={tf} levels={levels} />
+                {selectedCell && (
+                  <div className="rsiHmFoot">
+                    {coin} · {tf} · RSI(14): {selectedCell.rsi ?? '—'} ·
+                    Yangilandi:{' '}
+                    {payload?.updatedAt ? new Date(payload.updatedAt).toLocaleTimeString() : '—'}
+                  </div>
+                )}
+              </div>
               {levels && (() => {
                 const chartRsi = selectedCell?.rsi ?? null
                 const shown = filterLevelsByRsi(levels, chartRsi)
@@ -732,14 +747,6 @@ export default function SpotRSIHeatmap() {
                 </div>
               )})()}
             </>
-          )}
-
-          {selectedCell && (
-            <div className="rsiHmFoot">
-              {coin} · {tf} · RSI(14): {selectedCell.rsi ?? '—'} ·
-              Yangilandi:{' '}
-              {payload?.updatedAt ? new Date(payload.updatedAt).toLocaleTimeString() : '—'}
-            </div>
           )}
         </>
       )}
