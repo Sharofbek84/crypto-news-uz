@@ -599,7 +599,7 @@ export default function SpotRSIHeatmap() {
         .rsiHeat { color: #e6edf3; }
         .rsiHeat h1 { margin: 0 0 8px; font-size: 1.4rem; font-weight: 800; }
         .rsiSub { color: #8b949e; font-size: 0.88rem; margin: 0 0 16px; line-height: 1.5; }
-        .rsiTfRow { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+        .rsiTfRow { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; justify-content: flex-end; }
         .rsiTfBtn {
           border: 1px solid #303846; background: #111820; color: #c8d1dc;
           border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 0.84rem;
@@ -632,9 +632,6 @@ export default function SpotRSIHeatmap() {
         .rsiMeta { font-size: 0.68rem; opacity: 0.9; }
         .rsiErr, .rsiLoad { padding: 28px; text-align: center; color: #8b949e; }
         .rsiUpdated { font-size: 0.75rem; color: #8b949e; margin-top: 14px; }
-        .rsiLegend { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 16px; font-size: 0.72rem; color: #8b949e; }
-        .rsiLeg { display: inline-flex; align-items: center; gap: 6px; }
-        .rsiLeg i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
         .homeChartWrap { margin-top: 18px; border: 1px solid #252d38; border-radius: 12px; overflow: hidden; background: #0a1018; }
         .homeChartScroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .homeChart { display: block; min-width: 900px; }
@@ -647,24 +644,11 @@ export default function SpotRSIHeatmap() {
         .rsiTradeLabel { color: #8b949e; font-weight: 600; }
         .rsiBuy { color: #2ecc71; margin-right: 6px; }
         .rsiSell { color: #e74c3c; margin-right: 6px; }
-        .rsiHmFoot { margin-top: 10px; font-size: 0.78rem; color: #8b949e; }
-        .rsiChartHead {
-          display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-          margin: 18px 0 10px; justify-content: space-between;
-        }
-        .rsiChartTitle { font-size: 1.05rem; font-weight: 800; margin: 0; }
-        .rsiChartActions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .rsiChartBtn {
-          border: 1px solid #303846; background: #111820; color: #c8d1dc;
-          border-radius: 8px; padding: 7px 12px; font-weight: 700; cursor: pointer; font-size: 0.8rem;
-          text-decoration: none; display: inline-block;
-        }
-        .rsiChartBtn:hover { border-color: #f0b90b; color: #f0b90b; }
       `}</style>
 
-      <h1>RSI Heatmap</h1>
+      <h1>Spot RSI Heatmap</h1>
       <p className="rsiSub">
-        Spot bozor RSI (14) — H4 / D1 / W1. Kartaga bosing: grafik + BUY/SELL darajalari.
+        Top kriptovalyutalar trendini bir joyda kuzating.
       </p>
 
       <div className="rsiTfRow">
@@ -678,14 +662,6 @@ export default function SpotRSIHeatmap() {
             {t.key}
           </button>
         ))}
-      </div>
-
-      <div className="rsiLegend">
-        <span className="rsiLeg"><i style={{ background: '#148f55' }} /> Oversold</span>
-        <span className="rsiLeg"><i style={{ background: '#2ecc71' }} /> Bullish</span>
-        <span className="rsiLeg"><i style={{ background: '#3a424d' }} /> Neutral</span>
-        <span className="rsiLeg"><i style={{ background: '#c47a12' }} /> Warm</span>
-        <span className="rsiLeg"><i style={{ background: '#c62828' }} /> Overbought</span>
       </div>
 
       {loading && !payload ? (
@@ -718,15 +694,6 @@ export default function SpotRSIHeatmap() {
                 </button>
               )
             })}
-          </div>
-
-          <div className="rsiChartHead">
-            <h2 className="rsiChartTitle">{coin}/USDT · {tf}</h2>
-            <div className="rsiChartActions">
-              <Link href={`${premiumHref}?coin=${coin}&tf=${tf}`} className="rsiChartBtn">
-                Premium analiz
-              </Link>
-            </div>
           </div>
 
           {chartLoading ? (
@@ -762,14 +729,6 @@ export default function SpotRSIHeatmap() {
                 </div>
               )})()}
             </>
-          )}
-
-          {selectedCell && (
-            <div className="rsiHmFoot">
-              {coin} · {tf} · RSI(14): {selectedCell.rsi ?? '—'} ·
-              Yangilandi:{' '}
-              {payload?.updatedAt ? new Date(payload.updatedAt).toLocaleTimeString() : '—'}
-            </div>
           )}
         </>
       )}
