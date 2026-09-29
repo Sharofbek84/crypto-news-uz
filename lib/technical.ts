@@ -10,7 +10,6 @@ import {
   shortLevels,
   tfLabel,
   fmt,
-  detectStructureBreakRetest,
   detectEmaPullback,
 } from './technical-helpers'
 
@@ -95,17 +94,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
     }
   }
 
-  // Break+Retest — faqat NEUTRAL
-  const structureSignal =
-    trend === 'NEUTRAL' ? detectStructureBreakRetest(candles, trend) : null
-  if (
-    trend === 'NEUTRAL' &&
-    structureSignal &&
-    structureSignal.retestIndex >= candles.length - 6
-  ) {
-    side = structureSignal.type
-    neutralTone = 'strong'
-  }
+  // Break+Retest struktura signallari o'chirilgan (BUY/SELL va grafik markerlar)
+  const structureSignal = null
 
   // EMA pullback — grafik uchburchak + side (xulosa o'zgarmaydi)
   const emaPullback = detectEmaPullback(candles)
@@ -153,12 +143,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA50 ostida qolsa va momentum salbiy bo'lsa, ` +
       `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga pasayish ssenariysi kuchayadi.`
 
-    if (trend === 'NEUTRAL' && structureSignal?.type === 'SELL') {
-      summary =
-        `${tf}: neytral trendda oxirgi minimum yorildi va qayta test qilindi. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
-    } else if (trend === 'BEARISH') {
+    if (trend === 'BEARISH') {
       summary =
         `${tf} grafikda trend BEARISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
@@ -177,12 +162,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       `Narx EMA50 ostida qolish va momentum susayishi ` +
       `${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
 
-    if (trend === 'NEUTRAL' && structureSignal?.type === 'BUY') {
-      summary =
-        `${tf}: neytral trendda oxirgi maksimum yorildi va qayta test qilindi. ` +
-        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
-        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
-    } else if (trend === 'BULLISH') {
+    if (trend === 'BULLISH') {
       summary =
         `${tf} grafikda trend BULLISH. ` +
         `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
