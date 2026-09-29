@@ -3,11 +3,110 @@
     "slug": "btc-83000-neft-100-29-sent",
     "title": "Bitcoin $83 000 ga tushdi: neft $100 dan oshdi, altcoinlar juma rallysini qaytardi",
     "summary": "Bitcoin dushanba seansida $83 000 atrofida 1,7–2,1 foiz tushdi. CoinDesk 100 indeksi 2,6 foiz pasayib 1 874,56 ga tushdi. Brent nefti Eron shartlari rad etilgach $100 dan oshdi.",
-    "body": "CoinDesk 28-sentabr Crypto Markets Today hisobotiga ko\u2018ra, Bitcoin UTC yarimidan beri 1,7 foiz tushib $83 000 ga yetdi, 24 soatlik pasayish taxminan 2,1 foiz. Altcoinlar asosiy zararni oldi: CoinDesk 100 tarkibidagi 91 ta aktiv qizil zonaida, indeks 2,6 foiz tushib 1 874,56 ga tushdi. Juma kuni yetakchilik qilgan DeFi Select indeksi 6,4 foiz, Computing indeksi 3,2 foiz tushdi.\n\nMakroiqtisodiy trigger kripto ichida emas, neft bozorida. Prezident Donald Trump Eronning Hormuz bo\u2018g\u2018ozini ochish shartlarini rad etdi; shartlar muzlatilgan mablag\u2018larni chiqarish, neft sanksiyalarini olib tashlash va AQSh dengiz blokadasini to\u2018xtatishni o\u2018z ichiga olgan edi. Brent $100 dan oshdi, oltin, kumush va AQSh aktsiya fyucherslari pasaydi. 10 yillik Treasury daromadi 5,255 foizga, 30 yillik 5,565 foizga chiqdi \u2014 deyarli 20 yillik yuqori.\n\nNarxlar kesimi: BTC $82 900\u2013$84 100, ETH $2 648\u2013$2 666 (\u22122 foiz atrofida), SOL $117\u2013$118 (\u22122,2\u20133,4 foiz), BNB $763 (\u22121,1 foiz). SUI 6,2 foiz, Bitcoin Cash 7,7\u201310 foiz tushgan. Ether ochiq qiziqishi 12,85 million ETH ga qisqargan (iyul 1 dagi 13,95 million va may oxiridagi 15,65 milliondan past), ya\u2019ni yozgi rally leverage emas, spot xarid bilan ketgan.\n\nStrategy 21\u201327 sentabr oralig\u2018ida 1 665 BTC ni $142,7 millionga ($85 681 o\u2018rtacha) sotib oldi; jami 847 666 BTC, xarajat $63,95 milliard. Bu korporativ bid narx pasayishini qisman yumshatadi. $81 500\u2013$83 000 tayanch, $87 000 qarshilik. Agar neft $105 ga chiqsa va PCE ma\u2019lumoti qattiq kelsa, $81 500 testdan o\u2018tadi.\n\nManba: CoinDesk.",
+    "body": "CoinDesk 28-sentabr Crypto Markets Today hisobotiga ko‘ra, Bitcoin UTC yarimidan beri 1,7 foiz tushib $83 000 ga yetdi, 24 soatlik pasayish taxminan 2,1 foiz. Altcoinlar asosiy zararni oldi: CoinDesk 100 tarkibidagi 91 ta aktiv qizil zonaida, indeks 2,6 foiz tushib 1 874,56 ga tushdi. Juma kuni yetakchilik qilgan DeFi Select indeksi 6,4 foiz, Computing indeksi 3,2 foiz tushdi.\n\nMakroiqtisodiy trigger kripto ichida emas, neft bozorida. Prezident Donald Trump Eronning Hormuz bo‘g‘ozini ochish shartlarini rad etdi; shartlar muzlatilgan mablag‘larni chiqarish, neft sanksiyalarini olib tashlash va AQSh dengiz blokadasini to‘xtatishni o‘z ichiga olgan edi. Brent $100 dan oshdi, oltin, kumush va AQSh aktsiya fyucherslari pasaydi. 10 yillik Treasury daromadi 5,255 foizga, 30 yillik 5,565 foizga chiqdi — deyarli 20 yillik yuqori.\n\nNarxlar kesimi: BTC $82 900–$84 100, ETH $2 648–$2 666 (−2 foiz atrofida), SOL $117–$118 (−2,2–3,4 foiz), BNB $763 (−1,1 foiz). SUI 6,2 foiz, Bitcoin Cash 7,7–10 foiz tushgan. Ether ochiq qiziqishi 12,85 million ETH ga qisqargan (iyul 1 dagi 13,95 million va may oxiridagi 15,65 milliondan past), ya’ni yozgi rally leverage emas, spot xarid bilan ketgan.\n\nStrategy 21–27 sentabr oralig‘ida 1 665 BTC ni $142,7 millionga ($85 681 o‘rtacha) sotib oldi; jami 847 666 BTC, xarajat $63,95 milliard. Bu korporativ bid narx pasayishini qisman yumshatadi. $81 500–$83 000 tayanch, $87 000 qarshilik. Agar neft $105 ga chiqsa va PCE ma’lumoti qattiq kelsa, $81 500 testdan o‘tadi.\n\nManba: CoinDesk.",
     "manba": "CoinDesk",
     "url": "https://www.coindesk.com/markets/2026/09/28/bitcoin-falls-to-usd83-000-while-altcoins-unwind-friday-s-rally",
     "source": "GOLDENWEB.UZ",
     "date": "2026-09-29",
     "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "btc-eth-sol-etf-inflow-29-sent",
+    "title": "Spot ETF-lar: BTC $2,39 mlrd, ETH $690 mln, SOL $188 mln — 2026 oqimi musbat",
+    "summary": "AQSh spot bitcoin ETF-lari 25-sentabrda yakunlangan haftada $2,39–$2,4 milliard kirim oldi — 2025-yil oktabrdan beri eng katta. Ether $690 million, Solana $188 million. 2026 yil oqimi $934 million atrofida musbat.",
+    "body": "The Block, CoinDesk va Cointelegraph ma’lumotiga ko‘ra, AQSh spot bitcoin ETF-lari o‘tgan savdo haftasida $2,39 milliard sof kirim qayd etdi. Bu 2025-yil oktabridan beri eng kuchli hafta. Yil boshida iyul o‘rtalarida $5,8 milliardlik teshik bor edi; endi yil-to-date oqim $800–$934 million musbat. Ishga tushirilgandan beri kumulativ kirim $55–$57 milliard, AUM $108 milliard atrofida.\n\nEther fondlari $689,9 million qo‘shdi, oldingi haftadagi $140 millionlik chiqimni qaytardi. Solana ETF-lari $188,22 million — listingdan keyingi ikkinchi eng katta hafta, juma kuni $86,7–$87 millionlik kunlik rekord. Bitwise BSOL haftalik oqimning taxminan 68 foizini ($128 million) oldi; Grayscale GSOL $28 million, Fidelity FSOL $18 million. SOL fondlari AUM $1,5 milliardga yetdi. XRP ETF-lari $75,6 million.\n\nCointelegraph xulosasi: har 10 dollardan 7 tasi Bitcoin mahsulotlariga ketgan. SOL va XRP birgalikda 8 foizdan kam. Bu institutsional oqim hali ham BTC dan boshlanishini ko‘rsatadi, lekin altcoin ETF-lari kengaymoqda.\n\nSEC Nasdaq ISE kripto ETF-optsion listing standartlari bo‘yicha qarorni 27-sentabrdan 11-noyabr 2026 ga kechiktirdi. Bu optsion likvidligini sekinlashtiradi, lekin spot oqimga to‘g‘ridan-to‘g‘ri ta’sir qilmaydi. Agar yangi hafta oqimi musbat qolsa, $83 000 BTC uchun yangi asos bo‘lishi mumkin.\n\nManba: The Block / CoinDesk.",
+    "manba": "The Block",
+    "url": "https://www.theblock.co/news/markets/2026-09-26-bitcoin-etfs-turn-positive-for-2026-with-2-4-billion-weekly-inflow-their-largest-since-october-416944",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+  },
+  {
+    "slug": "eth-bitmine-6mln-glamsterdam-29-sent",
+    "title": "Bitmine 6 million ETH dan oshdi, Glamsterdam Q4 da: ETH $2 650",
+    "summary": "Tom Lee boshchiligidagi Bitmine Immersion yana 17 362 ETH sotib olib, jami 6 001 302 ETH ga yetdi — aylanma supplyning 4,9 foizi. Ethereum Glamsterdam yangilanishi 2026 Q4, Sepolia fork 6-oktabr.",
+    "body": "CoinDesk Live Updates va Binance Square xabariga ko‘ra, Bitmine Immersion Technologies oxirgi haftada 17 362 ETH ($46,6 million atrofida) qo‘shdi. 27-sentabr holatiga holding 6 001 302 ETH, taxminan $16,1 milliard. Kompaniya 2025-yil 30-iyundan beri har hafta qo‘shib keladi va 5 foizlik supply maqsadiga yaqinlashmoqda. BMNR aksiyasi ETH narxiga korrelyatsiya qiladi, staking daromadi esa tushishda buffer beradi.\n\nETH $2 648–$2 666, 24 soatda taxminan −2 foiz, hajm $13 milliard atrofida. ATH $4 953 dan 45 foiz past. Ochiq qiziqish 12,85 million ETH ga tushgan — leverage emas, spot xarid rallyni olib kelganini tasdiqlaydi. Spot ether ETF-lari o‘tgan haftada $690 million oldi.\n\nTarmoq yo‘l xaritasi: Glamsterdam 2026-yil to‘rtinchi choragiga mo‘ljallangan, Sepolia fork 6-oktabr. Vitalik Buterin 27-sentabr esseysida 2027-yilgi Hegota ni oxirgi “oddiy” fork deb atagan. Staking kirish navbatida 1,68 million ETH ($4,5 milliard) turibdi.\n\n$2 640–$2 670 tayanch, $2 800 qarshilik. Agar Bitmine va ETF bid saqlansa, $2 800 qayta ochiladi. Aks holda neft shoki va Treasury 5,25 foiz ETH ni $2 500 ga yaqinlashtirishi mumkin.\n\nManba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/business/2026/09/28/live-updates-bitcoin-sinks-below-usd83-000-as-iran-talks-stall-and-oil-climbs",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+  },
+  {
+    "slug": "sol-etf-188-alpenglow-testnet-29-sent",
+    "title": "Solana ETF-lari $188 million, Alpenglow ikkinchi testnetda: SOL $117–$118",
+    "summary": "Yetti AQSh spot SOL ETF o‘tgan haftada rekord $188 million oldi. Alpenglow 26-sentabrda ikkinchi ochiq testnetga chiqdi, maqsad finality 150 ms. Narx dushanba tuzatishida $117–$118.",
+    "body": "CoinDesk 28-sentabr maqolasiga ko‘ra, AQSh spot Solana ETF-lari $188 million haftalik kirim qayd etdi, barcha yetti fond pul oldi. Bitwise BSOL $128 million (68 foiz), kumulativ guruh kirimining $1,6 milliardidan $1,2 milliardini ushlab turadi. Juma $87 millionlik kunlik rekord berdi. Fond aktivlari $1,5 milliard.\n\nSOL $117–$118,5, 24 soatda −2,2–3,4 foiz — juma rallysining qisman qaytarilishi. Alpenglow ikkinchi ochiq testnetga 26-sentabrda chiqdi. Upgrade TowerBFT o‘rniga Votor ovoz berish protokolini qo‘yadi va to‘lov finalityni 12,8 soniyadan 150 millisekundga tushirishni maqsad qiladi. Dasturchilar “Alpenrush” mish-mishlarini rad etib, mainnet yaqin emasligini aytdi.\n\nSolana RWA holderlar 300 000 dan oshgan, DeFi TVL $10,7 milliard. Bu on-chain foydalanish ETF oqimini qo‘llab-quvvatlaydi. Lekin Pump.fun kabi ichki sotuvchilar hali ham taklif bosimini saqlaydi.\n\n$115–$118 tayanch, $125 qarshilik. Agar Alpenglow testnet barqaror va ETF seriyasi davom etsa, $125 ochiladi. Aks holda BTC $83 000 ostiga tushishi SOL ni $110 ga yaqinlashtiradi.\n\nManba: CoinDesk.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/28/solana-etfs-draw-record-usd188-million-in-a-week-as-bitwise-takes-two-thirds-of-inflows",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/4128/large/solana.png"
+  },
+  {
+    "slug": "bnb-763-bitget-withdrawals-29-sent",
+    "title": "BNB $763: Bitget yechimlari ochildi, CEX tokenlari barqaror",
+    "summary": "BNB 24 soatda 1,1 foiz tushib $763 atrofida. Bitget 28-sentabr 08:00 UTC da Bitcoin yechimlarini qayta ochdi, ETH va EVM tarmoqlari 29-sentabrga rejalashtirilgan. CEX likvidligi test qilinmoqda.",
+    "body": "CoinStats 28-sentabr brifingiga ko‘ra, BNB $763,63, 24 soatda −1,14 foiz, hajm $500 million, kapitallashuv $101,7 milliard. Bu BTC va SOL tuzatishidan yumshoqroq. Binance–Circle $100 millionlik 5 yillik USDC kelishuvi steyblkoin bazasini saqlab turadi.\n\nBitget 24-sentabr hujumidan keyin yo‘qotishni $387,5 millionga oshirdi. Mijoz balanslari va cold wallet ta’sirlanmagan, $464 millionlik himoya fondi zarar qoplashini va’da qiladi. Yechimlar bosqichma-bosqich: BTC 28-sentabr 08:00 UTC, Ethereum va boshqa EVM 29-sentabr. Haker deyarli 5 000 BTC ni kuzatiladigan rezervlardan chiqargan, $83 millionlik o‘g‘irlangan XRP muzlatishdan tashqariga o‘tkazilgan.\n\nCEO Gracy Chen hujumni backend tizimida soxta tranzaksiya ma’lumotlari orqali tasvirlagan: private key o‘g‘irlanmagan. Elliptic dastlabki bahoda TraderTraitor / Shimoliy Koreya izlarini ko‘rsatgan. THORChain Bitgetning bloklash so‘rovini rad etgan — permissionless protokol bahsi qayta ochildi.\n\n$750–$760 tayanch, $800 qarshilik. Agar yechimlar muammosiz o‘tsa, BNB “xavfsiz CEX tokeni” sifatida $780–$800 ni qayta sinaydi. Aks holda sektor ishonchi $750 ni testdan o‘tkazadi.\n\nManba: CoinStats / CoinDesk.",
+    "manba": "CoinStats",
+    "url": "https://coinstats.app/ai/a/crypto-news-update-28-September-2026",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png"
+  },
+  {
+    "slug": "near-nrr-etf-launch-29-sent",
+    "title": "Bitwise NEAR ETF (NRR) 29-sentabr atrofida start: staking 100 foiz",
+    "summary": "NYSE Arca va SEC 24-sentabrda Bitwise spot NEAR ETF listingini tasdiqladi. Ticker NRR, savdo 29-sentabr atrofida kutiladi. Fond tokenlarni to‘liq steykalaydi, komissiya 0,75 foiz.",
+    "body": "CryptoBriefing va The Defiant xulosasiga ko‘ra, Bitwise Investment Advisers 24-sentabrda ikkita to‘siqni o‘tdi: NYSE Arca listing va SEC Form 8-A orqali registratsiya kuchga kirishi. Ticker NRR. Savdo 29-sentabr atrofida boshlanishi kutiladi — AQShdagi birinchi spot NEAR ETF.\n\nFond NEAR ni to‘g‘ridan-to‘g‘ri ushlaydi va 100 foizini steykalashni rejalashtiradi. Yillik sponsor komissiyasi 0,75 foiz, staking xarajatlari hosilning 33 foizi. Coinbase Custody tokenlarni, BNY Mellon naqd va administratsiyani oladi. Seed avval $200 (8 ulush × $25) edi, listing oldidan 20 000 ulushlik $500 000 seed savat rejalashtirilgan. NAV CME CF NEAR-Dollar Reference Rate New York Variantiga bog‘lanadi.\n\nNEAR tasdiq xabaridan keyin 20–26 foiz oshgan, ba’zi seanslarda $5,24–$5,55. Ochiq qiziqish $1,5 milliarddan oshib, deyarli 3 yillik yuqoriga chiqqan. Intents kumulativ hajmi $29–$31 milliard. Lookonchain 748 100 NEAR ($3,67 million) likvidatsiyasini qayd etgan — leverage tuzatishi bor.\n\n$4,20–$4,80 tayanch, $5,50–$6,00 qarshilik. Listing kuni spread keng bo‘lishi odatiy. Agar NRR yaratish savatlari katta bo‘lsa, token steykingga qulflanadi va taklif qisqaradi.\n\nManba: CryptoBriefing / The Defiant.",
+    "manba": "CryptoBriefing",
+    "url": "https://cryptobriefing.com/bitwise-near-etf-nyse-arca-sec-approval/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/10365/large/near.jpg"
+  },
+  {
+    "slug": "sui-tuzatish-confidential-29-sent",
+    "title": "SUI 6 foiz tushdi: juma yetakchisi dushanba tuzatishida, confidential finance yo‘l xaritasi saqlanadi",
+    "summary": "SUI dushanba seansida 6,2 foiz tushib $1,17 atrofida. Gate Ventures haftalik xulosasida SUI o‘tgan haftada 36 foiz oshgan edi. Confidential finance roadmap institutsional hikoyani ushlab turadi.",
+    "body": "CoinDesk Markets Today 28-sentabrda SUI ni $1,1731 da, 6,2 foiz past deb ko‘rsatdi — juma rallysini qaytargan tokenlar qatorida. Gate Ventures 28-sentabr recapida SUI top-30 ichida yetakchi bo‘lib, o‘tgan haftada 36 foiz oshganini yozgan. Catalyst — confidential transfers, Seal orqali dasturlashtiriladigan kirish va Nautilus orqali tekshiriladigan maxfiy hisoblash.\n\nBeInCrypto SUI ni QNT va BTW bilan oktabrning birinchi haftasi uchun kuzatiladigan uchtalik qatoriga qo‘ydi. Overbought o‘qishlar va so‘nuvchi hajm $1,00–$1,02 zonasi sinovini ochiq qoldiradi. Ali Martinez on-chain metrikalar asosida kengroq reversal setup ni qayd etgan edi, lekin dushanba tuzatishi shu setupni qisqa muddatda zaiflashtirdi.\n\nCME micro fyucherslari muhokamasi va Canary, 21Shares, Grayscale spot ETF arizalari o‘rta muddatli omil. Token unlock kalendari yaqin kunlarda bosim berishi mumkin. DeFi TVL avval $469 milliongacha tushgan, Phantom qo‘llab-quvvatlashini to‘xtatgan.\n\n$1,00 psixologik tayanch, $1,25 qarshilik. Agar confidential roadmap yangi hamkorlik keltirsa, $1,25 qayta ochiladi. Aks holda BTC $83 000 ostida SUI $1,00 ni testdan o‘tkazadi.\n\nManba: CoinDesk / Gate Ventures.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/markets/2026/09/28/bitcoin-falls-to-usd83-000-while-altcoins-unwind-friday-s-rally",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/26375/large/sui-ocean-square.png"
+  },
+  {
+    "slug": "apt-tvl-max-listing-29-sent",
+    "title": "Aptos: TVL $1,89 mlrd, MAX listing 30-sentabr, APT $0,85 atrofida",
+    "summary": "Aptos bridged TVL $1,89 milliardga yetgan. MAX birjasi 30-sentabrda APT savdosini ochadi. Narx $0,85 yaqinida, $1,00 supply zonasi hali qarshilik.",
+    "body": "AMBCrypto va oldingi hafta on-chain kesimiga ko‘ra, Aptos bridged TVL 6-sentabrdagi $550 milliondan $1,89 milliardga uch barobar oshgan. Bitcoin, Ethereum va Solana dan kapital oqimi kelgan. Kunlik token hajmi $42,76 milliondan $150 milliondan oshiqqa chiqqan, 19-sentabrda oylik pik $267 million.\n\nAPT $0,85 atrofida, kutilayotgan diapazon $0,72–$0,93. CryptoQuant spot taker CVD xaridorlar tomonida. Confidential APT mainnetda: balans va o‘tkazma summasi shifrlanadi, manzil compliance uchun ochiq. Bithumb native staking ni yoqgan. Aptos Labs v1.49.1 ni validator va fullnode uchun chiqargan.\n\nRisk: steyblkoin kapitallashuvi 26-sentabrda 15 foiz tushib $1 milliard ostiga tushgan. AIP-140 2,1 milliardlik qattiq supply cap, gas fee burn va staking mukofotini deyarli yarmiga qisqartirishni o‘z ichiga oladi. Foundation 210 million APT ni qulflab steykalagan.\n\nMAX 30-sentabr 15:00 GMT+8 da APT juftligini ochadi. Agar listing hajmi yuqori va TVL saqlansa, $0,90–$1,00 sinovi ochiq. Aks holda steyblkoin chiqimi $0,76 tayanchini testdan o‘tkazadi.\n\nManba: AMBCrypto.",
+    "manba": "AMBCrypto",
+    "url": "https://ambcrypto.com/aptos-attracts-capital-from-3-major-chains-can-apt-turn-it-into-1/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/26455/large/aptos_round.png"
+  },
+  {
+    "slug": "atom-refund-governance-29-sent",
+    "title": "ATOM: 1,23 million token recovery multisigda, refund governance kutilmoqda",
+    "summary": "Cosmos validatorlari Neutron hodisasidan keyin 1,23 million ATOM ni 4-of-6 recovery multisigga o‘tkazgan. Holderlarga qaytarish uchun alohida governance ovozi kerak. 168 991 ATOM THORChain orqali chiqib ketgan.",
+    "body": "Altcoin Buzz va ekotizim xulosalariga ko‘ra, Cosmos Hub 23-sentabr 12:00 UTC da blok ishlab chiqarishni tiklagan. Birinchi blokda 1 227 121 ATOM ($2,1–$2,2 million) Nansen, Keplr, Enigma, Silknodes, Kiln va Polkachu ishtirokidagi 4-of-6 multisigga o‘tgan. Hubning o‘zi ekspluatatsiya qilinmagan, lekin IBC va Neutron tomoni zarar ko‘rgan.\n\nTHORChain orqali 168 991 ATOM qochib, Osmosis da taxminan 266 841 USDC ga sotilgan. Neutron to‘xtatilgan holatda. Tarmoq 24,5 soat ishlamagan. Bu cross-chain xavfsizlik modelini qayta ochdi: permissionless bridge-lar bloklash so‘rovini bajarishga majbur emas.\n\nATOM narxi xavfsizlik intervensiyasiga aralash munosabatda. Refund proposal ovozi kechiksa, ishonch tiklanishi sekinlashadi va IBC likvidligi past qoladi. Agar ovoz o‘tsa, 1,23 million ATOM holderlariga qaytadi va beta yumshashi mumkin.\n\nKeyingi kuzatuv: governance taklif matni, Neutron qayta ochilish sanasi va IBC kanal holati. Makro tuzatishda ATOM beta si yuqori qoladi.\n\nManba: Altcoin Buzz.",
+    "manba": "Altcoin Buzz",
+    "url": "https://www.altcoinbuzz.io/category/crypto-news",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/1481/large/cosmos_hub.png"
+  },
+  {
+    "slug": "ltc-gram-listing-tether-550m-29-sent",
+    "title": "LTC $70 va GRAM: MAX listing 30-sentabr, Tether $550 mln Iran-USDT ni muzlatdi",
+    "summary": "Litecoin $70 atrofida, Grayscale ETF konversiyasi navbatda. GRAM 30-sentabrda MAX da ochiladi. Tether 2026-yilda Eron bilan bog‘liq deyarli $550 million USDT ni muzlatishga yordam bergan.",
+    "body": "CoinDesk Daybook va Latestly kesimiga ko‘ra, Litecoin halvingdan keyingi yugurishni qisman qaytardi: $69–$71, ba’zi seanslarda 1,6 foiz past. Grayscale Litecoin Trust ni NYSE Arca ETF ga aylantirish uchun S-3/A yuborgan, trustdagi aktiv iyun holatiga $82 million. Circulating supply 77,6 million, max 84 million, keyingi halving 2027-yil iyul. Futures OI $500 milliondan oshiq.\n\nGRAM (Toncoin) Telegram ekotizimiga bog‘liq, 77 milliondan oshiq hamyon. MaiCoin/MAX 29-sentabrda depozit, 30-sentabr 15:00 GMT+8 da GRAM, APT, HYPE va RENDER savdosini yoqadi. U Today 28-sentabr tahlilida GRAM ni XRP va NEAR bilan “outstander” qatorida tilga olgan. Listing kuni spred keng, birinchi 24 soat dump xavfi bor.\n\nTether CEO Paolo Ardoino 2026-yilda AQSh idoralari bilan Eron Markaziy banki va sanksiya tarmoqlariga bog‘liq deyarli $550 million USDT ni muzlatishga yordam berganini aytdi. Bu steyblkoin compliance hikoyasini kuchaytiradi, lekin senator-demokratlar Tetherni Eron rejimi uchun “jon liniyasi” deb atagan hisobotni ham e’lon qilgan.\n\nLTC $66–$68 tayanch, $75 qarshilik. GRAM uchun MAX 24 soatlik hajm va Telegram bot to‘lovlari asosiy metrika. Agar BTC $83 000 ni ushlasa, ikkala token L1/CEX rotatsiyasiga qo‘shilishi mumkin.\n\nManba: CoinDesk / Live Bitcoin News.",
+    "manba": "CoinDesk",
+    "url": "https://www.coindesk.com/daybook-us",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-09-29",
+    "image": "https://assets.coingecko.com/coins/images/2/large/litecoin.png"
   }
 ]
