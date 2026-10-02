@@ -218,11 +218,12 @@ export function structureWindow(interval: string) {
 }
 
 /**
- * RSI divergensiya: grafik + NEUTRAL signal (RSI tasdiq bilan).
+ * RSI divergensiya: grafik + signal (RSI tasdiq bilan).
+ * Pivotlar orasidagi masofa: 8–40 bar.
  */
 export function detectRsiDivergence(
   candles: Candle[],
-  lookbackMin = 5,
+  lookbackMin = 8,
   lookbackMax = 40,
   searchBars = 60
 ): Divergence | null {

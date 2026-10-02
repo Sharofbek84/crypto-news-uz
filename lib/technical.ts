@@ -39,44 +39,42 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let side: 'BUY' | 'SELL'
   let neutralTone: 'strong' | 'caution' | null = null
 
-  if (trend === 'BEARISH') {
+  const swing = lastSwingLevels(candles)
+  // RSI filtr yumshatilgan: > 40 / < 60. EMA20/EMA50 stack va Trend filtri olib tashlangan.
+  const rsiBuyOk = r > 40
+  const rsiSellOk = r < 60
+
+  // Divergensiya — trenddan qat'i nazar (priority)
+  if (
+    divergence?.type === 'bullish' &&
+    rsiBuyOk &&
+    (!swing || last >= swing.low)
+  ) {
+    side = 'BUY'
+    neutralTone = trend === 'NEUTRAL' ? 'caution' : null
+  } else if (
+    divergence?.type === 'bearish' &&
+    rsiSellOk &&
+    (!swing || last <= swing.high)
+  ) {
+    side = 'SELL'
+    neutralTone = trend === 'NEUTRAL' ? 'caution' : null
+  } else if (trend === 'BEARISH') {
     side = 'SELL'
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    const swing = lastSwingLevels(candles)
-    // H4+ : RSI signallarni narx emas, EMA20/EMA50 struktura bilan filtrlash
-    // EMA20 > EMA50 → SELL taqiqlanadi; EMA20 < EMA50 → BUY taqiqlanadi
-    const useEmaStructureFilter = interval === '4h' || interval === '1d' || interval === '1w'
-    const emaBullStack = e20 > e50
-    const emaBearStack = e20 < e50
-    const rsiBuyOk = r > 50 && (!useEmaStructureFilter || emaBullStack)
-    const rsiSellOk = r < 50 && (!useEmaStructureFilter || emaBearStack)
-
-    if (
-      divergence?.type === 'bullish' &&
-      rsiBuyOk &&
-      (!swing || last >= swing.low)
-    ) {
-      side = 'BUY'
-      neutralTone = 'caution'
-    } else if (
-      divergence?.type === 'bearish' &&
-      rsiSellOk &&
-      (!swing || last <= swing.high)
-    ) {
-      side = 'SELL'
-      neutralTone = 'caution'
-    } else if (swing && rsiBuyOk && last >= swing.low) {
+    // NEUTRAL fallback (EMA stack filtri yo'q)
+    if (swing && rsiBuyOk && last >= swing.low) {
       side = 'BUY'
       neutralTone = 'caution'
     } else if (swing && rsiSellOk && last <= swing.high) {
       side = 'SELL'
       neutralTone = 'caution'
-    } else if (swing && last < swing.low && (!useEmaStructureFilter || emaBearStack)) {
+    } else if (swing && last < swing.low) {
       side = 'SELL'
       neutralTone = 'caution'
-    } else if (swing && last > swing.high && (!useEmaStructureFilter || emaBullStack)) {
+    } else if (swing && last > swing.high) {
       side = 'BUY'
       neutralTone = 'caution'
     } else if (rsiBuyOk) {
@@ -84,9 +82,6 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       neutralTone = 'caution'
     } else if (rsiSellOk) {
       side = 'SELL'
-      neutralTone = 'caution'
-    } else if (useEmaStructureFilter) {
-      side = emaBullStack ? 'BUY' : 'SELL'
       neutralTone = 'caution'
     } else {
       side = 'SELL'
