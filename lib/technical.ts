@@ -40,21 +40,21 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let neutralTone: 'strong' | 'caution' | null = null
 
   const swing = lastSwingLevels(candles)
-  // RSI filtr yumshatilgan: > 40 / < 60. Divergensiya prioriteti saqlangan.
+  // NEUTRAL fallback uchun yumshatilgan RSI: > 40 / < 60
   const rsiBuyOk = r > 40
   const rsiSellOk = r < 60
 
-  // Divergensiya — trenddan qat'i nazar (priority)
+  // Divergensiya — RSI 50 filtri qattiqlashtirilgan (bullish > 50, bearish < 50)
   if (
     divergence?.type === 'bullish' &&
-    rsiBuyOk &&
+    r > 50 &&
     (!swing || last >= swing.low)
   ) {
     side = 'BUY'
     neutralTone = trend === 'NEUTRAL' ? 'caution' : null
   } else if (
     divergence?.type === 'bearish' &&
-    rsiSellOk &&
+    r < 50 &&
     (!swing || last <= swing.high)
   ) {
     side = 'SELL'
