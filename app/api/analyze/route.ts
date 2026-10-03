@@ -84,11 +84,6 @@ async function notifyTelegramForNewSignal(
 
   const previous = analyze(previousCandles, interval)
 
-  // H1 + NEUTRAL trend — Telegramga yuborilmaydi
-  if (interval === '1h' && current.trend === 'NEUTRAL') {
-    return { tracked: false, telegram: false, reason: 'h1-neutral' }
-  }
-
   // Faqat side o'zgarganda (BUY↔SELL)
   if (current.side === previous.side) {
     return { tracked: false, telegram: false, reason: 'same-side' }
