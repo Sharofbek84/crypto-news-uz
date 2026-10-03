@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
+import { longLevels, shortLevels } from '@/lib/technical-helpers'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
 import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
@@ -64,6 +65,49 @@ async function fetchMarketData(symbol: string, interval: string) {
 }
 
 /**
+ * H1 da RSI divergensiya bo'lsa — H4 result.side (va darajalar) ni H1 signaliga moslashtirish.
+ */
+async function applyH1DivergenceToH4(
+  symbol: string,
+  h4Candles: Candle[],
+  h4Result: ReturnType<typeof analyze>
+): Promise<ReturnType<typeof analyze>> {
+  try {
+    const h1Candles = await fetchGate(symbol, '1h')
+    if (h1Candles.length < 60) return h4Result
+
+    const h1 = analyze(h1Candles, '1h')
+    if (!h1.divergence) return h4Result
+
+    // H1 da divergensiya bor — H4 ham shu side ni olsin
+    if (h1.side === h4Result.side) return h4Result
+
+    const last = h4Candles.at(-1)?.close ?? 0
+    const levels =
+      h1.side === 'SELL'
+        ? shortLevels(h4Candles, last, '4h')
+        : longLevels(h4Candles, last, '4h')
+
+    return {
+      ...h4Result,
+      side: h1.side,
+      signalTone: h4Result.trend === 'NEUTRAL' ? 'caution' : h4Result.signalTone,
+      entryLow: levels.entryLow,
+      entryHigh: levels.entryHigh,
+      invalidation: levels.invalidation,
+      tp: levels.tp,
+      support: levels.support,
+      resistance: levels.resistance,
+      // H1 divergensiyasini H4 da ham ko'rsatish (ixtiyoriy, lekin foydali)
+      divergence: h1.divergence,
+    }
+  } catch (e) {
+    console.error('H1 divergence → H4 sync failed:', e)
+    return h4Result
+  }
+}
+
+/**
  * Telegram + tracker.
  * Avval Redis trackerga yoziladi, keyin Telegram.
  */
@@ -78,11 +122,18 @@ async function notifyTelegramForNewSignal(
   const closedCandles = candles.length > 1 ? candles.slice(0, -1) : candles
   if (closedCandles.length < 60) return { tracked: false, telegram: false, reason: 'few-candles' }
 
-  const current = analyze(closedCandles, interval)
+  let current = analyze(closedCandles, interval)
+  if (interval === '4h') {
+    current = await applyH1DivergenceToH4(symbol, closedCandles, current)
+  }
+
   const previousCandles = closedCandles.slice(0, -1)
   if (previousCandles.length < 60) return { tracked: false, telegram: false, reason: 'few-prev' }
 
-  const previous = analyze(previousCandles, interval)
+  let previous = analyze(previousCandles, interval)
+  if (interval === '4h') {
+    previous = await applyH1DivergenceToH4(symbol, previousCandles, previous)
+  }
 
   // H1 + NEUTRAL trend — Telegramga yuborilmaydi
   if (interval === '1h' && current.trend === 'NEUTRAL') {
@@ -180,7 +231,13 @@ export async function GET(req: NextRequest) {
 
   try {
     const { candles, provider } = await fetchMarketData(symbol, interval)
-    const result = analyze(candles, interval)
+    let result = analyze(candles, interval)
+
+    // H1 divergensiya → H4 ham shu signal
+    if (interval === '4h') {
+      result = await applyH1DivergenceToH4(symbol, candles, result)
+    }
+
     const scannerSecret = process.env.CRON_SECRET
     const scannerHeader = req.headers.get('x-signal-scanner-secret')
     const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
