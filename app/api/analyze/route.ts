@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
+import { longLevels, shortLevels } from '@/lib/technical-helpers'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
 import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
@@ -61,6 +62,53 @@ async function fetchGate(symbol: string, interval: string): Promise<Candle[]> {
 
 async function fetchMarketData(symbol: string, interval: string) {
   return { candles: await fetchGate(symbol, interval), provider: 'Gate.io' }
+}
+
+/**
+ * Yumshoq D1 → W1: faqat W1 trend NEUTRAL bo'lganda D1 EMA yo'nalishiga moslash.
+ * Asosiy xulosa matni (summary/bullish/bearish) o'zgarmaydi.
+ */
+async function applyD1EmaToW1IfNeutral(
+  symbol: string,
+  w1Candles: Candle[],
+  w1Result: ReturnType<typeof analyze>
+): Promise<ReturnType<typeof analyze>> {
+  if (w1Result.trend !== 'NEUTRAL') return w1Result
+
+  try {
+    const d1Candles = await fetchGate(symbol, '1d')
+    if (d1Candles.length < 60) return w1Result
+
+    const d1 = analyze(d1Candles, '1d')
+    const d1Bull = d1.ema20 > d1.ema50
+    const d1Bear = d1.ema20 < d1.ema50
+    if (!d1Bull && !d1Bear) return w1Result
+
+    const newSide: 'BUY' | 'SELL' = d1Bull ? 'BUY' : 'SELL'
+    if (newSide === w1Result.side) return w1Result
+
+    const last = w1Candles.at(-1)?.close ?? 0
+    const levels =
+      newSide === 'SELL'
+        ? shortLevels(w1Candles, last, '1w')
+        : longLevels(w1Candles, last, '1w')
+
+    return {
+      ...w1Result,
+      side: newSide,
+      signalTone: 'caution',
+      entryLow: levels.entryLow,
+      entryHigh: levels.entryHigh,
+      invalidation: levels.invalidation,
+      tp: levels.tp,
+      support: levels.support,
+      resistance: levels.resistance,
+      // summary, bullish, bearish — o'zgarmaydi (asli W1 xulosasi saqlanadi)
+    }
+  } catch (e) {
+    console.error('D1 EMA → W1 neutral sync failed:', e)
+    return w1Result
+  }
 }
 
 /**
@@ -180,7 +228,13 @@ export async function GET(req: NextRequest) {
 
   try {
     const { candles, provider } = await fetchMarketData(symbol, interval)
-    const result = analyze(candles, interval)
+    let result = analyze(candles, interval)
+
+    // W1 NEUTRAL bo'lsa — D1 EMA yo'nalishiga yumshoq moslash (xulosa o'zgarmaydi)
+    if (interval === '1w') {
+      result = await applyD1EmaToW1IfNeutral(symbol, candles, result)
+    }
+
     const scannerSecret = process.env.CRON_SECRET
     const scannerHeader = req.headers.get('x-signal-scanner-secret')
     const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
