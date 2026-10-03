@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
-import { longLevels, shortLevels } from '@/lib/technical-helpers'
+import { longLevels, shortLevels, fmt } from '@/lib/technical-helpers'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
 import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
@@ -66,7 +66,7 @@ async function fetchMarketData(symbol: string, interval: string) {
 
 /**
  * Yumshoq D1 → W1: faqat W1 trend NEUTRAL bo'lganda D1 EMA yo'nalishiga moslash.
- * Asosiy xulosa matni (summary/bullish/bearish) o'zgarmaydi.
+ * Side o'zgaganda xulosa matni ham yangi yo'nalishga mos yoziladi.
  */
 async function applyD1EmaToW1IfNeutral(
   symbol: string,
@@ -93,17 +93,54 @@ async function applyD1EmaToW1IfNeutral(
         ? shortLevels(w1Candles, last, '1w')
         : longLevels(w1Candles, last, '1w')
 
+    const { entryLow, entryHigh, invalidation, tp, support, resistance } = levels
+    const deepSupport = support.length
+      ? Math.min(...support)
+      : newSide === 'SELL'
+        ? tp[2]
+        : Math.min(invalidation, last * 0.97)
+
+    let bullish: string
+    let bearish: string
+    let summary: string
+
+    if (newSide === 'SELL') {
+      bullish =
+        `Narx ${fmt(invalidation)} resistance zonasini qayta test qilib, EMA50 ustiga chiqsa, ` +
+        `qisqa muddatli rebound ehtimoli oshadi va SELL signal bekor bo'lishi mumkin.`
+      bearish =
+        `Narx EMA50 ostida qolsa va momentum salbiy bo'lsa, ` +
+        `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} zonalarga pasayish ssenariysi kuchayadi.`
+      summary =
+        `W1 grafikda trend NEUTRAL, biroq D1 EMA yo'nalishi bearish. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, pasayish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan yuqorisida yopilsa, signal bekor bo'ladi.`
+    } else {
+      bullish =
+        `Narx EMA50 ustida va momentum ijobiy bo'lsa, ` +
+        `${fmt(tp[0])} → ${fmt(tp[1])} → ${fmt(tp[2])} gacha rebound/breakout ssenariysi kuzatiladi.`
+      bearish =
+        `Narx EMA50 ostida qolish va momentum susayishi ` +
+        `${fmt(deepSupport)} support zonasini qayta test qilish xavfini oshiradi.`
+      summary =
+        `W1 grafikda trend NEUTRAL, biroq D1 EMA yo'nalishi bullish. ` +
+        `Agar ${fmt(entryLow)}–${fmt(entryHigh)} kirish zonasi saqlanib qolsa, o'sish ehtimoli bor. ` +
+        `Agar narx ${fmt(invalidation)} dan pastida yopilsa, signal bekor bo'ladi.`
+    }
+
     return {
       ...w1Result,
       side: newSide,
       signalTone: 'caution',
-      entryLow: levels.entryLow,
-      entryHigh: levels.entryHigh,
-      invalidation: levels.invalidation,
-      tp: levels.tp,
-      support: levels.support,
-      resistance: levels.resistance,
-      // summary, bullish, bearish — o'zgarmaydi (asli W1 xulosasi saqlanadi)
+      entryLow,
+      entryHigh,
+      invalidation,
+      tp,
+      support,
+      resistance,
+      bullish,
+      bearish,
+      summary,
     }
   } catch (e) {
     console.error('D1 EMA → W1 neutral sync failed:', e)
@@ -230,7 +267,7 @@ export async function GET(req: NextRequest) {
     const { candles, provider } = await fetchMarketData(symbol, interval)
     let result = analyze(candles, interval)
 
-    // W1 NEUTRAL bo'lsa — D1 EMA yo'nalishiga yumshoq moslash (xulosa o'zgarmaydi)
+    // W1 NEUTRAL bo'lsa — D1 EMA yo'nalishiga yumshoq moslash
     if (interval === '1w') {
       result = await applyD1EmaToW1IfNeutral(symbol, candles, result)
     }
