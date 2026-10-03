@@ -94,8 +94,8 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
       side = 'SELL'
       neutralTone = 'caution'
     } else {
-      // e20 === e50 (juda kam)
-      side = r >= 50 ? 'BUY' : 'SELL'
+      // e20 === e50 (juda kam): RSI > 50 = BUY, RSI < 50 = SELL
+      side = r > 50 ? 'BUY' : 'SELL'
       neutralTone = 'caution'
     }
   }
