@@ -40,7 +40,7 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   let neutralTone: 'strong' | 'caution' | null = null
 
   const swing = lastSwingLevels(candles)
-  // RSI filtr yumshatilgan: > 40 / < 60. EMA20/EMA50 stack va Trend filtri olib tashlangan.
+  // RSI filtr yumshatilgan: > 40 / < 60. Divergensiya prioriteti saqlangan.
   const rsiBuyOk = r > 40
   const rsiSellOk = r < 60
 
@@ -64,27 +64,38 @@ export function analyze(candles: Candle[], interval: string = '1h'): TechnicalRe
   } else if (trend === 'BULLISH') {
     side = 'BUY'
   } else {
-    // NEUTRAL fallback (EMA stack filtri yo'q)
-    if (swing && rsiBuyOk && last >= swing.low) {
+    // NEUTRAL fallback — EMA20/EMA50 stack filtri qo'shildi
+    // EMA20 > EMA50 → faqat BUY; EMA20 < EMA50 → faqat SELL
+    const emaBullStack = e20 > e50
+    const emaBearStack = e20 < e50
+
+    if (swing && rsiBuyOk && last >= swing.low && emaBullStack) {
       side = 'BUY'
       neutralTone = 'caution'
-    } else if (swing && rsiSellOk && last <= swing.high) {
+    } else if (swing && rsiSellOk && last <= swing.high && emaBearStack) {
       side = 'SELL'
       neutralTone = 'caution'
-    } else if (swing && last < swing.low) {
+    } else if (swing && last < swing.low && emaBearStack) {
       side = 'SELL'
       neutralTone = 'caution'
-    } else if (swing && last > swing.high) {
+    } else if (swing && last > swing.high && emaBullStack) {
       side = 'BUY'
       neutralTone = 'caution'
-    } else if (rsiBuyOk) {
+    } else if (rsiBuyOk && emaBullStack) {
       side = 'BUY'
       neutralTone = 'caution'
-    } else if (rsiSellOk) {
+    } else if (rsiSellOk && emaBearStack) {
+      side = 'SELL'
+      neutralTone = 'caution'
+    } else if (emaBullStack) {
+      side = 'BUY'
+      neutralTone = 'caution'
+    } else if (emaBearStack) {
       side = 'SELL'
       neutralTone = 'caution'
     } else {
-      side = 'SELL'
+      // e20 === e50 (juda kam)
+      side = r >= 50 ? 'BUY' : 'SELL'
       neutralTone = 'caution'
     }
   }
