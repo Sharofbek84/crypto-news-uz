@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { authOptions } from '@/lib/auth'
+import { isAdminEmail } from '@/lib/admin'
 import { createCommunityIdea, listCommunityIdeas, MAX_STORED_IDEAS } from '@/lib/community-ideas'
 
 export const dynamic = 'force-dynamic'
@@ -28,6 +29,14 @@ export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.email) {
     return NextResponse.json({ ok: false, error: 'Avval tizimga kiring.' }, { status: 401 })
+  }
+
+  // Faqat admin g'oya e'lon qila oladi
+  if (!isAdminEmail(session.user.email)) {
+    return NextResponse.json(
+      { ok: false, error: "G'oya e'lon qilish faqat admin uchun." },
+      { status: 403 }
+    )
   }
 
   const userId = (session.user as { id?: string }).id || session.user.email
