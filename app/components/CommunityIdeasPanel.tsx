@@ -539,67 +539,11 @@ export default function CommunityIdeasPanel() {
       </form>
     ) : null
 
+  const panelStyles = ".ciPanel{background:#0d1117;border:1px solid #252d38;border-radius:16px;padding:20px;color:#e6edf3}.ciTitle{margin:0;font-size:1.35rem;font-weight:800}.ciSub{margin:8px 0 16px;color:#8b949e;font-size:.86rem;line-height:1.5}.ciSectionLabel{margin:0 0 12px;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#8b949e}.ciForm{border:1px solid #2b3139;border-radius:12px;padding:14px;background:#111820;margin-top:8px;display:flex;flex-direction:column;gap:10px}.ciForm label{font-size:.8rem;color:#9aa7b8;font-weight:600;display:block;margin-bottom:4px}.ciForm input[type=text],.ciForm textarea,.ciEditInput,.ciEditTextarea{width:100%;box-sizing:border-box;border:1px solid #303846;background:#0d1117;color:#e6edf3;border-radius:8px;padding:10px 12px;font-size:.9rem;font-family:inherit}.ciForm textarea,.ciEditTextarea{min-height:110px;resize:vertical}.ciFormMeta{font-size:.78rem;color:#8b949e}.ciFileNative{display:none}.ciFileRow{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.ciFileBtn{border:1px solid #303846;background:#0d1117;color:#e6edf3;border-radius:8px;padding:8px 12px;font-size:.82rem;font-weight:700;cursor:pointer}.ciFileBtn:hover{border-color:#f0b90b;color:#f0b90b}.ciFileName{font-size:.8rem;color:#8b949e}.ciBtn{align-self:flex-start;border:none;background:#f0b90b;color:#0b0f14;font-weight:800;border-radius:8px;padding:10px 16px;cursor:pointer;font-size:.88rem}.ciBtn:disabled{opacity:.6;cursor:not-allowed}.ciMsg{font-size:.84rem;color:#f0b90b}.ciMsg.err{color:#ff7b87}.ciLoginHint{border:1px dashed #303846;border-radius:12px;padding:14px;margin-top:8px;color:#9aa7b8;font-size:.88rem}.ciLoginHint a{color:#f0b90b}.ciList{margin-bottom:20px;overflow:visible}.ciCard{border:1px solid #252d38;border-radius:12px;padding:14px 16px;background:#111820;margin-bottom:12px;overflow:visible}.ciCardHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:nowrap;overflow:visible}.ciCard h3{margin:0 0 6px;font-size:1.05rem;flex:1;min-width:0;overflow-wrap:anywhere}.ciMeta{color:#8b949e;font-size:.78rem;margin-bottom:10px}.ciBody{white-space:pre-wrap;color:#c8d1dc;font-size:.9rem;line-height:1.55;margin:0 0 12px}.ciImgBtn{display:block;width:fit-content;max-width:100%;padding:0;margin:0 0 12px;border:none;background:transparent;cursor:zoom-in}.ciImg{display:block;max-width:100%;max-height:360px;border-radius:10px;border:1px solid #252d38}.ciLightbox{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}.ciLightbox img{max-width:min(96vw,1200px);max-height:92vh;border-radius:12px;object-fit:contain;box-shadow:0 12px 40px rgba(0,0,0,.5)}.ciLightboxClose{position:absolute;top:14px;right:16px;border:1px solid #303846;background:#111820;color:#e6edf3;border-radius:8px;width:40px;height:40px;font-size:1.4rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}.ciLightboxClose:hover{border-color:#f0b90b;color:#f0b90b}.ciHeadActions{display:flex;align-items:center;gap:8px;flex-shrink:0}.ciAdminRow{display:flex;gap:6px;flex-wrap:wrap}.ciAdminBtn{border:1px solid #303846;background:#0d1117;color:#e6edf3;border-radius:6px;padding:4px 8px;font-size:.72rem;cursor:pointer}.ciAdminBtn.danger{color:#f85149;border-color:#f85149}.ciEditBox{display:flex;flex-direction:column;gap:10px}.ciShareWrap{position:relative}.ciShareFab{width:32px;height:32px;border-radius:50%;border:1px solid #303846;background:#0d1117;color:#e6edf3;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.ciShareMenu{position:absolute;right:0;top:36px;z-index:20;min-width:180px;border:1px solid #303846;background:#161b22;border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.4)}.ciShareItem{width:100%;display:flex;align-items:center;gap:8px;border:none;background:transparent;color:#e6edf3;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:.82rem;text-align:left}.ciShareItem:hover{background:#21262d}.ciShareIcon{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;flex-shrink:0}.ciShareIcon.tg{background:#229ED9;color:#fff}.ciShareIcon.x{background:#000;color:#fff;border:1px solid #444}.ciShareIcon.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff}.ciShareIcon.link{background:#252d38;color:#e6edf3;font-size:.75rem}.ciCommentsToggle{background:transparent;border:none;color:#f0b90b;cursor:pointer;font-size:.82rem;font-weight:700;padding:0;margin-top:10px}.ciCommentList{margin-top:12px;display:flex;flex-direction:column;gap:8px}.ciComment{border-left:2px solid #303846;padding:6px 0 6px 10px;font-size:.84rem}.ciComment strong{color:#e6edf3}.ciComment span{color:#8b949e;font-size:.72rem;margin-left:6px}.ciComment p{margin:4px 0 0;color:#c8d1dc;white-space:pre-wrap}.ciCommentForm{display:flex;gap:8px;margin-top:10px}.ciCommentForm input{flex:1;border:1px solid #303846;background:#0d1117;color:#e6edf3;border-radius:8px;padding:8px 10px;font-size:.84rem}.ciCommentForm button{border:1px solid #303846;background:#0d1117;color:#f0b90b;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:.8rem}.ciEmpty{text-align:center;padding:24px;color:#8b949e}"
+
   return (
     <section className="ciPanel">
-      <style>{`
-        .ciPanel { background: #0d1117; border: 1px solid #252d38; border-radius: 16px; padding: 20px; color: #e6edf3; }
-        .ciTitle { margin: 0; font-size: 1.35rem; font-weight: 800; }
-        .ciSub { margin: 8px 0 16px; color: #8b949e; font-size: 0.86rem; line-height: 1.5; }
-        .ciSectionLabel { margin: 0 0 12px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #8b949e; }
-        .ciForm { border: 1px solid #2b3139; border-radius: 12px; padding: 14px; background: #111820; margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
-        .ciForm label { font-size: 0.8rem; color: #9aa7b8; font-weight: 600; display: block; margin-bottom: 4px; }
-        .ciForm input[type="text"], .ciForm textarea, .ciEditInput, .ciEditTextarea { width: 100%; box-sizing: border-box; border: 1px solid #303846; background: #0d1117; color: #e6edf3; border-radius: 8px; padding: 10px 12px; font-size: 0.9rem; font-family: inherit; }
-        .ciForm textarea, .ciEditTextarea { min-height: 110px; resize: vertical; }
-        .ciFormMeta { font-size: 0.78rem; color: #8b949e; }
-        .ciFileNative { display: none; }
-        .ciFileRow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-        .ciFileBtn { border: 1px solid #303846; background: #0d1117; color: #e6edf3; border-radius: 8px; padding: 8px 12px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
-        .ciFileBtn:hover { border-color: #f0b90b; color: #f0b90b; }
-        .ciFileName { font-size: 0.8rem; color: #8b949e; }
-        .ciBtn { align-self: flex-start; border: none; background: #f0b90b; color: #0b0f14; font-weight: 800; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-size: 0.88rem; }
-        .ciBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .ciMsg { font-size: 0.84rem; color: #f0b90b; }
-        .ciMsg.err { color: #ff7b87; }
-        .ciLoginHint { border: 1px dashed #303846; border-radius: 12px; padding: 14px; margin-top: 8px; color: #9aa7b8; font-size: 0.88rem; }
-        .ciLoginHint a { color: #f0b90b; }
-        .ciList { margin-bottom: 20px; overflow: visible; }
-        .ciCard { border: 1px solid #252d38; border-radius: 12px; padding: 14px 16px; background: #111820; margin-bottom: 12px; overflow: visible; }
-        .ciCardHead { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; flex-wrap: nowrap; overflow: visible; }
-        .ciCard h3 { margin: 0 0 6px; font-size: 1.05rem; flex: 1; min-width: 0; overflow-wrap: anywhere; }
-        .ciMeta { color: #8b949e; font-size: 0.78rem; margin-bottom: 10px; }
-        .ciBody { white-space: pre-wrap; color: #c8d1dc; font-size: 0.9rem; line-height: 1.55; margin: 0 0 12px; }
-        .ciImgBtn { display: block; width: fit-content; max-width: 100%; padding: 0; margin: 0 0 12px; border: none; background: transparent; cursor: zoom-in; }
-        .ciImg { display: block; max-width: 100%; max-height: 360px; border-radius: 10px; border: 1px solid #252d38; }
-        .ciLightbox { position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.88); display: flex; align-items: center; justify-content: center; padding: 16px; cursor: zoom-out; }
-        .ciLightbox img { max-width: min(96vw, 1200px); max-height: 92vh; border-radius: 12px; object-fit: contain; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); }
-        .ciLightboxClose { position: absolute; top: 14px; right: 16px; border: 1px solid #303846; background: #111820; color: #e6edf3; border-radius: 8px; width: 40px; height: 40px; font-size: 1.4rem; cursor: pointer; line-height: 1; display: flex; align-items: center; justify-content: center; }
-        .ciLightboxClose:hover { border-color: #f0b90b; color: #f0b90b; }
-        .ciHeadActions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .ciAdminRow { display: flex; gap: 6px; flex-wrap: wrap; }
-        .ciAdminBtn { border: 1px solid #303846; background: #0d1117; color: #e6edf3; border-radius: 6px; padding: 4px 8px; font-size: 0.72rem; cursor: pointer; }
-        .ciAdminBtn.danger { color: #f85149; border-color: #f85149; }
-        .ciEditBox { display: flex; flex-direction: column; gap: 10px; }
-        .ciShareWrap { position: relative; }
-        .ciShareFab { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #303846; background: #0d1117; color: #e6edf3; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
-        .ciShareMenu { position: absolute; right: 0; top: 36px; z-index: 20; min-width: 180px; border: 1px solid #303846; background: #161b22; border-radius: 10px; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-        .ciShareItem { width: 100%; display: flex; align-items: center; gap: 8px; border: none; background: transparent; color: #e6edf3; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; text-align: left; }
-        .ciShareItem:hover { background: #21262d; }
-        .ciShareIcon { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 800; flex-shrink: 0; }
-        .ciShareIcon.tg { background: #229ED9; color: #fff; }
-        .ciShareIcon.x { background: #000; color: #fff; border: 1px solid #444; }
-        .ciShareIcon.ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
-        .ciShareIcon.link { background: #252d38; color: #e6edf3; font-size: 0.75rem; }
-        .ciCommentsToggle { background: transparent; border: none; color: #f0b90b; cursor: pointer; font-size: 0.82rem; font-weight: 700; padding: 0; margin-top: 10px; }
-        .ciCommentList { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .ciComment { border-left: 2px solid #303846; padding: 6px 0 6px 10px; font-size: 0.84rem; }
-        .ciComment strong { color: #e6edf3; }
-        .ciComment span { color: #8b949e; font-size: 0.72rem; margin-left: 6px; }
-        .ciComment p { margin: 4px 0 0; color: #c8d1dc; white-space: pre-wrap; }
-        .ciCommentForm { display: flex; gap: 8px; margin-top: 10px; }
-        .ciCommentForm input { flex: 1; border: 1px solid #303846; background: #0d1117; color: #e6edf3; border-radius: 8px; padding: 8px 10px; font-size: 0.84rem; }
-        .ciCommentForm button { border: 1px solid #303846; background: #0d1117; color: #f0b90b; border-radius: 8px; padding: 8px 12px; font-weight: 700; cursor: pointer; font-size: 0.8rem; }
-        .ciEmpty { text-align: center; padding: 24px; color: #8b949e; }
-      `}</style>
+      <style>{panelStyles}</style>
 
       <h1 className="ciTitle">Savdo g'oyalari</h1>
       <p className="ciSub">Top kriptovalyutalar bo'yicha eng yaxshi savdo g'oyalari.</p>
