@@ -541,7 +541,7 @@ export default function CommunityIdeasPanel() {
 
   return (
     <section className="ciPanel">
-      <style>{\`
+      <style>{`
         .ciPanel { background: #0d1117; border: 1px solid #252d38; border-radius: 16px; padding: 20px; color: #e6edf3; }
         .ciTitle { margin: 0; font-size: 1.35rem; font-weight: 800; }
         .ciSub { margin: 8px 0 16px; color: #8b949e; font-size: 0.86rem; line-height: 1.5; }
@@ -599,7 +599,7 @@ export default function CommunityIdeasPanel() {
         .ciCommentForm input { flex: 1; border: 1px solid #303846; background: #0d1117; color: #e6edf3; border-radius: 8px; padding: 8px 10px; font-size: 0.84rem; }
         .ciCommentForm button { border: 1px solid #303846; background: #0d1117; color: #f0b90b; border-radius: 8px; padding: 8px 12px; font-weight: 700; cursor: pointer; font-size: 0.8rem; }
         .ciEmpty { text-align: center; padding: 24px; color: #8b949e; }
-      \`}</style>
+      `}</style>
 
       <h1 className="ciTitle">Savdo g'oyalari</h1>
       <p className="ciSub">Top kriptovalyutalar bo'yicha eng yaxshi savdo g'oyalari.</p>
