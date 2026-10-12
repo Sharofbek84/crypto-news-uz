@@ -1,0 +1,1 @@
+$(cat /tmp/news_final.json)
