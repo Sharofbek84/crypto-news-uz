@@ -11,7 +11,6 @@ const NAV = [
   { href: '/spot-heatmap', label: 'Heatmap' },
   { href: '/savdo-goyalari', label: "Savdo g'oyalari" },
   { href: '/obuna', label: 'Premium obuna' },
-  // { href: '/nft', label: 'GoldenWeb NFT' }, // vaqtincha yashirilgan
 ]
 
 function isActive(pathname: string, href: string) {
