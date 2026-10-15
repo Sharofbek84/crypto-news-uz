@@ -11,11 +11,10 @@ const intervals=[['1h','H1'],['4h','H4'],['1d','D1']]
 function money(n:number){if(n>=1000)return n.toLocaleString('en-US',{maximumFractionDigits:0});if(n>=1)return n.toFixed(2);return n.toFixed(5)}
 function money$(n:number){return '$'+money(n)}
 function tfShort(interval:string){return interval==='4h'?'H4':interval==='1d'?'D1':'H1'}
-function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i<c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))}}return out}
+function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=0;i<c.length;i++){if(i===0){out.push(50);continue}const d=c[i].close-c[i-1].close,gg=Math.max(d,0),ll=Math.max(-d,0);if(i<=p){g+=gg;l+=ll;out.push(i===p?(l===0?100:100-100/(1+g/l)):50)}else{g=(g*(p-1)+gg)/p;l=(l*(p-1)+ll)/p;out.push(l===0?100:100-100/(1+g/l))} }return out}
 function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.map((x,i)=>{if(i)a=x.close*k+a*(1-k);return a})}
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
-  const [zoom,setZoom]=useState(1)
   const W=1700,H=820,L=68,R=210,T=78,MB=540,RT=580,RB=740
   const plotRight=W-R
   const candleRight=L+(plotRight-L)*0.93
@@ -49,14 +48,8 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 
   return (
     <div className="homeChartWrap">
-      <div className="chartZoomControls">
-        <button onClick={()=>setZoom(z=>Math.min(1.8,+(z+0.2).toFixed(1)))}>+</button>
-        <span>{Math.round(zoom*100)}%</span>
-        <button onClick={()=>setZoom(z=>Math.max(1,+(z-0.2).toFixed(1)))}>-</button>
-        <button onClick={()=>setZoom(1)}>Reset</button>
-      </div>
       <div className="homeChartScroller">
-        <svg viewBox={`0 0 ${W} ${H}`} className="homeChart" style={{width:`${zoom*100}%`,maxWidth:'none'}} role="img" aria-label={`${coin} ${interval} professional technical analysis`}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="homeChart" style={{width:'100%',maxWidth:'none'}} role="img" aria-label={`${coin} ${interval} professional technical analysis`}>
           <defs>
             <linearGradient id="hcMain" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#0a1018"/><stop offset="1" stopColor="#070b11"/>
@@ -80,36 +73,31 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
             O {money(last?.open||0)}   H {money(last?.high||0)}   L {money(last?.low||0)}   C {money(latest)}{'  '}
             <tspan fill={chg>=0?'#20d67a':'#ff5360'}>{chg>=0?'+':''}{money(chg)} ({chgPct>=0?'+':''}{chgPct.toFixed(2)}%)</tspan>
           </text>
-
           <text x={L} y="70" fill="#ff9f0a" fontSize="12" fontWeight="700">EMA 10 (to'q sariq): {money(result.ema10)}</text>
           <text x={L+260} y="70" fill="#00c7e6" fontSize="12" fontWeight="700">EMA 20 (ko'k): {money(result.ema20)}</text>
           <text x={L+500} y="70" fill="#4aa8ff" fontSize="12" fontWeight="700">EMA 50 (havorang): {money(result.ema50)}</text>
 
-          {candles.map((c,i)=>{
-            const up=c.close>=c.open
-            return <g key={c.time}>
+          {candles.map((c,i)=>{const up=c.close>=c.open;return (
+            <g key={c.time}>
               <line x1={x(i)} x2={x(i)} y1={y(c.high)} y2={y(c.low)} stroke={up?'#36d66f':'#ff4d5a'} strokeWidth="1.15"/>
               <rect x={x(i)-cw/2} y={Math.min(y(c.open),y(c.close))} width={cw} height={Math.max(1.4,Math.abs(y(c.open)-y(c.close)))} fill={up?'#36d66f':'#ff4d5a'} rx="1"/>
             </g>
-          })}
+          )})}
 
           <polyline points={poly(e10)} fill="none" stroke="#ff9f0a" strokeWidth="1.9"/>
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9"/>
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9"/>
 
           <rect x={zoneLeft} y={Math.min(y(result.entryHigh),y(result.entryLow))} width={zoneW} height={Math.max(12,Math.abs(y(result.entryLow)-y(result.entryHigh)))} fill={isSell?'#c52f3a':'#1dbf6b'} fillOpacity=".18" stroke={isSell?'#ff4d5a':'#20d67a'} strokeOpacity=".55" rx="3"/>
-
           <line x1={lx} x2={plotRight} y1={y(latest)} y2={y(latest)} stroke="#65d9ff" strokeDasharray="3 4" strokeWidth="1.2"/>
           <rect x={labelX} y={y(latest)-13} width="100" height="26" rx="4" fill={isSell?'#c52f3a':'#1a9e55'}/>
           <text x={labelX+50} y={y(latest)+5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">{money(latest)}</text>
-
-          {rightBox(y(result.tp[2]),`TP3  ${money(result.tp[2]||0)}`,'#148f55')}
-          {rightBox(y(result.tp[1]),`TP2  ${money(result.tp[1]||0)}`,'#148f55')}
-          {rightBox(y(result.tp[0]),`TP1  ${money(result.tp[0]||0)}`,'#148f55')}
-          {rightBox(y(result.invalidation),`SL  ${money(result.invalidation)}`,'#c52f3a')}
-
-          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBear)':'url(#hcBull)'}/>
-          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBear)':'url(#hcBull)'} opacity=".88"/>
+          {rightBox(y(result.tp[2]),'TP3  '+money(result.tp[2]||0),'#148f55')}
+          {rightBox(y(result.tp[1]),'TP2  '+money(result.tp[1]||0),'#148f55')}
+          {rightBox(y(result.tp[0]),'TP1  '+money(result.tp[0]||0),'#148f55')}
+          {rightBox(y(result.invalidation),'SL  '+money(result.invalidation),'#c52f3a')}
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[0])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="2.2" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBear)':'url(#hcBull)'} opacity=".88"/>
+          <line x1={arrowStartX} y1={y(latest)} x2={arrowEndX} y2={y(result.tp[1])} stroke={isSell?'#ff4d5a':'#20d67a'} strokeWidth="1.9" strokeDasharray="8 5" markerEnd={isSell?'url(#hcBear)':'url(#hcBull)'} opacity=".72"/>
 
           <text x={L} y={RT+6} fill="#e6edf3" fontSize="14" fontWeight="800">RSI 14  {result.rsi.toFixed(2)}</text>
           <polyline points={rs.map((v,i)=>`${x(i)},${ry(v)}`).join(' ')} fill="none" stroke="#a78bfa" strokeWidth="2"/>
@@ -124,61 +112,36 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
   )
 }
 
-function bearishLevels(r: Result): number[] {
-  if (r.side==='SELL') {
-    return [r.tp[0], r.tp[1], r.tp[2]]
-  }
-  const sl = r.invalidation
-  const supports = (r.support || []).filter(s => sl > s).sort((a, b) => b - a)
-  const s1 = supports[0] ?? sl * 0.992
-  const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
-  const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
-  const levels = [sl, s1, s2, deep]
-  const uniq: number[] = []
-  for (const v of levels.sort((a, b) => b - a)) {
-    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (sl || 1) > 0.0015) uniq.push(v)
-  }
-  while (uniq.length < 4) uniq.push(uniq[uniq.length - 1] * 0.99)
-  return uniq.slice(0, 4)
-}
-
-function bullishSellLevels(r: Result): number[] {
-  const sl = r.invalidation
-  const above = (r.resistance || []).filter(x => x > sl).sort((a, b) => a - b)
-  const r1 = above[0] ?? sl * 1.008
-  const r2 = above[1] ?? (above[0] ? above[0] * 1.006 : sl * 1.016)
-  const uniq: number[] = []
-  for (const v of [sl, r1, r2].sort((a, b) => a - b)) {
-    if (!uniq.length || Math.abs(uniq[uniq.length - 1] - v) / (Math.abs(sl) || 1) > 0.0015) uniq.push(v)
-  }
-  while (uniq.length < 3) uniq.push(uniq[uniq.length - 1] * 1.008)
-  return uniq.slice(0, 3)
-}
-
 export default function HomeAnalyst(){
   const searchParams=useSearchParams()
   const urlSymbol=(searchParams.get('symbol')||'').toUpperCase()
   const initial=coins.includes(urlSymbol)?urlSymbol:'BTC'
-  const [coin,setCoin]=useState(initial),[interval,setInterval]=useState('1h'),[data,setData]=useState<any>(null),[loading,setLoading]=useState(true),[error,setError]=useState('')
-
-  useEffect(()=>{
-    if(coins.includes(urlSymbol) && urlSymbol!==coin) setCoin(urlSymbol)
-  },[urlSymbol])
-
-  async function load(){setLoading(true);setError('');try{const r=await fetch(`/api/analyze?symbol=${coin}&interval=${interval}`);const j=await r.json();if(!r.ok)throw new Error(j.error||'Market data xatosi');setData(j)}catch(e:any){setError(e.message||'Xato')}finally{setLoading(false)}}
+  const [coin,setCoin]=useState(initial)
+  const [interval,setInterval]=useState('1h')
+  const [data,setData]=useState<any>(null)
+  const [loading,setLoading]=useState(true)
+  const [error,setError]=useState('')
+  useEffect(()=>{if(coins.includes(urlSymbol)&&urlSymbol!==coin)setCoin(urlSymbol)},[urlSymbol])
+  async function load(){
+    setLoading(true);setError('')
+    try{
+      const r=await fetch('/api/analyze?symbol='+coin+'&interval='+interval)
+      const j=await r.json()
+      if(!r.ok)throw new Error(j.error||'Market data xatosi')
+      setData(j)
+    }catch(e:any){setError(e.message||'Xato')}finally{setLoading(false)}
+  }
   useEffect(()=>{load()},[coin,interval])
   const r=data?.result
   const tf=tfShort(interval)
-  const bearPath = r ? bearishLevels(r) : []
-  const bullSellPath = r && r.side==='SELL' ? bullishSellLevels(r) : []
 
   return (
-    <section className="homeAnalyst">
+  <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
-        <div className="homeKicker">AI CRYPTO ANALYST</div>
-        <h2>Real vaqtda kripto bozor tahlili</h2>
-        <p>Jonli market data asosida avtomatik BUY/SELL · Entry · TP · SL va texnik xulosa.</p>
+        <div className="homeKicker">TEXNIK TAHLIL</div>
+        <h2>Kripto bozor tahlili</h2>
+        <p>Jonli market data asosida avtomatik BUY/SELL · Entry · TP · SL va texnik xulosa</p>
       </div>
       <div className="homeControls">
         <select value={coin} onChange={e=>setCoin(e.target.value)}>{coins.map(c=><option key={c}>{c}</option>)}</select>
@@ -187,63 +150,41 @@ export default function HomeAnalyst(){
       </div>
     </div>
 
-    {loading?<div className="homeLoading">Grafik va tahlil yuklanmoqda...</div>:error?<div className="homeLoading error">{error}</div>:r&&(
-      <>
+    {loading&&<div className="homeLoading">Ma\'lumot yuklanmoqda…</div>}
+    {error&&<div className="homeLoading error">{error}</div>}
+    {!loading&&!error&&r&&data?.candles&&(
+    <>
       <div className="homeChartPanel">
         <CleanChart candles={data.candles} result={r} coin={coin} interval={interval}/>
       </div>
-
-      <div className="proAnalysis">
-        <div className="proCard">
-          <h3>TEXNIK TAHLIL · {tf}</h3>
-          <div className="proRow"><span>TREND</span><strong className={r.trend==='BULLISH'?'good':r.trend==='BEARISH'?'bad':''}>{r.trend==='BULLISH'?'Bullish':r.trend==='BEARISH'?'Bearish':'Neytral'}</strong></div>
-          <div className="proRow"><span>SIGNAL</span><strong className={r.side==='SELL'?'bad':'good'}>{r.side==='SELL'?'SELL':'BUY'}</strong></div>
-          <div className="proRow"><span>RSI (14)</span><strong>{r.rsi.toFixed(2)}</strong></div>
-          <p className="proNote">{r.rsi>=50?"RSI 50 dan yuqorida, bu bullish momentumni ko'rsatadi.":"RSI 50 dan past, momentum susaygan."}</p>
-          <div className="proRow"><span>ASOSIY XULOSA</span></div>
-          <p className="proSummary">{r.summary}</p>
-        </div>
-
-        <div className="proCard">
-          <div className={`proBox ${r.side==='SELL'?'red':'green'}`}>
-            <b>KIRISH ZONASI ({r.side==='SELL'?'SELL':'BUY'})</b>
-            <strong>{money$(r.entryLow)} – {money$(r.entryHigh)}</strong>
-          </div>
-          <div className="proBox red">
-            <b>STOP LOSS (SL)</b>
-            <strong>{money$(r.invalidation)}</strong>
-            <small>{r.side==='SELL'?'yuqorisida':'pastida'} {tf} candle yopilsa</small>
-          </div>
-          <div className="proBox tp">
-            <b>TAKE PROFIT (TP)</b>
-            <div className="tpLine"><span>TP1</span><strong>{money$(r.tp[0])}</strong></div>
-            <div className="tpLine"><span>TP2</span><strong>{money$(r.tp[1])}</strong></div>
-            <div className="tpLine"><span>TP3</span><strong>{money$(r.tp[2])}</strong></div>
+      <div className="homeAnalysis">
+        <div className="homeAnalysisCard">
+          <h3>Texnik xulosa · {coin} · {tf}</h3>
+          <p>{r.summary}</p>
+          <div className="miniGrid">
+            <span>Trend<strong>{r.trend}</strong></span>
+            <span>Signal<strong>{r.side||'-'}</strong></span>
+            <span>RSI<strong>{r.rsi?.toFixed?.(1)||r.rsi}</strong></span>
+            <span>EMA10<strong>{money$(r.ema10)}</strong></span>
+            <span>EMA20<strong>{money$(r.ema20)}</strong></span>
+            <span>EMA50<strong>{money$(r.ema50)}</strong></span>
           </div>
         </div>
-
-        <div className="proCard bullCard">
-          <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
+        <div className="homeAnalysisCard">
+          <h3 className="bullText">Bullish ssenariy</h3>
           <p>{r.bullish}</p>
-          <div className="levelPath greenPath">
-            {r.side==='SELL'
-              ? <>{money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}</>
-              : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
-          </div>
-        </div>
-
-        <div className="proCard bearCard">
-          <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
+          <h3 className="bearText" style={{marginTop:12}}>Bearish ssenariy</h3>
           <p>{r.bearish}</p>
-          <div className="levelPath redPath">
-            {r.side==='SELL'
-              ? <>{money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}</>
-              : <>{money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}</>}
-          </div>
+        </div>
+        <div className="homeTradeCard">
+          <div><b>Kirish zonasi</b><strong>{money$(r.entryLow)} – {money$(r.entryHigh)}</strong></div>
+          <div><b>TP1</b><strong>{money$(r.tp?.[0])}</strong></div>
+          <div><b>TP2</b><strong>{money$(r.tp?.[1])}</strong></div>
+          <div><b>TP3</b><strong>{money$(r.tp?.[2])}</strong></div>
+          <div><b>Stop Loss</b><strong className="redText">{money$(r.invalidation)}</strong></div>
         </div>
       </div>
-
-      <p className="homeDisclaimer">Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat yuqotishga tayyor bo'lgan pulingiz bilan kiring.</p>
+      <p className="homeDisclaimer">Bu avtomatik texnik tahlil. Moliyaviy maslahat emas. O\'z xavfingiz ostida savdo qiling va faqat yo\'qotishga tayyor bo\'lgan pulingiz bilan kiring.</p>
     </>
     )}
   </section>
