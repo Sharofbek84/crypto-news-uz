@@ -8,5 +8,15 @@
     "source": "GOLDENWEB.UZ",
     "date": "2026-10-15",
     "image": "https://cdn.sanity.io/images/s3y3vcno/production/ed334c7526ca675825caee4912b564d76c0e5b3d-1920x1080.png?auto=format&fit=crop&crop=focalpoint&w=1200&h=675&q=75"
+  },
+  {
+    "slug": "solana-alpenglow-yangilanish-21-oktabr-2026-10-15",
+    "title": "Solana Alpenglow yangilanishini 21-oktabrga belgiladi: finality 150 millisekundga qisqaradi",
+    "summary": "Solana Foundation Alpenglow konsensus yangilanishini 21-oktabr, epoch 1064 da faollashtirishni rejalashtirdi. Bu tranzaksiya finalityni 12.8 soniyadan taxminan 150 millisekundga tushiradi va validator ovozlarini off-chainga o'tkazadi.",
+    "body": "Solana tarmog'i 21-oktabr 2026 yilida Alpenglow konsensus protokolini mainnetda faollashtirishni rejalashtirmoqda. Yangilanish epoch 1064 da, taxminan 15:00 UTC atrofida boshlanadi. Alpenglow TowerBFT o'rnini egallaydi va tranzaksiya finalityni taxminan 12.8 soniyadan 150 millisekundga qisqartirishni maqsad qiladi \u2014 bu taxminan 85 marta tezroq.\n\nYangilanish Votor protokoli orqali validator ovozlarini to'g'ridan-to'g'ri validatorlar o'rtasida yuboradi, ularni on-chain tranzaksiyalardan olib tashlaydi. Bu bloklardagi ovoz tranzaksiyalarini yo'q qiladi, shuning uchun hisobot qilinadigan TPS raqamlari o'zgarishi mumkin, hatto foydalanuvchi faolligi o'zgarmasa ham. 80 foiz stake bilan bir bosqichli, 60 foiz bilan ikki bosqichli finalizatsiya yo'llari mavjud.\n\nValidatorlar Agave 4.3.0 dan foydalanishi kerak. Firedancer va Frankendancer vaqtincha o'tishni talab qiladi. Ovoz xarajatlari o'rniga 0.8 SOL Validator Admission Ticket to'lovi joriy etiladi. Yangilanish testnet va devnetda muvaffaqiyatli sinovdan o'tgan.\n\nNarx tomondan SOL $103-$107 oralig'ida savdo qildi, ETF'larda chiqimlar kuzatildi. Alpenglow kutilishi bozorga ijobiy ta'sir qilishi mumkin, ammo makro bosim va raqobat saqlanib qolmoqda. Analitiklar $110-$115 qarshilikni va yangilanishdan keyingi ishlashni kuzatmoqda.\n\nManba: CoinDesk, TokenPost, Solana Foundation",
+    "url": "https://www.coindesk.com/tech/2026/10/14/solana-sets-oct-21-for-alpenglow-upgrade-targeting-150-millisecond-finality",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://cdn.sanity.io/images/s3y3vcno/production/54c0f3b41e62df4cdf774aab4c7d68c64e5e976c-1920x1080.png?auto=format&fit=crop&crop=focalpoint&w=1200&h=675&q=75"
   }
 ]
