@@ -15,6 +15,7 @@ function rsiSeries(c:Candle[],p=14){const out:number[]=[];let g=0,l=0;for(let i=
 function emaSeries(c:Candle[],p:number){let a=c[0]?.close||0,k=2/(p+1);return c.map((x,i)=>{if(i)a=x.close*k+a*(1-k);return a})}
 
 function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Result;coin:string;interval:string}){
+  const [zoom,setZoom]=useState(1)
   const W=1700,H=820,L=68,R=210,T=78,MB=540,RT=580,RB=740
   const plotRight=W-R
   const candleRight=L+(plotRight-L)*0.93
@@ -48,8 +49,14 @@ function CleanChart({candles,result,coin,interval}:{candles:Candle[];result:Resu
 
   return (
     <div className="homeChartWrap">
+      <div className="chartZoomControls">
+        <button onClick={()=>setZoom(z=>Math.min(1.8,+(z+0.2).toFixed(1)))}>+</button>
+        <span>{Math.round(zoom*100)}%</span>
+        <button onClick={()=>setZoom(z=>Math.max(1,+(z-0.2).toFixed(1)))}>-</button>
+        <button onClick={()=>setZoom(1)}>Reset</button>
+      </div>
       <div className="homeChartScroller">
-        <svg viewBox={`0 0 ${W} ${H}`} className="homeChart" style={{width:'100%',maxWidth:'none'}} role="img" aria-label={`${coin} ${interval} professional technical analysis`}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="homeChart" style={{width:`${zoom*100}%`,maxWidth:'none'}} role="img" aria-label={`${coin} ${interval} professional technical analysis`}>
           <defs>
             <linearGradient id="hcMain" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#0a1018"/><stop offset="1" stopColor="#070b11"/>
