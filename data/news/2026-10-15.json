@@ -1,1 +1,102 @@
-[full content from /tmp/2026-10-15.json here - but in practice pass the actual string]
+[
+  {
+    "slug": "bitcoin-82k-past-cpi-inflyatsiya-2026-10-15",
+    "title": "Bitcoin 82 000 dollardan pastga tushdi: issiq CPI Fed stavka oshirish ehtimolini oshirdi",
+    "summary": "Sentyabr CPI 3.7% chiqdi (kutilgan 3.6%). Core CPI ham yuqori. Bitcoin 81 500–82 000 oralig‘iga tushdi, likvidatsiyalar 200 million dollardan oshdi.",
+    "body": "Bitcoin (BTC) 14-oktabr kuni AQSh iste’mol narxlari indeksi (CPI) e’lonidan so‘ng 82 000 dollar chegarasidan pastga tushdi. Yillik CPI 3.7% ni tashkil etdi (kutilgan 3.6%, avgustda 3.4%). Oylik o‘sish 0.6% bo‘ldi, asosan benzin narxining 9.1% ga oshishi bilan bog‘liq. Core CPI (oziq-ovqat va energiya chiqarilgan) oylik 0.3% va yillik 2.6% chiqdi — ikkalasi ham kutilganidan yuqori.\n\nBu ma’lumotlar Fedning oktyabr yig‘ilishida foiz stavkasini oshirish ehtimolini sezilarli oshirdi. CME FedWatch bo‘yicha 25 bazis punktga oshirish ehtimoli taxminan 22% dan 40–43% gacha ko‘tarildi. Bitcoin narxi 83 000–84 000 dan 81 500 atrofiga tushdi. 24 soatlik likvidatsiyalar 200–250 million dollar oralig‘ida, asosan long pozitsiyalar.\n\nUmumiy kripto bozor kapitalizatsiyasi taxminan 2.75–2.76 trillion dollarga tushdi. Analitiklar 80 000–81 000 zonani muhim qo‘llab-quvvatlash deb belgilashmoqda. Keyingi katalizatorlar: 15-oktabr PPI va 28-oktabr Fed qarori.\n\nQisqa muddatli prognoz: agar 80 000 ushlansa, 84 000 qaytish mumkin; buzilsa, 78 000–76 000 sinovi.\n\nManba: The Block, CryptoBriefing",
+    "url": "https://www.theblock.co/news/markets/2026-10-14-bitcoin-falls-below-82000-core-inflation-fed-rate-hike-418582",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://cdn.sanity.io/images/s3y3vcno/production/ed334c7526ca675825caee4912b564d76c0e5b3d-1920x1080.png?auto=format&fit=crop&crop=focalpoint&w=1200&h=675&q=75"
+  },
+  {
+    "slug": "eth-sol-xrp-pasayish-cpi-keyin",
+    "title": "Ethereum, Solana va XRP 3% atrofida tushdi: CPI dan keyingi risk-off",
+    "summary": "ETH 2 400–2 450, SOL 104–105, XRP 1.32–1.33 dollar oralig‘iga tushdi. Altcoinlar Bitcoin bilan birga pasaydi.",
+    "body": "CPI e’lonidan so‘ng asosiy altcoinlar ham sezilarli tushdi. Ethereum 3–3.7% ga pasayib 2 410–2 450 dollar oralig‘iga yetdi. Solana 2.4–5% atrofida tushib 104–105 dollar zona sinovini o‘tkazmoqda. XRP 2.8–3.3% ga tushib 1.32–1.33 dollarga yetdi.\n\nBNB ham 2% atrofida pasaydi. Umumiy bozor risk-off kayfiyatida, Treasury yieldlari oshgani va dollar mustahkamlangani altcoinlarga qo‘shimcha bosim yaratdi. Liquidatsiyalarning katta qismi longlarga to‘g‘ri keldi.\n\nETF oqimlari oldingi kunlarda aralash edi: 13-oktabrda BTC ETF lariga 175 million dollar kirim bo‘lgan, lekin umumiy oktyabr oqimlari hali manfiy zonada.\n\nPrognoz: BTC barqarorlashsa, altlar ham tiklanishi mumkin. Hozircha 2 400 (ETH) va 100–103 (SOL) muhim qo‘llab-quvvatlash.\n\nManba: CoinDesk, TokenPost, CryptoNews",
+    "url": "https://cryptobriefing.com/bitcoin-falls-below-82k-as-hotter-us-inflation-fuels-fed-rate-hike-bets/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg"
+  },
+  {
+    "slug": "bozor-kapitali-2-76-trillion-tushishi",
+    "title": "Kripto bozor kapitalizatsiyasi 2.76 trillion dollarga tushdi",
+    "summary": "Umumiy kapit 4.6% atrofida pasayib 2.76 trillionga yetdi. BTC dominantligi 59.3%. Liquidatsiyalar 220 million dollar atrofida.",
+    "body": "14-oktabr oxiriga kelib umumiy kripto bozor kapitalizatsiyasi taxminan 2.76 trillion dollarga tushdi (ba’zi hisobotlarda 4.67% pasayish). Bitcoin 81 800 atrofida, dominantlik 59.3%. Ethereum ulushi 10.7% atrofida.\n\n24 soatlik likvidatsiyalar Binance, Bybit va OKX bo‘yicha 220–250 million dollar oralig‘ida qayd etildi, shundan 190 millionga yaqini longlar. ENA kabi ba’zi altlar 7% dan ortiq tushdi.\n\nBu CPI dan keyingi klassik risk-off reaksiyasi. Analitiklar makro bosim (yuqori yieldlar, dollar) saqlanayotganini ta’kidlamoqda.\n\nPrognoz: 2.7 trillion atrofida barqarorlashuv yoki qo‘shimcha pasayish CPI/PPI ta’siriga bog‘liq.\n\nManba: TokenPost, CoinMarketCap",
+    "url": "https://www.tokenpost.com/news/investing/32076",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/6802042/pexels-photo-6802042.jpeg"
+  },
+  {
+    "slug": "fed-hike-odds-oshishi-cpi",
+    "title": "Fed oktyabr stavka oshirishi ehtimoli 40%+ ga ko‘tarildi",
+    "summary": "Issiq core CPI dan keyin CME FedWatch bo‘yicha oktyabr hike ehtimoli 22% dan 40–43% gacha oshdi. Dekabr uchun ham bosim kuchaydi.",
+    "body": "Sentyabr core CPI kutilganidan yuqori chiqqach, bozor ishtirokchilari Fed siyosatini qayta baholadi. CME FedWatch tool bo‘yicha 28-oktabr yig‘ilishida 25 bazis punktga oshirish ehtimoli taxminan 22% dan 40–43% gacha ko‘tarildi. Stavka o‘zgarmasligi ehtimoli 57–58% atrofida qoldi.\n\nDekabr uchun ham yuqoriroq stavka kutishlari kuchaydi. Bu Treasury yieldlarining oshishi va dollar mustahkamlanishi bilan birga kriptoga bosim o‘tkazmoqda.\n\nAnalitiklar (Ledn CFO Thomas Wu va boshqalar) core 0.3% ning oktyabr hike ehtimolini qayta ochganini ta’kidlashdi. Yuqori stavkalar borrowing costlarni oshiradi va risk aktivlarga salbiy ta’sir qiladi.\n\nPrognoz: 28-oktabr Fed qarori asosiy katalizator. Hozircha bozor ehtiyotkor.\n\nManba: The Block, CryptoBriefing, CME FedWatch",
+    "url": "https://www.theblock.co/news/markets/2026-10-14-bitcoin-falls-below-82000-core-inflation-fed-rate-hike-418582",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg"
+  },
+  {
+    "slug": "likvidatsiyalar-long-ustunligi-cpi",
+    "title": "CPI dan keyin 200+ million dollarlik likvidatsiyalar: longlar asosiy qurbon",
+    "summary": "24 soatda 220–250 million dollarlik pozitsiyalar yopildi. Longlar 85%+ ni tashkil etdi. Leverage tozalanishi davom etmoqda.",
+    "body": "CPI e’lonidan so‘ng kriptovalyuta fyuchers bozorida sezilarli likvidatsiyalar kuzatildi. Turli manbalarga ko‘ra, 24 soatlik jami 220–250 million dollar atrofida. Binance, Bybit va OKX bo‘yicha longlar 190 million dollarga yaqin, shortlar ancha kam.\n\nBu leverage tozalanishining davomi. Oldingi kunlarda ham yirik long likvidatsiyalar bo‘lgan edi. Open interest biroz kamaygan, funding rate past darajada.\n\nBunday tozalanishlar keyingi harakat uchun asos yaratishi mumkin, ammo yangi kapitallashuv (ETF kirimlari) kerak.\n\nPrognoz: agar qo‘llab-quvvatlash ushlansa, short squeeze ehtimoli oshadi. Aks holda qo‘shimcha long tozalanishi mumkin.\n\nManba: TokenPost, CoinGlass ma’lumotlari",
+    "url": "https://www.tokenpost.com/news/investing/32076",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/6802049/pexels-photo-6802049.jpeg"
+  },
+  {
+    "slug": "btc-etf-oqimlari-oktyabr-aralash",
+    "title": "Bitcoin ETF oqimlari aralash: 13-oktabrda 175 mln kirim, oy hali manfiy",
+    "summary": "13-oktabrda US spot BTC ETF lariga 175.6 million dollar kirim bo‘ldi. Oktyabr oyi hali net manfiy zonada.",
+    "body": "13-oktabrda AQSh spot Bitcoin ETF lari 175.6 million dollar sof kirim qayd etdi. Fidelity FBTC 103.1 million, BlackRock IBIT 65.9 million bilan yetakchilik qildi. Bu oldingi kunlardagi chiqimlarga (12-oktabrda 65.4 mln) qarshi ijobiy signal.\n\nShunga qaramay, oktyabr oyi boshi bo‘yicha net oqimlar hali manfiy (taxminan −270–450 million dollar oralig‘ida turli hisobotlarda). Sentabrda kuchli kirimlar bo‘lgan edi.\n\nETF oqimlari narxga bevosita ta’sir qiladi, chunki ular real BTC xarid/sotuvini talab qiladi. CPI dan keyin yangi ma’lumotlar kutilmoqda.\n\nPrognoz: agar kirimlar davom etsa, 82 000–84 000 zonasini ushlash osonlashadi. Aks holda bosim saqlanadi.\n\nManba: Farside Investors, TFTC, SoSoValue",
+    "url": "https://www.tftc.io/bitcoin-etf-flows/october-2026",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/844124/pexels-photo-844124.jpeg"
+  },
+  {
+    "slug": "ppi-15-oktyabr-keyingi-katalizator",
+    "title": "15-oktabr PPI ma’lumotlari keyingi muhim katalizator",
+    "summary": "CPI dan keyin Producer Price Index (PPI) 15-oktabrda e’lon qilinadi. Bu Fed kutishlarini yanada aniqlashtirishi mumkin.",
+    "body": "Sentyabr CPI issiq chiqqach, bozor diqqati 15-oktabrda e’lon qilinadigan Producer Price Index (PPI) ga qaratildi. PPI ishlab chiqaruvchi narxlarini o‘lchaydi va kelgusi iste’mol inflyatsiyasi haqida signal beradi.\n\nAgar PPI ham yuqori chiqsa, Fed hike ehtimoli yanada oshishi va kriptoga qo‘shimcha bosim yaratishi mumkin. Aks holda, CPI “energiya spike” sifatida talqin qilinib, bozor biroz yengillashishi mumkin.\n\nImport/eksport narxlari ham 16-oktabrda chiqadi. Asosiy voqea esa 28-oktabr Fed yig‘ilishi.\n\nPrognoz: PPI natijasi qisqa muddatli volatillikni belgilaydi. Traderlar diqqatli bo‘lishi kerak.\n\nManba: bozor tahlillari, BLS kutilishlari",
+    "url": "https://www.theblock.co/news/markets/2026-10-14-bitcoin-falls-below-82000-core-inflation-fed-rate-hike-418582",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg"
+  },
+  {
+    "slug": "solana-alpenglow-21-oktabr-yangiilik",
+    "title": "Solana Alpenglow yangilanishi 21-oktabrga belgilandi",
+    "summary": "Solana Foundation Alpenglow konsensus yangilanishini 21-oktabr (epoch 1064) da faollashtirishni rejalashtirdi. Finality 150 ms gacha qisqaradi.",
+    "body": "Solana tarmog‘i 21-oktabr 2026 yilida Alpenglow konsensus protokolini mainnetda yoqishni rejalashtirmoqda. Yangilanish epoch 1064 da boshlanadi. Maqsad — tranzaksiya finalityni taxminan 12.8 soniyadan 150 millisekundga tushirish.\n\nVotor protokoli orqali validator ovozlari off-chain yuboriladi. Bu TPS hisobotlariga ta’sir qilishi mumkin. Validatorlar Agave 4.3.0 dan foydalanishi kerak.\n\nNarx tomondan SOL CPI dan keyin 104–105 dollar atrofida. Yangilanish kutilishi uzoq muddatda ijobiy, ammo qisqa muddatda makro bosim ustun.\n\nPrognoz: yangilanish muvaffaqiyatli bo‘lsa, 110–115 nishoni ochilishi mumkin. Hozircha 100–103 qo‘llab-quvvatlash muhim.\n\nManba: CoinDesk, Solana Foundation",
+    "url": "https://www.coindesk.com/tech/2026/10/14/solana-sets-oct-21-for-alpenglow-upgrade-targeting-150-millisecond-finality",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://cdn.sanity.io/images/s3y3vcno/production/54c0f3b41e62df4cdf774aab4c7d68c64e5e976c-1920x1080.png?auto=format&fit=crop&crop=focalpoint&w=1200&h=675&q=75"
+  },
+  {
+    "slug": "fear-greed-sovishi-cpi-keyin",
+    "title": "Fear & Greed indeksi sovimoqda: bozor ehtiyotkor zonaga o‘tdi",
+    "summary": "Issiq CPI va narx tushishidan so‘ng sentiment “Greed” dan neytral/fear tomonga siljidi. Traderlar ehtiyotkor.",
+    "body": "CPI e’lonidan keyin kripto Fear & Greed indeksi sezilarli sovidi. Oldingi kunlarda 57–69 oralig‘ida bo‘lgan ko‘rsatkich pastga siljidi. Long likvidatsiyalar va makro xavotirlar sentimentni o‘zgartirdi.\n\nBunday sovishlar tarixan keyingi tiklanish uchun asos yaratgan, lekin hozircha Fed qarori va qo‘shimcha ma’lumotlar kutilyapti. Open interest kamaygan, yangi longlar ehtiyotkor ochilmoqda.\n\nPrognoz: agar 80 000 ushlansa va PPI yumshoq chiqsa, sentiment tez yaxshilanishi mumkin. Aks holda “Fear” zonasi chuqurlashishi mumkin.\n\nManba: alternative.me, bozor ma’lumotlari",
+    "url": "https://cryptobriefing.com/bitcoin-falls-below-82k-as-hotter-us-inflation-fuels-fed-rate-hike-bets/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/6801648/pexels-photo-6801648.jpeg"
+  },
+  {
+    "slug": "qisqa-muddatli-prognoz-btc-80-84k",
+    "title": "Qisqa muddatli prognoz: BTC 80 000–84 000 oralig‘ida konsolidatsiya",
+    "summary": "80 000 muhim qo‘llab-quvvatlash. PPI va Fed qarori yo‘nalishni belgilaydi. 84 000 qaytish yoki 78 000 sinovi asosiy senariylar.",
+    "body": "Hozirgi holatda Bitcoin 80 000–84 000 dollar oralig‘ida konsolidatsiya qilishi kutilmoqda. 82 000 atrofidagi zona sinovdan o‘tdi, 80 000–81 000 muhim qo‘llab-quvvatlash.\n\nAgar ushlansa va ETF kirimlari qaytsa, 84 000–86 000 nishoni ochilishi mumkin. Agar 80 000 buzilsa, 78 000–76 800 sinovi real.\n\nMakro omillar (PPI, Treasury yieldlari, dollar, Fed) hali ham asosiy rol o‘ynamoqda. Leverage tozalanishi bozorni biroz “sog‘lomlashtirdi”, lekin yangi talab kerak.\n\nPrognoz (qisqa muddat): diapazon savdosi, 15–16 oktyabr ma’lumotlari va 28-oktabr Fed dan keyin yo‘nalishli harakat.\n\nManba: The Block, TradingNews, bozor tahlillari",
+    "url": "https://www.theblock.co/news/markets/2026-10-14-bitcoin-falls-below-82000-core-inflation-fed-rate-hike-418582",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-10-15",
+    "image": "https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg"
+  }
+]
