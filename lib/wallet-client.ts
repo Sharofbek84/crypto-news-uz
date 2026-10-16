@@ -1,7 +1,9 @@
 'use client'
 
 import { BrowserProvider, Eip1193Provider } from 'ethers'
-import { NFT_CHAIN_ID, NFT_CHAIN_NAME } from './nft-config'
+// BSC (previously used for NFT; kept for wallet chain switch)
+const CHAIN_ID = 56
+const CHAIN_NAME = 'BNB Smart Chain'
 
 const STORAGE_KEY = 'goldenweb_wallet_method'
 const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ''
@@ -30,12 +32,12 @@ export function hasWalletConnectConfig() {
 async function ensureBsc(provider: Eip1193Provider) {
   const chainIdHex = await provider.request({ method: 'eth_chainId' })
   const chainId = Number(chainIdHex)
-  if (chainId === NFT_CHAIN_ID) return true
+  if (chainId === CHAIN_ID) return true
 
   try {
     await provider.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x' + NFT_CHAIN_ID.toString(16) }],
+      params: [{ chainId: '0x' + CHAIN_ID.toString(16) }],
     })
     return true
   } catch (e: any) {
@@ -46,8 +48,8 @@ async function ensureBsc(provider: Eip1193Provider) {
           method: 'wallet_addEthereumChain',
           params: [
             {
-              chainId: '0x' + NFT_CHAIN_ID.toString(16),
-              chainName: NFT_CHAIN_NAME || 'BNB Smart Chain',
+              chainId: '0x' + CHAIN_ID.toString(16),
+              chainName: CHAIN_NAME || 'BNB Smart Chain',
               nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
               rpcUrls: ['https://bsc-dataseed.binance.org'],
               blockExplorerUrls: ['https://bscscan.com'],
@@ -71,12 +73,12 @@ async function initWalletConnect() {
   const { default: EthereumProvider } = await import('@walletconnect/ethereum-provider')
   wcProvider = await EthereumProvider.init({
     projectId: WC_PROJECT_ID,
-    chains: [NFT_CHAIN_ID],
-    optionalChains: [NFT_CHAIN_ID],
+    chains: [CHAIN_ID],
+    optionalChains: [CHAIN_ID],
     showQrModal: true,
     metadata: {
       name: 'GOLDENWEB.UZ',
-      description: 'GoldenWeb NFT Mint & Premium',
+      description: 'GOLDENWEB.UZ Premium',
       url: typeof window !== 'undefined' ? window.location.origin : 'https://goldenweb.uz',
       icons: ['https://goldenweb.uz/icons/192'],
     },
@@ -143,7 +145,7 @@ export async function connectWallet(preferred?: 'injected' | 'walletconnect'): P
     const accounts = (await injected.request({ method: 'eth_requestAccounts' })) as string[]
     if (!accounts?.[0]) throw new Error('Wallet ulanmadi')
     const ok = await ensureBsc(injected)
-    if (!ok) throw new Error(`${NFT_CHAIN_NAME} (Chain ID ${NFT_CHAIN_ID}) ga o‘ting`)
+    if (!ok) throw new Error(`${CHAIN_NAME} (Chain ID ${CHAIN_ID}) ga o‘ting`)
     const provider = new BrowserProvider(injected)
     localStorage.setItem(STORAGE_KEY, 'injected')
     return { address: accounts[0], provider, method: 'injected', eip1193: injected }
