@@ -13,7 +13,7 @@ export default function SpotHeatmapPage() {
   return (
     <>
       <SiteHeader />
-      <main className="container" style={{ paddingTop: 28, paddingBottom: 48 }}>
+      <main className="container" style={{ paddingTop: 12, paddingBottom: 48 }}>
         <SpotRSIHeatmap />
         <p
           style={{
