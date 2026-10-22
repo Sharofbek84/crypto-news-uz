@@ -33,60 +33,257 @@ type Direction = 'up' | 'down' | 'flat' | null
 
 type Cell = {
   rsi: number | null
-  rsiDirection: Direction
   price: number | null
+  timestamp: number | null
+  priceDirection?: Direction
+  rsiDirection?: Direction
 }
 
-type Payload = {
-  updatedAt: string
-  cells: Record<string, Record<string, Cell>>
+type ApiResponse = {
+  updatedAt: number
+  data: Record<string, Record<string, Cell>>
 }
 
-type Candle = {
-  time: number
-  open: number
-  high: number
-  low: number
-  close: number
-}
+type Candle = { time: number; open: number; high: number; low: number; close: number; volume: number }
 
-type Levels = {
-  entry?: number
-  sl?: number
-  tp1?: number
-  tp2?: number
-  tp3?: number
+type TradeLevels = {
+  buys: number[]
+  sells: number[]
+  side: string | null
 }
 
 function rsiColor(rsi: number | null): string {
-  if (rsi == null) return 'rgba(48, 54, 61, 0.6)'
-  if (rsi >= 70) return 'rgba(231, 76, 60, 0.35)'
-  if (rsi <= 30) return 'rgba(46, 204, 113, 0.35)'
-  if (rsi >= 55) return 'rgba(241, 196, 15, 0.25)'
-  if (rsi <= 45) return 'rgba(52, 152, 219, 0.25)'
-  return 'rgba(48, 54, 61, 0.6)'
+  if (rsi == null || !Number.isFinite(rsi)) return '#2a3038'
+  const v = Math.max(0, Math.min(100, rsi))
+  if (v < 20) return lerpHex('#0a4d2e', '#148f55', v / 20)
+  if (v < 30) return lerpHex('#148f55', '#2ecc71', (v - 20) / 10)
+  if (v < 50) return lerpHex('#2ecc71', '#3a424d', (v - 30) / 20)
+  if (v < 70) return lerpHex('#3a424d', '#c47a12', (v - 50) / 20)
+  return lerpHex('#c62828', '#6b0f14', (v - 70) / 30)
 }
 
-function rsiLabel(rsi: number | null): string {
-  if (rsi == null) return '—'
-  if (rsi >= 70) return 'Ortiqcha sotilgan'
-  if (rsi <= 30) return 'Ortiqcha sotib olingan'
-  if (rsi >= 55) return 'Bullish'
-  if (rsi <= 45) return 'Bearish'
-  return 'Neytral'
+function lerpHex(a: string, b: string, t: number) {
+  const parse = (h: string) => [
+    parseInt(h.slice(1, 3), 16),
+    parseInt(h.slice(3, 5), 16),
+    parseInt(h.slice(5, 7), 16),
+  ]
+  const [ar, ag, ab] = parse(a)
+  const [br, bg, bb] = parse(b)
+  return `rgb(${Math.round(ar + (br - ar) * t)},${Math.round(ag + (bg - ag) * t)},${Math.round(ab + (bb - ab) * t)})`
 }
 
-function arrow(d: Direction): string {
+function formatPrice(price: number | null) {
+  if (price == null || !Number.isFinite(price)) return '—'
+  if (price >= 1000) return '$' + price.toLocaleString('en-US', { maximumFractionDigits: 2 })
+  if (price >= 1) return '$' + price.toLocaleString('en-US', { maximumFractionDigits: 4 })
+  return '$' + price.toPrecision(4)
+}
+
+function money(n: number) {
+  if (!Number.isFinite(n)) return '-'
+  if (n >= 1000) return n.toLocaleString('en-US', { maximumFractionDigits: 2 })
+  if (n >= 1) return n.toFixed(4)
+  return n.toPrecision(4)
+}
+
+function arrow(d: Direction) {
   if (d === 'up') return '↑'
   if (d === 'down') return '↓'
-  return '→'
+  return ''
 }
 
-function formatPrice(p: number | null): string {
-  if (p == null) return '—'
-  if (p >= 1000) return p.toLocaleString('en-US', { maximumFractionDigits: 0 })
-  if (p >= 1) return p.toLocaleString('en-US', { maximumFractionDigits: 2 })
-  return p.toLocaleString('en-US', { maximumFractionDigits: 4 })
+function rsiLabel(rsi: number | null) {
+  if (rsi == null) return 'N/A'
+  if (rsi < 30) return 'Oversold'
+  if (rsi >= 70) return 'Overbought'
+  if (rsi >= 55) return 'Bullish'
+  return 'Neutral'
+}
+
+function emaSeries(candles: Candle[], period: number) {
+  const out: number[] = []
+  const k = 2 / (period + 1)
+  let ema = candles[0]?.close ?? 0
+  for (let i = 0; i < candles.length; i++) {
+    ema = i === 0 ? candles[i].close : candles[i].close * k + ema * (1 - k)
+    out.push(ema)
+  }
+  return out
+}
+
+function rsiSeries(candles: Candle[], p = 14) {
+  const out: number[] = []
+  let g = 0
+  let l = 0
+  for (let i = 0; i < candles.length; i++) {
+    if (i === 0) {
+      out.push(50)
+      continue
+    }
+    const d = candles[i].close - candles[i - 1].close
+    const gg = Math.max(d, 0)
+    const ll = Math.max(-d, 0)
+    if (i <= p) {
+      g += gg
+      l += ll
+      out.push(i === p ? (l === 0 ? 100 : 100 - 100 / (1 + g / l)) : 50)
+    } else {
+      g = (g * (p - 1) + gg) / p
+      l = (l * (p - 1) + ll) / p
+      out.push(l === 0 ? 100 : 100 - 100 / (1 + g / l))
+    }
+  }
+  return out
+}
+
+function atrSeries(candles: Candle[], period = 14): number {
+  if (candles.length < 2) return 0
+  const trs: number[] = []
+  for (let i = 1; i < candles.length; i++) {
+    const c = candles[i]
+    const prev = candles[i - 1].close
+    const tr = Math.max(c.high - c.low, Math.abs(c.high - prev), Math.abs(c.low - prev))
+    trs.push(tr)
+  }
+  if (!trs.length) return 0
+  const n = Math.min(period, trs.length)
+  let atr = trs.slice(0, n).reduce((a, b) => a + b, 0) / n
+  for (let i = n; i < trs.length; i++) {
+    atr = (atr * (period - 1) + trs[i]) / period
+  }
+  return atr
+}
+
+function findSwingPoints(candles: Candle[], left = 2, right = 2) {
+  const swings: { price: number; type: 'high' | 'low'; index: number }[] = []
+  for (let i = left; i < candles.length - right; i++) {
+    const c = candles[i]
+    let isHigh = true
+    let isLow = true
+    for (let j = 1; j <= left; j++) {
+      if (candles[i - j].high >= c.high) isHigh = false
+      if (candles[i - j].low <= c.low) isLow = false
+    }
+    for (let j = 1; j <= right; j++) {
+      if (candles[i + j].high >= c.high) isHigh = false
+      if (candles[i + j].low <= c.low) isLow = false
+    }
+    if (isHigh) swings.push({ price: c.high, type: 'high', index: i })
+    if (isLow) swings.push({ price: c.low, type: 'low', index: i })
+  }
+  return swings
+}
+
+function clusterLevels(prices: number[], tolerance: number) {
+  if (!prices.length) return [] as number[]
+  const sorted = [...prices].sort((a, b) => a - b)
+  const clusters: number[] = []
+  let group = [sorted[0]]
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] - group[group.length - 1] <= tolerance) {
+      group.push(sorted[i])
+    } else {
+      clusters.push(group.reduce((a, b) => a + b, 0) / group.length)
+      group = [sorted[i]]
+    }
+  }
+  clusters.push(group.reduce((a, b) => a + b, 0) / group.length)
+  return clusters
+}
+
+function structureWindow(interval: string) {
+  return interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : 48
+}
+
+function computeIndependentTradeLevels(
+  candles: Candle[],
+  interval: string
+): TradeLevels {
+  if (!candles.length) return { buys: [], sells: [], side: null }
+
+  const price = candles[candles.length - 1].close
+  if (!Number.isFinite(price) || price <= 0) return { buys: [], sells: [], side: null }
+
+  const window = structureWindow(interval)
+  const recent = candles.slice(-Math.min(candles.length, window))
+  const atr = atrSeries(recent, 14)
+  const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
+
+  const tol =
+    price *
+    (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
+
+  const swings = findSwingPoints(recent, 2, 2)
+  const rawLows = swings.filter((s) => s.type === 'low').map((s) => s.price)
+  const rawHighs = swings.filter((s) => s.type === 'high').map((s) => s.price)
+
+  if (!rawLows.length) rawLows.push(price - atrSafe)
+  if (!rawHighs.length) rawHighs.push(price + atrSafe)
+
+  const support = clusterLevels(rawLows, tol)
+    .filter((p) => p < price)
+    .sort((a, b) => b - a)
+  const resistance = clusterLevels(rawHighs, tol)
+    .filter((p) => p > price)
+    .sort((a, b) => a - b)
+
+  const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
+  const maxFromPrice = Math.max(atrSafe * 2, price * 0.02)
+  const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
+  const maxBetween = Math.max(atrSafe * 2, price * 0.02)
+
+  const supportsBelow = support
+    .filter((v) => {
+      const d = price - v
+      return d >= minFromPrice && d <= maxFromPrice
+    })
+    .sort((a, b) => b - a)
+
+  const resistsAbove = resistance
+    .filter((v) => {
+      const d = v - price
+      return d >= minFromPrice && d <= maxFromPrice
+    })
+    .sort((a, b) => a - b)
+
+  function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
+    const firstDefault = direction === 'down' ? price - atrSafe : price + atrSafe
+    const first = ordered.length ? ordered[0] : firstDefault
+
+    let second: number | null = null
+    for (let i = 1; i < ordered.length; i++) {
+      const v = ordered[i]
+      const dist = Math.abs(v - first)
+      if (dist < minBetween) continue
+      if (dist > maxBetween) break
+      second = v
+      break
+    }
+    if (second == null) {
+      second = direction === 'down' ? first - atrSafe : first + atrSafe
+    }
+
+    return [first, second]
+  }
+
+  return {
+    buys: pickTwo(supportsBelow, 'down'),
+    sells: pickTwo(resistsAbove, 'up'),
+    side: null,
+  }
+}
+
+function filterLevelsByRsi(levels: TradeLevels | null, rsi: number | null): TradeLevels | null {
+  if (!levels) return null
+  if (rsi == null || !Number.isFinite(rsi)) return levels
+  if (rsi >= 70) {
+    return { buys: [], sells: levels.sells, side: levels.side }
+  }
+  if (rsi <= 30) {
+    return { buys: levels.buys, sells: [], side: levels.side }
+  }
+  return levels
 }
 
 function CandleChart({
@@ -98,133 +295,259 @@ function CandleChart({
   candles: Candle[]
   coin: string
   tf: string
-  levels: Levels | null
+  levels: TradeLevels | null
 }) {
-  if (!candles.length) return null
+  if (!candles.length) return <div className="rsiChartEmpty">Grafik ma'lumoti yo'q</div>
 
-  const w = 640
-  const h = 280
-  const padL = 48
-  const padR = 12
-  const padT = 16
-  const padB = 28
-  const chartW = w - padL - padR
-  const chartH = h - padT - padB
+  const rsPreview = rsiSeries(candles)
+  const chartRsi = rsPreview.length ? rsPreview[rsPreview.length - 1] : null
+  const displayLevels = filterLevelsByRsi(levels, chartRsi)
 
-  const highs = candles.map((c) => c.high)
-  const lows = candles.map((c) => c.low)
-  let min = Math.min(...lows)
-  let max = Math.max(...highs)
-  if (levels) {
-    const vals = [levels.entry, levels.sl, levels.tp1, levels.tp2, levels.tp3].filter(
-      (v): v is number => typeof v === 'number'
-    )
-    if (vals.length) {
-      min = Math.min(min, ...vals)
-      max = Math.max(max, ...vals)
+  const W = 1700
+  const H = 720
+  const L = 24
+  const R = 200
+  const T = 56
+  const MB = 480
+  const RT = 520
+  const RB = 680
+  const plotRight = W - R
+  const candleRight = L + (plotRight - L) * 0.97
+  const priceLabelX = plotRight + 6
+  const labelX = plotRight + 72
+
+  const levelPrices = [...(displayLevels?.buys || []), ...(displayLevels?.sells || [])]
+  const min = Math.min(...candles.map((c) => c.low), ...(levelPrices.length ? levelPrices : [Infinity])) * 0.997
+  const max = Math.max(...candles.map((c) => c.high), ...(levelPrices.length ? levelPrices : [0])) * 1.003
+  const x = (i: number) => L + (i * (candleRight - L)) / Math.max(1, candles.length - 1)
+  const y = (v: number) => MB - ((v - min) / (max - min || 1)) * (MB - T)
+  const ry = (v: number) => RB - (Math.max(0, Math.min(100, v)) / 100) * (RB - RT)
+  const e10 = emaSeries(candles, 10)
+  const e20 = emaSeries(candles, 20)
+  const e50 = emaSeries(candles, 50)
+  const rs = rsPreview
+  const poly = (arr: number[]) => arr.map((v, i) => `${x(i)},${y(v)}`).join(' ')
+  const rpoly = (arr: number[]) => arr.map((v, i) => `${x(i)},${ry(v)}`).join(' ')
+  const cw = Math.max(1.6, Math.min(8, ((candleRight - L) / candles.length) * 0.65))
+
+  const last = candles[candles.length - 1]
+  const prevC = candles[candles.length - 2]?.close ?? last.close
+  const latest = last.close
+  const chg = latest - prevC
+  const chgPct = prevC ? (chg / prevC) * 100 : 0
+  const up = chg >= 0
+
+  const priceTicks = [0, 0.2, 0.4, 0.6, 0.8, 1].map((t) => max - (max - min) * t)
+
+  const sideLabel = displayLevels?.side === 'SELL' ? 'SELL' : displayLevels?.side === 'BUY' ? 'BUY' : ''
+
+  const levelLabels: { p: number; label: string; bg: string }[] = []
+  displayLevels?.buys.forEach((p, i) =>
+    levelLabels.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' })
+  )
+  displayLevels?.sells.forEach((p, i) =>
+    levelLabels.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' })
+  )
+  levelLabels.sort((a, b) => b.p - a.p)
+  const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
+  const minGap = 28
+  for (const it of levelLabels) {
+    let yy = y(it.p)
+    for (const prev of placedLabels) {
+      if (Math.abs(yy - prev.yy) < minGap) {
+        if (yy >= prev.yy) yy = prev.yy + minGap
+        else yy = prev.yy - minGap
+      }
     }
+    yy = Math.max(T + 14, Math.min(MB - 14, yy))
+    placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
   }
-  const range = max - min || 1
-
-  const x = (i: number) => padL + (i / Math.max(candles.length - 1, 1)) * chartW
-  const y = (v: number) => padT + ((max - v) / range) * chartH
-
-  const candleW = Math.max(2, (chartW / candles.length) * 0.6)
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="rsiSvg" role="img" aria-label={`${coin} ${tf} chart`}>
-      {/* grid */}
-      {[0, 0.25, 0.5, 0.75, 1].map((t) => {
-        const yy = padT + t * chartH
-        const val = max - t * range
-        return (
-          <g key={t}>
-            <line x1={padL} y1={yy} x2={w - padR} y2={yy} stroke="#30363d" strokeWidth={1} />
-            <text x={padL - 6} y={yy + 3} textAnchor="end" fill="#8b949e" fontSize={10}>
-              {formatPrice(val)}
-            </text>
-          </g>
-        )
-      })}
+    <div className="homeChartWrap">
+      <div className="homeChartScroller">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="homeChart"
+          style={{ width: '100%', maxWidth: 'none' }}
+          role="img"
+          aria-label={`${coin} ${tf} chart`}
+        >
+          <defs>
+            <linearGradient id="hmMain" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#0a1018" />
+              <stop offset="1" stopColor="#070b11" />
+            </linearGradient>
+          </defs>
+          <rect width={W} height={H} fill="url(#hmMain)" />
+          <rect x="0" y={RT - 16} width={W} height={RB - RT + 50} fill="#0e1320" />
 
-      {candles.map((c, i) => {
-        const cx = x(i)
-        const openY = y(c.open)
-        const closeY = y(c.close)
-        const highY = y(c.high)
-        const lowY = y(c.low)
-        const up = c.close >= c.open
-        const color = up ? '#2ecc71' : '#e74c3c'
-        const bodyTop = Math.min(openY, closeY)
-        const bodyH = Math.max(1, Math.abs(closeY - openY))
-        return (
-          <g key={i}>
-            <line x1={cx} y1={highY} x2={cx} y2={lowY} stroke={color} strokeWidth={1} />
-            <rect
-              x={cx - candleW / 2}
-              y={bodyTop}
-              width={candleW}
-              height={bodyH}
-              fill={color}
-            />
-          </g>
-        )
-      })}
+          {priceTicks.map((v, i) => {
+            const yy = y(v)
+            return (
+              <g key={i}>
+                <line x1={L} x2={plotRight} y1={yy} y2={yy} stroke="#182230" />
+                <text x={priceLabelX} y={yy + 4} fill="#8b949e" fontSize="11" fontWeight="600">
+                  {money(v)}
+                </text>
+              </g>
+            )
+          })}
 
-      {levels &&
-        ([
-          { key: 'entry', val: levels.entry, color: '#58a6ff', label: 'Kirish' },
-          { key: 'sl', val: levels.sl, color: '#e74c3c', label: 'SL' },
-          { key: 'tp1', val: levels.tp1, color: '#2ecc71', label: 'TP1' },
-          { key: 'tp2', val: levels.tp2, color: '#27ae60', label: 'TP2' },
-          { key: 'tp3', val: levels.tp3, color: '#1abc9c', label: 'TP3' },
-        ] as const).map(({ key, val, color, label }) => {
-          if (val == null) return null
-          const yy = y(val)
-          return (
-            <g key={key}>
+          <text x={L + 8} y="28" fill="#f0b90b" fontSize="18" fontWeight="800">
+            {coin}/USDT · {tf}
+            {sideLabel ? ` · ${sideLabel}` : ''}
+          </text>
+          <text x={L + 8} y="50" fill="#9aa7b8" fontSize="12">
+            O {money(last.open)} H {money(last.high)} L {money(last.low)} C {money(latest)}{' '}
+            <tspan fill={up ? '#20d67a' : '#ff5360'}>
+              {chg >= 0 ? '+' : ''}
+              {money(chg)} ({chgPct >= 0 ? '+' : ''}
+              {chgPct.toFixed(2)}%)
+            </tspan>
+          </text>
+
+          <text x={L + 8} y="70" fill="#ff9f0a" fontSize="12" fontWeight="700">
+            EMA 10: {money(e10[e10.length - 1])}
+          </text>
+          <text x={L + 200} y="70" fill="#00c7e6" fontSize="12" fontWeight="700">
+            EMA 20: {money(e20[e20.length - 1])}
+          </text>
+          <text x={L + 400} y="70" fill="#4aa8ff" fontSize="12" fontWeight="700">
+            EMA 50: {money(e50[e50.length - 1])}
+          </text>
+
+          {candles.map((c, i) => {
+            const bull = c.close >= c.open
+            return (
+              <g key={c.time}>
+                <line
+                  x1={x(i)}
+                  x2={x(i)}
+                  y1={y(c.high)}
+                  y2={y(c.low)}
+                  stroke={bull ? '#36d66f' : '#ff4d5a'}
+                  strokeWidth="1.05"
+                />
+                <rect
+                  x={x(i) - cw / 2}
+                  y={Math.min(y(c.open), y(c.close))}
+                  width={cw}
+                  height={Math.max(1.2, Math.abs(y(c.open) - y(c.close)))}
+                  fill={bull ? '#36d66f' : '#ff4d5a'}
+                  rx="1"
+                />
+              </g>
+            )
+          })}
+
+          <polyline points={poly(e10)} fill="none" stroke="#ff9f0a" strokeWidth="1.9" />
+          <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
+          <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
+
+          {placedLabels.map((it, i) => (
+            <g key={i}>
               <line
-                x1={padL}
-                y1={yy}
-                x2={w - padR}
-                y2={yy}
-                stroke={color}
-                strokeWidth={1.2}
-                strokeDasharray="4 3"
+                x1={L}
+                x2={plotRight}
+                y1={y(it.p)}
+                y2={y(it.p)}
+                stroke={it.bg}
+                strokeWidth="1.3"
+                strokeDasharray="6 5"
+                opacity="0.85"
               />
-              <text x={w - padR - 2} y={yy - 3} textAnchor="end" fill={color} fontSize={10}>
-                {label} {formatPrice(val)}
+              <line
+                x1={plotRight}
+                x2={labelX}
+                y1={y(it.p)}
+                y2={it.yy}
+                stroke={it.bg}
+                strokeWidth="1"
+                opacity="0.45"
+              />
+              <rect x={labelX} y={it.yy - 12} width={118} height={24} rx="4" fill={it.bg} />
+              <text
+                x={labelX + 59}
+                y={it.yy + 5}
+                textAnchor="middle"
+                fill="#fff"
+                fontSize="11"
+                fontWeight="800"
+              >
+                {it.label}
               </text>
             </g>
-          )
-        })}
-    </svg>
+          ))}
+
+          <line
+            x1={L}
+            x2={plotRight}
+            y1={y(latest)}
+            y2={y(latest)}
+            stroke="#65d9ff"
+            strokeDasharray="3 4"
+            strokeWidth="1.2"
+          />
+          <rect x={labelX} y={y(latest) - 13} width={118} height={26} rx="4" fill="#1a6f9a" />
+          <text x={labelX + 59} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
+            {money(latest)}
+          </text>
+
+          <text x={L + 8} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
+            RSI 14 {rs[rs.length - 1]?.toFixed(2) ?? '—'}
+          </text>
+          {[30, 50, 70].map((v) => (
+            <line key={v} x1={L} x2={plotRight} y1={ry(v)} y2={ry(v)} stroke="#3a4658" strokeDasharray="4 6" />
+          ))}
+          <polyline points={rpoly(rs)} fill="none" stroke="#a78bfa" strokeWidth="2" />
+          <rect x={labelX} y={ry(rs[rs.length - 1] ?? 50) - 12} width={70} height={24} rx="4" fill="#5b4a9a" />
+          <text
+            x={labelX + 35}
+            y={ry(rs[rs.length - 1] ?? 50) + 5}
+            textAnchor="middle"
+            fill="#fff"
+            fontSize="12"
+            fontWeight="700"
+          >
+            {(rs[rs.length - 1] ?? 0).toFixed(1)}
+          </text>
+          <text x={plotRight - 6} y={ry(70) - 5} textAnchor="end" fill="#7a8796" fontSize="11">
+            70
+          </text>
+          <text x={plotRight - 6} y={ry(50) - 5} textAnchor="end" fill="#7a8796" fontSize="11">
+            50
+          </text>
+          <text x={plotRight - 6} y={ry(30) - 5} textAnchor="end" fill="#7a8796" fontSize="11">
+            30
+          </text>
+        </svg>
+      </div>
+    </div>
   )
 }
 
 export default function SpotRSIHeatmap() {
   const { data: session } = useSession()
-  const isPremium = Boolean((session?.user as any)?.isPremium)
-
-  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('H4')
-  const [coin, setCoin] = useState<string>('BTC')
-  const [payload, setPayload] = useState<Payload | null>(null)
+  const hasPremium = Boolean((session?.user as { premium?: boolean } | undefined)?.premium)
+  const premiumHref = hasPremium ? '/premium' : '/obuna'
+  const [payload, setPayload] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('D1')
+  const [coin, setCoin] = useState<(typeof COINS)[number]>('BTC')
   const [candles, setCandles] = useState<Candle[]>([])
-  const [chartLoading, setChartLoading] = useState(false)
-  const [levels, setLevels] = useState<Levels | null>(null)
+  const [levels, setLevels] = useState<TradeLevels | null>(null)
+  const [chartLoading, setChartLoading] = useState(true)
 
-  const cells = payload?.cells
+  const interval = TIMEFRAMES.find((t) => t.key === tf)?.interval || '1d'
 
   const loadHeatmap = useCallback(async () => {
-    setLoading(true)
-    setError(false)
     try {
-      const res = await fetch('/api/spot-rsi-heatmap', { cache: 'no-store' })
-      if (!res.ok) throw new Error('fail')
-      const data = (await res.json()) as Payload
-      setPayload(data)
+      setError(false)
+      const res = await fetch('/api/spot-heatmap', { cache: 'no-store' })
+      if (!res.ok) throw new Error('Heatmap API error')
+      setPayload(await res.json())
     } catch {
       setError(true)
     } finally {
@@ -232,14 +555,23 @@ export default function SpotRSIHeatmap() {
     }
   }, [])
 
-  const loadChart = useCallback(async (c: string, t: string) => {
+  const loadChart = useCallback(async (c: string, timeframe: string, intv: string) => {
     setChartLoading(true)
     try {
-      const res = await fetch(`/api/spot-rsi-chart?coin=${c}&tf=${t}`, { cache: 'no-store' })
-      if (!res.ok) throw new Error('fail')
-      const data = await res.json()
-      setCandles(data.candles || [])
-      setLevels(data.levels || null)
+      const chartRes = await fetch(
+        `/api/spot-heatmap/chart?coin=${encodeURIComponent(c)}&tf=${encodeURIComponent(timeframe)}`,
+        { cache: 'no-store' }
+      )
+
+      if (chartRes.ok) {
+        const data = await chartRes.json()
+        const nextCandles: Candle[] = Array.isArray(data.candles) ? data.candles : []
+        setCandles(nextCandles)
+        setLevels(computeIndependentTradeLevels(nextCandles, intv))
+      } else {
+        setCandles([])
+        setLevels(null)
+      }
     } catch {
       setCandles([])
       setLevels(null)
@@ -250,77 +582,71 @@ export default function SpotRSIHeatmap() {
 
   useEffect(() => {
     loadHeatmap()
+    const timer = window.setInterval(loadHeatmap, 60_000)
+    return () => window.clearInterval(timer)
   }, [loadHeatmap])
 
   useEffect(() => {
-    loadChart(coin, tf)
-  }, [coin, tf, loadChart])
+    loadChart(coin, tf, interval)
+  }, [coin, tf, interval, loadChart])
 
-  const selectedCell = useMemo(() => {
-    return cells?.[coin]?.[tf] ?? null
-  }, [cells, coin, tf])
-
-  const premiumHref = '/premium'
+  const cells = payload?.data
+  const selectedCell = cells?.[coin]?.[tf]
 
   return (
     <section className="rsiHeat">
       <style>{`
-        .rsiHeat { margin: 0; }
+        .rsiHeat { color: #e6edf3; }
+        .rsiSub { color: #8b949e; font-size: 0.88rem; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
         .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
-        .rsiSub { margin: 0; color: #8b949e; font-size: 0.9rem; }
-        .rsiTfRow { display: flex; gap: 6px; }
-        .rsiTfBtn {
-          background: #21262d; border: 1px solid #30363d; color: #c9d1d9;
-          border-radius: 6px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer;
+        .rsiChartOuter { position: relative; }
+        .rsiHmFoot {
+          position: absolute; bottom: 10px; right: 14px; z-index: 2;
+          margin: 0; font-size: 0.72rem; color: #9aa7b8; text-align: right;
+          background: transparent; padding: 0; border: none;
+          pointer-events: none; white-space: nowrap;
         }
-        .rsiTfBtn.active { background: #238636; border-color: #2ea043; color: #fff; }
+        .rsiTfRow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; margin: 0; }
+        .rsiTfBtn {
+          border: 1px solid #303846; background: #111820; color: #c8d1dc;
+          border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 0.84rem;
+        }
+        .rsiTfBtn.active { border-color: #f0b90b; color: #f0b90b; background: #1a1610; }
         .rsiGrid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-          gap: 8px;
-          margin-bottom: 16px;
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 10px;
         }
         .rsiCard {
-          border: 1px solid #30363d;
-          border-radius: 8px;
-          padding: 10px 8px;
-          text-align: left;
+          border-radius: 10px; padding: 8px 10px; min-height: 80px;
+          display: flex; flex-direction: column; justify-content: center; gap: 2px;
+          border: 1px solid #252d38; text-decoration: none; color: inherit;
+          transition: transform 0.12s ease, border-color 0.12s ease;
           cursor: pointer;
-          color: #e6edf3;
-          transition: border-color 0.15s;
         }
-        .rsiCard:hover, .rsiCard.active { border-color: #58a6ff; }
-        .rsiCardTop { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-        .rsiCoin { font-weight: 700; font-size: 0.95rem; }
-        .rsiPrice { font-size: 0.75rem; color: #8b949e; }
-        .rsiVal { font-size: 1.15rem; font-weight: 700; }
-        .rsiMeta { font-size: 0.72rem; color: #8b949e; margin-top: 2px; }
-        .rsiLoad, .rsiErr { text-align: center; padding: 24px; color: #8b949e; }
-        .rsiErr { color: #e74c3c; }
-        .rsiChartOuter {
-          background: #0d1117;
-          border: 1px solid #30363d;
-          border-radius: 10px;
-          padding: 8px;
-          overflow: hidden;
+        .rsiCard:hover { transform: translateY(-2px); border-color: #f0b90b66; }
+        .rsiCard.active { border-color: #f0b90b; box-shadow: 0 0 0 1px #f0b90b44; }
+        .rsiCardTop {
+          display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+          min-width: 0;
         }
-        .rsiSvg { width: 100%; height: auto; display: block; }
-        .rsiHmFoot {
-          margin-top: 6px;
-          font-size: 0.78rem;
-          color: #8b949e;
-          text-align: center;
+        .rsiCoin { font-size: 0.88rem; font-weight: 800; letter-spacing: 0.02em; flex-shrink: 0; }
+        .rsiPrice {
+          font-size: 0.68rem; opacity: 0.9; font-weight: 600;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
         }
-        .rsiTradeBox {
-          margin-top: 12px;
-          background: #161b22;
-          border: 1px solid #30363d;
-          border-radius: 8px;
-          padding: 12px 14px;
-          font-size: 0.85rem;
-          color: #c9d1d9;
+        .rsiVal { font-size: 1.15rem; font-weight: 800; line-height: 1.15; }
+        .rsiMeta { font-size: 0.68rem; opacity: 0.9; }
+        .rsiErr, .rsiLoad { padding: 28px; text-align: center; color: #8b949e; }
+        .rsiUpdated { font-size: 0.75rem; color: #8b949e; margin-top: 14px; }
+        .homeChartWrap { margin-top: 18px; border: 1px solid #252d38; border-radius: 12px; overflow: hidden; background: #0a1018; }
+        .homeChartScroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .homeChart { display: block; min-width: 900px; }
+        .rsiChartEmpty { padding: 40px; text-align: center; color: #8b949e; }
+        .rsiLevelsNote {
+          margin-top: 12px; padding: 14px 16px; border-radius: 10px;
+          background: #111820; border: 1px solid #252d38; font-size: 0.88rem; line-height: 1.55;
         }
-        .rsiTradeTitle { font-weight: 700; margin-bottom: 6px; color: #e6edf3; }
         .rsiTradeLine { margin-bottom: 6px; }
         .rsiTradeLabel { color: #8b949e; font-weight: 600; }
         .rsiBuy { color: #2ecc71; margin-right: 6px; }
@@ -392,33 +718,44 @@ export default function SpotRSIHeatmap() {
                 )}
               </div>
               {levels && (() => {
-                const dir = selectedCell?.rsiDirection
-                const isLong = dir === 'up' || (selectedCell?.rsi != null && selectedCell.rsi < 40)
+                const chartRsi = selectedCell?.rsi ?? null
+                const shown = filterLevelsByRsi(levels, chartRsi)
+                if (!shown) return null
+                const noBuy = chartRsi != null && chartRsi >= 70
+                const noSell = chartRsi != null && chartRsi <= 30
+                if (shown.buys.length === 0 && shown.sells.length === 0 && !noBuy && !noSell) return null
                 return (
-                  <div className="rsiTradeBox">
-                    <div className="rsiTradeTitle">
-                      {isLong ? <span className="rsiBuy">LONG</span> : <span className="rsiSell">SHORT</span>}
-                      {coin} · {tf}
-                    </div>
-                    <div className="rsiTradeLine">
-                      <span className="rsiTradeLabel">Kirish:</span> {formatPrice(levels.entry ?? null)}
-                    </div>
-                    <div className="rsiTradeLine">
-                      <span className="rsiTradeLabel">SL:</span> {formatPrice(levels.sl ?? null)}
-                    </div>
-                    <div className="rsiTradeLine">
-                      <span className="rsiTradeLabel">TP1 / TP2 / TP3:</span>{' '}
-                      {formatPrice(levels.tp1 ?? null)} / {formatPrice(levels.tp2 ?? null)} /{' '}
-                      {formatPrice(levels.tp3 ?? null)}
-                    </div>
-                    {!isPremium && (
-                      <div style={{ marginTop: 8, fontSize: '0.8rem', color: '#8b949e' }}>
-                        To‘liq signal va tahlil premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
-                      </div>
+                <div className="rsiLevelsNote">
+                  <div className="rsiTradeLine">
+                    <span className="rsiTradeLabel">Sotib olish:</span>{' '}
+                    {noBuy || shown.buys.length === 0 ? (
+                      <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
+                    ) : (
+                      shown.buys.map((p, i) => (
+                        <span key={`b${i}`} className="rsiBuy">
+                          BUY{i + 1}: <b>{money(p)}</b>{i < shown.buys.length - 1 ? ', ' : ''}
+                        </span>
+                      ))
                     )}
                   </div>
-                )
-              })()}
+                  <div className="rsiTradeLine">
+                    <span className="rsiTradeLabel">Sotish:</span>{' '}
+                    {noSell || shown.sells.length === 0 ? (
+                      <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
+                    ) : (
+                      shown.sells.map((p, i) => (
+                        <span key={`s${i}`} className="rsiSell">
+                          SELL{i + 1}: <b>{money(p)}</b>{i < shown.sells.length - 1 ? ', ' : ''}
+                        </span>
+                      ))
+                    )}
+                  </div>
+                  <div className="rsiTradeLine" style={{ marginBottom: 0, color: '#8b949e' }}>
+                    <span className="rsiTradeLabel">Izoh:</span>{' '}
+                    Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
+                  </div>
+                </div>
+              )})()}
             </>
           )}
         </>
