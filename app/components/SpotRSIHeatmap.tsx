@@ -534,7 +534,7 @@ export default function SpotRSIHeatmap() {
   const [payload, setPayload] = useState<ApiResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('D1')
+  const [tf, setTf] = useState<'H4' | 'D1' | 'W1'>('H4')
   const [coin, setCoin] = useState<(typeof COINS)[number]>('BTC')
   const [candles, setCandles] = useState<Candle[]>([])
   const [levels, setLevels] = useState<TradeLevels | null>(null)
@@ -597,7 +597,7 @@ export default function SpotRSIHeatmap() {
     <section className="rsiHeat">
       <style>{`
         .rsiHeat { color: #e6edf3; }
-        .rsiSub { color: #e6edf3; font-size: 0.95rem; font-weight: 700; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
+        .rsiSub { color: #8b949e; font-size: 0.88rem; font-weight: 700; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
         .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
         .rsiChartOuter { position: relative; }
         .rsiHmFoot {
