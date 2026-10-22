@@ -597,7 +597,7 @@ export default function SpotRSIHeatmap() {
     <section className="rsiHeat">
       <style>{`
         .rsiHeat { color: #e6edf3; }
-        .rsiSub { color: #8b949e; font-size: 0.88rem; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
+        .rsiSub { color: #e6edf3; font-size: 0.95rem; font-weight: 700; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
         .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
         .rsiChartOuter { position: relative; }
         .rsiHmFoot {
@@ -655,7 +655,7 @@ export default function SpotRSIHeatmap() {
 
       <div className="rsiHeadRow">
         <p className="rsiSub">
-          Top kriptovalyutalar trendini bir joyda kuzating.
+          Spot RSI Heatmap: top kriptovalyutalar trendini bir joyda kuzating.
         </p>
         <div className="rsiTfRow">
           {TIMEFRAMES.map((t) => (
