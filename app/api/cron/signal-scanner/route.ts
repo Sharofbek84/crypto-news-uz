@@ -39,23 +39,6 @@ async function scanOne(baseUrl: string, symbol: string, interval: string, secret
   }
 }
 
-async function runTracker(baseUrl: string, secret: string) {
-  const url = new URL('/api/cron/signal-tracker', baseUrl)
-  const response = await fetch(url.toString(), {
-    method: 'GET',
-    cache: 'no-store',
-    headers: {
-      'User-Agent': 'GoldenWeb-Signal-Scanner/1.0',
-      'x-cron-secret': secret,
-    },
-  })
-  if (!response.ok) {
-    const body = await response.text()
-    throw new Error(`tracker: ${response.status} ${body.slice(0, 180)}`)
-  }
-  return response.json()
-}
-
 export async function GET(request: NextRequest) {
   const expectedSecret = process.env.CRON_SECRET
   const authorization = request.headers.get('authorization')
@@ -107,13 +90,6 @@ export async function GET(request: NextRequest) {
     })
   }
 
-  let tracker: unknown = null
-  try {
-    tracker = await runTracker(baseUrl, expectedSecret!)
-  } catch (e: any) {
-    errors.push(e?.message || 'tracker failed')
-  }
-
   return NextResponse.json({
     ok: errors.length === 0,
     scanned: jobs.length,
@@ -122,7 +98,6 @@ export async function GET(request: NextRequest) {
     trackedCount,
     reasonCounts,
     sentSignals: completed.filter((c) => c.telegram),
-    tracker,
     errors,
     generatedAt: new Date().toISOString(),
   })
