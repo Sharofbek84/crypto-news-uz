@@ -1,1 +1,1 @@
-SEE_ARTIFACTS_FILE
+@/tmp/SpotRSIHeatmap.tsx
