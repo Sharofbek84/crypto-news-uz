@@ -3,7 +3,6 @@ import { analyze, Candle } from '@/lib/technical'
 import { longLevels, shortLevels, fmt } from '@/lib/technical-helpers'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
-import { buildSignalId, saveTrackedSignal } from '@/lib/signal-tracker'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTC', ETH: 'ETH', LTC: 'LTC', SOL: 'SOL', BNB: 'BNB', NEAR: 'NEAR', GRAM: 'GRAM', SUI: 'SUI', APT: 'APT', ATOM: 'ATOM', XAUT: 'XAUT', XRP: 'XRP', XLM: 'XLM', TRX: 'TRX', HYPE: 'HYPE', BCH: 'BCH', ZEC: 'ZEC', LINK: 'LINK', AVAX: 'AVAX', ONDO: 'ONDO', WLD: 'WLD',
@@ -149,8 +148,7 @@ async function applyD1EmaToW1IfNeutral(
 }
 
 /**
- * Telegram + tracker.
- * Avval Redis trackerga yoziladi, keyin Telegram.
+ * Telegram signal (dedup Redis orqali). Statistika tracker olib tashlangan.
  */
 async function notifyTelegramForNewSignal(
   symbol: string,
@@ -225,26 +223,9 @@ async function notifyTelegramForNewSignal(
     return { tracked: false, telegram: false, reason: 'dup-event' }
   }
 
-  const signalId = buildSignalId(symbol, interval, signalTime, current.side)
-
   try {
-    await saveTrackedSignal({
-      id: signalId,
-      symbol,
-      interval,
-      timeframe,
-      side: current.side,
-      entryLow: current.entryLow,
-      entryHigh: current.entryHigh,
-      tp1: current.tp[0],
-      tp2: current.tp[1],
-      tp3: current.tp[2],
-      sl: current.invalidation,
-      signalTime,
-    })
-
     await sendTelegramSignal(signal)
-    return { tracked: true, telegram: true }
+    return { tracked: false, telegram: true }
   } catch (error) {
     await redis.del(redisKey)
     await redis.del(cooldownKey)
