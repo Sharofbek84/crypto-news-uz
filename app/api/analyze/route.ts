@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
 import { longLevels, shortLevels, fmt } from '@/lib/technical-helpers'
 import { sendTelegramSignal } from '@/lib/telegram'
-import { getRedis } from '@/lib/redis'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTC', ETH: 'ETH', LTC: 'LTC', SOL: 'SOL', BNB: 'BNB', NEAR: 'NEAR', GRAM: 'GRAM', SUI: 'SUI', APT: 'APT', ATOM: 'ATOM', XAUT: 'XAUT', XRP: 'XRP', XLM: 'XLM', TRX: 'TRX', HYPE: 'HYPE', BCH: 'BCH', ZEC: 'ZEC', LINK: 'LINK', AVAX: 'AVAX', ONDO: 'ONDO', WLD: 'WLD',
@@ -13,23 +12,11 @@ const ALLOWED_INTERVALS = ['1h', '4h', '1d', '1w'] as const
 type AllowedInterval = (typeof ALLOWED_INTERVALS)[number]
 const TELEGRAM_INTERVALS = new Set(['1h', '4h', '1d'])
 
-/** Bir coin uchun keyingi Telegram signalgacha kutish (soat). */
-const COIN_TELEGRAM_COOLDOWN_SEC = 60 * 60 * 4 // 4 soat
-
 function intervalConfig(interval: string) {
   if (interval === '1w') return '7d'
   if (interval === '1d') return '1d'
   if (interval === '4h') return '4h'
   return '1h'
-}
-
-/**
- * Upstash SET NX natijasi.
- * Muvaffaqiyat: 'OK' | true | boshqa truthy (null/false emas).
- * Faqat null/undefined/false — rad etiladi.
- */
-function redisSetOk(result: unknown): boolean {
-  return result !== null && result !== undefined && result !== false
 }
 
 async function fetchGate(symbol: string, interval: string): Promise<Candle[]> {
@@ -148,7 +135,9 @@ async function applyD1EmaToW1IfNeutral(
 }
 
 /**
- * Telegram signal (dedup Redis orqali). Statistika tracker olib tashlangan.
+ * Telegram signal.
+ * Signal stats / Redis dedup / tracker to'liq olib tashlangan (Upstash limit xatolarini to'xtatish uchun).
+ * Faqat side o'zgarganda (BUY↔SELL) yuboriladi. Spam himoyasi yo'q — tashqi cron kamroq ishlashi kerak.
  */
 async function notifyTelegramForNewSignal(
   symbol: string,
@@ -177,7 +166,6 @@ async function notifyTelegramForNewSignal(
     return { tracked: false, telegram: false, reason: 'same-side' }
   }
 
-  const signalTime = closedCandles[closedCandles.length - 1].time
   const timeframe = (interval === '1h' ? 'H1' : interval === '4h' ? 'H4' : 'D1') as 'H1' | 'H4' | 'D1'
 
   const signal = {
@@ -192,44 +180,10 @@ async function notifyTelegramForNewSignal(
     rsi: current.rsi,
   }
 
-  const redis = getRedis()
-  if (!redis) {
-    console.error('Telegram signal deduplication unavailable: Upstash Redis is not configured')
-    return { tracked: false, telegram: false, reason: 'no-redis' }
-  }
-
-  const coinLockKey = `goldenweb:telegram-coin:${symbol}`
-  const coinLocked = await redis.set(coinLockKey, `${interval}:${current.side}:${signalTime}`, {
-    nx: true,
-    ex: 60 * 5,
-  })
-  if (!redisSetOk(coinLocked)) {
-    return { tracked: false, telegram: false, reason: 'coin-lock' }
-  }
-
-  const cooldownKey = `goldenweb:telegram-coin-cd:${symbol}`
-  const cooldownOk = await redis.set(cooldownKey, `${interval}:${current.side}`, {
-    nx: true,
-    ex: COIN_TELEGRAM_COOLDOWN_SEC,
-  })
-  if (!redisSetOk(cooldownOk)) {
-    return { tracked: false, telegram: false, reason: 'cooldown' }
-  }
-
-  const redisKey = `goldenweb:telegram-signal:${symbol}:${interval}:${signalTime}:${current.side}`
-  const claimed = await redis.set(redisKey, '1', { nx: true, ex: 60 * 60 * 24 * 30 })
-  if (!redisSetOk(claimed)) {
-    await redis.del(cooldownKey)
-    return { tracked: false, telegram: false, reason: 'dup-event' }
-  }
-
   try {
     await sendTelegramSignal(signal)
     return { tracked: false, telegram: true }
   } catch (error) {
-    await redis.del(redisKey)
-    await redis.del(cooldownKey)
-    await redis.del(coinLockKey)
     console.error(`Signal notify failed ${symbol}/${interval}:`, error)
     throw error
   }
