@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
     error: '/sign-in',
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
         token.email = user.email
