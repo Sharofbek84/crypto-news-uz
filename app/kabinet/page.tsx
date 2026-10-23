@@ -38,7 +38,7 @@ function formatDateDDMMYYYY(iso: string): string {
 }
 
 function KabinetContent() {
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const needPremium = searchParams.get('need') === 'premium'
@@ -69,8 +69,13 @@ function KabinetContent() {
       router.replace('/sign-in?callbackUrl=/kabinet')
       return
     }
-    if (status === 'authenticated') loadMe()
-  }, [status, router, loadMe])
+    if (status === 'authenticated') {
+      // On entering the cabinet, explicitly refresh JWT permission claims from Redis.
+      // The JWT callback treats this update as a forced refresh, so Premium changes
+      // made by an administrator are reflected without waiting for the hourly interval.
+      void update().catch(() => null).finally(() => loadMe())
+    }
+  }, [status, router, loadMe, update])
 
   if (status === 'loading' || loading) {
     return <p style={{ color: '#848e9c', padding: 24 }}>Yuklanmoqda...</p>
