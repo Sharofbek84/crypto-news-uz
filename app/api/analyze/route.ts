@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyze, Candle } from '@/lib/technical'
 import { longLevels, shortLevels, fmt } from '@/lib/technical-helpers'
-import { sendTelegramSignal } from '@/lib/telegram'
 
 const ALIASES: Record<string, string> = {
   BTC: 'BTC', ETH: 'ETH', LTC: 'LTC', SOL: 'SOL', BNB: 'BNB', NEAR: 'NEAR', GRAM: 'GRAM', SUI: 'SUI', APT: 'APT', ATOM: 'ATOM', XAUT: 'XAUT', XRP: 'XRP', XLM: 'XLM', TRX: 'TRX', HYPE: 'HYPE', BCH: 'BCH', ZEC: 'ZEC', LINK: 'LINK', AVAX: 'AVAX', ONDO: 'ONDO', WLD: 'WLD',
@@ -136,14 +135,29 @@ async function applyD1EmaToW1IfNeutral(
 
 /**
  * Telegram signal.
- * Signal stats / Redis dedup / tracker to'liq olib tashlangan (Upstash limit xatolarini to'xtatish uchun).
- * Faqat side o'zgarganda (BUY↔SELL) yuboriladi. Spam himoyasi yo'q — tashqi cron kamroq ishlashi kerak.
+ * Signal kandidatlarini tayyorlaydi. Telegramga yuborish signal-scanner tomonidan
+ * har bir coin uchun faqat bitta timeframe tanlangandan keyin bajariladi.
  */
 async function notifyTelegramForNewSignal(
   symbol: string,
   interval: string,
   candles: Candle[]
-): Promise<{ tracked: boolean; telegram: boolean; reason?: string }> {
+): Promise<{
+  tracked: boolean
+  telegram: boolean
+  reason?: string
+  signal?: {
+    side: 'BUY' | 'SELL'
+    symbol: string
+    timeframe: 'H1' | 'H4' | 'D1'
+    entryLow: number
+    entryHigh: number
+    tp: number[]
+    sl: number
+    trend?: string
+    rsi?: number
+  }
+}> {
   if (!TELEGRAM_INTERVALS.has(interval)) return { tracked: false, telegram: false, reason: 'interval' }
   if (!candles.length) return { tracked: false, telegram: false, reason: 'no-candles' }
 
@@ -180,13 +194,9 @@ async function notifyTelegramForNewSignal(
     rsi: current.rsi,
   }
 
-  try {
-    await sendTelegramSignal(signal)
-    return { tracked: false, telegram: true }
-  } catch (error) {
-    console.error(`Signal notify failed ${symbol}/${interval}:`, error)
-    throw error
-  }
+  // Jo'natishni scanner markazlashgan holda boshqaradi: bir coin uchun
+  // H1/H4/D1 orasidan faqat bitta kandidat yuboriladi.
+  return { tracked: false, telegram: false, reason: 'candidate-ready', signal }
 }
 
 export async function GET(req: NextRequest) {
@@ -211,7 +221,22 @@ export async function GET(req: NextRequest) {
     const scannerHeader = req.headers.get('x-signal-scanner-secret')
     const isScannerRequest = Boolean(scannerSecret) && scannerHeader === scannerSecret
 
-    let signalNotify: { tracked: boolean; telegram: boolean; reason?: string } | null = null
+    let signalNotify: {
+      tracked: boolean
+      telegram: boolean
+      reason?: string
+      signal?: {
+        side: 'BUY' | 'SELL'
+        symbol: string
+        timeframe: 'H1' | 'H4' | 'D1'
+        entryLow: number
+        entryHigh: number
+        tp: number[]
+        sl: number
+        trend?: string
+        rsi?: number
+      }
+    } | null = null
     if (isScannerRequest && TELEGRAM_INTERVALS.has(interval)) {
       try {
         signalNotify = await notifyTelegramForNewSignal(symbol, interval, candles)
