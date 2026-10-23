@@ -128,11 +128,22 @@ export async function GET(request: NextRequest) {
     candidatesByCoin.set(key, list)
   }
 
-  for (const [symbol, candidates] of candidatesByCoin) {
+  // Map.forEach avoids requiring downlevelIteration for the configured TS target.
+  candidatesByCoin.forEach((candidates, symbol) => {
     candidates.sort(
       (a, b) =>
         timeframePriority[b.signal!.timeframe] - timeframePriority[a.signal!.timeframe]
     )
+    // Sending is async, so queue each selected coin for sequential processing below.
+  })
+
+  const selectedByCoin: Array<{ symbol: string; candidates: typeof completed[number][] }> = []
+  candidatesByCoin.forEach((candidates, symbol) => {
+    selectedByCoin.push({ symbol, candidates })
+  })
+
+  for (const entry of selectedByCoin) {
+    const { symbol, candidates } = entry
     const selected = candidates[0]
     try {
       await sendTelegramSignal(selected.signal!)
