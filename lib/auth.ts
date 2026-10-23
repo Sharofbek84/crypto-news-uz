@@ -55,8 +55,9 @@ export const authOptions: NextAuthOptions = {
         typeof token.permissionsRefreshAfter === 'number' ? token.permissionsRefreshAfter : 0
       const isInitialSignIn = Boolean(user)
       const refreshDue = now - lastCheckedAt >= PERMISSIONS_REFRESH_INTERVAL_MS
-      const shouldRefresh =
-        trigger === 'update' || isInitialSignIn || (refreshDue && now >= retryAfter)
+      // Refresh on sign-in and at most hourly. Client-triggered session updates
+      // must not bypass this limit, otherwise each cabinet visit spends a Redis read.
+      const shouldRefresh = isInitialSignIn || (refreshDue && now >= retryAfter)
 
       if (shouldRefresh) {
         try {
