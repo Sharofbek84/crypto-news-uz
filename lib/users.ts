@@ -115,8 +115,8 @@ export async function verifyPassword(email: string, password: string): Promise<A
   if (!user) return null
   const match = await bcrypt.compare(password, user.passwordHash)
   if (!match) return null
-  const redis = getRedis()
-  if (redis) await redis.sadd(USERS_INDEX, user.email.toLowerCase())
+  // The user index is maintained when accounts are created. Avoid an extra
+  // Redis write on every successful login, which consumes the daily command quota.
   return user
 }
 
