@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
     error: '/sign-in',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id
         token.email = user.email
@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
       const isInitialSignIn = Boolean(user)
       const refreshDue = now - lastCheckedAt >= PERMISSIONS_REFRESH_INTERVAL_MS
       const shouldRefresh =
-        isInitialSignIn || (refreshDue && now >= retryAfter)
+        trigger === 'update' || isInitialSignIn || (refreshDue && now >= retryAfter)
 
       if (shouldRefresh) {
         try {
