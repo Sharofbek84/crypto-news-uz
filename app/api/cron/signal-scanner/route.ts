@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendTelegramSignal } from '@/lib/telegram'
+import { getRedis } from '@/lib/redis'
 
 const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
 const INTERVALS = ['1h', '4h', '1d'] as const
 const CONCURRENCY = 4
+const SIGNAL_COOLDOWN_SECONDS = 4 * 60 * 60
 
 async function scanOne(baseUrl: string, symbol: string, interval: string, secret: string) {
   const url = new URL('/api/analyze', baseUrl)
@@ -128,14 +130,49 @@ export async function GET(request: NextRequest) {
     candidatesByCoin.set(key, list)
   }
 
-  for (const [symbol, candidates] of candidatesByCoin) {
+  // Map.forEach avoids requiring downlevelIteration for the configured TS target.
+  candidatesByCoin.forEach((candidates, symbol) => {
     candidates.sort(
       (a, b) =>
         timeframePriority[b.signal!.timeframe] - timeframePriority[a.signal!.timeframe]
     )
+    // Sending is async, so queue each selected coin for sequential processing below.
+  })
+
+  const selectedByCoin: Array<{ symbol: string; candidates: typeof completed[number][] }> = []
+  candidatesByCoin.forEach((candidates, symbol) => {
+    selectedByCoin.push({ symbol, candidates })
+  })
+
+  const redis = getRedis()
+
+  for (const entry of selectedByCoin) {
+    const { symbol, candidates } = entry
     const selected = candidates[0]
+    const signal = selected.signal!
+
+    // Persist a per-coin, per-direction cooldown across separate Cron invocations.
+    // Fail closed if Redis is unavailable so the scanner cannot flood Telegram.
+    const cooldownKey = `signal:cooldown:${signal.symbol.toUpperCase()}:${signal.side}`
+    let claimed = false
+
     try {
-      await sendTelegramSignal(selected.signal!)
+      if (!redis) throw new Error('Redis is not configured')
+      const claim = await redis.set(cooldownKey, '1', {
+        nx: true,
+        ex: SIGNAL_COOLDOWN_SECONDS,
+      })
+
+      if (!claim) {
+        selected.reason = 'suppressed-cooldown'
+        for (const suppressed of candidates.slice(1)) {
+          suppressed.reason = 'suppressed-same-coin'
+        }
+        continue
+      }
+      claimed = true
+
+      await sendTelegramSignal(signal)
       selected.telegram = true
       selected.reason = 'sent-selected-timeframe'
       telegramSent++
@@ -143,8 +180,17 @@ export async function GET(request: NextRequest) {
         suppressed.reason = 'suppressed-same-coin'
       }
     } catch (error) {
+      if (claimed && redis) {
+        try {
+          await redis.del(cooldownKey)
+        } catch (releaseError) {
+          errors.push(
+            `${symbol}: cooldown release failed: ${releaseError instanceof Error ? releaseError.message : 'unknown error'}`
+          )
+        }
+      }
       errors.push(
-        `${symbol}: Telegram send failed: ${error instanceof Error ? error.message : 'unknown error'}`
+        `${symbol}: Telegram/cooldown failed: ${error instanceof Error ? error.message : 'unknown error'}`
       )
       selected.reason = 'telegram-send-error'
     }
