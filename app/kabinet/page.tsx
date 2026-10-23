@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 
@@ -46,6 +46,7 @@ function KabinetContent() {
   const [me, setMe] = useState<MeResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const sessionRefreshStarted = useRef(false)
 
   const loadMe = useCallback(async () => {
     setLoading(true)
@@ -69,7 +70,8 @@ function KabinetContent() {
       router.replace('/sign-in?callbackUrl=/kabinet')
       return
     }
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && !sessionRefreshStarted.current) {
+      sessionRefreshStarted.current = true
       // On entering the cabinet, explicitly refresh JWT permission claims from Redis.
       // The JWT callback treats this update as a forced refresh, so Premium changes
       // made by an administrator are reflected without waiting for the hourly interval.
