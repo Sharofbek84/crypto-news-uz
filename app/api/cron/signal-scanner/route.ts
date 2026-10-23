@@ -105,7 +105,6 @@ export async function GET(request: NextRequest) {
       if (result.status === 'fulfilled') {
         const v = result.value
         completed.push(v)
-        reasonCounts[v.reason] = (reasonCounts[v.reason] || 0) + 1
         if (v.tracked) trackedCount++
       } else {
         errors.push(
@@ -116,7 +115,6 @@ export async function GET(request: NextRequest) {
       }
     })
   }
-
 
   // Har bir coin uchun faqat bitta signal: yuqori timeframe ustuvor
   // (D1 > H4 > H1). Yo'nalishdan qat'i nazar, qolgan timeframe'lar bostiriladi.
@@ -150,6 +148,10 @@ export async function GET(request: NextRequest) {
       )
       selected.reason = 'telegram-send-error'
     }
+  }
+
+  for (const item of completed) {
+    reasonCounts[item.reason] = (reasonCounts[item.reason] || 0) + 1
   }
 
   return NextResponse.json({
