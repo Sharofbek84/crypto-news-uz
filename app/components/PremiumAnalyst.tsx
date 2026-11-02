@@ -121,7 +121,6 @@ function CleanChart({
   coin: string
   interval: string
 }) {
-  const [zoom, setZoom] = useState(1)
   if (!candles?.length || !result) return null
 
   const W = 1700
@@ -175,17 +174,11 @@ function CleanChart({
 
   return (
     <div className="homeChartWrap">
-      <div className="chartZoomControls">
-        <button onClick={() => setZoom((z) => Math.min(1.8, +(z + 0.2).toFixed(1)))}>+</button>
-        <span>{Math.round(zoom * 100)}%</span>
-        <button onClick={() => setZoom((z) => Math.max(1, +(z - 0.2).toFixed(1)))}>-</button>
-        <button onClick={() => setZoom(1)}>Reset</button>
-      </div>
       <div className="homeChartScroller">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="homeChart"
-          style={{ width: `${zoom * 100}%`, maxWidth: 'none' }}
+          style={{ width: '100%', maxWidth: 'none' }}
           role="img"
           aria-label={coin + ' ' + interval + ' premium technical analysis'}
         >
