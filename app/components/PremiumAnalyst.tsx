@@ -487,7 +487,6 @@ export default function PremiumAnalyst() {
     <section className="homeAnalyst">
       <div className="homeAnalystHead">
         <div>
-          <div className="homeKicker">PREMIUM TAHLIL</div>
           <h2>Kengaytirilgan kripto bozor tahlili</h2>
           <p>Jonli market data asosida avtomatik BUY/SELL · Entry · TP · SL va texnik xulosa</p>
         </div>
@@ -599,21 +598,20 @@ export default function PremiumAnalyst() {
                   </>
                 ) : (
                   <>
-                    {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓{' '}
-                    {money$(bearPath[3])}
+                    {money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}
                   </>
                 )}
               </div>
             </div>
           </div>
 
+          <CryptoAnalystAI symbol={coin} interval={interval} result={r} />
+
           <p className="homeDisclaimer">
             Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz
             tahlil qiling. Kripto bozorida savdo qilish yuqori riskli faoliyat turi hisoblanadi. Bozorga faqat yuqotishga
             tayyor bo'lgan pulingiz bilan kiring.
           </p>
-
-          <CryptoAnalystAI coin={coin} interval={interval} />
         </>
       )}
     </section>
