@@ -172,7 +172,6 @@ export default function HomeAnalyst(){
   <section className="homeAnalyst">
     <div className="homeAnalystHead">
       <div>
-        <div className="homeKicker">TEXNIK TAHLIL</div>
         <h2>Real vaqtda kripto bozor tahlili</h2>
         <p>Jonli market data asosida avtomatik BUY/SELL · Entry · TP · SL va texnik xulosa</p>
       </div>
