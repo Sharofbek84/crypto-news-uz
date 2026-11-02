@@ -605,7 +605,7 @@ export default function PremiumAnalyst() {
             </div>
           </div>
 
-          <CryptoAnalystAI symbol={coin} interval={interval} result={r} />
+          <CryptoAnalystAI coin={coin} interval={interval} analysis={r} />
 
           <p className="homeDisclaimer">
             Eslatma: Ushbu tahlil faqat axborot maqsadida. Investitsiya tavsiyasi emas. Savdo qilishdan oldin o'zingiz
