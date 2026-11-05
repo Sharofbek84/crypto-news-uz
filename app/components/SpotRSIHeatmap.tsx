@@ -214,10 +214,10 @@ function computeIndependentTradeLevels(
     price *
     (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
 
-  // ATR-based min + softened max (was atr*2 / 2%, now atr*3 / 3%)
-  const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
+  // ATR-based min (raised) + softened max
+  const minFromPrice = Math.max(atrSafe * 1.0, price * 0.012)
   const maxFromPrice = Math.max(atrSafe * 3, price * 0.03)
-  const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
+  const minBetween = Math.max(atrSafe * 1.0, price * 0.008)
 
   const swings = findSwingPoints(recent, 2, 2)
 
