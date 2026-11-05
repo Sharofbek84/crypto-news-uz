@@ -349,17 +349,32 @@ function CandleChart({
     levelLabels.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' })
   )
   levelLabels.sort((a, b) => b.p - a.p)
+
+  // Current price label stays fixed at its true y. BUY/SELL labels avoid it and each other.
+  const priceLabelY = y(latest)
   const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
-  const minGap = 28
+  const minGap = 30
+  const occupied = [priceLabelY] // fixed price label occupies this y
+
   for (const it of levelLabels) {
     let yy = y(it.p)
-    for (const prev of placedLabels) {
-      if (Math.abs(yy - prev.yy) < minGap) {
-        if (yy >= prev.yy) yy = prev.yy + minGap
-        else yy = prev.yy - minGap
+    let safety = 0
+    while (safety < 24) {
+      let clash = false
+      for (const oy of occupied) {
+        if (Math.abs(yy - oy) < minGap) {
+          // push away from the conflicting label (prefer direction based on true price)
+          if (yy >= oy) yy = oy + minGap
+          else yy = oy - minGap
+          clash = true
+          break
+        }
       }
+      if (!clash) break
+      safety++
     }
     yy = Math.max(T + 14, Math.min(MB - 14, yy))
+    occupied.push(yy)
     placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
   }
 
