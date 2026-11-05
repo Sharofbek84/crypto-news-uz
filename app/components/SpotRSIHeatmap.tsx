@@ -341,65 +341,43 @@ function CandleChart({
 
   const sideLabel = displayLevels?.side === 'SELL' ? 'SELL' : displayLevels?.side === 'BUY' ? 'BUY' : ''
 
-  // SELL labels always above price label, BUY labels always below.
-  type LevelItem = { p: number; label: string; bg: string; side: 'buy' | 'sell' }
+  // SELL labels always above price, BUY always below.
+  // Closest level first so SELL1 stays nearest to price, SELL2 further up (same for BUY).
+  type LevelItem = { p: number; label: string; bg: string }
   const sellItems: LevelItem[] = []
   const buyItems: LevelItem[] = []
   displayLevels?.sells.forEach((p, i) =>
-    sellItems.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a', side: 'sell' })
+    sellItems.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' })
   )
   displayLevels?.buys.forEach((p, i) =>
-    buyItems.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55', side: 'buy' })
+    buyItems.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' })
   )
-  // Higher price first for sells (top of chart), lower price first for buys (bottom)
-  sellItems.sort((a, b) => b.p - a.p)
-  buyItems.sort((a, b) => a.p - b.p)
+  // Closest to current price first
+  sellItems.sort((a, b) => a.p - b.p) // lower resistance first (SELL1)
+  buyItems.sort((a, b) => b.p - a.p)  // higher support first (BUY1)
 
   const priceLabelY = y(latest)
   const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
   const minGap = 30
 
-  // Place SELLs above the price label (smaller SVG y = higher on screen)
-  const sellOccupied: number[] = [priceLabelY]
+  // SELLs: stack upward from just above the price label
+  let nextSellY = priceLabelY - minGap
   for (const it of sellItems) {
-    let yy = Math.min(y(it.p), priceLabelY - minGap)
-    let safety = 0
-    while (safety < 20) {
-      let clash = false
-      for (const oy of sellOccupied) {
-        if (Math.abs(yy - oy) < minGap) {
-          yy = oy - minGap // always push upward (smaller y)
-          clash = true
-          break
-        }
-      }
-      if (!clash) break
-      safety++
-    }
-    yy = Math.max(T + 14, Math.min(priceLabelY - minGap, yy))
-    sellOccupied.push(yy)
+    let yy = Math.min(y(it.p), nextSellY)
+    // keep stacking upward if still too close to previous
+    if (yy > nextSellY) yy = nextSellY
+    yy = Math.max(T + 14, yy)
+    nextSellY = yy - minGap
     placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
   }
 
-  // Place BUYs below the price label (larger SVG y = lower on screen)
-  const buyOccupied: number[] = [priceLabelY]
+  // BUYs: stack downward from just below the price label
+  let nextBuyY = priceLabelY + minGap
   for (const it of buyItems) {
-    let yy = Math.max(y(it.p), priceLabelY + minGap)
-    let safety = 0
-    while (safety < 20) {
-      let clash = false
-      for (const oy of buyOccupied) {
-        if (Math.abs(yy - oy) < minGap) {
-          yy = oy + minGap // always push downward (larger y)
-          clash = true
-          break
-        }
-      }
-      if (!clash) break
-      safety++
-    }
-    yy = Math.max(priceLabelY + minGap, Math.min(MB - 14, yy))
-    buyOccupied.push(yy)
+    let yy = Math.max(y(it.p), nextBuyY)
+    if (yy < nextBuyY) yy = nextBuyY
+    yy = Math.min(MB - 14, yy)
+    nextBuyY = yy + minGap
     placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
   }
 
