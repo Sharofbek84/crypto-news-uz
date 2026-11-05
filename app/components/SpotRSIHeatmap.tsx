@@ -214,8 +214,7 @@ function computeIndependentTradeLevels(
     price *
     (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
 
-  // Original ATR min to price; wider gap between level1 and level2
-  const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
+  const minFromPrice = Math.max(atrSafe * 1.0, price * 0.012)
   const maxFromPrice = Math.max(atrSafe * 3, price * 0.03)
   const minBetween = Math.max(atrSafe * 2.0, price * 0.018)
 
