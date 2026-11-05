@@ -193,7 +193,6 @@ function clusterLevels(prices: number[], tolerance: number) {
 }
 
 function structureWindow(_interval: string) {
-  // Always use last 100 candles for HH/LL based levels
   return 100
 }
 
@@ -211,26 +210,22 @@ function computeIndependentTradeLevels(
   const atr = atrSeries(recent, 14)
   const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
 
-  // Keep previous proportional ranges
   const tol =
     price *
     (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
 
+  // ATR-based minimum distance only (no max limit)
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
-  const maxFromPrice = Math.max(atrSafe * 2, price * 0.02)
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
-  const maxBetween = Math.max(atrSafe * 2, price * 0.02)
 
   const swings = findSwingPoints(recent, 2, 2)
 
-  // Most recent HH (last swing high) and LL (last swing low) by candle index
   const highs = swings.filter((s) => s.type === 'high').sort((a, b) => b.index - a.index)
   const lows = swings.filter((s) => s.type === 'low').sort((a, b) => b.index - a.index)
 
   const lastHH = highs.length ? highs[0].price : null
   const lastLL = lows.length ? lows[0].price : null
 
-  // All clustered levels from last 100 candles
   const rawLows = swings.filter((s) => s.type === 'low').map((s) => s.price)
   const rawHighs = swings.filter((s) => s.type === 'high').map((s) => s.price)
   if (!rawLows.length) rawLows.push(price - atrSafe)
@@ -238,39 +233,35 @@ function computeIndependentTradeLevels(
 
   const support = clusterLevels(rawLows, tol)
     .filter((p) => p < price)
-    .sort((a, b) => b - a) // closest support first
+    .sort((a, b) => b - a)
   const resistance = clusterLevels(rawHighs, tol)
     .filter((p) => p > price)
-    .sort((a, b) => a - b) // closest resistance first
+    .sort((a, b) => a - b)
 
-  // Prefer last HH/LL if they fall inside proportional band
-  function inBandAbove(v: number) {
-    const d = v - price
-    return d >= minFromPrice && d <= maxFromPrice
+  // Only min distance required — levels follow last HH/LL freely
+  function farEnoughAbove(v: number) {
+    return v - price >= minFromPrice
   }
-  function inBandBelow(v: number) {
-    const d = price - v
-    return d >= minFromPrice && d <= maxFromPrice
+  function farEnoughBelow(v: number) {
+    return price - v >= minFromPrice
   }
 
-  // Build sell candidates: last HH first if valid, then other resistances
   const sellCands: number[] = []
-  if (lastHH != null && lastHH > price && inBandAbove(lastHH)) {
+  if (lastHH != null && lastHH > price && farEnoughAbove(lastHH)) {
     sellCands.push(lastHH)
   }
   for (const r of resistance) {
     if (sellCands.some((x) => Math.abs(x - r) < tol)) continue
-    if (inBandAbove(r)) sellCands.push(r)
+    if (farEnoughAbove(r)) sellCands.push(r)
   }
 
-  // Build buy candidates: last LL first if valid, then other supports
   const buyCands: number[] = []
-  if (lastLL != null && lastLL < price && inBandBelow(lastLL)) {
+  if (lastLL != null && lastLL < price && farEnoughBelow(lastLL)) {
     buyCands.push(lastLL)
   }
   for (const s of support) {
     if (buyCands.some((x) => Math.abs(x - s) < tol)) continue
-    if (inBandBelow(s)) buyCands.push(s)
+    if (farEnoughBelow(s)) buyCands.push(s)
   }
 
   function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
@@ -282,7 +273,7 @@ function computeIndependentTradeLevels(
       const v = ordered[i]
       const dist = Math.abs(v - first)
       if (dist < minBetween) continue
-      if (dist > maxBetween) break
+      // no max distance — use further HH/LL
       second = v
       break
     }
@@ -367,14 +358,11 @@ function CandleChart({
 
   const sideLabel = displayLevels?.side === 'SELL' ? 'SELL' : displayLevels?.side === 'BUY' ? 'BUY' : ''
 
-  // Labels order top→bottom: SELL2, SELL1, PRICE, BUY1, BUY2.
-  // When price is in the middle: price label stays on the price line (symmetric).
-  // Near edges the whole stack shifts so nothing overlaps or clips.
   type LevelItem = { p: number; label: string; bg: string; kind: 'sell' | 'buy' | 'price' }
   const items: LevelItem[] = []
 
-  const sells = [...(displayLevels?.sells || [])].sort((a, b) => a - b) // [SELL1, SELL2]
-  const buys = [...(displayLevels?.buys || [])].sort((a, b) => b - a)   // [BUY1, BUY2]
+  const sells = [...(displayLevels?.sells || [])].sort((a, b) => a - b)
+  const buys = [...(displayLevels?.buys || [])].sort((a, b) => b - a)
 
   if (sells.length >= 2) {
     items.push({ p: sells[1], label: `SELL2  ${money(sells[1])}`, bg: '#c52f3a', kind: 'sell' })
@@ -395,26 +383,22 @@ function CandleChart({
   const topLimit = T + 14
   const botLimit = MB - 14
 
-  // Anchor price at its true y; stack sells up and buys down from it
   const priceY = y(latest)
   let ys = new Array(items.length).fill(0)
   ys[priceIdx] = priceY
 
-  // SELLs: upward from price (smaller y)
   for (let i = priceIdx - 1; i >= 0; i--) {
     const ideal = y(items[i].p)
-    const ceiling = ys[i + 1] - minGap // must stay above next item
+    const ceiling = ys[i + 1] - minGap
     ys[i] = Math.min(ideal, ceiling)
   }
 
-  // BUYs: downward from price (larger y)
   for (let i = priceIdx + 1; i < items.length; i++) {
     const ideal = y(items[i].p)
     const floor = ys[i - 1] + minGap
     ys[i] = Math.max(ideal, floor)
   }
 
-  // If stack overflows top or bottom, shift everything (including price)
   if (ys[0] < topLimit) {
     const shift = topLimit - ys[0]
     ys = ys.map((v) => v + shift)
@@ -423,7 +407,6 @@ function CandleChart({
     const shift = ys[ys.length - 1] - botLimit
     ys = ys.map((v) => v - shift)
   }
-  // Re-clamp if still tight
   if (ys[0] < topLimit) {
     ys[0] = topLimit
     for (let i = 1; i < ys.length; i++) {
