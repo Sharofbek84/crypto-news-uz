@@ -214,8 +214,9 @@ function computeIndependentTradeLevels(
     price *
     (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
 
-  // ATR min distance + Fib 1.272 max based on last HH–LL range
+  // ATR-based min + softened max (was atr*2 / 2%, now atr*3 / 3%)
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
+  const maxFromPrice = Math.max(atrSafe * 3, price * 0.03)
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
 
   const swings = findSwingPoints(recent, 2, 2)
@@ -225,13 +226,6 @@ function computeIndependentTradeLevels(
 
   const lastHH = highs.length ? highs[0].price : null
   const lastLL = lows.length ? lows[0].price : null
-
-  // Swing range from last HH/LL (fallback: ATR-based)
-  const swingHigh = lastHH != null ? lastHH : price + atrSafe * 2
-  const swingLow = lastLL != null ? lastLL : price - atrSafe * 2
-  const swingRange = Math.max(swingHigh - swingLow, atrSafe)
-  const fibMax = 1.272
-  const maxFromPrice = Math.max(swingRange * fibMax, minFromPrice * 2)
 
   const rawLows = swings.filter((s) => s.type === 'low').map((s) => s.price)
   const rawHighs = swings.filter((s) => s.type === 'high').map((s) => s.price)
@@ -245,7 +239,6 @@ function computeIndependentTradeLevels(
     .filter((p) => p > price)
     .sort((a, b) => a - b)
 
-  // Min (ATR) + Max (Fib 1.272 of HH–LL range)
   function inBandAbove(v: number) {
     const d = v - price
     return d >= minFromPrice && d <= maxFromPrice
