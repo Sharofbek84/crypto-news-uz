@@ -341,26 +341,40 @@ function CandleChart({
 
   const sideLabel = displayLevels?.side === 'SELL' ? 'SELL' : displayLevels?.side === 'BUY' ? 'BUY' : ''
 
-  const levelLabels: { p: number; label: string; bg: string }[] = []
+  // Collect all labels that need collision avoidance (BUY/SELL + current price)
+  type LabelItem = { p: number; label: string; bg: string; isPrice?: boolean }
+  const levelLabels: LabelItem[] = []
   displayLevels?.buys.forEach((p, i) =>
     levelLabels.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' })
   )
   displayLevels?.sells.forEach((p, i) =>
     levelLabels.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' })
   )
+  // Current price is always included so it participates in spacing
+  levelLabels.push({ p: latest, label: money(latest), bg: '#1a6f9a', isPrice: true })
   levelLabels.sort((a, b) => b.p - a.p)
-  const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
-  const minGap = 28
+
+  const placedLabels: { yy: number; p: number; label: string; bg: string; isPrice?: boolean }[] = []
+  const minGap = 30 // slightly larger gap for better readability
+
   for (const it of levelLabels) {
     let yy = y(it.p)
-    for (const prev of placedLabels) {
-      if (Math.abs(yy - prev.yy) < minGap) {
-        if (yy >= prev.yy) yy = prev.yy + minGap
-        else yy = prev.yy - minGap
+    // Resolve collisions by pushing away from already placed labels
+    let changed = true
+    let safety = 0
+    while (changed && safety < 20) {
+      changed = false
+      safety++
+      for (const prev of placedLabels) {
+        if (Math.abs(yy - prev.yy) < minGap) {
+          if (yy >= prev.yy) yy = prev.yy + minGap
+          else yy = prev.yy - minGap
+          changed = true
+        }
       }
     }
     yy = Math.max(T + 14, Math.min(MB - 14, yy))
-    placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
+    placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg, isPrice: it.isPrice })
   }
 
   return (
@@ -445,6 +459,7 @@ function CandleChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
+          {/* Horizontal lines + labels for BUY / SELL / current price */}
           {placedLabels.map((it, i) => (
             <g key={i}>
               <line
@@ -453,46 +468,42 @@ function CandleChart({
                 y1={y(it.p)}
                 y2={y(it.p)}
                 stroke={it.bg}
-                strokeWidth="1.3"
-                strokeDasharray="6 5"
-                opacity="0.85"
+                strokeWidth={it.isPrice ? 1.2 : 1.3}
+                strokeDasharray={it.isPrice ? '3 4' : '6 5'}
+                opacity={it.isPrice ? 1 : 0.85}
               />
-              <line
-                x1={plotRight}
-                x2={labelX}
-                y1={y(it.p)}
-                y2={it.yy}
-                stroke={it.bg}
-                strokeWidth="1"
-                opacity="0.45"
+              {/* connector only when label was shifted away from true price line */}
+              {Math.abs(it.yy - y(it.p)) > 2 && (
+                <line
+                  x1={plotRight}
+                  x2={labelX}
+                  y1={y(it.p)}
+                  y2={it.yy}
+                  stroke={it.bg}
+                  strokeWidth="1"
+                  opacity="0.45"
+                />
+              )}
+              <rect
+                x={labelX}
+                y={it.yy - (it.isPrice ? 13 : 12)}
+                width={118}
+                height={it.isPrice ? 26 : 24}
+                rx="4"
+                fill={it.bg}
               />
-              <rect x={labelX} y={it.yy - 12} width={118} height={24} rx="4" fill={it.bg} />
               <text
                 x={labelX + 59}
                 y={it.yy + 5}
                 textAnchor="middle"
                 fill="#fff"
-                fontSize="11"
+                fontSize={it.isPrice ? 12 : 11}
                 fontWeight="800"
               >
                 {it.label}
               </text>
             </g>
           ))}
-
-          <line
-            x1={L}
-            x2={plotRight}
-            y1={y(latest)}
-            y2={y(latest)}
-            stroke="#65d9ff"
-            strokeDasharray="3 4"
-            strokeWidth="1.2"
-          />
-          <rect x={labelX} y={y(latest) - 13} width={118} height={26} rx="4" fill="#1a6f9a" />
-          <text x={labelX + 59} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
-            {money(latest)}
-          </text>
 
           <text x={L + 8} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
             RSI 14 {rs[rs.length - 1]?.toFixed(2) ?? '—'}
@@ -582,180 +593,121 @@ export default function SpotRSIHeatmap() {
 
   useEffect(() => {
     loadHeatmap()
-    const timer = window.setInterval(loadHeatmap, 60_000)
-    return () => window.clearInterval(timer)
+    const id = setInterval(loadHeatmap, 60_000)
+    return () => clearInterval(id)
   }, [loadHeatmap])
 
   useEffect(() => {
     loadChart(coin, tf, interval)
   }, [coin, tf, interval, loadChart])
 
-  const cells = payload?.data
-  const selectedCell = cells?.[coin]?.[tf]
+  const selectedCell = payload?.data?.[coin]?.[tf] ?? null
 
   return (
-    <section className="rsiHeat">
-      <style>{`
-        .rsiHeat { color: #e6edf3; }
-        .rsiSub { color: #8b949e; font-size: 0.88rem; font-weight: 700; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
-        .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
-        .rsiChartOuter { position: relative; }
-        .rsiHmFoot {
-          position: absolute; bottom: 10px; right: 14px; z-index: 2;
-          margin: 0; font-size: 0.72rem; color: #9aa7b8; text-align: right;
-          background: transparent; padding: 0; border: none;
-          pointer-events: none; white-space: nowrap;
-        }
-        .rsiTfRow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; margin: 0; }
-        .rsiTfBtn {
-          border: 1px solid #303846; background: #111820; color: #c8d1dc;
-          border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 0.84rem;
-        }
-        .rsiTfBtn.active { border-color: #f0b90b; color: #f0b90b; background: #1a1610; }
-        .rsiGrid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-          gap: 10px;
-        }
-        .rsiCard {
-          border-radius: 10px; padding: 8px 10px; min-height: 80px;
-          display: flex; flex-direction: column; justify-content: center; gap: 2px;
-          border: 1px solid #252d38; text-decoration: none; color: inherit;
-          transition: transform 0.12s ease, border-color 0.12s ease;
-          cursor: pointer;
-        }
-        .rsiCard:hover { transform: translateY(-2px); border-color: #f0b90b66; }
-        .rsiCard.active { border-color: #f0b90b; box-shadow: 0 0 0 1px #f0b90b44; }
-        .rsiCardTop {
-          display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
-          min-width: 0;
-        }
-        .rsiCoin { font-size: 0.88rem; font-weight: 800; letter-spacing: 0.02em; flex-shrink: 0; }
-        .rsiPrice {
-          font-size: 0.68rem; opacity: 0.9; font-weight: 600;
-          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
-        }
-        .rsiVal { font-size: 1.15rem; font-weight: 800; line-height: 1.15; }
-        .rsiMeta { font-size: 0.68rem; opacity: 0.9; }
-        .rsiErr, .rsiLoad { padding: 28px; text-align: center; color: #8b949e; }
-        .rsiUpdated { font-size: 0.75rem; color: #8b949e; margin-top: 14px; }
-        .homeChartWrap { margin-top: 18px; border: 1px solid #252d38; border-radius: 12px; overflow: hidden; background: #0a1018; }
-        .homeChartScroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .homeChart { display: block; min-width: 900px; }
-        .rsiChartEmpty { padding: 40px; text-align: center; color: #8b949e; }
-        .rsiLevelsNote {
-          margin-top: 12px; padding: 14px 16px; border-radius: 10px;
-          background: #111820; border: 1px solid #252d38; font-size: 0.88rem; line-height: 1.55;
-        }
-        .rsiTradeLine { margin-bottom: 6px; }
-        .rsiTradeLabel { color: #8b949e; font-weight: 600; }
-        .rsiBuy { color: #2ecc71; margin-right: 6px; }
-        .rsiSell { color: #e74c3c; margin-right: 6px; }
-      `}</style>
-
-      <div className="rsiHeadRow">
-        <p className="rsiSub">
-          Spot RSI Heatmap: top kriptovalyutalar trendini bir joyda kuzating.
+    <section className="rsiHeatmapSection">
+      <div className="rsiHeatmapHeader">
+        <h2 className="rsiHeatmapTitle">Spot RSI Heatmap</h2>
+        <p className="rsiHeatmapSub">
+          RSI(14) asosida overbought / oversold holatlar va mustaqil support/resistance darajalari
         </p>
-        <div className="rsiTfRow">
-          {TIMEFRAMES.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              className={`rsiTfBtn${tf === t.key ? ' active' : ''}`}
-              onClick={() => setTf(t.key)}
-            >
-              {t.key}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {loading && !payload ? (
-        <div className="rsiLoad">Yuklanmoqda…</div>
-      ) : error ? (
-        <div className="rsiErr">Ma'lumot yuklanmadi. Qayta urinib ko'ring.</div>
-      ) : (
+      {loading && <div className="rsiLoading">Yuklanmoqda...</div>}
+      {error && !loading && (
+        <div className="rsiError">Ma'lumot yuklanmadi. Qayta urinib ko'ring.</div>
+      )}
+
+      {!loading && !error && payload && (
         <>
+          <div className="rsiTfTabs">
+            {TIMEFRAMES.map((t) => (
+              <button
+                key={t.key}
+                className={`rsiTfBtn ${tf === t.key ? 'active' : ''}`}
+                onClick={() => setTf(t.key)}
+              >
+                {t.key}
+              </button>
+            ))}
+          </div>
+
           <div className="rsiGrid">
             {COINS.map((c) => {
-              const cell = cells?.[c]?.[tf]
+              const cell = payload.data?.[c]?.[tf]
               const rsi = cell?.rsi ?? null
+              const active = c === coin
               return (
                 <button
                   key={c}
-                  type="button"
-                  className={`rsiCard${coin === c ? ' active' : ''}`}
+                  className={`rsiCell ${active ? 'active' : ''}`}
                   style={{ background: rsiColor(rsi) }}
                   onClick={() => setCoin(c)}
                 >
-                  <div className="rsiCardTop">
-                    <span className="rsiCoin">{c}</span>
-                    <span className="rsiPrice">{formatPrice(cell?.price ?? null)}</span>
-                  </div>
-                  <div className="rsiVal">
-                    {rsi != null ? rsi.toFixed(1) : '—'}{' '}
-                    <span style={{ fontSize: '0.8rem' }}>{arrow(cell?.rsiDirection ?? null)}</span>
-                  </div>
-                  <div className="rsiMeta">{rsiLabel(rsi)}</div>
+                  <span className="rsiCellCoin">{c}</span>
+                  <span className="rsiCellVal">{rsi != null ? rsi.toFixed(1) : '—'}</span>
+                  <span className="rsiCellPrice">{formatPrice(cell?.price ?? null)}</span>
                 </button>
               )
             })}
           </div>
 
+          <div className="rsiChartHeader">
+            <div className="rsiChartTitle">
+              {coin} · {tf} · RSI(14): {selectedCell?.rsi ?? '—'} · Yangilandi:{' '}
+              {payload?.updatedAt ? new Date(payload.updatedAt).toLocaleTimeString() : '—'}
+            </div>
+          </div>
+
           {chartLoading ? (
-            <div className="rsiLoad">Grafik yuklanmoqda…</div>
+            <div className="rsiChartEmpty">Grafik yuklanmoqda...</div>
           ) : (
             <>
-              <div className="rsiChartOuter">
-                <CandleChart candles={candles} coin={coin} tf={tf} levels={levels} />
-                {selectedCell && (
-                  <div className="rsiHmFoot">
-                    {coin} · {tf} · RSI(14): {selectedCell.rsi ?? '—'} ·
-                    Yangilandi:{' '}
-                    {payload?.updatedAt ? new Date(payload.updatedAt).toLocaleTimeString() : '—'}
-                  </div>
-                )}
-              </div>
-              {levels && (() => {
-                const chartRsi = selectedCell?.rsi ?? null
-                const shown = filterLevelsByRsi(levels, chartRsi)
-                if (!shown) return null
-                const noBuy = chartRsi != null && chartRsi >= 70
-                const noSell = chartRsi != null && chartRsi <= 30
-                if (shown.buys.length === 0 && shown.sells.length === 0 && !noBuy && !noSell) return null
-                return (
-                <div className="rsiLevelsNote">
-                  <div className="rsiTradeLine">
-                    <span className="rsiTradeLabel">Sotib olish:</span>{' '}
-                    {noBuy || shown.buys.length === 0 ? (
-                      <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
-                    ) : (
-                      shown.buys.map((p, i) => (
-                        <span key={`b${i}`} className="rsiBuy">
-                          BUY{i + 1}: <b>{money(p)}</b>{i < shown.buys.length - 1 ? ', ' : ''}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                  <div className="rsiTradeLine">
-                    <span className="rsiTradeLabel">Sotish:</span>{' '}
-                    {noSell || shown.sells.length === 0 ? (
-                      <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
-                    ) : (
-                      shown.sells.map((p, i) => (
-                        <span key={`s${i}`} className="rsiSell">
-                          SELL{i + 1}: <b>{money(p)}</b>{i < shown.sells.length - 1 ? ', ' : ''}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                  <div className="rsiTradeLine" style={{ marginBottom: 0, color: '#8b949e' }}>
-                    <span className="rsiTradeLabel">Izoh:</span>{' '}
-                    Ushbu narx darajalari faqat spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
-                  </div>
-                </div>
-              )})()}
+              <CandleChart candles={candles} coin={coin} tf={tf} levels={levels} />
+              {levels &&
+                (() => {
+                  const chartRsi = selectedCell?.rsi ?? null
+                  const shown = filterLevelsByRsi(levels, chartRsi)
+                  if (!shown) return null
+                  const noBuy = chartRsi != null && chartRsi >= 70
+                  const noSell = chartRsi != null && chartRsi <= 30
+                  if (shown.buys.length === 0 && shown.sells.length === 0 && !noBuy && !noSell)
+                    return null
+                  return (
+                    <div className="rsiLevelsNote">
+                      <div className="rsiTradeLine">
+                        <span className="rsiTradeLabel">Sotib olish:</span>{' '}
+                        {noBuy || shown.buys.length === 0 ? (
+                          <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
+                        ) : (
+                          shown.buys.map((p, i) => (
+                            <span key={`b${i}`} className="rsiBuy">
+                              BUY{i + 1}: <b>{money(p)}</b>
+                              {i < shown.buys.length - 1 ? ', ' : ''}
+                            </span>
+                          ))
+                        )}
+                      </div>
+                      <div className="rsiTradeLine">
+                        <span className="rsiTradeLabel">Sotish:</span>{' '}
+                        {noSell || shown.sells.length === 0 ? (
+                          <span style={{ color: '#8b949e' }}>tavsiya etilmaydi.</span>
+                        ) : (
+                          shown.sells.map((p, i) => (
+                            <span key={`s${i}`} className="rsiSell">
+                              SELL{i + 1}: <b>{money(p)}</b>
+                              {i < shown.sells.length - 1 ? ', ' : ''}
+                            </span>
+                          ))
+                        )}
+                      </div>
+                      <div className="rsiTradeLine" style={{ marginBottom: 0, color: '#8b949e' }}>
+                        <span className="rsiTradeLabel">Izoh:</span> Ushbu narx darajalari faqat
+                        spot savdosi uchun mo'ljallangan. Fyuchers uchun aniq signallar va texnik
+                        tahlil Premium sahifada berilgan <Link href={premiumHref}>{'>>>'}</Link>
+                      </div>
+                    </div>
+                  )
+                })()}
             </>
           )}
         </>
