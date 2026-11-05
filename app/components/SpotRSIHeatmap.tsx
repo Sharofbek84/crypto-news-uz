@@ -658,8 +658,8 @@ export default function SpotRSIHeatmap() {
     <section className="rsiHeat">
       <style>{`
         .rsiHeat { color: #e6edf3; }
-        .rsiSub { color: #8b949e; font-size: 0.88rem; font-weight: 700; margin: 0; line-height: 1.5; flex: 1; min-width: 0; }
-        .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; flex-wrap: wrap; }
+        .rsiSub { color: #8b949e; font-size: 1.02rem; font-weight: 700; margin: 6px 0 0; line-height: 1.5; flex: 1; min-width: 0; }
+        .rsiHeadRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 14px; flex-wrap: wrap; }
         .rsiChartOuter { position: relative; }
         .rsiHmFoot {
           position: absolute; bottom: 10px; right: 14px; z-index: 2;
@@ -715,7 +715,7 @@ export default function SpotRSIHeatmap() {
 
       <div className="rsiHeadRow">
         <p className="rsiSub">
-          RSI(14) asosida overbought / oversold holatlar va mustaqil support/resistance darajalari
+          Spot RSI Heatmap: top kriptovalyutalar trendini bir joyda kuzating.
         </p>
         <div className="rsiTfRow">
           {TIMEFRAMES.map((t) => (
