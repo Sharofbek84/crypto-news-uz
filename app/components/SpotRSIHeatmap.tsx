@@ -214,7 +214,7 @@ function computeIndependentTradeLevels(
     price *
     (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
 
-  // ATR-based minimum distance only (no max limit)
+  // ATR min distance + Fib 1.272 max based on last HH–LL range
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
 
@@ -225,6 +225,13 @@ function computeIndependentTradeLevels(
 
   const lastHH = highs.length ? highs[0].price : null
   const lastLL = lows.length ? lows[0].price : null
+
+  // Swing range from last HH/LL (fallback: ATR-based)
+  const swingHigh = lastHH != null ? lastHH : price + atrSafe * 2
+  const swingLow = lastLL != null ? lastLL : price - atrSafe * 2
+  const swingRange = Math.max(swingHigh - swingLow, atrSafe)
+  const fibMax = 1.272
+  const maxFromPrice = Math.max(swingRange * fibMax, minFromPrice * 2)
 
   const rawLows = swings.filter((s) => s.type === 'low').map((s) => s.price)
   const rawHighs = swings.filter((s) => s.type === 'high').map((s) => s.price)
@@ -238,30 +245,32 @@ function computeIndependentTradeLevels(
     .filter((p) => p > price)
     .sort((a, b) => a - b)
 
-  // Only min distance required — levels follow last HH/LL freely
-  function farEnoughAbove(v: number) {
-    return v - price >= minFromPrice
+  // Min (ATR) + Max (Fib 1.272 of HH–LL range)
+  function inBandAbove(v: number) {
+    const d = v - price
+    return d >= minFromPrice && d <= maxFromPrice
   }
-  function farEnoughBelow(v: number) {
-    return price - v >= minFromPrice
+  function inBandBelow(v: number) {
+    const d = price - v
+    return d >= minFromPrice && d <= maxFromPrice
   }
 
   const sellCands: number[] = []
-  if (lastHH != null && lastHH > price && farEnoughAbove(lastHH)) {
+  if (lastHH != null && lastHH > price && inBandAbove(lastHH)) {
     sellCands.push(lastHH)
   }
   for (const r of resistance) {
     if (sellCands.some((x) => Math.abs(x - r) < tol)) continue
-    if (farEnoughAbove(r)) sellCands.push(r)
+    if (inBandAbove(r)) sellCands.push(r)
   }
 
   const buyCands: number[] = []
-  if (lastLL != null && lastLL < price && farEnoughBelow(lastLL)) {
+  if (lastLL != null && lastLL < price && inBandBelow(lastLL)) {
     buyCands.push(lastLL)
   }
   for (const s of support) {
     if (buyCands.some((x) => Math.abs(x - s) < tol)) continue
-    if (farEnoughBelow(s)) buyCands.push(s)
+    if (inBandBelow(s)) buyCands.push(s)
   }
 
   function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
@@ -273,7 +282,6 @@ function computeIndependentTradeLevels(
       const v = ordered[i]
       const dist = Math.abs(v - first)
       if (dist < minBetween) continue
-      // no max distance — use further HH/LL
       second = v
       break
     }
