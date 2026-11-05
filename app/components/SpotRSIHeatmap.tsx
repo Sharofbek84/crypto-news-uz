@@ -192,8 +192,9 @@ function clusterLevels(prices: number[], tolerance: number) {
   return clusters
 }
 
-function structureWindow(interval: string) {
-  return interval === '1w' ? 52 : interval === '1d' ? 80 : interval === '4h' ? 70 : 48
+function structureWindow(_interval: string) {
+  // Always use last 100 candles for HH/LL based levels
+  return 100
 }
 
 function computeIndependentTradeLevels(
@@ -210,42 +211,67 @@ function computeIndependentTradeLevels(
   const atr = atrSeries(recent, 14)
   const atrSafe = Number.isFinite(atr) && atr > 0 ? atr : price * 0.01
 
+  // Keep previous proportional ranges
   const tol =
     price *
     (interval === '1h' ? 0.002 : interval === '4h' ? 0.003 : interval === '1w' ? 0.005 : 0.004)
-
-  const swings = findSwingPoints(recent, 2, 2)
-  const rawLows = swings.filter((s) => s.type === 'low').map((s) => s.price)
-  const rawHighs = swings.filter((s) => s.type === 'high').map((s) => s.price)
-
-  if (!rawLows.length) rawLows.push(price - atrSafe)
-  if (!rawHighs.length) rawHighs.push(price + atrSafe)
-
-  const support = clusterLevels(rawLows, tol)
-    .filter((p) => p < price)
-    .sort((a, b) => b - a)
-  const resistance = clusterLevels(rawHighs, tol)
-    .filter((p) => p > price)
-    .sort((a, b) => a - b)
 
   const minFromPrice = Math.max(atrSafe * 0.6, price * 0.008)
   const maxFromPrice = Math.max(atrSafe * 2, price * 0.02)
   const minBetween = Math.max(atrSafe * 0.8, price * 0.005)
   const maxBetween = Math.max(atrSafe * 2, price * 0.02)
 
-  const supportsBelow = support
-    .filter((v) => {
-      const d = price - v
-      return d >= minFromPrice && d <= maxFromPrice
-    })
-    .sort((a, b) => b - a)
+  const swings = findSwingPoints(recent, 2, 2)
 
-  const resistsAbove = resistance
-    .filter((v) => {
-      const d = v - price
-      return d >= minFromPrice && d <= maxFromPrice
-    })
-    .sort((a, b) => a - b)
+  // Most recent HH (last swing high) and LL (last swing low) by candle index
+  const highs = swings.filter((s) => s.type === 'high').sort((a, b) => b.index - a.index)
+  const lows = swings.filter((s) => s.type === 'low').sort((a, b) => b.index - a.index)
+
+  const lastHH = highs.length ? highs[0].price : null
+  const lastLL = lows.length ? lows[0].price : null
+
+  // All clustered levels from last 100 candles
+  const rawLows = swings.filter((s) => s.type === 'low').map((s) => s.price)
+  const rawHighs = swings.filter((s) => s.type === 'high').map((s) => s.price)
+  if (!rawLows.length) rawLows.push(price - atrSafe)
+  if (!rawHighs.length) rawHighs.push(price + atrSafe)
+
+  const support = clusterLevels(rawLows, tol)
+    .filter((p) => p < price)
+    .sort((a, b) => b - a) // closest support first
+  const resistance = clusterLevels(rawHighs, tol)
+    .filter((p) => p > price)
+    .sort((a, b) => a - b) // closest resistance first
+
+  // Prefer last HH/LL if they fall inside proportional band
+  function inBandAbove(v: number) {
+    const d = v - price
+    return d >= minFromPrice && d <= maxFromPrice
+  }
+  function inBandBelow(v: number) {
+    const d = price - v
+    return d >= minFromPrice && d <= maxFromPrice
+  }
+
+  // Build sell candidates: last HH first if valid, then other resistances
+  const sellCands: number[] = []
+  if (lastHH != null && lastHH > price && inBandAbove(lastHH)) {
+    sellCands.push(lastHH)
+  }
+  for (const r of resistance) {
+    if (sellCands.some((x) => Math.abs(x - r) < tol)) continue
+    if (inBandAbove(r)) sellCands.push(r)
+  }
+
+  // Build buy candidates: last LL first if valid, then other supports
+  const buyCands: number[] = []
+  if (lastLL != null && lastLL < price && inBandBelow(lastLL)) {
+    buyCands.push(lastLL)
+  }
+  for (const s of support) {
+    if (buyCands.some((x) => Math.abs(x - s) < tol)) continue
+    if (inBandBelow(s)) buyCands.push(s)
+  }
 
   function pickTwo(ordered: number[], direction: 'down' | 'up'): number[] {
     const firstDefault = direction === 'down' ? price - atrSafe : price + atrSafe
@@ -268,8 +294,8 @@ function computeIndependentTradeLevels(
   }
 
   return {
-    buys: pickTwo(supportsBelow, 'down'),
-    sells: pickTwo(resistsAbove, 'up'),
+    buys: pickTwo(buyCands, 'down'),
+    sells: pickTwo(sellCands, 'up'),
     side: null,
   }
 }
