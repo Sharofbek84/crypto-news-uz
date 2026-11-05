@@ -754,10 +754,7 @@ export default function SpotRSIHeatmap() {
                 >
                   <div className="rsiCardTop">
                     <span className="rsiCoin">{c}</span>
-                    <span className="rsiPrice">
-                      {formatPrice(cell?.price ?? null)}{' '}
-                      <span style={{ fontSize: '0.75rem' }}>{arrow(cell?.priceDirection ?? null)}</span>
-                    </span>
+                    <span className="rsiPrice">{formatPrice(cell?.price ?? null)}</span>
                   </div>
                   <div className="rsiVal">
                     {rsi != null ? rsi.toFixed(1) : '—'}{' '}
