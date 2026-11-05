@@ -341,21 +341,22 @@ function CandleChart({
 
   const sideLabel = displayLevels?.side === 'SELL' ? 'SELL' : displayLevels?.side === 'BUY' ? 'BUY' : ''
 
-  // Unified labels: SELL2, SELL1, PRICE, BUY1, BUY2 (top → bottom).
-  // Price label also has a connector and can shift when near chart edges.
+  // Labels order top→bottom: SELL2, SELL1, PRICE, BUY1, BUY2.
+  // When price is in the middle: price label stays on the price line (symmetric).
+  // Near edges the whole stack shifts so nothing overlaps or clips.
   type LevelItem = { p: number; label: string; bg: string; kind: 'sell' | 'buy' | 'price' }
   const items: LevelItem[] = []
 
-  const sells = [...(displayLevels?.sells || [])].sort((a, b) => a - b) // SELL1 closer, SELL2 higher
-  const buys = [...(displayLevels?.buys || [])].sort((a, b) => b - a)   // BUY1 closer, BUY2 lower
+  const sells = [...(displayLevels?.sells || [])].sort((a, b) => a - b) // [SELL1, SELL2]
+  const buys = [...(displayLevels?.buys || [])].sort((a, b) => b - a)   // [BUY1, BUY2]
 
-  // Order top→bottom on chart: higher sells first, then price, then buys
   if (sells.length >= 2) {
     items.push({ p: sells[1], label: `SELL2  ${money(sells[1])}`, bg: '#c52f3a', kind: 'sell' })
   }
   if (sells.length >= 1) {
     items.push({ p: sells[0], label: `SELL1  ${money(sells[0])}`, bg: '#c52f3a', kind: 'sell' })
   }
+  const priceIdx = items.length
   items.push({ p: latest, label: money(latest), bg: '#1a6f9a', kind: 'price' })
   if (buys.length >= 1) {
     items.push({ p: buys[0], label: `BUY1  ${money(buys[0])}`, bg: '#148f55', kind: 'buy' })
@@ -368,37 +369,46 @@ function CandleChart({
   const topLimit = T + 14
   const botLimit = MB - 14
 
-  // Ideal y from true price, then resolve collisions keeping order
-  let ys = items.map((it) => y(it.p))
+  // Anchor price at its true y; stack sells up and buys down from it
+  const priceY = y(latest)
+  let ys = new Array(items.length).fill(0)
+  ys[priceIdx] = priceY
 
-  // Push apart from top to bottom to enforce minGap while preserving order
-  for (let i = 1; i < ys.length; i++) {
-    if (ys[i] < ys[i - 1] + minGap) {
-      ys[i] = ys[i - 1] + minGap
+  // SELLs: upward from price (smaller y)
+  for (let i = priceIdx - 1; i >= 0; i--) {
+    const ideal = y(items[i].p)
+    const ceiling = ys[i + 1] - minGap // must stay above next item
+    ys[i] = Math.min(ideal, ceiling)
+  }
+
+  // BUYs: downward from price (larger y)
+  for (let i = priceIdx + 1; i < items.length; i++) {
+    const ideal = y(items[i].p)
+    const floor = ys[i - 1] + minGap
+    ys[i] = Math.max(ideal, floor)
+  }
+
+  // If stack overflows top or bottom, shift everything (including price)
+  if (ys[0] < topLimit) {
+    const shift = topLimit - ys[0]
+    ys = ys.map((v) => v + shift)
+  }
+  if (ys[ys.length - 1] > botLimit) {
+    const shift = ys[ys.length - 1] - botLimit
+    ys = ys.map((v) => v - shift)
+  }
+  // Re-clamp if still tight
+  if (ys[0] < topLimit) {
+    ys[0] = topLimit
+    for (let i = 1; i < ys.length; i++) {
+      ys[i] = Math.max(ys[i], ys[i - 1] + minGap)
     }
   }
-  // If overflow past bottom, shift whole stack up
-  const overflowBot = ys[ys.length - 1] - botLimit
-  if (overflowBot > 0) {
-    ys = ys.map((v) => v - overflowBot)
-  }
-  // If overflow past top, shift whole stack down
-  const overflowTop = topLimit - ys[0]
-  if (overflowTop > 0) {
-    ys = ys.map((v) => v + overflowTop)
-  }
-  // Final clamp + re-enforce gaps from top
-  ys[0] = Math.max(topLimit, Math.min(botLimit, ys[0]))
-  for (let i = 1; i < ys.length; i++) {
-    ys[i] = Math.max(ys[i - 1] + minGap, Math.min(botLimit, ys[i]))
-  }
-  // If still overflowing bottom after clamp, compress from bottom upward
   if (ys[ys.length - 1] > botLimit) {
     ys[ys.length - 1] = botLimit
     for (let i = ys.length - 2; i >= 0; i--) {
-      if (ys[i] > ys[i + 1] - minGap) ys[i] = ys[i + 1] - minGap
+      ys[i] = Math.min(ys[i], ys[i + 1] - minGap)
     }
-    if (ys[0] < topLimit) ys[0] = topLimit
   }
 
   const placedLabels = items.map((it, i) => ({
