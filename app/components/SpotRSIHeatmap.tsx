@@ -341,31 +341,34 @@ function CandleChart({
 
   const sideLabel = displayLevels?.side === 'SELL' ? 'SELL' : displayLevels?.side === 'BUY' ? 'BUY' : ''
 
-  const levelLabels: { p: number; label: string; bg: string }[] = []
-  displayLevels?.buys.forEach((p, i) =>
-    levelLabels.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' })
-  )
+  // SELL labels always above price label, BUY labels always below.
+  type LevelItem = { p: number; label: string; bg: string; side: 'buy' | 'sell' }
+  const sellItems: LevelItem[] = []
+  const buyItems: LevelItem[] = []
   displayLevels?.sells.forEach((p, i) =>
-    levelLabels.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' })
+    sellItems.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a', side: 'sell' })
   )
-  levelLabels.sort((a, b) => b.p - a.p)
+  displayLevels?.buys.forEach((p, i) =>
+    buyItems.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55', side: 'buy' })
+  )
+  // Higher price first for sells (top of chart), lower price first for buys (bottom)
+  sellItems.sort((a, b) => b.p - a.p)
+  buyItems.sort((a, b) => a.p - b.p)
 
-  // Current price label stays fixed at its true y. BUY/SELL labels avoid it and each other.
   const priceLabelY = y(latest)
   const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
   const minGap = 30
-  const occupied = [priceLabelY] // fixed price label occupies this y
 
-  for (const it of levelLabels) {
-    let yy = y(it.p)
+  // Place SELLs above the price label (smaller SVG y = higher on screen)
+  const sellOccupied: number[] = [priceLabelY]
+  for (const it of sellItems) {
+    let yy = Math.min(y(it.p), priceLabelY - minGap)
     let safety = 0
-    while (safety < 24) {
+    while (safety < 20) {
       let clash = false
-      for (const oy of occupied) {
+      for (const oy of sellOccupied) {
         if (Math.abs(yy - oy) < minGap) {
-          // push away from the conflicting label (prefer direction based on true price)
-          if (yy >= oy) yy = oy + minGap
-          else yy = oy - minGap
+          yy = oy - minGap // always push upward (smaller y)
           clash = true
           break
         }
@@ -373,8 +376,30 @@ function CandleChart({
       if (!clash) break
       safety++
     }
-    yy = Math.max(T + 14, Math.min(MB - 14, yy))
-    occupied.push(yy)
+    yy = Math.max(T + 14, Math.min(priceLabelY - minGap, yy))
+    sellOccupied.push(yy)
+    placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
+  }
+
+  // Place BUYs below the price label (larger SVG y = lower on screen)
+  const buyOccupied: number[] = [priceLabelY]
+  for (const it of buyItems) {
+    let yy = Math.max(y(it.p), priceLabelY + minGap)
+    let safety = 0
+    while (safety < 20) {
+      let clash = false
+      for (const oy of buyOccupied) {
+        if (Math.abs(yy - oy) < minGap) {
+          yy = oy + minGap // always push downward (larger y)
+          clash = true
+          break
+        }
+      }
+      if (!clash) break
+      safety++
+    }
+    yy = Math.max(priceLabelY + minGap, Math.min(MB - 14, yy))
+    buyOccupied.push(yy)
     placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
   }
 
