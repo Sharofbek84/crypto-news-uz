@@ -341,45 +341,73 @@ function CandleChart({
 
   const sideLabel = displayLevels?.side === 'SELL' ? 'SELL' : displayLevels?.side === 'BUY' ? 'BUY' : ''
 
-  // SELL labels always above price, BUY always below.
-  // Closest level first so SELL1 stays nearest to price, SELL2 further up (same for BUY).
-  type LevelItem = { p: number; label: string; bg: string }
-  const sellItems: LevelItem[] = []
-  const buyItems: LevelItem[] = []
-  displayLevels?.sells.forEach((p, i) =>
-    sellItems.push({ p, label: `SELL${i + 1}  ${money(p)}`, bg: '#c52f3a' })
-  )
-  displayLevels?.buys.forEach((p, i) =>
-    buyItems.push({ p, label: `BUY${i + 1}  ${money(p)}`, bg: '#148f55' })
-  )
-  // Closest to current price first
-  sellItems.sort((a, b) => a.p - b.p) // lower resistance first (SELL1)
-  buyItems.sort((a, b) => b.p - a.p)  // higher support first (BUY1)
+  // Unified labels: SELL2, SELL1, PRICE, BUY1, BUY2 (top → bottom).
+  // Price label also has a connector and can shift when near chart edges.
+  type LevelItem = { p: number; label: string; bg: string; kind: 'sell' | 'buy' | 'price' }
+  const items: LevelItem[] = []
 
-  const priceLabelY = y(latest)
-  const placedLabels: { yy: number; p: number; label: string; bg: string }[] = []
+  const sells = [...(displayLevels?.sells || [])].sort((a, b) => a - b) // SELL1 closer, SELL2 higher
+  const buys = [...(displayLevels?.buys || [])].sort((a, b) => b - a)   // BUY1 closer, BUY2 lower
+
+  // Order top→bottom on chart: higher sells first, then price, then buys
+  if (sells.length >= 2) {
+    items.push({ p: sells[1], label: `SELL2  ${money(sells[1])}`, bg: '#c52f3a', kind: 'sell' })
+  }
+  if (sells.length >= 1) {
+    items.push({ p: sells[0], label: `SELL1  ${money(sells[0])}`, bg: '#c52f3a', kind: 'sell' })
+  }
+  items.push({ p: latest, label: money(latest), bg: '#1a6f9a', kind: 'price' })
+  if (buys.length >= 1) {
+    items.push({ p: buys[0], label: `BUY1  ${money(buys[0])}`, bg: '#148f55', kind: 'buy' })
+  }
+  if (buys.length >= 2) {
+    items.push({ p: buys[1], label: `BUY2  ${money(buys[1])}`, bg: '#148f55', kind: 'buy' })
+  }
+
   const minGap = 30
+  const topLimit = T + 14
+  const botLimit = MB - 14
 
-  // SELLs: stack upward from just above the price label
-  let nextSellY = priceLabelY - minGap
-  for (const it of sellItems) {
-    let yy = Math.min(y(it.p), nextSellY)
-    // keep stacking upward if still too close to previous
-    if (yy > nextSellY) yy = nextSellY
-    yy = Math.max(T + 14, yy)
-    nextSellY = yy - minGap
-    placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
+  // Ideal y from true price, then resolve collisions keeping order
+  let ys = items.map((it) => y(it.p))
+
+  // Push apart from top to bottom to enforce minGap while preserving order
+  for (let i = 1; i < ys.length; i++) {
+    if (ys[i] < ys[i - 1] + minGap) {
+      ys[i] = ys[i - 1] + minGap
+    }
+  }
+  // If overflow past bottom, shift whole stack up
+  const overflowBot = ys[ys.length - 1] - botLimit
+  if (overflowBot > 0) {
+    ys = ys.map((v) => v - overflowBot)
+  }
+  // If overflow past top, shift whole stack down
+  const overflowTop = topLimit - ys[0]
+  if (overflowTop > 0) {
+    ys = ys.map((v) => v + overflowTop)
+  }
+  // Final clamp + re-enforce gaps from top
+  ys[0] = Math.max(topLimit, Math.min(botLimit, ys[0]))
+  for (let i = 1; i < ys.length; i++) {
+    ys[i] = Math.max(ys[i - 1] + minGap, Math.min(botLimit, ys[i]))
+  }
+  // If still overflowing bottom after clamp, compress from bottom upward
+  if (ys[ys.length - 1] > botLimit) {
+    ys[ys.length - 1] = botLimit
+    for (let i = ys.length - 2; i >= 0; i--) {
+      if (ys[i] > ys[i + 1] - minGap) ys[i] = ys[i + 1] - minGap
+    }
+    if (ys[0] < topLimit) ys[0] = topLimit
   }
 
-  // BUYs: stack downward from just below the price label
-  let nextBuyY = priceLabelY + minGap
-  for (const it of buyItems) {
-    let yy = Math.max(y(it.p), nextBuyY)
-    if (yy < nextBuyY) yy = nextBuyY
-    yy = Math.min(MB - 14, yy)
-    nextBuyY = yy + minGap
-    placedLabels.push({ yy, p: it.p, label: it.label, bg: it.bg })
-  }
+  const placedLabels = items.map((it, i) => ({
+    yy: ys[i],
+    p: it.p,
+    label: it.label,
+    bg: it.bg,
+    kind: it.kind,
+  }))
 
   return (
     <div className="homeChartWrap">
@@ -463,54 +491,50 @@ function CandleChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
-          {placedLabels.map((it, i) => (
-            <g key={i}>
-              <line
-                x1={L}
-                x2={plotRight}
-                y1={y(it.p)}
-                y2={y(it.p)}
-                stroke={it.bg}
-                strokeWidth="1.3"
-                strokeDasharray="6 5"
-                opacity="0.85"
-              />
-              <line
-                x1={plotRight}
-                x2={labelX}
-                y1={y(it.p)}
-                y2={it.yy}
-                stroke={it.bg}
-                strokeWidth="1"
-                opacity="0.45"
-              />
-              <rect x={labelX} y={it.yy - 12} width={118} height={24} rx="4" fill={it.bg} />
-              <text
-                x={labelX + 59}
-                y={it.yy + 5}
-                textAnchor="middle"
-                fill="#fff"
-                fontSize="11"
-                fontWeight="800"
-              >
-                {it.label}
-              </text>
-            </g>
-          ))}
-
-          <line
-            x1={L}
-            x2={plotRight}
-            y1={y(latest)}
-            y2={y(latest)}
-            stroke="#65d9ff"
-            strokeDasharray="3 4"
-            strokeWidth="1.2"
-          />
-          <rect x={labelX} y={y(latest) - 13} width={118} height={26} rx="4" fill="#1a6f9a" />
-          <text x={labelX + 59} y={y(latest) + 5} textAnchor="middle" fill="#fff" fontSize="12" fontWeight="800">
-            {money(latest)}
-          </text>
+          {placedLabels.map((it, i) => {
+            const isPrice = it.kind === 'price'
+            return (
+              <g key={i}>
+                <line
+                  x1={L}
+                  x2={plotRight}
+                  y1={y(it.p)}
+                  y2={y(it.p)}
+                  stroke={isPrice ? '#65d9ff' : it.bg}
+                  strokeWidth={isPrice ? 1.2 : 1.3}
+                  strokeDasharray={isPrice ? '3 4' : '6 5'}
+                  opacity={isPrice ? 1 : 0.85}
+                />
+                <line
+                  x1={plotRight}
+                  x2={labelX}
+                  y1={y(it.p)}
+                  y2={it.yy}
+                  stroke={isPrice ? '#65d9ff' : it.bg}
+                  strokeWidth="1"
+                  opacity="0.45"
+                />
+                <rect
+                  x={labelX}
+                  y={it.yy - (isPrice ? 13 : 12)}
+                  width={118}
+                  height={isPrice ? 26 : 24}
+                  rx="4"
+                  fill={it.bg}
+                />
+                <text
+                  x={labelX + 59}
+                  y={it.yy + 5}
+                  textAnchor="middle"
+                  fill="#fff"
+                  fontSize={isPrice ? 12 : 11}
+                  fontWeight="800"
+                >
+                  {it.label}
+                </text>
+              </g>
+            )
+          })}
 
           <text x={L + 8} y={RT + 6} fill="#e6edf3" fontSize="14" fontWeight="800">
             RSI 14 {rs[rs.length - 1]?.toFixed(2) ?? '—'}
