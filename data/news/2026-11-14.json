@@ -1,1 +1,22 @@
-See /tmp/news_2026-11-14.json for full content - but this is invalid, will fix properly next.
+[
+  {
+    "slug": "bitcoin-67k-liquidations-etf-outflows-2026-11-14",
+    "title": "Bitcoin 67 000 dollar ostiga tushdi, 1,6 milliard dollar liquidatsiya",
+    "summary": "BTC 12 haftalik pastki darajaga yetdi, dollar mustahkamlanishi va Fed stavka kutilmalari ta\u2019sirida. 24 soatda 1,64 milliard dollar liquidatsiya, asosan longlar. Spot Bitcoin ETF chiqimlari davom etmoqda.",
+    "body": "Bitcoin so\u2018nggi 24 soatda 70 000 dollar psixologik darajasini buzib, 67 000\u201368 000 dollar oralig\u2018iga tushdi. Bu avgust oyidan beri eng past daraja. Dollar indeksi oshishi va dekabr oyida Fed foiz stavkasini oshirish ehtimoli 90 foizga yaqinlashishi riskli aktivlarga bosim o\u2018tkazdi. CoinGlass ma\u2019lumotlariga ko\u2018ra, 24 soat ichida kripto futures liquidatsiyalari 1,64 milliard dollarga yetdi, shundan 88\u201390 foizi long pozitsiyalar. Bitcoin o\u2018zi taxminan 900 million dollar atrofida liquidatsiyaga uchradi.\n\nSoSoValue va Farside Investors ma\u2019lumotlariga ko\u2018ra, AQSh spot Bitcoin ETF lari ketma-ket oltinchi yoki undan ortiq sessiyada chiqim qildi. Noyabr oyidagi umumiy chiqimlar 1,4\u20131,9 milliard dollar atrofida. BlackRock IBIT asosiy chiqim manbai bo\u2018lib qolmoqda. Bu institutsional sotish bosimini ko\u2018rsatadi, garchi ba\u2019zi kichik fondlar (MSBT) kichik kirim ko\u2018rsatgan bo\u2018lsa ham.\n\nOpen interest biroz pasaydi, funding rate esa salbiy yoki neytral tomonga o\u2018tdi. Eng katta bitta liquidatsiya Hyperliquid\u2019da 31 million dollar atrofidagi long pozitsiya bo\u2018ldi. Bozor kayfiyati Extreme Fear (13) darajasida.\n\nQisqa prognoz: BTC 66 000\u201370 000 dollar oralig\u2018ida tebranishi mumkin. 65 000\u201366 000 qo\u2018llab-quvvatlash sinovi bo\u2018lishi ehtimoli bor. ETF chiqimlari sekinlashmasa, pastki bosim saqlanadi. Dollar va Fed yangiliklari asosiy omil.\n\nManba: CoinDesk, CoinGlass, SoSoValue, Farside Investors, BeInCrypto",
+    "url": "https://www.coindesk.com/markets/2026/11/13/bitcoin-hits-12-week-low-as-dollar-rallies-on-interest-rate-outlook-liquidations-top-usd1-6-billion",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-11-14",
+    "image": "https://cdn.sanity.io/images/s3y3vcno/production/08b632a654251b193a137eced80be2bec14bb635-1920x1080.png?auto=format&fit=crop&w=1200&h=675&q=75"
+  },
+  {
+    "slug": "ethereum-1900-liquidations-etf-2026-11-14",
+    "title": "Ethereum 1 900 dollar atrofida, 289 million dollar liquidatsiya",
+    "summary": "ETH 2 000 dollar darajasini yo\u2018qotdi va 12 haftalik pastki darajaga tushdi. Liquidatsiyalar 250\u2013290 million dollar. Ethereum ETF chiqimlari kichikroq, lekin umumiy bozor bosimi kuchli.",
+    "body": "Ethereum so\u2018nggi 24 soatda 4 foizdan oshiq pasayib, 1 900\u20131 930 dollar oralig\u2018ida savdo qilmoqda. Bu avgust oyidan beri eng past daraja. Bitcoin bilan birga 2 000 dollar psixologik darajasini buzdi. CoinGlass ma\u2019lumotlariga ko\u2018ra, ETH liquidatsiyalari taxminan 289 million dollarni tashkil etdi, asosan long pozitsiyalar (78\u201390 foiz).\n\nSoSoValue ma\u2019lumotlariga ko\u2018ra, spot Ethereum ETF lari chiqimlari Bitcoin ga nisbatan kichikroq, ba\u2019zi sessiyalarda atigi bir necha million. Kumulativ oqimlar hali ham ijobiy, lekin so\u2018nggi kunlarda bosim oshgan. Open interest pasaydi, funding rate ijobiy qolishi mumkin, lekin pastroq.\n\nDeutsche Bank kabi Yevropa banklarining custody xizmatlari uzoq muddatli ijobiy, lekin qisqa muddatda makroiqtisodiy omillar ustun. Stablecoin supply qisqarishi ham likvidlikni kamaytirgan.\n\nQisqa prognoz: ETH 1 850\u20132 000 dollar oralig\u2018ida. 1 900 qo\u2018llab-quvvatlash saqlansa, barqarorlashishi mumkin. Bitcoin tiklansa, ETH ham ergashadi. ETF oqimlari diqqat markazida.\n\nManba: CoinDesk, CoinGlass, SoSoValue, InflowScan, The Crypto Times",
+    "url": "https://www.coindesk.com/markets/2026/11/13/bitcoin-hits-12-week-low-as-dollar-rallies-on-interest-rate-outlook-liquidations-top-usd1-6-billion",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-11-14",
+    "image": "https://www.cryptotimes.io/wp-content/uploads/2026/11/Bitcoin-Price-Today-BTC-Slides-to-67K-as-1.26B-Crypto-Liquidations-Hit-Longs-Fed-Hike-Bets-Rise.jpg"
+  }
+]
