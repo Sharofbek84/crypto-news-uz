@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import PushEnableButton from './PushEnableButton'
 
 type RecentSignal = {
   side: 'BUY' | 'SELL'
@@ -138,42 +139,45 @@ export default function TelegramPremiumButton() {
             Yangi signallarni o‘z vaqtida qabul qiling
           </h2>
           <p style={{ color: '#aeb9c6', fontSize: 14, lineHeight: 1.55, margin: 0, maxWidth: 680 }}>
-            Endi siz PREMIUM foydalanuvchi sifatida telegram kanalimiz orqali yangi signallarni o‘z
-            vaqtida qabul qilib olishingiz mumkin.
+            Telegram kanal yoki brauzer push orqali yangi signallarni darhol oling. Push yoqilsa,
+            yangi signal ro‘yxatga tushganda xabar keladi.
           </p>
         </div>
 
-        <a
-          href="https://t.me/+Q8d8pPnjKwMxZjUy"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            flex: '0 0 auto',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 9,
-            minHeight: 44,
-            padding: '10px 18px',
-            borderRadius: 10,
-            background: '#229ED9',
-            color: '#ffffff',
-            fontWeight: 800,
-            fontSize: 13,
-            textDecoration: 'none',
-            boxShadow: '0 8px 22px rgba(34,158,217,.24)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <img
-            src="https://telegram.org/img/t_logo.svg"
-            alt="Telegram"
-            width="23"
-            height="23"
-            style={{ display: 'block', width: 23, height: 23 }}
-          />
-          KANALGA OBUNA BO‘LING
-        </a>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+          <PushEnableButton />
+          <a
+            href="https://t.me/+Q8d8pPnjKwMxZjUy"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              flex: '0 0 auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 9,
+              minHeight: 44,
+              padding: '10px 18px',
+              borderRadius: 10,
+              background: '#229ED9',
+              color: '#ffffff',
+              fontWeight: 800,
+              fontSize: 13,
+              textDecoration: 'none',
+              boxShadow: '0 8px 22px rgba(34,158,217,.24)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <img
+              src="https://telegram.org/img/t_logo.svg"
+              alt="Telegram"
+              width="23"
+              height="23"
+              style={{ display: 'block', width: 23, height: 23 }}
+            />
+            KANALGA OBUNA BO‘LING
+          </a>
+        </div>
       </div>
 
       {/* Recent signals table — after text */}
