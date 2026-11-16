@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import CryptoAnalystAI from './CryptoAnalystAI'
+import CleanChart from './CleanChart'
 
 const coins = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
 const intervals = [
@@ -87,21 +88,10 @@ export default function PremiumAnalyst() {
 
       {loading && <div className="homeLoading">Ma'lumot yuklanmoqda…</div>}
       {error && <div className="homeLoading error">{error}</div>}
-      {!loading && !error && r && (
+      {!loading && !error && r && data?.candles && (
         <>
-          <div className="homeChartPanel" style={{ padding: '20px 24px' }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
-              <strong style={{ color: '#f0b90b', fontSize: 18 }}>
-                {coin}/USDT · {tf} ·{' '}
-                <span className={r.side === 'SELL' ? 'bearText' : 'bullText'}>{r.side || '-'}</span>
-              </strong>
-              <span style={{ color: '#9aa7b8', fontSize: 14 }}>
-                Trend: <b style={{ color: '#e6edf3' }}>{r.trend}</b> · RSI: <b style={{ color: '#e6edf3' }}>{Number(r.rsi).toFixed(2)}</b>
-              </span>
-            </div>
-            <p style={{ marginTop: 10, color: '#8492a2', fontSize: 13 }}>
-              To‘liq SVG grafik keyingi bosqichda qayta tiklanadi. Hozir tahlil va signallar ishlaydi.
-            </p>
+          <div className="homeChartPanel">
+            <CleanChart candles={data.candles} result={r} coin={coin} interval={interval} />
           </div>
 
           <div className="homeAnalysis proAnalysis">
