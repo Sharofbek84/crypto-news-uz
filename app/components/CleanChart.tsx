@@ -233,6 +233,102 @@ export default function CleanChart({
           <polyline points={poly(e20)} fill="none" stroke="#00c7e6" strokeWidth="1.9" />
           <polyline points={poly(e50)} fill="none" stroke="#4aa8ff" strokeWidth="1.9" />
 
+          {result.structureSignal &&
+            result.structureSignal.swingIndex >= 0 &&
+            result.structureSignal.retestIndex < candles.length && (
+              <g opacity="0.95">
+                <line
+                  x1={x(result.structureSignal.swingIndex)}
+                  x2={x(Math.max(result.structureSignal.retestIndex, result.structureSignal.breakIndex))}
+                  y1={y(result.structureSignal.level)}
+                  y2={y(result.structureSignal.level)}
+                  stroke={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
+                  strokeWidth="2"
+                  strokeDasharray="5 4"
+                />
+                <circle
+                  cx={x(result.structureSignal.swingIndex)}
+                  cy={y(result.structureSignal.level)}
+                  r="4.5"
+                  fill="#f0b90b"
+                  stroke="#0b1018"
+                  strokeWidth="1.2"
+                />
+                <circle
+                  cx={x(result.structureSignal.breakIndex)}
+                  cy={y(result.structureSignal.level)}
+                  r="5.5"
+                  fill="none"
+                  stroke={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
+                  strokeWidth="2.2"
+                />
+                <circle
+                  cx={x(result.structureSignal.retestIndex)}
+                  cy={y(result.structureSignal.level)}
+                  r="5.5"
+                  fill={result.structureSignal.type === 'SELL' ? '#ff4d5a' : '#20d67a'}
+                  stroke="#0b1018"
+                  strokeWidth="1"
+                />
+              </g>
+            )}
+
+          {result.emaPullback &&
+            result.emaPullback.index >= 0 &&
+            result.emaPullback.index < candles.length &&
+            (() => {
+              const s = result.emaPullback!
+              const cx = x(s.index)
+              const cy = y(s.price)
+              if (s.type === 'BUY') {
+                return (
+                  <polygon
+                    key={`pb-buy-${s.index}`}
+                    points={`${cx},${cy + 5} ${cx - 7},${cy + 18} ${cx + 7},${cy + 18}`}
+                    fill="#20d67a"
+                    stroke="#0b1a12"
+                    strokeWidth="1"
+                  />
+                )
+              }
+              return (
+                <polygon
+                  key={`pb-sell-${s.index}`}
+                  points={`${cx},${cy - 5} ${cx - 7},${cy - 18} ${cx + 7},${cy - 18}`}
+                  fill="#ff4d5a"
+                  stroke="#1a0b0d"
+                  strokeWidth="1"
+                />
+              )
+            })()}
+
+          {div && div.i1 >= 0 && div.i2 < candles.length && (
+            <g opacity="0.95">
+              <line
+                x1={x(div.i1)}
+                y1={y(div.price1)}
+                x2={x(div.i2)}
+                y2={y(div.price2)}
+                stroke={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+                strokeWidth="2.2"
+                strokeDasharray="6 4"
+              />
+              <circle cx={x(div.i1)} cy={y(div.price1)} r="4" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
+              <circle cx={x(div.i2)} cy={y(div.price2)} r="4" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
+              <line
+                x1={x(div.i1)}
+                y1={ry(div.rsi1)}
+                x2={x(div.i2)}
+                y2={ry(div.rsi2)}
+                stroke={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'}
+                strokeWidth="2.2"
+                strokeDasharray="6 4"
+              />
+              <circle cx={x(div.i1)} cy={ry(div.rsi1)} r="3.5" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
+              <circle cx={x(div.i2)} cy={ry(div.rsi2)} r="3.5" fill={div.type === 'bullish' ? '#20d67a' : '#ff4d5a'} />
+            </g>
+          )}
+
           <rect
             x={zoneLeft}
             y={Math.min(y(result.entryHigh), y(result.entryLow))}
