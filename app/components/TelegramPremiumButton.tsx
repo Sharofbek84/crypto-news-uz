@@ -189,7 +189,7 @@ export default function TelegramPremiumButton() {
               textTransform: 'uppercase',
             }}
           >
-            Oxirgi signallar
+            Oxirgi 10 ta signal
           </div>
 
           {loading && signals.length === 0 ? (
@@ -202,8 +202,8 @@ export default function TelegramPremiumButton() {
                 style={{
                   width: '100%',
                   borderCollapse: 'collapse',
-                  fontSize: 13,
-                  minWidth: 520,
+                  fontSize: 12.5,
+                  minWidth: 720,
                 }}
               >
                 <thead>
@@ -216,17 +216,21 @@ export default function TelegramPremiumButton() {
                       borderBottom: '1px solid rgba(255,255,255,.06)',
                     }}
                   >
-                    <th style={{ padding: '8px 10px 8px 0' }}>SIDE</th>
-                    <th style={{ padding: '8px 10px' }}>COIN</th>
-                    <th style={{ padding: '8px 10px' }}>TF</th>
-                    <th style={{ padding: '8px 10px' }}>ENTRY</th>
-                    <th style={{ padding: '8px 10px' }}>SL</th>
-                    <th style={{ padding: '8px 0 8px 10px' }}>VAQT</th>
+                    <th style={{ padding: '8px 8px 8px 0' }}>COIN</th>
+                    <th style={{ padding: '8px 8px' }}>SIDE</th>
+                    <th style={{ padding: '8px 8px' }}>TF</th>
+                    <th style={{ padding: '8px 8px' }}>ENTRY</th>
+                    <th style={{ padding: '8px 8px' }}>TP1</th>
+                    <th style={{ padding: '8px 8px' }}>TP2</th>
+                    <th style={{ padding: '8px 8px' }}>TP3</th>
+                    <th style={{ padding: '8px 8px' }}>SL</th>
+                    <th style={{ padding: '8px 0 8px 8px' }}>VAQT</th>
                   </tr>
                 </thead>
                 <tbody>
                   {signals.map((s, i) => {
                     const isBuy = s.side === 'BUY'
+                    const tp = s.tp || []
                     return (
                       <tr
                         key={`${s.symbol}-${s.timeframe}-${s.createdAt}-${i}`}
@@ -237,11 +241,23 @@ export default function TelegramPremiumButton() {
                               : 'none',
                         }}
                       >
-                        <td style={{ padding: '9px 10px 9px 0' }}>
+                        <td style={{ padding: '9px 8px 9px 0' }}>
+                          <Link
+                            href={`/premium?symbol=${s.symbol}`}
+                            style={{
+                              color: '#f0b90b',
+                              fontWeight: 700,
+                              textDecoration: 'none',
+                            }}
+                          >
+                            {s.symbol}
+                          </Link>
+                        </td>
+                        <td style={{ padding: '9px 8px' }}>
                           <span
                             style={{
                               display: 'inline-block',
-                              padding: '2px 8px',
+                              padding: '2px 7px',
                               borderRadius: 6,
                               fontSize: 11,
                               fontWeight: 800,
@@ -255,30 +271,27 @@ export default function TelegramPremiumButton() {
                             {s.side}
                           </span>
                         </td>
-                        <td style={{ padding: '9px 10px' }}>
-                          <Link
-                            href={`/premium?symbol=${s.symbol}`}
-                            style={{
-                              color: '#f0b90b',
-                              fontWeight: 700,
-                              textDecoration: 'none',
-                            }}
-                          >
-                            {s.symbol}
-                          </Link>
-                        </td>
-                        <td style={{ padding: '9px 10px', color: '#c5d0dc', fontWeight: 600 }}>
+                        <td style={{ padding: '9px 8px', color: '#c5d0dc', fontWeight: 600 }}>
                           {s.timeframe}
                         </td>
-                        <td style={{ padding: '9px 10px', color: '#e6edf3', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '9px 8px', color: '#e6edf3', whiteSpace: 'nowrap' }}>
                           ${money(s.entryLow)} – ${money(s.entryHigh)}
                         </td>
-                        <td style={{ padding: '9px 10px', color: '#ff5360', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '9px 8px', color: '#20d67a', whiteSpace: 'nowrap' }}>
+                          ${money(tp[0])}
+                        </td>
+                        <td style={{ padding: '9px 8px', color: '#20d67a', whiteSpace: 'nowrap' }}>
+                          ${money(tp[1])}
+                        </td>
+                        <td style={{ padding: '9px 8px', color: '#20d67a', whiteSpace: 'nowrap' }}>
+                          ${money(tp[2])}
+                        </td>
+                        <td style={{ padding: '9px 8px', color: '#ff5360', whiteSpace: 'nowrap' }}>
                           ${money(s.sl)}
                         </td>
                         <td
                           style={{
-                            padding: '9px 0 9px 10px',
+                            padding: '9px 0 9px 8px',
                             color: '#8492a2',
                             whiteSpace: 'nowrap',
                             fontSize: 12,
