@@ -97,6 +97,7 @@ export async function GET(request: NextRequest) {
   const errors: string[] = []
   const reasonCounts: Record<string, number> = {}
   let telegramSent = 0
+  let listedCount = 0
   let trackedCount = 0
 
   for (let i = 0; i < jobs.length; i += CONCURRENCY) {
@@ -132,13 +133,11 @@ export async function GET(request: NextRequest) {
     candidatesByCoin.set(key, list)
   }
 
-  // Map.forEach avoids requiring downlevelIteration for the configured TS target.
-  candidatesByCoin.forEach((candidates, symbol) => {
+  candidatesByCoin.forEach((candidates) => {
     candidates.sort(
       (a, b) =>
         timeframePriority[b.signal!.timeframe] - timeframePriority[a.signal!.timeframe]
     )
-    // Sending is async, so queue each selected coin for sequential processing below.
   })
 
   const selectedByCoin: Array<{ symbol: string; candidates: typeof completed[number][] }> = []
@@ -153,8 +152,39 @@ export async function GET(request: NextRequest) {
     const selected = candidates[0]
     const signal = selected.signal!
 
-    // Persist a per-coin, per-direction cooldown across separate Cron invocations.
-    // Fail closed if Redis is unavailable so the scanner cannot flood Telegram.
+    // 1) Yangi signalni recent listga yozish (Telegram dan mustaqil).
+    //    Dublikatni oldini olish uchun qisqa listed-key.
+    if (redis) {
+      try {
+        const listedKey = `signal:listed:${signal.symbol.toUpperCase()}:${signal.side}:${signal.timeframe}`
+        const listed = await redis.set(listedKey, '1', {
+          nx: true,
+          ex: SIGNAL_COOLDOWN_SECONDS,
+        })
+        if (listed) {
+          const record = {
+            side: signal.side,
+            symbol: signal.symbol.toUpperCase(),
+            timeframe: signal.timeframe,
+            entryLow: signal.entryLow,
+            entryHigh: signal.entryHigh,
+            tp: signal.tp,
+            sl: signal.sl,
+            trend: signal.trend || null,
+            rsi: signal.rsi ?? null,
+            createdAt: new Date().toISOString(),
+          }
+          await redis.lpush(RECENT_SIGNALS_KEY, JSON.stringify(record))
+          await redis.ltrim(RECENT_SIGNALS_KEY, 0, RECENT_SIGNALS_LIMIT - 1)
+          listedCount++
+          selected.reason = selected.reason === 'candidate-ready' ? 'listed' : selected.reason
+        }
+      } catch (storeErr) {
+        console.error('Failed to store recent signal:', storeErr)
+      }
+    }
+
+    // 2) Telegram — alohida cooldown (bir coin + side uchun 4 soat)
     const cooldownKey = `signal:cooldown:${signal.symbol.toUpperCase()}:${signal.side}`
     let claimed = false
 
@@ -166,7 +196,7 @@ export async function GET(request: NextRequest) {
       })
 
       if (!claim) {
-        selected.reason = 'suppressed-cooldown'
+        selected.reason = selected.reason === 'listed' ? 'listed-telegram-cooldown' : 'suppressed-cooldown'
         for (const suppressed of candidates.slice(1)) {
           suppressed.reason = 'suppressed-same-coin'
         }
@@ -178,27 +208,6 @@ export async function GET(request: NextRequest) {
       selected.telegram = true
       selected.reason = 'sent-selected-timeframe'
       telegramSent++
-
-      // Oxirgi signallarni Redis listiga saqlash (UI uchun)
-      try {
-        const record = {
-          side: signal.side,
-          symbol: signal.symbol.toUpperCase(),
-          timeframe: signal.timeframe,
-          entryLow: signal.entryLow,
-          entryHigh: signal.entryHigh,
-          tp: signal.tp,
-          sl: signal.sl,
-          trend: signal.trend || null,
-          rsi: signal.rsi ?? null,
-          createdAt: new Date().toISOString(),
-        }
-        await redis.lpush(RECENT_SIGNALS_KEY, JSON.stringify(record))
-        await redis.ltrim(RECENT_SIGNALS_KEY, 0, RECENT_SIGNALS_LIMIT - 1)
-      } catch (storeErr) {
-        // UI list ixtiyoriy — Telegram yuborilgan bo'lsa xato qilmaymiz
-        console.error('Failed to store recent signal:', storeErr)
-      }
 
       for (const suppressed of candidates.slice(1)) {
         suppressed.reason = 'suppressed-same-coin'
@@ -229,6 +238,7 @@ export async function GET(request: NextRequest) {
     scanned: jobs.length,
     completed: completed.length,
     telegramSent,
+    listedCount,
     trackedCount,
     reasonCounts,
     sentSignals: completed.filter((c) => c.telegram).map(({ signal: _signal, ...item }) => item),
