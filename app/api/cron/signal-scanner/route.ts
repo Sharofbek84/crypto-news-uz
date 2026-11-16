@@ -6,6 +6,8 @@ const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 
 const INTERVALS = ['1h', '4h', '1d'] as const
 const CONCURRENCY = 4
 const SIGNAL_COOLDOWN_SECONDS = 4 * 60 * 60
+const RECENT_SIGNALS_KEY = 'signals:recent'
+const RECENT_SIGNALS_LIMIT = 20
 
 async function scanOne(baseUrl: string, symbol: string, interval: string, secret: string) {
   const url = new URL('/api/analyze', baseUrl)
@@ -176,6 +178,28 @@ export async function GET(request: NextRequest) {
       selected.telegram = true
       selected.reason = 'sent-selected-timeframe'
       telegramSent++
+
+      // Oxirgi signallarni Redis listiga saqlash (UI uchun)
+      try {
+        const record = {
+          side: signal.side,
+          symbol: signal.symbol.toUpperCase(),
+          timeframe: signal.timeframe,
+          entryLow: signal.entryLow,
+          entryHigh: signal.entryHigh,
+          tp: signal.tp,
+          sl: signal.sl,
+          trend: signal.trend || null,
+          rsi: signal.rsi ?? null,
+          createdAt: new Date().toISOString(),
+        }
+        await redis.lpush(RECENT_SIGNALS_KEY, JSON.stringify(record))
+        await redis.ltrim(RECENT_SIGNALS_KEY, 0, RECENT_SIGNALS_LIMIT - 1)
+      } catch (storeErr) {
+        // UI list ixtiyoriy — Telegram yuborilgan bo'lsa xato qilmaymiz
+        console.error('Failed to store recent signal:', storeErr)
+      }
+
       for (const suppressed of candidates.slice(1)) {
         suppressed.reason = 'suppressed-same-coin'
       }
