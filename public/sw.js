@@ -1,4 +1,4 @@
-/* GOLDENWEB.UZ — service worker (cache + web push) */
+/* GOLDENWEB.UZ — service worker (PWA cache) */
 const CACHE = 'goldenweb-v2'
 const PRECACHE = ['/', '/obuna', '/yangiliklar', '/premium']
 
@@ -34,39 +34,5 @@ self.addEventListener('fetch', (event) => {
         return res
       })
       .catch(() => caches.match(req).then((cached) => cached || caches.match('/')))
-  )
-})
-
-self.addEventListener('push', (event) => {
-  let data = { title: 'GOLDENWEB.UZ', body: 'Yangi signal', url: '/premium', tag: 'signal' }
-  try {
-    if (event.data) data = { ...data, ...event.data.json() }
-  } catch (_) {}
-
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'GOLDENWEB.UZ', {
-      body: data.body || '',
-      icon: '/icons/192',
-      badge: '/icons/192',
-      tag: data.tag || 'signal',
-      renotify: true,
-      data: { url: data.url || '/premium' },
-    })
-  )
-})
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
-  const target = (event.notification.data && event.notification.data.url) || '/premium'
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      for (const client of list) {
-        if ('focus' in client) {
-          client.navigate(target)
-          return client.focus()
-        }
-      }
-      if (clients.openWindow) return clients.openWindow(target)
-    })
   )
 })
