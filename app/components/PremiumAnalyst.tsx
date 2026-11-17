@@ -26,6 +26,44 @@ function tfShort(i: string) {
   return ({ '1h': 'H1', '4h': 'H4', '1d': 'D1', '1w': 'W1' } as any)[i] || i
 }
 
+type AnalysisLevels = {
+  side?: string
+  support?: number[]
+  resistance?: number[]
+  invalidation: number
+  entryHigh: number
+  tp: number[]
+}
+
+function bearishLevels(r: AnalysisLevels): number[] {
+  const sl = r.invalidation
+  const threshold = r.side === 'SELL' ? r.entryHigh : sl
+  const supports = (r.support || []).filter((s) => threshold > s).sort((a, b) => b - a)
+  const s1 = supports[0] ?? sl * 0.992
+  const s2 = supports[1] ?? (supports[0] ? supports[0] * 0.995 : sl * 0.985)
+  const deep = supports.length >= 2 ? supports[supports.length - 1] : sl * 0.97
+  const levels = r.side === 'SELL' ? [r.tp[0], r.tp[1], r.tp[2]] : [sl, s1, s2, deep]
+  const unique: number[] = []
+  for (const v of levels.sort((a, b) => b - a)) {
+    if (!unique.length || Math.abs(unique[unique.length - 1] - v) / (Math.abs(sl) || 1) > 0.0015) unique.push(v)
+  }
+  while (unique.length < 4) unique.push(unique[unique.length - 1] * 0.99)
+  return unique.slice(0, 4)
+}
+
+function bullishSellLevels(r: AnalysisLevels): number[] {
+  const sl = r.invalidation
+  const above = (r.resistance || []).filter((x) => x > sl).sort((a, b) => a - b)
+  const r1 = above[0] ?? sl * 1.008
+  const r2 = above[1] ?? (above[0] ? above[0] * 1.006 : sl * 1.016)
+  const unique: number[] = []
+  for (const v of [sl, r1, r2].sort((a, b) => a - b)) {
+    if (!unique.length || Math.abs(unique[unique.length - 1] - v) / (Math.abs(sl) || 1) > 0.0015) unique.push(v)
+  }
+  while (unique.length < 3) unique.push(unique[unique.length - 1] * 1.008)
+  return unique.slice(0, 3)
+}
+
 export default function PremiumAnalyst() {
   const searchParams = useSearchParams()
   const urlSymbol = (searchParams.get('symbol') || '').toUpperCase()
@@ -61,6 +99,8 @@ export default function PremiumAnalyst() {
 
   const r = data?.result
   const tf = tfShort(interval)
+  const bearPath = r ? bearishLevels(r) : []
+  const bullSellPath = r && r.side === 'SELL' ? bullishSellLevels(r) : []
 
   return (
     <section className="homeAnalyst">
@@ -155,11 +195,21 @@ export default function PremiumAnalyst() {
             <div className="proCard bullCard">
               <h3 className="bullText">BULLISH SENARIY · {tf}</h3>
               <p>{r.bullish}</p>
+              <div className="levelPath greenPath">
+                {r.side === 'SELL'
+                  ? <>{money$(bullSellPath[0])} ↑ {money$(bullSellPath[1])} ↑ {money$(bullSellPath[2])}</>
+                  : <>{money$(r.entryHigh)} ↑ {money$(r.tp[0])} ↑ {money$(r.tp[1])} ↑ {money$(r.tp[2])}</>}
+              </div>
             </div>
 
             <div className="proCard bearCard">
               <h3 className="bearText">BEARISH SENARIY · {tf}</h3>
               <p>{r.bearish}</p>
+              <div className="levelPath redPath">
+                {r.side === 'SELL'
+                  ? <>{money$(r.tp[0])} ↓ {money$(r.tp[1])} ↓ {money$(r.tp[2])}</>
+                  : <>{money$(bearPath[0])} ↓ {money$(bearPath[1])} ↓ {money$(bearPath[2])} ↓ {money$(bearPath[3])}</>}
+              </div>
             </div>
           </div>
 
