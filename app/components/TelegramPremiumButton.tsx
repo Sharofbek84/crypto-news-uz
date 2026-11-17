@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import PushEnableButton from './PushEnableButton'
 
 type RecentSignal = {
   side: 'BUY' | 'SELL'
@@ -139,13 +138,11 @@ export default function TelegramPremiumButton() {
             Yangi signallarni o‘z vaqtida qabul qiling
           </h2>
           <p style={{ color: '#aeb9c6', fontSize: 14, lineHeight: 1.55, margin: 0, maxWidth: 680 }}>
-            Telegram kanal yoki brauzer push orqali yangi signallarni darhol oling. Push yoqilsa,
-            yangi signal ro‘yxatga tushganda xabar keladi.
+            Siz Premium obunachi sifatida telegram signal kanalimizga bepul obuna bo‘lishingiz va yangi signallarni o‘z vaqtida qabul qilib olishingiz mumkin.
           </p>
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-          <PushEnableButton />
           <a
             href="https://t.me/+Q8d8pPnjKwMxZjUy"
             target="_blank"
