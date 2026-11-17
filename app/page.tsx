@@ -120,7 +120,7 @@ export default async function Home() {
 
             <SubscribeSection />
 
-            <div className="sectionRow">
+            <div className="sectionRow" style={{ marginBottom: 14 }}>
               <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
                 So‘nggi Yangiliklar
               </h2>
