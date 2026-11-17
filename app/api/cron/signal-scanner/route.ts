@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendTelegramSignal } from '@/lib/telegram'
 import { getRedis } from '@/lib/redis'
-import { broadcastPush } from '@/lib/push'
 
 const COINS = ['BTC', 'ETH', 'LTC', 'SOL', 'BNB', 'NEAR', 'GRAM', 'SUI', 'APT', 'ATOM', 'XAUT', 'XRP', 'XLM', 'BCH', 'LINK', 'AVAX']
 const INTERVALS = ['1h', '4h', '1d'] as const
@@ -99,7 +98,6 @@ export async function GET(request: NextRequest) {
   const reasonCounts: Record<string, number> = {}
   let telegramSent = 0
   let listedCount = 0
-  let pushSent = 0
   let trackedCount = 0
 
   for (let i = 0; i < jobs.length; i += CONCURRENCY) {
@@ -180,18 +178,6 @@ export async function GET(request: NextRequest) {
           listedCount++
           selected.reason = selected.reason === 'candidate-ready' ? 'listed' : selected.reason
 
-          // Web push — yangi signal ro'yxatga tushganda
-          try {
-            const pushResult = await broadcastPush({
-              title: `${signal.side} · ${signal.symbol} · ${signal.timeframe}`,
-              body: `Entry $${signal.entryLow}–$${signal.entryHigh} · SL $${signal.sl}`,
-              url: `/premium?symbol=${signal.symbol.toUpperCase()}`,
-              tag: `signal-${signal.symbol}-${signal.side}`,
-            })
-            pushSent += pushResult.sent
-          } catch (pushErr) {
-            console.error('Push broadcast failed:', pushErr)
-          }
         }
       } catch (storeErr) {
         console.error('Failed to store recent signal:', storeErr)
@@ -253,7 +239,6 @@ export async function GET(request: NextRequest) {
     completed: completed.length,
     telegramSent,
     listedCount,
-    pushSent,
     trackedCount,
     reasonCounts,
     sentSignals: completed.filter((c) => c.telegram).map(({ signal: _signal, ...item }) => item),
