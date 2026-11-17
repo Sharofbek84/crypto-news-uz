@@ -124,9 +124,6 @@ export default async function Home() {
               <h2 className="section" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
                 So‘nggi Yangiliklar
               </h2>
-              <Link href="/yangiliklar" className="sectionMore">
-                Barchasi →
-              </Link>
             </div>
             <div className="news">
               {news.map((item) => (
