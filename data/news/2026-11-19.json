@@ -1,1 +1,22 @@
-See local file /tmp/news_content.txt for full content
+[
+  {
+    "slug": "bitcoin-62700-dollar-etf-outflow-liquidation-2026-11-19",
+    "title": "Bitcoin 62 700 dollar atrofida, ETF chiqimlari va liquidatsiyalar davom etmoqda",
+    "summary": "Bitcoin 19 noyabr kuni 62 700–63 000 dollar oralig‘ida savdo qilmoqda. Spot ETF lari chiqim qilishda davom etdi. CoinGlass bo‘yicha liquidatsiyalar yuzlab million dollarga yetdi, asosan longlar. Qisqa muddatda ehtiyotkorlik saqlanmoqda.",
+    "body": "Bitcoin 19 noyabr kuni ertalab 62 700 dollar atrofida savdo qilmoqda, 24 soatda taxminan 2,3–2,7 foiz pasaygan. Dam olish kunlari 64 000 dollar atrofida bo‘lganidan keyin yana pastga tushdi, 63 000 dollar ostiga tushib, umumiy market cap 2,17 trillion dollar atrofida. Fear & Greed indeksi extreme fear darajasida (10–20) qolmoqda, bu investorlar kayfiyatining zaifligini ko‘rsatadi. CoinDesk va boshqa manbalar bo‘yicha, makroiqtisodiy omillar va risk-off kayfiyat bosimni saqlab turmoqda.\n\nFarside Investors va SoSoValue ma’lumotlariga ko‘ra, AQSh spot Bitcoin ETF lari 17–18 noyabr kunlarida sof chiqim qildi, ba’zi hisobotlarda 239 million dollar, boshqalarida 86 million dollar atrofida. BlackRock IBIT asosiy chiqim manbai bo‘ldi. Bu chiqimlar seriyasi davom etmoqda, kumulativ oqimlar hali ijobiy bo‘lsa ham, qisqa muddatli bosim sezilmoqda. ETF oqimlari narx harakatining asosiy omillaridan biri sifatida qaralmoqda.\n\nCoinGlass va boshqa platformalar bo‘yicha so‘nggi 24 soatda liquidatsiyalar 160–400 million dollar oralig‘ida, longlar ulushi 70–80 foiz. BTC eng ko‘p liquidatsiya qilingan coin, keyin ETH. Eng yirik bitta liquidatsiyalar millionlab dollarga yetgan. Bu leverage tozalanishi narx pastga itarishda rol o‘ynagan, lekin oversold sharoitlar qisqa muddatli bounce imkonini beradi.\n\nUmumiy bozor kapitalizatsiyasi pasayishi, Bitcoin dominance 58 foiz atrofida. Nvidia va boshqa tech yangiliklari fonida, kriptoga ta’sir sezilmoqda. Strategy va treasury xaridchilar past narxlarda faol, lekin umumiy kayfiyat zaif.\n\nQisqa prognoz: BTC 61 500–64 500 dollar oralig‘ida tebranishi mumkin. ETF oqimlari ijobiy tomonga o‘tsa va liquidatsiyalar sekinlashsa, 65 000 tomon. Aks holda 61 000 sinovi ehtimoli. Oversold sharoitlar rebound imkonini beradi, lekin ehtiyotkorlik kerak.\n\nManba: CoinDesk, Farside Investors, SoSoValue, CoinGlass, CoinGecko",
+    "url": "https://www.coindesk.com/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-11-19",
+    "image": "https://cdn.sanity.io/images/s3y3vcno/production/2d8d349c0bf26ddb0aca804f57d300f4afc6c95d-1920x1080.png?auto=format&fit=crop&crop=focalpoint&w=1200&h=675&q=75"
+  },
+  {
+    "slug": "ethereum-1775-dollar-liquidation-etf-2026-11-19",
+    "title": "Ethereum 1775 dollar atrofida, liquidatsiya bosimi va ETF chiqimlari",
+    "summary": "ETH 1775 dollar darajasida savdo qilmoqda. 24 soatda 1,5 foiz atrofida pasayish. Liquidatsiyalar sezilarli, spot ETF lari chiqim ko‘rsatmoqda. Qisqa muddatda barqarorlik sinovdan o‘tmoqda.",
+    "body": "Ethereum 19 noyabr kuni 1770–1780 dollar oralig‘ida savdo qilmoqda, 24 soatda taxminan 1,4–1,9 foiz pasaygan. Binance va boshqa birjalarda narx 1730–1820 oralig‘ida tebranishdi. Umumiy bozor liquidatsiyalari ta’sir qilgan, ETH eng ko‘p liquidatsiya qilingan coinlardan biri sifatida qolmoqda. Market cap 217 milliard dollar atrofida.\n\nCoinGlass ma’lumotlariga ko‘ra, so‘nggi 24 soatda ETH liquidatsiyalari 50–80 million dollar oralig‘ida, longlar ulushi yuqori. Eng yirik bitta orderlar Binance da qayd etilgan. Funding rate neytral yoki salbiy. Spot Ethereum ETF lari ba’zi kunlarda chiqim ko‘rsatgan, SoSoValue bo‘yicha 17 million dollar atrofida.\n\nWhale lar past narxlarda to‘plamoqda, onchain ma’lumotlarga ko‘ra. Ethereum Foundation faolligi fonida, asosiy bosim umumiy bozordan. Gas fee past, tarmoq barqaror. DeFi va staking fundamentals saqlanib qolgan. Glamsterdam yangilanishlari uzoq muddatli rivojlanishni qo‘llab-quvvatlaydi.\n\n1770 dollar qo‘llab-quvvatlash muhim daraja sifatida qaralmoqda. Liquidatsiya klasterlari past darajalarda longlar uchun.\n\nQisqa prognoz: ETH 1720–1850 dollar oralig‘ida. Bitcoin barqarorlashsa, ETH ham ergashadi. ETF oqimlari ijobiy tomonga o‘tsa, 1900 dollar tomon. Aks holda pastga risk saqlanadi. Uzoq muddatli rivojlanish ijobiy.\n\nManba: CoinGlass, SoSoValue, CoinDesk, Binance, CoinGecko",
+    "url": "https://crypto-economy.com/crypto-news-today/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-11-19",
+    "image": "https://img.etimg.com/thumb/msid-135893342,width-1200,height-900,imgsize-80060,overlay-etmarkets/articleshow.jpg"
+  }
+]
