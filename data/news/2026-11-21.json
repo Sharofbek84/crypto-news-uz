@@ -1,1 +1,22 @@
-See full content below - but tool requires string
+[
+  {
+    "slug": "bitcoin-59000-etf-outflow-liquidation-2026-11-21",
+    "title": "Bitcoin 59 000 dollar ostiga tushdi, ETF chiqimlari va liquidatsiyalar rekord",
+    "summary": "Bitcoin so‘nggi 24 soatda 59 000 dollar atrofida savdo qilmoqda, iyuldan beri eng past daraja. Spot ETF lari bir kunda 582 million dollar chiqim qildi, noyabrda jami 3,5 milliard. CoinGlass bo‘yicha liquidatsiyalar 1 milliard dollardan oshdi.",
+    "body": "Bitcoin 21 noyabr kuni ertalab 58 800–59 300 dollar oralig‘ida savdo qilmoqda, so‘nggi 24 soatda 5–6 foiz pasaygan. CoinDesk va CryptoSlate ma’lumotlariga ko‘ra, narx 57 800 dollar yaqinidagi yozgi pastlikka yaqinlashdi. Umumiy market capitalization 2,04–2,12 trillion dollarga tushdi, Fear & Greed indeksi extreme fear zonada qolmoqda.\n\nSoSoValue va Farside Investors ma’lumotlariga ko‘ra, AQSh spot Bitcoin ETF lari 19 noyabrda 582 million dollar sof chiqim qildi. BlackRock IBIT bir o‘zi 541 million dollar chiqim qildi, bu fondning rekordi. Noyabr oyidagi jami chiqimlar 3,5 milliard dollarga yetdi. Bu institutsional talabning keskin zaiflashganini ko‘rsatadi.\n\nCoinGlass bo‘yicha so‘nggi 24 soatda crypto liquidatsiyalar 1–1,6 milliard dollarga yetdi, 85–90 foizi long pozitsiyalar. Bitcoin o‘zi 200–540 million dollar atrofida liquidatsiya qilindi. 150–260 ming trader zarar ko‘rdi. Fed foiz oshirish ehtimoli va AI aksiyalari (Anthropic IPO dan keyin tushish) asosiy bosim manbai.\n\nMakroiqtisodiy omillar hukmronlik qilmoqda: Treasury yield oshishi va risk-off kayfiyat. Glassnode va boshqa tahlilchilar BTC ni texnologik aksiyalar kabi leverage qilingan deb baholamoqda.\n\nQisqa prognoz: BTC 57 500–62 000 dollar oralig‘ida tebranishi mumkin. Chiqimlar sekinlashsa va Fed signallari yumshasa, 63 000 tomon rebound. Aks holda 57 700 yozgi pastlik sinovi ehtimoli yuqori. Oversold holat, lekin ehtiyotkorlik kerak.\n\nManba: CoinDesk, SoSoValue, Farside Investors, CoinGlass, CryptoSlate",
+    "url": "https://www.coindesk.com/markets/2026/11/20/bitcoin-plunges-below-usd59-000-as-rush-to-cash-puts-new-bear-market-lows-back-in-play",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-11-21",
+    "image": "https://cdn.sanity.io/images/s3y3vcno/production/13d74c4c3feaf7c1066344227101358a75134c19-1520x856.png?auto=format&fit=crop&crop=focalpoint&w=1200&h=675&q=75"
+  },
+  {
+    "slug": "ethereum-1620-etf-outflow-liquidation-2026-11-21",
+    "title": "Ethereum 1 620 dollar atrofida, ETF chiqimlari va liquidatsiya bosimi",
+    "summary": "ETH so‘nggi 24 soatda 1 620 dollar atrofida, 7–8 foiz pasaygan. Spot ETF lari chiqim qilishda davom etmoqda. CoinGlass bo‘yicha Ethereum liquidatsiyalari yuzlab million dollarga yetdi.",
+    "body": "Ethereum 21 noyabr kuni 1 600–1 650 dollar oralig‘ida savdo qilmoqda. CoinMarketCap va Crypto Briefing ma’lumotlariga ko‘ra, narx 1 620 atrofida, 24 soatda sezilarli pasayish. Umumiy bozor ta’siri ostida, lekin alohida signalar ham bor.\n\nSoSoValue ma’lumotlariga ko‘ra, spot Ethereum ETF lari ketma-ket chiqim qilmoqda, 19 noyabrda yuz millionlab dollar. BlackRock ETHA asosiy chiqim manbai. Bu investorlar riskdan qochayotganini tasdiqlaydi. Open interest 11 foizgacha tushgan, funding rate salbiy.\n\nCoinGlass bo‘yicha ETH liquidatsiyalari 120–330 million dollar atrofida, asosan longlar. Eng katta single liquidation Binance ETHUSDT da millionlab dollar. Gas fee past, tarmoq barqaror, lekin narx fundamentalsdan ortda qolmoqda.\n\nDeFi va staking faolligi saqlanib qolgan. Whale lar ba’zi joylarda yig‘ish belgilari ko‘rsatmoqda, lekin umumiy kayfiyat bearish. Makroiqtisodiy omillar va risk-off kayfiyat hukmronlik qilmoqda.\n\nQisqa prognoz: ETH 1 550–1 700 dollar oralig‘ida. Bitcoin barqarorlashsa, ETH ergashadi. ETF oqimlari ijobiy tomonga o‘tsa, 1 750 dollar. Aks holda 1 500 sinovi. Uzoq muddatli rivojlanish ijobiy, lekin qisqa muddatda ehtiyotkorlik.\n\nManba: CoinDesk, SoSoValue, CoinGlass, Crypto Briefing, CoinMarketCap",
+    "url": "https://cryptobriefing.com/crypto-liquidations-bitcoin-decline/",
+    "source": "GOLDENWEB.UZ",
+    "date": "2026-11-21",
+    "image": "https://static.cryptobriefing.com/wp-content/uploads/2026/11/20110759/Crypto-liquidations-surge-past-1.9-billion-as-Bitcoin-nears-63000-1-800x420.jpg"
+  }
+]
